@@ -98,6 +98,16 @@ function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.
 $('#product-menu-toggle').addEventListener('click',()=>$('#product-menu').hidden?openProductMenu(new URLSearchParams(location.search).get('kategori')):closeProductMenu());
 $('#product-menu').addEventListener('click',event=>{const group=event.target.closest('[data-menu-group]');if(group){event.stopPropagation();openProductMenu(group.dataset.menuGroup);}});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#product-menu').hidden){closeProductMenu();$('#product-menu-toggle').focus();}});
+document.addEventListener('pointerdown',event=>{
+ if(event.button!==0)return;
+ const interactive=event.target.closest('a,button,[role="button"],summary,.pf-placement-card,.pf-quantity-tier,.swatches label');
+ if(!interactive||interactive.matches(':disabled,[aria-disabled="true"]'))return;
+ const target=interactive.closest('.category-tile,.product-card,.pf-placement-card,.pf-quantity-tier')||interactive;
+ target.classList.remove('click-confirmed');
+ void target.offsetWidth;
+ target.classList.add('click-confirmed');
+ window.setTimeout(()=>target.classList.remove('click-confirmed'),360);
+},{capture:true});
 document.addEventListener('click',event=>{if(!$('#product-menu').hidden&&!event.target.closest('#product-menu, #product-menu-toggle'))closeProductMenu();});
 document.addEventListener('click',async e=>{const link=e.target.closest('a');if(link&&link.origin===location.origin&&!link.hash&&!link.download&&!e.metaKey&&!e.ctrlKey&&!e.shiftKey&&e.button===0){e.preventDefault();nav(link.pathname+link.search,{scrollTop:Boolean(link.closest('.pf-pagination'))});return;}const remove=e.target.closest('[data-remove]');if(remove){const item=cart.find(l=>l.id===remove.dataset.remove);const previous=cart;cart=cart.filter(l=>l.id!==remove.dataset.remove);if(!persist()){cart=previous;return;}if(item?.logo)deleteFile(item.logo.id).catch(()=>{});render();notify('Produktet er fjernet.');}const gallery=e.target.closest('[data-gallery]');if(gallery){$('#main-image').src=gallery.dataset.gallery;$('#main-image').alt=`${activeProduct.name} — ${gallery.getAttribute('aria-label')}`;document.querySelectorAll('[data-gallery]').forEach(b=>b.setAttribute('aria-pressed',b===gallery));}const dl=e.target.closest('[data-download]');if(dl){try{const file=await loadFile(dl.dataset.download);if(!file)throw Error();downloadBlob(file,dl.dataset.filename);}catch{notify('Filen findes ikke længere i browseren. Tilføj produktet igen med logoet.');}}});
 $('#search').addEventListener('submit',e=>{e.preventDefault();const q=$('#search-input').value.trim();nav('/produkter'+(q?'?q='+encodeURIComponent(q):''));});
