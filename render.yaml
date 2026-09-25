@@ -70,6 +70,8 @@ services:
         sync: false
       - key: PF_PROOF_INBOX_TOKEN
         sync: false
+      - key: PF_ORDER_ADMIN_TOKEN
+        sync: false
       - key: PF_WEBHOOK_SIGNING_SECRET
         sync: false
       - key: SMERCH_ARTWORK_SIGNING_SECRET
