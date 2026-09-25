@@ -1149,20 +1149,22 @@ header nav a:focus-visible,
   .pf-filter-sidebar {padding: 18px; border-radius: 12px; background: #f8f4ed}
 }
 
-/* A short, positive confirmation when a clickable choice is pressed. */
+/* Quiet, premium click confirmation: a brief sage tint without movement. */
 .click-confirmed {
-  background-color: #ccefd5 !important;
-  color: #174d2b !important;
-  box-shadow: 0 0 0 4px rgba(74, 176, 104, .24) !important;
-  transform: scale(.985);
-  transition: background-color .12s ease, color .12s ease, box-shadow .12s ease, transform .12s ease !important;
+  box-shadow: inset 0 0 0 999px rgba(105, 139, 113, .1), 0 0 0 1px rgba(78, 112, 87, .16) !important;
+  transition: box-shadow .16s ease !important;
+}
+a.click-confirmed:not(.button):not(.category-tile):not(.product-image):not(.product-card) {
+  color: #58745f !important;
+  box-shadow: none !important;
+  transition: color .16s ease !important;
 }
 .product-card.click-confirmed,
 .category-tile.click-confirmed,
 .pf-placement-card.click-confirmed,
 .pf-quantity-tier.click-confirmed {
-  border-color: #58ad70 !important;
+  border-color: rgba(78, 112, 87, .32) !important;
 }
 @media (prefers-reduced-motion: reduce) {
-  .click-confirmed {transform: none;transition: none !important}
+  .click-confirmed {transition: none !important}
 }
