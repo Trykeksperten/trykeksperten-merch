@@ -1148,23 +1148,3 @@ header nav a:focus-visible,
   .pf-subcategory-sections section:last-child {border: 1px solid #ddd6cc}
   .pf-filter-sidebar {padding: 18px; border-radius: 12px; background: #f8f4ed}
 }
-
-/* Quiet, premium click confirmation: a brief sage tint without movement. */
-.click-confirmed {
-  box-shadow: inset 0 0 0 999px rgba(105, 139, 113, .1), 0 0 0 1px rgba(78, 112, 87, .16) !important;
-  transition: box-shadow .16s ease !important;
-}
-a.click-confirmed:not(.button):not(.category-tile):not(.product-image):not(.product-card) {
-  color: #58745f !important;
-  box-shadow: none !important;
-  transition: color .16s ease !important;
-}
-.product-card.click-confirmed,
-.category-tile.click-confirmed,
-.pf-placement-card.click-confirmed,
-.pf-quantity-tier.click-confirmed {
-  border-color: rgba(78, 112, 87, .32) !important;
-}
-@media (prefers-reduced-motion: reduce) {
-  .click-confirmed {transition: none !important}
-}
