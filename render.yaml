@@ -1,0 +1,86 @@
+services:
+  - type: web
+    name: smerch-api
+    runtime: node
+    region: frankfurt
+    plan: starter
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    disk:
+      name: smerch-data
+      mountPath: /var/data
+      sizeGB: 10
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: SMERCH_DATA_DIR
+        value: /var/data
+      - key: SMERCH_PUBLIC_BASE_URL
+        value: https://api.smerch.dk
+      - key: PF_GATEWAY_MODE
+        value: test
+      - key: PF_PRICE_SYNC_INTERVAL_MINUTES
+        value: "60"
+      - key: PF_GOODS_MARKUP_PERCENT
+        value: "100"
+      - key: PF_PRINT_MARKUP_PERCENT
+        value: "100"
+      - key: PF_SETUP_MARKUP_PERCENT
+        value: "50"
+      - key: PF_HEADWEAR_GOODS_MARKUP_PERCENT
+        value: "112.5"
+      - key: PAYMENT_PROVIDER
+        value: quickpay
+      - key: PF_GATEWAY_LIVE_ENABLED
+        value: "0"
+      - key: PF_AUTO_SUBMIT_ENABLED
+        value: "0"
+      - key: PF_PROOF_DELIVERY_CONFIRMED
+        value: "0"
+      - key: PF_WHITE_LABEL_CONFIRMED
+        value: "0"
+      - key: QUICKPAY_MODE
+        value: test
+      - key: QUICKPAY_PAYMENT_METHODS
+        value: mobilepay,apple-pay,creditcard
+      - key: QUICKPAY_LIVE_ENABLED
+        value: "0"
+      - key: QUICKPAY_CAPTURE_ENABLED
+        value: "0"
+      - key: PF_GATEWAY_USERNAME
+        sync: false
+      - key: PF_GATEWAY_TEST_PASSWORD
+        sync: false
+      - key: PF_GATEWAY_PROD_PASSWORD
+        sync: false
+      - key: PF_GATEWAY_SENDER_ID
+        sync: false
+      - key: PF_PRICE_FEED_URL
+        sync: false
+      - key: PF_PRINT_PRICE_FEED_URL
+        sync: false
+      - key: PF_STOCK_FEED_URL
+        sync: false
+      - key: PF_COMMUNICATION_EMAIL
+        value: korrektur@smerch.dk
+      - key: PF_CALLBACK_USERNAME
+        sync: false
+      - key: PF_CALLBACK_PASSWORD
+        sync: false
+      - key: PF_PROOF_INBOX_TOKEN
+        sync: false
+      - key: PF_WEBHOOK_SIGNING_SECRET
+        sync: false
+      - key: SMERCH_ARTWORK_SIGNING_SECRET
+        sync: false
+      - key: SMERCH_PMS_COLOR_MAP
+        sync: false
+      - key: SMERCH_ADMIN_USERNAME
+        sync: false
+      - key: SMERCH_ADMIN_PASSWORD_HASH
+        sync: false
+      - key: QUICKPAY_API_KEY
+        sync: false
+      - key: QUICKPAY_PRIVATE_KEY
+        sync: false

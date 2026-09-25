@@ -1,1 +1,13 @@
 .DS_Store
+
+.env
+.env.*
+!.env.example
+node_modules/
+
+.private/
+
+# Store trykklare rollup-filer bliver på den lokale arbejdsstation og skal ikke
+# bygges eller distribueres sammen med webshoppen.
+dist/assets/rollup/
+dist/assets/**/*.zip
