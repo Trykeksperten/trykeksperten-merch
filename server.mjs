@@ -23,7 +23,7 @@ const root=resolve(fileURLToPath(new URL('./dist/',import.meta.url)));
 const pdfRoot=resolve(fileURLToPath(new URL('./node_modules/pdfjs-dist/build/',import.meta.url)));
 const port=Number(process.env.PORT||5173);
 const host=process.env.HOST||'0.0.0.0';
-const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.webp':'image/webp'};
+const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2','.ico':'image/x-icon'};
 const placementCache=new Map();
 const placementArtCache=new Map();
 async function readJSON(req,limit=1024*1024){if(!String(req.headers['content-type']||'').startsWith('application/json'))throw Error('JSON kræves.');const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>limit)throw Error('Anmodningen er for stor.');chunks.push(chunk);}return JSON.parse(Buffer.concat(chunks).toString());}
@@ -159,7 +159,8 @@ const handleRequest=async(req,res)=>{
  const isPage=/^\/design\/pf-[a-z0-9]+$/i.test(path)||path==='/'||path==='/produkter'||path==='/brands'||path==='/specialproduktion'||path==='/demokurv'||path==='/kurv'||path==='/betaling'||path==='/ordre'||path==='/kontakt'||path==='/gennemgang'||/^\/produkt\/[a-z0-9-]+$/.test(path);
  const file=path==='/admin'?resolve(root,'admin-dashboard.html'):path==='/admin/pf-orders'?resolve(root,'pf-orders-admin.html'):isPage?resolve(root,'index.html'):resolve(root,'.'+path);
  if(!file.startsWith(root+sep)||!types[extname(file)]){res.writeHead(404).end('Siden findes ikke');return;}
- const data=await readFile(file);res.writeHead(200,{'Content-Type':types[extname(file)]}).end(req.method==='HEAD'?undefined:data);
+ const data=await readFile(file),extension=extname(file),cacheControl=['.html','.css','.mjs','.js'].includes(extension)?'no-cache':'public, max-age=604800, stale-while-revalidate=86400';
+ res.writeHead(200,{'Content-Type':types[extension],'Cache-Control':cacheControl,'Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);
  }catch{res.writeHead(404).end('Siden findes ikke');}
 };
 const server=createServer(handleRequest);
