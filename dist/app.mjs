@@ -1,6 +1,6 @@
-import {pfCartPage,bindCart,updateCartHeader} from './pf-cart.mjs';
-import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs';
-import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=7';
+import {pfCartPage,bindCart,updateCartHeader} from './pf-cart.mjs?v=11';
+import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs?v=11';
+import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=11';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from './pf-visibility.mjs';
 import {productGroups,groupSections,productGroupURL} from './product-groups.mjs';
 import { specialPage, bindSpecial } from './special.mjs';
