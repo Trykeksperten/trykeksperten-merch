@@ -128,7 +128,7 @@ const handleRequest=async(req,res)=>{
    let bounds=placementCache.get(url.href);
    if(!bounds){const response=await fetch(url,{redirect:'error',signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error();const length=Number(response.headers.get('content-length')||0);if(length>8*1024*1024)throw Error();const svg=await response.text();if(svg.length>8*1024*1024)throw Error();bounds=parsePFPlacementSVG(svg);placementCache.set(url.href,bounds);while(placementCache.size>500)placementCache.delete(placementCache.keys().next().value);}
    res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(JSON.stringify(bounds));
-  }catch{res.writeHead(404,{'Content-Type':'application/json; charset=utf-8'}).end(JSON.stringify({error:'PF-trykfladen kunne ikke aflæses.'}));}return;
+  }catch{res.writeHead(404,{'Content-Type':'application/json; charset=utf-8'}).end(JSON.stringify({error:'Trykfladen kunne ikke aflæses.'}));}return;
  }
  if(req.url?.startsWith('/api/pf-placement-art?')&&req.method==='GET'){
   try{

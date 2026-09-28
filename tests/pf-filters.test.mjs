@@ -8,7 +8,7 @@ test('PF product facets use only priced variants and combine within a subcategor
   {id:'plain',name:'Enkeltvægget flaske',brand:'Brand B',brandId:'b',modelCode:'2',shopCategory:'flasker',category:'Vandflasker',insulation:'no',variants:[{sku:'C',color:'Rød',methods:['Tampontryk'],discontinued:false}]},
   {id:'cup',name:'Isoleret krus',brand:'Brand A',brandId:'a',modelCode:'3',shopCategory:'flasker',category:'Krus',insulation:'yes',variants:[{sku:'D',color:'Kongeblå',methods:['Gravering'],discontinued:false}]}
  ];
- const prices={available:true,products:{cold:{fromIncVat:12000},plain:{fromIncVat:4000},cup:{fromIncVat:12000}},skus:{A:true,C:true,D:true}};
+ const prices={available:true,products:{cold:{fromIncVat:12000,fromQuantity:1},plain:{fromIncVat:4000,fromQuantity:1},cup:{fromIncVat:12000,fromQuantity:1}},skus:{A:true,C:true,D:true},skuMinimums:{A:1,C:1,D:1}};
  assert.deepEqual(productColors(products[0],prices),['Blå']);
  assert.deepEqual(productMethods(products[0],prices),['Gravering']);
  const params=new URLSearchParams('kategori=flasker&underkategori=Vandflasker&farve=Blå&isolering=yes&tryk=Gravering&pris=100-250');

@@ -1,16 +1,16 @@
-// Products stay in the supplier catalog. Unpriced Citizen Green launches are
-// previewed, while other unpriced products remain unpublished.
+// Products stay in the supplier catalog, while the public shop initially shows
+// only products and variants that can be ordered from one piece.
 
 export function isShopProduct(product, priceData) {
- return Boolean(priceData?.available && (priceData.products?.[product.id] || priceData.quoteOnlyIds?.includes(product.id) || priceData.comingSoonIds?.includes(product.id)));
+ return Boolean(priceData?.available && priceData.products?.[product.id]?.fromQuantity===1 && pricedVariants(product,priceData).length);
 }
 
 export function isQuoteOnlyProduct(product, priceData) {
- return isShopProduct(product, priceData) && !priceData.products?.[product.id] && !isComingSoonProduct(product, priceData);
+ return false;
 }
 
 export function isComingSoonProduct(product, priceData) {
- return Boolean(priceData?.available && !priceData.products?.[product.id] && priceData.comingSoonIds?.includes(product.id));
+ return false;
 }
 
 export function shopProducts(catalog, priceData) {
@@ -19,5 +19,5 @@ export function shopProducts(catalog, priceData) {
 
 export function pricedVariants(product, priceData) {
  if (!priceData?.available) return [];
- return product.variants.filter(variant => !variant.discontinued && Boolean(priceData.skus?.[variant.sku]));
+ return product.variants.filter(variant => !variant.discontinued && Boolean(priceData.skus?.[variant.sku]) && (priceData.skuMinimums?priceData.skuMinimums[variant.sku]===1:priceData.products?.[product.id]?.fromQuantity===1));
 }

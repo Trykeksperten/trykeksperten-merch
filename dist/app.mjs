@@ -1,6 +1,6 @@
-import {pfCartPage,bindCart,updateCartHeader} from './pf-cart.mjs?v=11';
+import {pfCartPage,bindCart,updateCartHeader,readCart as readLiveCart,writeCart as writeLiveCart} from './pf-cart.mjs?v=12';
 import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs?v=11';
-import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=11';
+import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=12';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from './pf-visibility.mjs';
 import {productGroups,groupSections,productGroupURL} from './product-groups.mjs';
 import { specialPage, bindSpecial } from './special.mjs';
@@ -22,7 +22,7 @@ function visibleBrands(){if(!pfCatalog)return catalog.brands||[];const ids=new S
 function liveProductImage(product){return pricedVariants(product,pfPrices).find(variant=>variant.images?.[0])?.images[0];}
 function homeCategoryTiles(){
  const products=shopProducts(pfCatalog,pfPrices).filter(product=>pfPrices?.products?.[product.id]&&liveProductImage(product));
- const categories=[{id:'toj',name:'Tøj og tekstiler',modelCode:'38235',category:'Hættetrøjer'},{id:'tasker',name:'Tasker',modelCode:'120632',category:'Rygsække'},{id:'flasker',name:'Flasker og krus',modelCode:'100798',category:'Vandflasker'}];
+ const categories=productGroups.filter(group=>products.some(product=>product.shopCategory===group.id)).slice(0,3).map(group=>({id:group.id,name:group.name}));
  const tiles=categories.map(item=>{
   const matches=products.filter(product=>product.shopCategory===item.id);
   const product=matches.find(candidate=>candidate.modelCode===item.modelCode)||matches.find(candidate=>candidate.category===item.category)||matches[0];
@@ -32,7 +32,8 @@ function homeCategoryTiles(){
  return tiles;
 }
 function homeFeaturedProducts(){
- return shopProducts(pfCatalog,pfPrices).filter(product=>pfPrices?.products?.[product.id]&&liveProductImage(product)&&['thule','stanley-1913','moleskine','hydro-flask'].includes(product.brandId)).filter((product,index,all)=>all.findIndex(candidate=>candidate.brandId===product.brandId)===index).map(product=>`<article class="product-card"><a class="product-image" href="/design/${product.id}"><img src="${esc(liveProductImage(product))}" alt="${esc(product.name)}" loading="lazy" decoding="async" width="700" height="700"></a><p class="card-meta">${esc(product.brand)}</p><a class="product-title" href="/design/${product.id}">${esc(product.name)}</a></article>`).join('');
+ const products=shopProducts(pfCatalog,pfPrices).filter(product=>pfPrices?.products?.[product.id]&&liveProductImage(product)),premium=products.filter(product=>['thule','stanley-1913','moleskine','hydro-flask'].includes(product.brandId)).filter((product,index,all)=>all.findIndex(candidate=>candidate.brandId===product.brandId)===index),featured=premium.length?premium:products.slice(0,4);
+ return featured.map(product=>`<article class="product-card"><a class="product-image" href="/design/${product.id}"><img src="${esc(liveProductImage(product))}" alt="${esc(product.name)}" loading="lazy" decoding="async" width="700" height="700"></a><p class="card-meta">${esc(product.brand)}</p><a class="product-title" href="/design/${product.id}">${esc(product.name)}</a></article>`).join('');
 }
 function closeProductMenu(){const menu=$('#product-menu'),toggle=$('#product-menu-toggle');menu.hidden=true;toggle.setAttribute('aria-expanded','false');}
 function openProductMenu(groupId){
@@ -68,7 +69,7 @@ function render(){if(!catalog)return;closeProductMenu();if(previewURL){URL.revok
 function setGallery(){const images=activeProduct.colors.find(c=>c.name===draft.color).images;if(!images.length)return;$('#main-image').src=images[0];$('#main-image').alt=`${activeProduct.name} — ${draft.color}`;$('#thumbnails').innerHTML=images.map((src,i)=>`<button type="button" data-gallery="${src}" aria-label="Vis ${i===0?'forside':'bagside'}" aria-pressed="${i===0}"><img src="${src}" alt="${i===0?'Forside':'Bagside'}" width="80" height="90"></button>`).join('');}
 function readDraft(){const form=$('#configure');for(const s of activeProduct.sizes)draft.quantities[s]=Number(form.elements[`qty-${s}`].value);draft.color=form.elements.color.value;draft.method=form.elements.method.value;draft.position=form.elements.position.value;draft.notes=form.elements.notes.value;for(const name of Object.keys(activeProduct.options||{}))draft.options[name]=form.elements[`option-${name}`].value;}
 function updateConfig(){readDraft();$('#config-summary').innerHTML=breakdown(activeProduct,draft);$('#selected-color').textContent=draft.color;}
-const customerCopy=value=>String(value).replaceAll('PF CONCEPT · ','SMERCH · ').replaceAll('PF Concept-produkter · ','').replaceAll('PF Concepts','leverandørens').replaceAll('PF Concept','leverandøren').replaceAll('PF’s','leverandørens').replace('Produkter og trykvalg fra leverandøren ·','Produkter og trykvalg ·').replace('Produkterne er hentet fra leverandøren.','Produkterne er udvalgt til vores sortiment.').replaceAll('leverandørens trykmuligheder','trykmuligheder').replaceAll('leverandørens placeringsbillede','Placeringsbillede').replaceAll('Placeringen ses på leverandørens billede ovenfor.','Placeringen ses på billedet ovenfor.').replaceAll('leverandøren:','Trykplacering:').replaceAll('leverandørens trykmål og korrektur styrer produktionen.','De angivne trykmål og den endelige korrektur styrer produktionen.').replace(/(\d+) produkter fra (\d+) brands\./,'$1 produkter i vores udvalg · $2 brands.');
+const customerCopy=value=>String(value).replaceAll('PF CONCEPT · ','SMERCH · ').replaceAll('PF Concept-produkter · ','').replaceAll('PF Concepts','leverandørens').replaceAll('PF Concept','leverandøren').replaceAll('PF’s','leverandørens').replaceAll('PFs','leverandørens').replace(/\bPF\b/g,'leverandøren').replace('Produkter og trykvalg fra leverandøren ·','Produkter og trykvalg ·').replace('Produkterne er hentet fra leverandøren.','Produkterne er udvalgt til vores sortiment.').replaceAll('leverandørens trykmuligheder','trykmuligheder').replaceAll('leverandørens placeringsbillede','Placeringsbillede').replaceAll('Placeringen ses på leverandørens billede ovenfor.','Placeringen ses på billedet ovenfor.').replaceAll('leverandøren:','Trykplacering:').replaceAll('leverandørens trykmål og korrektur styrer produktionen.','De angivne trykmål og den endelige korrektur styrer produktionen.').replace(/(\d+) produkter fra (\d+) brands\./,'$1 produkter i vores udvalg · $2 brands.');
 function scrubCustomerCopy(root=document){
  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;while((node=walker.nextNode())){const clean=customerCopy(node.nodeValue);if(clean!==node.nodeValue)node.nodeValue=clean;}
  const elements=root.nodeType===Node.ELEMENT_NODE?[root,...root.querySelectorAll('*')]:[...root.querySelectorAll?.('*')||[]];
@@ -105,7 +106,8 @@ $('.menu-toggle').addEventListener('click',()=>{const open=$('#navigation').clas
 window.addEventListener('popstate',render);
 window.addEventListener('pf-cart-change',updateCartHeader);
 window.addEventListener('storage',()=>{updateCartHeader();if(location.pathname==='/kurv')render();});
-pfCatalog=await fetch('/api/pf-catalog').then(r=>{if(!r.ok)throw Error('PF-katalog mangler');return r.json();}).catch(()=>null);
-pfPrices=await fetch('/api/pf-product-prices').then(r=>{if(!r.ok)throw Error('PF-priser mangler');return r.json();}).catch(()=>({available:false,products:{},skus:{},message:'Priserne kan ikke vises lige nu.'}));
+pfCatalog=await fetch('/api/pf-catalog').then(r=>{if(!r.ok)throw Error('Produktkataloget mangler');return r.json();}).catch(()=>null);
+pfPrices=await fetch('/api/pf-product-prices').then(r=>{if(!r.ok)throw Error('Priserne mangler');return r.json();}).catch(()=>({available:false,products:{},skus:{},skuMinimums:{},message:'Priserne kan ikke vises lige nu.'}));
+if(pfCatalog&&pfPrices?.available){const allowedProducts=new Map(shopProducts(pfCatalog,pfPrices).map(product=>[product.id,new Set(pricedVariants(product,pfPrices).map(variant=>variant.sku))])),lines=readLiveCart(),visible=lines.filter(line=>allowedProducts.get(line.productId)?.has(line.sku));if(visible.length!==lines.length)writeLiveCart(visible);}
 setInterval(async()=>{try{const response=await fetch('/api/pf-product-prices');if(!response.ok)return;const next=await response.json();if(!next.available)return;const previous=pfPrices;const changed=!previous?.available||previous.productDate!==next.productDate||JSON.stringify(previous.comingSoonIds)!==JSON.stringify(next.comingSoonIds);pfPrices=next;if(changed&&(location.pathname==='/produkter'||location.pathname==='/brands'||location.pathname==='/'||(location.pathname.startsWith('/design/')&&!document.querySelector('.pf-studio'))))render();}catch{}},5*60_000);
 try{const response=await fetch('/api/catalog');if(!response.ok)throw Error();catalog=await response.json();const restored=cart.filter(l=>l.quantities&&typeof l.quantities==='object'&&!validateLine(catalog.products.find(p=>p.id===l.productId),l));if(restored.length!==cart.length){cart=restored;persist();notify('Ugyldige eller udgåede demoprodukter er fjernet fra kurven.');}render();}catch{$('#main').innerHTML='<div class="wrap empty"><h1>Kataloget kunne ikke indlæses.</h1><p>Kontrollér, at den lokale server kører, og genindlæs siden.</p><button onclick="location.reload()" class="button">Prøv igen</button></div>';}
