@@ -66,6 +66,18 @@ services:
         sync: false
       - key: PF_COMMUNICATION_EMAIL
         value: korrektur@smerch.dk
+      - key: CONTACT_SMTP_HOST
+        value: send.one.com
+      - key: CONTACT_SMTP_PORT
+        value: "465"
+      - key: CONTACT_SMTP_SECURE
+        value: "1"
+      - key: CONTACT_SMTP_USER
+        value: hello@smerch.dk
+      - key: CONTACT_SMTP_PASSWORD
+        sync: false
+      - key: CONTACT_TO_EMAIL
+        value: hello@smerch.dk
       - key: PF_CALLBACK_USERNAME
         sync: false
       - key: PF_CALLBACK_PASSWORD

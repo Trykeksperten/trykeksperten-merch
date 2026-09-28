@@ -15,6 +15,7 @@
     "node": ">=20.12"
   },
   "dependencies": {
+    "nodemailer": "^7.0.13",
     "pdfjs-dist": "^6.3.289"
   }
 }

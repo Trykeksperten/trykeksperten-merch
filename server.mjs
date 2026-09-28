@@ -8,6 +8,7 @@ import {verifyPFRelaySignature} from './lib/webhook-signing.mjs';
 import {applyQuickpayCallback,cancelQuickpay,createQuickpayLink,renewQuickpay,verifyQuickpayCallback} from './lib/quickpay.mjs';
 import {captureApprovedCheckout,handoffAuthorizedCheckout,handoffConfiguration,pfAssetsForGroup,setPFColours,validateRenewal} from './lib/order-flow.mjs';
 import {generatePreview} from './lib/ai-preview.mjs';
+import {contactConfiguration,sanitizeContact,sendContact} from './lib/contact.mjs';
 import {loadEnvFile} from 'node:process';
 try{loadEnvFile();}catch(error){if(error.code!=='ENOENT')throw error;}
 import { createServer } from 'node:http';
@@ -26,9 +27,11 @@ const host=process.env.HOST||'0.0.0.0';
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2','.ico':'image/x-icon'};
 const placementCache=new Map();
 const placementArtCache=new Map();
+const contactAttempts=new Map();
 async function readJSON(req,limit=1024*1024){if(!String(req.headers['content-type']||'').startsWith('application/json'))throw Error('JSON kræves.');const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>limit)throw Error('Anmodningen er for stor.');chunks.push(chunk);}return JSON.parse(Buffer.concat(chunks).toString());}
 async function readPFRelayJSON(req,limit=1024*1024){if(!String(req.headers['content-type']||'').startsWith('application/json'))throw Error('JSON kræves.');const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>limit)throw Error('Anmodningen er for stor.');chunks.push(chunk);}const raw=Buffer.concat(chunks),secret=process.env.PF_WEBHOOK_SIGNING_SECRET;if((secret||process.env.PF_GATEWAY_MODE==='live')&&!verifyPFRelaySignature(raw,req.headers,secret))throw Error('PF-relæets signatur mangler eller er ugyldig.');return JSON.parse(raw.toString());}
 function json(res,status,value){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'}).end(JSON.stringify(value));}
+function contactAllowed(req,now=Date.now()){const key=String(req.headers['x-forwarded-for']||req.socket.remoteAddress||'unknown').split(',')[0].trim(),recent=(contactAttempts.get(key)||[]).filter(time=>now-time<10*60_000);if(recent.length>=5){contactAttempts.set(key,recent);return false;}recent.push(now);contactAttempts.set(key,recent);return true;}
 async function quoteOnlyProductIds(catalog,priceResult){
  try{const config=JSON.parse(await readFile(new URL('./data/pf-quote-only.json',import.meta.url),'utf8'));
   const known=new Set(catalog.products.map(product=>product.id));
@@ -39,6 +42,13 @@ const handleRequest=async(req,res)=>{
  res.setHeader('X-Content-Type-Options','nosniff');
  res.setHeader('Cache-Control','no-store');
  if(req.url==='/health'&&['GET','HEAD'].includes(req.method)){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify({status:'ok'}));return;}
+ if(req.url==='/api/contact/status'&&req.method==='GET'){json(res,200,{ready:contactConfiguration().ready,email:'hello@smerch.dk'});return;}
+ if(req.url==='/api/contact'&&req.method==='POST'){
+  const expectedHost=req.headers.host,origin=req.headers.origin;let validOrigin=false;try{validOrigin=new URL(origin).host===expectedHost;}catch{}
+  if(!validOrigin){json(res,403,{error:'Ugyldig oprindelse.'});return;}
+  if(!contactAllowed(req)){json(res,429,{error:'Der er sendt for mange beskeder. Prøv igen om lidt.'});return;}
+  try{const inquiry=sanitizeContact(await readJSON(req,16*1024));if(inquiry.website){json(res,201,{sent:true});return;}await sendContact(inquiry);json(res,201,{sent:true});}catch(error){const unavailable=/ikke færdigkonfigureret/.test(error.message);json(res,unavailable?503:400,{error:unavailable?'Mailforbindelsen er ved at blive gjort klar. Skriv direkte til hello@smerch.dk indtil da.':error.message||'Beskeden kunne ikke sendes.'});}return;
+ }
  if(req.url==='/api/checkout/status'&&req.method==='GET'){json(res,200,checkoutConfiguration());return;}
  if(req.url==='/api/checkout/fulfillment'&&req.method==='POST'){try{const input=await readJSON(req),lines=input.lines;if(!Array.isArray(lines)||lines.length>20)throw Error();const catalog=await loadProductCatalog(lines.map(line=>line.productId));json(res,200,checkoutFulfillmentAssessment(catalog,lines,checkoutConfiguration().freightByLocation));}catch{json(res,400,{error:'Forsendelserne kunne ikke vurderes.'});}return;}
  if(req.url==='/api/checkout/session'&&req.method==='POST'){
