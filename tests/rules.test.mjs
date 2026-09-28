@@ -15,8 +15,8 @@ test('reject invalid quantities, colour, print and size combinations',()=>{
  assert.equal(validateLine(tee,{...line,quantities:{S:10,M:15}}),null);
 });
 test('unknown product prices must never produce a zero subtotal',()=>{
- const p=products.find(p=>p.id==='flyer');const l={color:'Fuld farve',quantities:{Standard:100},method:'digital',position:'Forside',options:{Format:'A5',Papir:'170 g bestrøget',Efterbehandling:'Ingen'}};
- assert.equal(quoteLine(p,l).subtotal,null);assert.ok(validateLine(p,{...l,options:{...l.options,Format:'A0'}}));
+ const p=products.find(p=>p.id==='event-kit');const l={color:'Efter aftale',quantities:{Standard:25},method:'custom',position:'Efter aftale',options:{}};
+ assert.equal(quoteLine(p,l).subtotal,null);assert.ok(validateLine(p,{...l,color:'Ukendt'}));
 });
 test('combined URL filters and price sorting',()=>{
  assert.deepEqual(filterProducts(products,new URLSearchParams('kategori=toj&farve=Hvid&materiale=Bomuld')).map(p=>p.id),['classic-tee']);
