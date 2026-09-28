@@ -3,7 +3,7 @@ services:
     name: smerch-api
     runtime: node
     region: frankfurt
-    plan: starter
+    plan: 0.5c-512mb
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /health
