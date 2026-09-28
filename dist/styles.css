@@ -786,6 +786,69 @@ header{border-bottom-color:#d2ccc2}
  letter-spacing:0;
 }
 
+/* Homepage proof points */
+.home-value-strip{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:0;
+ padding:0 max(40px,calc((100vw - 1440px)/2));
+ background:#faf7f1;
+ color:#171b19;
+ border-top:1px solid #ddd6cc;
+ border-bottom:1px solid #ddd6cc;
+ font-size:inherit;
+ font-weight:inherit;
+}
+.home-value-strip>span{
+ min-height:96px;
+ display:flex;
+ align-items:center;
+ gap:16px;
+ padding:22px clamp(18px,2.5vw,34px);
+ border-right:1px solid #ddd6cc;
+ white-space:normal;
+}
+.home-value-strip>span:last-child{border-right:0}
+.home-value-strip b{
+ flex:0 0 42px;
+ width:42px;
+ height:42px;
+ display:grid;
+ place-items:center;
+ border-radius:50%;
+ background:#cf4d22;
+ color:#fff;
+ font-size:.78rem;
+ font-weight:800;
+ letter-spacing:.04em;
+}
+.home-value-strip strong{
+ color:#171b19;
+ font-size:clamp(1rem,1.2vw,1.16rem);
+ font-weight:750;
+ line-height:1.2;
+ letter-spacing:-.025em;
+}
+
+@media(max-width:700px){
+ .home-value-strip{
+  display:grid;
+  grid-template-columns:1fr;
+  padding:0 18px;
+  overflow:visible;
+  white-space:normal;
+ }
+ .home-value-strip>span{
+  min-height:72px;
+  padding:14px 0;
+  border-right:0;
+  border-bottom:1px solid #ddd6cc;
+ }
+ .home-value-strip>span:last-child{border-bottom:0}
+ .home-value-strip b{flex-basis:36px;width:36px;height:36px;font-size:.72rem}
+ .home-value-strip strong{font-size:1rem}
+}
+
 .brand-preview,
 .home-categories,
 .home-featured,
