@@ -38,6 +38,31 @@ export async function tintArtworkPreview(file,color){
  }finally{image.close?.();}
 }
 
+const rgb=hex=>[1,3,5].map(index=>parseInt(hex.slice(index,index+2),16));
+export function recolorPixels(image,mappings=[]){
+ const colors=mappings.filter(row=>/^#[0-9a-f]{6}$/i.test(row?.source)&&/^#[0-9a-f]{6}$/i.test(row?.target)).map(row=>({...row,sourceRgb:rgb(row.source),targetRgb:rgb(row.target)}));
+ if(!colors.length)return image;
+ const output=new Uint8ClampedArray(image.data);
+ for(let index=0;index<output.length;index+=4){
+  if(output[index+3]<16)continue;
+  const current=[output[index],output[index+1],output[index+2]],nearest=colors.reduce((best,row)=>{const distance=Math.hypot(...current.map((value,channel)=>value-row.sourceRgb[channel]));return !best||distance<best.distance?{row,distance}:best;},null);
+  if(!nearest)continue;
+  nearest.row.targetRgb.forEach((value,channel)=>{output[index+channel]=value;});
+ }
+ return typeof ImageData==='function'?new ImageData(output,image.width,image.height):{data:output,width:image.width,height:image.height};
+}
+
+export async function recolorArtworkPreview(file,mappings=[]){
+ const image=await createImageBitmap(file);
+ try{
+  const canvas=window.document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;
+  const context=canvas.getContext('2d',{willReadFrequently:true});context.drawImage(image,0,0);
+  context.putImageData(recolorPixels(context.getImageData(0,0,canvas.width,canvas.height),mappings),0,0);
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+  return blob?URL.createObjectURL(blob):null;
+ }finally{image.close?.();}
+}
+
 export async function previewHasTransparency(file){
  const image=await createImageBitmap(file);
  try{

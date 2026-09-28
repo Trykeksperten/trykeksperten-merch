@@ -102,6 +102,9 @@ test('server design validation derives authoritative print data and rejects forg
  assert.equal(design.method,o.impMethod);assert.equal(design.position,o.impLocation);assert.equal(design.printCode,o.printCode);assert.equal(design.preflight.status,'review');
  const recolored={...line,decorations:[{...line.decorations[0],artworks:[{...normalized,color:'#C85127'}]}]};
  assert.equal(sanitizeDesignLine(catalog,recolored).decorations[0].artworks[0].color,'#c85127');
+ const palette={...line,decorations:[{...line.decorations[0],colors:1,artworks:[{...normalized,logo:{...normalized.logo,detectedColors:2,detectedPalette:[{hex:'#c85127',share:.5},{hex:'#17201f',share:.5}],recolorable:true},paletteColors:[{source:'#c85127',target:'#c85127'},{source:'#17201f',target:'#c85127'}]}]}]};
+ assert.equal(sanitizeDesignLine(catalog,palette).decorations[0].artworks[0].paletteColors.length,2);
+ assert.match(validateDesignLine(catalog,{...palette,decorations:[{...palette.decorations[0],artworks:[{...palette.decorations[0].artworks[0],paletteColors:undefined}]}]}),/2 farver/);
  assert.equal(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],artworks:[{...normalized,color:'red'}]}]}),'Logoets farveønske er ugyldigt.');
  assert.equal(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],width:1}]}),'Designets samlede trykmål stemmer ikke med lagene.');
  assert.ok(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],artworks:[{...normalized,x:99}]}]}));
