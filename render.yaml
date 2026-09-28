@@ -30,6 +30,8 @@ services:
         value: "50"
       - key: PF_HEADWEAR_GOODS_MARKUP_PERCENT
         value: "112.5"
+      - key: PF_MOLESKINE_GOODS_MARKUP_PERCENT
+        value: "58"
       - key: PAYMENT_PROVIDER
         value: quickpay
       - key: PF_GATEWAY_LIVE_ENABLED
