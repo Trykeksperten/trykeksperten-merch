@@ -37,7 +37,7 @@ services:
       - key: PF_AUTO_SUBMIT_ENABLED
         value: "0"
       - key: PF_PROOF_DELIVERY_CONFIRMED
-        value: "0"
+        value: "1"
       - key: PF_WHITE_LABEL_CONFIRMED
         value: "0"
       - key: QUICKPAY_MODE
