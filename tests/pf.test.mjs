@@ -124,6 +124,11 @@ test('PF text fonts, alignment and multiline spacing survive design validation',
  assert.match(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],textPlacement:{...textPlacement,font:'Comic Sans MS'}}]}),/tilladt skrifttype/);
  assert.match(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],textPlacement:{...textPlacement,rotation:270}}]}),/rotation/);
  assert.ok(group.heightMm>0);
+ const larger=normalizeTextPlacement(text,{...textPlacement,scale:.48},o),largerSize=textPrintSize(text,larger,o);
+ assert.equal(larger.scale,.48);
+ assert.ok(largerSize.widthMm>textPrintSize(text,textPlacement,o).widthMm);
+ const largerGroup=designGroupSize([],text,larger,o),largerLine={...line,decorations:[{...line.decorations[0],width:Math.round(largerGroup.widthMm*10)/10,height:Math.round(largerGroup.heightMm*10)/10,textPlacement:larger}]};
+ assert.equal(sanitizeDesignLine(catalog,largerLine).decorations[0].textPlacement.scale,.48);
 });
 
 test('rotated text fits a tall print area and remains inside its bounds',()=>{
