@@ -853,4 +853,6 @@ Flasker og krus|Bottles and mugs
 Kontor og gaver|Office and gifts
 Tøj og tekstiler|Clothing and textiles
 Sæt brandanimation på pause|Pause brand animation
+Vælg en produktgruppe|Choose a product group
+Vælg en gruppe for at se underkategorierne.|Choose a group to see its subcategories.
 `.trim().split('\n').map(line=>line.split('|')));
