@@ -1270,8 +1270,6 @@ header nav a:focus-visible,
 /* Verified company details at the bottom of every customer-facing page. */
  .footer-bottom{display:grid;grid-template-columns:1.2fr 1fr 1fr;align-items:start;gap:32px;padding-block:32px 40px;font-size:.85rem;line-height:1.65}
 .footer-bottom>div{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
-.footer-bottom .footer-meta-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#72756f;margin-bottom:9px}
-.footer-company strong{font-size:.95rem;color:#17201f;font-weight:600}
 .footer-location address{font-style:normal}
 .footer-company a{margin-top:6px;color:#17201f;text-decoration:underline;text-decoration-color:#aaa89f;text-underline-offset:4px}
 .footer-company a:hover{text-decoration-color:currentColor}
@@ -1383,3 +1381,7 @@ header nav a:focus-visible,
 
 @media(max-width:700px){.footer-bottom{grid-template-columns:1fr 1fr;gap:26px 20px;padding-block:28px 32px}.footer-service{grid-column:1/-1}}
 @media(max-width:380px){.footer-bottom{grid-template-columns:1fr}}
+
+.footer-bottom{grid-template-columns:repeat(3,minmax(0,1fr));text-align:center}
+.footer-bottom>div{align-items:center}
+@media(max-width:700px){.footer-bottom{grid-template-columns:1fr;gap:22px}}
