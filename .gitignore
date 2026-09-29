@@ -5,6 +5,10 @@
 !.env.example
 node_modules/
 
+# Lokale, flytbare sikkerhedskopier. De kan kopieres til et krypteret USB-drev,
+# men må ikke skubbes til GitHub sammen med projektet.
+Smerch-backup-*/
+
 .private/
 
 # Store trykklare rollup-filer bliver på den lokale arbejdsstation og skal ikke
