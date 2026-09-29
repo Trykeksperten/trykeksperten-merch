@@ -34,8 +34,9 @@ export function containMappedBounds(bounds,naturalWidth=0,naturalHeight=0,contai
 export function artworkPrintSize(artwork={},option={}){
  const print=optionPrintSize(option),pixelWidth=number(artwork.logo?.pixelWidth),pixelHeight=number(artwork.logo?.pixelHeight);
  const aspect=pixelWidth>0&&pixelHeight>0?pixelWidth/pixelHeight:number(artwork.aspect)||1;
- let width=Math.max(.1,print.width*clamp(artwork.scale??.34,.05,1)),height=width/aspect;
- if(height>print.height){const factor=print.height/height;width*=factor;height*=factor;}
+ const radians=clamp(artwork.rotation??0,-180,180)*Math.PI/180,cos=Math.abs(Math.cos(radians)),sin=Math.abs(Math.sin(radians));
+ const maxWidth=Math.min(print.width/Math.max(.0001,cos+sin/aspect),print.height/Math.max(.0001,sin+cos/aspect));
+ let width=maxWidth*clamp(artwork.scale??.34,.05,1),height=width/aspect;
  if(print.round){const diagonal=Math.hypot(width/print.width,height/print.height);if(diagonal>1){width/=diagonal;height/=diagonal;}}
  return {widthMm:width,heightMm:height,widthFraction:width/print.width,heightFraction:height/print.height,aspect};
 }
@@ -45,7 +46,8 @@ export function normalizeArtwork(artwork={}){
   ...artwork,
   x:clamp(artwork.x??.5,.04,.96),
   y:clamp(artwork.y??.5,.04,.96),
-  scale:clamp(artwork.scale??.34,.08,1)
+  scale:clamp(artwork.scale??.34,.08,1),
+  rotation:clamp(artwork.rotation??0,-180,180)
  };
 }
 
@@ -56,7 +58,7 @@ function normalizeCenter(x,y,halfWidth,halfHeight,round){
 }
 
 export function normalizeArtworkForOption(artwork={},option={}){
- const normalized=normalizeArtwork(artwork),size=artworkPrintSize(normalized,option),halfWidth=size.widthFraction/2,halfHeight=size.heightFraction/2;
+ const normalized=normalizeArtwork(artwork),size=rotatedTextBounds(artworkPrintSize(normalized,option),normalized.rotation,option),halfWidth=size.widthFraction/2,halfHeight=size.heightFraction/2;
  return {...normalized,...normalizeCenter(normalized.x,normalized.y,halfWidth,halfHeight,optionPrintSize(option).round)};
 }
 
@@ -86,19 +88,20 @@ export function normalizeTextPlacement(text='',placement={},option={}){
 }
 
 export function artworkGroupSize(artworks=[],option={}){
- const print=optionPrintSize(option),boxes=artworks.map(artwork=>{const art=normalizeArtworkForOption(artwork,option),size=artworkPrintSize(art,option);return {left:(art.x-size.widthFraction/2)*print.width,right:(art.x+size.widthFraction/2)*print.width,top:(art.y-size.heightFraction/2)*print.height,bottom:(art.y+size.heightFraction/2)*print.height};});
+ const print=optionPrintSize(option),boxes=artworks.map(artwork=>{const art=normalizeArtworkForOption(artwork,option),size=rotatedTextBounds(artworkPrintSize(art,option),art.rotation,option);return {left:(art.x-size.widthFraction/2)*print.width,right:(art.x+size.widthFraction/2)*print.width,top:(art.y-size.heightFraction/2)*print.height,bottom:(art.y+size.heightFraction/2)*print.height};});
  if(!boxes.length)return {widthMm:0,heightMm:0};
  return {widthMm:Math.max(...boxes.map(box=>box.right))-Math.min(...boxes.map(box=>box.left)),heightMm:Math.max(...boxes.map(box=>box.bottom))-Math.min(...boxes.map(box=>box.top))};
 }
 
 export function designGroupSize(artworks=[],text='',textPlacement={},option={}){
- const print=optionPrintSize(option),boxes=artworks.map(artwork=>{const art=normalizeArtworkForOption(artwork,option),size=artworkPrintSize(art,option);return {left:art.x-size.widthFraction/2,right:art.x+size.widthFraction/2,top:art.y-size.heightFraction/2,bottom:art.y+size.heightFraction/2};});
+ const print=optionPrintSize(option),boxes=artworks.map(artwork=>{const art=normalizeArtworkForOption(artwork,option),size=rotatedTextBounds(artworkPrintSize(art,option),art.rotation,option);return {left:art.x-size.widthFraction/2,right:art.x+size.widthFraction/2,top:art.y-size.heightFraction/2,bottom:art.y+size.heightFraction/2};});
  if(String(text).trim()){const placement=normalizeTextPlacement(text,textPlacement,option),size=textPrintSize(text,placement,option),bounds=rotatedTextBounds(size,placement.rotation,option);boxes.push({left:placement.x-bounds.widthFraction/2,right:placement.x+bounds.widthFraction/2,top:placement.y-bounds.heightFraction/2,bottom:placement.y+bounds.heightFraction/2});}
  if(!boxes.length)return {widthMm:0,heightMm:0};
  return {widthMm:(Math.max(...boxes.map(box=>box.right))-Math.min(...boxes.map(box=>box.left)))*print.width,heightMm:(Math.max(...boxes.map(box=>box.bottom))-Math.min(...boxes.map(box=>box.top)))*print.height};
 }
 
 export function artworkFitsOption(artwork={},option={},tolerance=.0001){
+ if(artwork.rotation!==undefined&&(!Number.isFinite(Number(artwork.rotation))||Math.abs(Number(artwork.rotation))>180))return false;
  if(!Number.isFinite(Number(artwork.x))||!Number.isFinite(Number(artwork.y))||!Number.isFinite(Number(artwork.scale)))return false;
  const normalized=normalizeArtworkForOption(artwork,option);
  return Math.abs(normalized.x-Number(artwork.x))<=tolerance&&Math.abs(normalized.y-Number(artwork.y))<=tolerance&&Math.abs(normalized.scale-Number(artwork.scale))<=tolerance;
@@ -107,7 +110,7 @@ export function artworkFitsOption(artwork={},option={},tolerance=.0001){
 export function validateArtworkLayers(artworks=[],option={}){
  for(const artwork of artworks){
   if(!artwork?.logo?.id)return 'En logofil mangler.';
-  const normalized=normalizeArtworkForOption(artwork,option),size=artworkPrintSize(normalized,option);
+  const normalized=normalizeArtworkForOption(artwork,option),size=rotatedTextBounds(artworkPrintSize(normalized,option),normalized.rotation,option);
   if(size.widthFraction>1.0001||size.heightFraction>1.0001)return `${artwork.logo.name||'Et logo'} er større end trykfladen.`;
   if(!artworkFitsOption(artwork,option))return `${artwork.logo.name||'Et logo'} ligger uden for trykfladen.`;
   const halfWidth=size.widthFraction/2,halfHeight=size.heightFraction/2;

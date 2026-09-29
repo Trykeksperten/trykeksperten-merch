@@ -1,3 +1,4 @@
+import {listProductDocuments,downloadProductDocument} from './lib/pf-documents.mjs';
 import {listPFPrintPrices,listPFProductPrices,listPFProductTiers,listPFStock,loadPricing,loadStock,quotePFCart} from './lib/pf-pricing.mjs';
 import {authorized,callbackAuthorized,proofInboxAuthorized,gatewayTestOrderInput,prepareOrder,dispatchOrder,readOrder,listOrders,applyPFNotification,recordProof,readProofFile,decideProof,recordApprovalDelivery,recordExternalApproval} from './lib/pf-orders.mjs';
 import {createAdminSession,adminSessionAuthorized,closeAdminSession,loginAllowed} from './lib/admin-auth.mjs';
@@ -109,6 +110,12 @@ const handleRequest=async(req,res)=>{
   try{const kind=new URL(req.url,'http://localhost').pathname.split('/').at(-1),order=await applyPFNotification(kind,await readPFRelayJSON(req));if(order.checkoutId&&order.shipment)await updateCheckout(order.checkoutId,checkout=>{checkout.shipment={...(checkout.shipment||{}),[order.id]:order.shipment};return checkout;});json(res,200,{received:true,orderId:order.id});}catch(error){json(res,400,{error:error.message||'PF-beskeden kunne ikke behandles.'});}return;
  }
  if(req.url==='/api/ai-status'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify({enabled:process.env.AI_ENABLED==='1'&&Boolean(process.env.OPENAI_API_KEY)}));return;}
+ if(req.url?.startsWith('/api/pf-documents?')&&req.method==='GET'){
+  try{const query=new URL(req.url,'http://localhost').searchParams,product=await loadPFProduct(query.get('productId')||''),id=query.get('document');
+   if(id){const file=await downloadProductDocument(product,id);res.writeHead(200,{'Content-Type':'application/pdf','Content-Disposition':`attachment; filename="${file.filename}"`,'X-Content-Type-Options':'nosniff'}).end(file.data);}
+   else{const documents=await listProductDocuments(product);json(res,200,{documents:documents.map(({id,label,kind})=>({id,label,kind,url:`/api/pf-documents?productId=${encodeURIComponent(product.id)}&document=${encodeURIComponent(id)}`}))});}
+  }catch{json(res,404,{error:'Dokumenterne kunne ikke hentes. Prøv igen senere.'});}return;
+ }
  if(req.url==='/api/pf-product-prices'&&req.method==='GET'){
   try{const catalog=await loadCatalogIndex();const {prices,rules}=await loadPricing(),result=listPFProductPrices(catalog,prices,rules);result.quoteOnlyIds=await quoteOnlyProductIds(catalog,result);result.comingSoonIds=result.available?catalog.products.filter(product=>product.brandId==='citizen-green'&&!result.products[product.id]&&product.variants.some(variant=>!variant.discontinued)).map(product=>product.id):[];res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify(result));}catch{res.writeHead(500,{'Content-Type':'application/json'}).end(JSON.stringify({available:false,message:'Priserne kunne ikke indlæses.',products:{},skus:{},quoteOnlyIds:[],comingSoonIds:[]}));}return;
  }

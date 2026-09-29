@@ -18,13 +18,13 @@ test('PDF-compatible AI files can be identified for an in-browser preview',async
 });
 test('full catalogue covers every available brand, curated additions and preserves unique SKUs',()=>{
  assert.ok(Object.keys(catalogIndex.counts).length>=40);assert.ok(Object.values(catalogIndex.counts).every(n=>n>0));
- const elevate=catalogIndex.products.filter(p=>p.brandId==='elevate'),elevateCaps=elevate.filter(p=>p.shopCategory==='caps');
+ const elevate=catalogIndex.products.filter(p=>p.brandId==='elevate'),elevateCaps=elevate.filter(p=>p.shopCategory==='toj'&&['Caps & hatte','Huer'].includes(p.category));
  assert.ok(elevate.length>=120);assert.ok(elevateCaps.length>=23);assert.ok(elevateCaps.every(p=>['Caps & hatte','Huer'].includes(p.category)));
  for(const code of ['38238','38239','39562'])assert.ok(elevate.some(p=>p.modelCode===code),`Mangler Elevate-model ${code}`);
  assert.equal(catalogIndex.products.length,Object.values(catalogIndex.counts).reduce((a,b)=>a+b,0));
  for(const code of ['120331','120711','120712','120745','120749','130154','130155','130156','106299','106378','107822','100798'])assert.ok(catalogIndex.products.some(p=>p.modelCode===code),`Mangler kurateret model ${code}`);
  for(const code of ['119179','120131','120135','120332','120695','120760','1PZ049','1PZ050'])assert.ok(catalogIndex.products.some(p=>p.modelCode===code),`Mangler vist mulepose ${code}`);
- for(const code of ['119179','120131','120135','120331','120332','120695','120711','120712','120749','120760','1PZ049','1PZ050'])assert.equal(catalogIndex.products.find(p=>p.modelCode===code)?.shopCategory,'bomuldstasker');
+ for(const code of ['119179','120131','120135','120331','120332','120695','120711','120712','120749','120760','1PZ049','1PZ050'])assert.equal(catalogIndex.products.find(p=>p.modelCode===code)?.shopCategory,'tasker');
  const variants=catalogIndex.products.flatMap(p=>p.variants);assert.ok(variants.length>=catalogIndex.products.length);assert.equal(new Set(variants.map(v=>v.sku)).size,variants.length);assert.ok(variants.every(variant=>variant.discontinued===false));
 });
 test('print dimensions, area, colour count and missing artwork are validated',()=>{
@@ -39,11 +39,11 @@ test('logo preflight approves production resolution and rejects unusable artwork
  assert.equal(logoPreflight({type:'application/pdf',widthMm:100,heightMm:50}).status,'review');
  assert.equal(logoPreflight({type:'image/svg+xml',widthMm:100,heightMm:50}).status,'review');
  assert.equal(logoPreflight({type:'application/postscript',widthMm:100,heightMm:50}).status,'review');
- assert.equal(logoPreflight({type:'application/vnd.corel-draw',widthMm:100,heightMm:50}).status,'review');
+ assert.equal(logoPreflight({type:'application/vnd.corel-draw',widthMm:100,heightMm:50}).status,'rejected');
  assert.equal(logoPreflight({hasText:true,widthMm:100,heightMm:50}).status,'approved');
 });
 test('design layers stay inside the product canvas and combine technical status',()=>{
- assert.deepEqual(normalizeArtwork({id:'a',x:-2,y:4,scale:2}),{id:'a',x:.04,y:.96,scale:1});
+ assert.deepEqual(normalizeArtwork({id:'a',x:-2,y:4,scale:2}),{id:'a',x:.04,y:.96,scale:1,rotation:0});
  assert.equal(overallArtworkPreflight([{status:'approved',checks:['ok']},{status:'review',checks:['check']}]).status,'review');
  assert.equal(overallArtworkPreflight([{status:'approved',checks:['ok']},{status:'rejected',checks:['bad']}]).status,'rejected');
  assert.equal(overallArtworkPreflight([],true).status,'approved');
@@ -54,7 +54,7 @@ test('PF coordinates define the printable zone and artwork gets physical dimensi
  assert.deepEqual(printableBounds(option,473,799),{x:279/1419,y:1164/2397,width:861/1419,height:966/2397,source:'coordinates'});
  const art={id:'logo',logo:{id:'file',name:'logo.png',pixelWidth:1200,pixelHeight:600},x:.98,y:.02,scale:.5};
  assert.deepEqual(artworkPrintSize(art,option),{widthMm:60,heightMm:30,widthFraction:.5,heightFraction:.5,aspect:2});
- assert.deepEqual(normalizeArtworkForOption(art,option),{...art,x:.75,y:.25,scale:.5});
+ assert.deepEqual(normalizeArtworkForOption(art,option),{...art,x:.75,y:.25,scale:.5,rotation:0});
  assert.deepEqual(artworkPrintSize(fitArtworkToOption(art,option),option),{widthMm:120,heightMm:60,widthFraction:1,heightFraction:1,aspect:2});
  assert.ok(validateArtworkLayers([art],option));
  assert.equal(validateArtworkLayers([normalizeArtworkForOption(art,option)],option),'');
@@ -103,7 +103,7 @@ test('server design validation derives authoritative print data and rejects forg
  assert.equal(design.method,o.impMethod);assert.equal(design.position,o.impLocation);assert.equal(design.printCode,o.printCode);assert.equal(design.preflight.status,'review');
  const recolored={...line,decorations:[{...line.decorations[0],artworks:[{...normalized,color:'#C85127'}]}]};
  assert.equal(sanitizeDesignLine(catalog,recolored).decorations[0].artworks[0].color,'#c85127');
- const palette={...line,decorations:[{...line.decorations[0],colors:1,artworks:[{...normalized,logo:{...normalized.logo,detectedColors:2,detectedPalette:[{hex:'#c85127',share:.5},{hex:'#17201f',share:.5}],recolorable:true},paletteColors:[{source:'#c85127',target:'#c85127'},{source:'#17201f',target:'#c85127'}]}]}]};
+ const palette={...line,decorations:[{...line.decorations[0],ink:'#c85127',colors:1,artworks:[{...normalized,logo:{...normalized.logo,detectedColors:2,detectedPalette:[{hex:'#c85127',share:.5},{hex:'#17201f',share:.5}],recolorable:true},paletteColors:[{source:'#c85127',target:'#c85127'},{source:'#17201f',target:'#c85127'}]}]}]};
  assert.equal(sanitizeDesignLine(catalog,palette).decorations[0].artworks[0].paletteColors.length,2);
  assert.match(validateDesignLine(catalog,{...palette,decorations:[{...palette.decorations[0],artworks:[{...palette.decorations[0].artworks[0],paletteColors:undefined}]}]}),/2 farver/);
  assert.equal(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],artworks:[{...normalized,color:'red'}]}]}),'Logoets farveønske er ugyldigt.');
@@ -111,7 +111,8 @@ test('server design validation derives authoritative print data and rejects forg
  assert.ok(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],artworks:[{...normalized,x:99}]}]}));
  assert.ok(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],artworks:[{...normalized,logo:{...normalized.logo,size:6*1024*1024}}]}]}));
  assert.ok(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],artworks:[{...normalized,logo:{...normalized.logo,pixelWidth:100001}}]}]}));
- assert.match(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],artworks:[{...normalized,logo:{...normalized.logo,name:'logo.png',type:'image/png'}}]}]}),/EPS-, CDR-, PDF- eller AI-fil/);
+ for(const [ext,type] of [['png','image/png'],['cdr','application/vnd.corel-draw']])assert.match(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],artworks:[{...normalized,logo:{...normalized.logo,name:`logo.${ext}`,type}}]}]}),/AI-, EPS- eller PDF-fil/);
+ for(const [ext,type] of [['AI','application/illustrator'],['eps','application/postscript'],['pdf','application/pdf']])assert.equal(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],artworks:[{...normalized,logo:{...normalized.logo,name:`logo.${ext}`,type}}]}]}),'');
  assert.ok(validateDesignLine(catalog,{...line,decorations:[line.decorations[0],line.decorations[0]]}));
  assert.equal(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],textPlacement:{x:2,y:2,scale:.24}}]}),'Tekstens placering er ugyldig.');
  const badOption={...o,id:'bad-placement',svg:null,image:null},badCatalog={...catalog,products:[{...p,variants:[{...v,options:[badOption]}]}]};assert.match(validateDesignLine(badCatalog,{...line,decorations:[{...line.decorations[0],optionId:badOption.id}]}),/mangler et gyldigt mockup/);

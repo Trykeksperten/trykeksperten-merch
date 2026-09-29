@@ -1,3 +1,5 @@
+import {supplierProductGroup} from '../dist/product-groups.mjs';
+import {productDocumentMetadata} from '../lib/pf-document-metadata.mjs';
 import {readFile,writeFile,rename,mkdir,rm} from 'node:fs/promises';
 import {gzip} from 'node:zlib';
 import {promisify} from 'node:util';
@@ -32,36 +34,28 @@ for(const source of printSources){
   }
  }
 }
-function classifyProduct({supplierGroup='',category='',description='',material=''}){
- const text=clean(`${supplierGroup} ${category} ${description} ${material}`),cottonBag=/bomuld|cotton/.test(text)&&/mulepose|bomuldstaske|tote bag/.test(text);
- if(cottonBag)return {group:'Tasker og rejse',shopCategory:'bomuldstasker'};
- if(/caps?\b|kasket|hovedbeklædning|headwear|beanie|hue\b/.test(text))return {group:'Tøj og tekstiler',shopCategory:'caps'};
- if(/t-shirt|polo|skjorte|sweat|hoodie|hættetrøje|jakke|vest|tekstil|beklædning|apparel|trøje|fleece/.test(text))return {group:'Tøj og tekstiler',shopCategory:'toj'};
- if(/mulepose|taske|rygsæk|pung|kuffert|trolley|bag\b|backpack|rejsetilbehør|toilettaske/.test(text))return {group:'Tasker og rejse',shopCategory:'tasker'};
- if(/flaske|krus|kop\b|drikke|bottle|tumbler|mug\b|termokande|madkasse|lunchbox/.test(text))return {group:'Flasker og krus',shopCategory:'flasker'};
- if(/powerbank|oplader|elektronik|technology|højttaler|speaker|øretelefon|headphone|usb\b|kabel|adapter|telefon|tablet|computer/.test(text))return {group:'Elektronik',shopCategory:'elektronik'};
- if(/paraply|umbrella/.test(text))return {group:'Paraplyer',shopCategory:'paraplyer'};
- if(/sport|fitness|golf|udendørs|outdoor|cykel|løb|håndklæde|tæppe/.test(text))return {group:'Sport og fritid',shopCategory:'sport'};
- if(/hjem|køkken|home|kitchen|lys\b|candle|glas\b|bestik|skål|værktøj|tool/.test(text))return {group:'Hjem og køkken',shopCategory:'hjem'};
- return {group:'Kontor og gaver',shopCategory:'kontor'};
-}
+// PF currently omits group codes for these three models.
+const missingGroupCodes={'2PA61':'mc7','1PA059':'mc11','1PZ049':'mc3'};
 function resolvedBrand(name,group){
  const label=String(name||'Andre mærker').trim()||'Andre mærker',key=clean(label),known=knownBrands.get(key);if(known)return known;
  const base=slug(label),existing=[...knownBrands.values()].find(brand=>brand.id===base&&clean(brand.name)!==key),id=existing?`${base}-${knownBrands.size}`:base,brand={id,name:label,group,focus:group,description:'Se produkter, varianter og tilgængelige muligheder for logo og tekst.',logo:null,status:'available',connected:true};knownBrands.set(key,brand);return brand;
 }
-const products=[];
+const products=[],documentMetadata={};
 for(const source of sources){
  const feed=(await read(source)).pfcProductfeed.productfeed; timestamps.push({source,date:feed.creationDateTime});
  for(const {model:m} of feed.models){
+  documentMetadata[`pf-${m.modelCode}`]=productDocumentMetadata(m);
   const items=m.items.map(x=>x.item),curated=curatedProducts.get(String(m.modelCode));
   const supplierGroup=items[0].categoryData?.groupDesc||'',category=items[0].categoryData?.catDesc||'',material=items[0].material||'';
-  const classification=classifyProduct({supplierGroup,category,description:m.description,material}),brand=resolvedBrand(items[0]?.brand,classification.group);
+  const pfGroup=supplierProductGroup(items[0].categoryData?.groupCode||missingGroupCodes[m.modelCode]);
+  if(!pfGroup)throw Error(`Unknown PF product group for ${m.modelCode}`);
+  const classification={group:pfGroup.name,shopCategory:pfGroup.id},brand=resolvedBrand(items[0]?.brand,classification.group);
   const variants=items.map(i=>{
    const c=list(i.colors?.color)[0]||{}, images=[...new Set(Object.entries(i.imageData||{}).filter(([k,v])=>v&&!k.includes('Logo')).map(([,v])=>`https://images.pfconcept.com/ProductImages_All/JPG/500x500/${encodeURIComponent(v)}`))];
    return {sku:String(i.itemCode),size:i.size||'',color:c.colorDesc||'',colorCode:c.colorCode,hex:/^[a-f\d]{6}$/i.test(c.hexColor)?`#${c.hexColor}`:'#cccccc',images,discontinued:String(i.isDiscontinued)==='true',decorationMandatory:String(i.decorationSettings?.decoDefault?.decorationMandatory).toLowerCase()==='no'?false:true,options:prints.get(String(i.itemCode))||[]};
   }).filter(variant=>!variant.discontinued);
   if(!variants.length)continue;
-  products.push({id:`pf-${m.modelCode}`,modelCode:String(m.modelCode),brandId:curated?.brandId||brand.id,brand:curated?.brand||brand.name,name:m.description,description:m.extDesc||'',category,shopCategory:curated?.shopCategory||classification.shopCategory,group:curated?.group||classification.group,material,variants});
+  products.push({id:`pf-${m.modelCode}`,modelCode:String(m.modelCode),brandId:curated?.brandId||brand.id,brand:curated?.brand||brand.name,name:m.description,description:m.extDesc||'',category,shopCategory:classification.shopCategory,group:classification.group,supplierGroupCode:items[0].categoryData?.groupCode||'',material,variants});
  }
 }
 if(!products.length||new Set(products.map(p=>p.id)).size!==products.length)throw Error('Empty or duplicate catalog');
@@ -71,5 +65,6 @@ const summary={...result,products:products.map(product=>({...product,insulation:
 await rm(temporary,{recursive:true,force:true});await mkdir(temporary,{recursive:true});
 const shards=new Map();for(const product of products){const key=pfCatalogShard(product.id);shards.set(key,[...(shards.get(key)||[]),product]);}
 for(let number=0;number<64;number++){const key=String(number).padStart(2,'0');await writeFile(`${temporary}/${key}.json.gz`,await zip(JSON.stringify(shards.get(key)||[]),{level:9}));}
+await writeFile('data/pf-document-metadata.json',JSON.stringify(documentMetadata));
 await writeFile('data/pf-catalog-index.json.tmp',JSON.stringify(summary));await rm('data/pf-products',{recursive:true,force:true});await rename(temporary,'data/pf-products');await rename('data/pf-catalog-index.json.tmp','data/pf-catalog-index.json');await rm('data/pf-catalog.json',{force:true});
 console.log(JSON.stringify({models:products.length,variants:products.reduce((s,p)=>s+p.variants.length,0),withoutPrint:products.flatMap(p=>p.variants).filter(v=>!v.options.length).length,brands:result.counts},null,2));

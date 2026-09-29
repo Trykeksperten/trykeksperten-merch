@@ -58,7 +58,7 @@ export function sortPFProducts(products,mode,priceData,tierFor=()=> 'recommended
 export function filterPFProducts(products,params,priceData,qualityTier,favorites=[]){
  const q=(params.get('q')||'').toLocaleLowerCase('da'),category=params.get('kategori')||'',subcategory=params.get('underkategori')||'',brand=params.get('brand')||'',level=params.get('niveau')||'',color=params.get('farve')||'',insulation=params.get('isolering')||'',method=params.get('tryk')||'',price=params.get('pris')||'',chosen=new Set(favorites);
  return products.filter(product=>{
-  if(category&&product.shopCategory!==category)return false;
+  if(category==='caps'){if(!['Caps & hatte','Huer'].includes(product.category))return false;}else if(category==='bomuldstasker'){if(product.shopCategory!=='tasker'||!(/bomuld|cotton/i.test(product.name+' '+(product.material||''))||product.category==='Bomuldstasker'))return false;}else if(category&&product.shopCategory!==category)return false;
   if(subcategory&&product.category!==subcategory)return false;
   if(brand&&product.brandId!==brand)return false;
   if(level&&qualityTier(product)!==level)return false;
