@@ -3,7 +3,7 @@ import {shouldHandleNavigation} from './navigation.mjs';
 import {editorialProductCard,editorialStory} from './product-editorial.mjs?v=2';
 import {pfCartPage,bindCart,updateCartHeader,readCart as readLiveCart,writeCart as writeLiveCart} from './pf-cart.mjs?v=13';
 import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs?v=11';
-import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=29';
+import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=31';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from './pf-visibility.mjs?v=22';
 import {productGroups,groupSections,productGroupURL} from './product-groups.mjs?v=22';
 import { specialPage, bindSpecial } from './special.mjs?v=21';
