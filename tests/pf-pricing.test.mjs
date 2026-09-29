@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {listPFPrintPrices,listPFProductPrices,listPFProductTiers,listPFStock,normalizePrices,normalizeStock,quotePFLine,quotePFCart,supplierPFOrderAmounts,validateCartLine} from '../lib/pf-pricing.mjs';
+import {listPFPrintPrices,listPFProductPrices,listPFProductTiers,listPFStock,normalizePrices,normalizeStock,estimatePFLine,quotePFLine,quotePFCart,supplierPFOrderAmounts,validateCartLine} from '../lib/pf-pricing.mjs';
 import {designGroupSize} from '../dist/design-layers.mjs';
 import {loadCatalogIndex,loadPFProduct} from '../lib/pf-catalog-store.mjs';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from '../dist/pf-visibility.mjs';
@@ -61,3 +61,16 @@ test('fixed embroidery allows thread colours without multiplying its one setup',
 test('different colour counts on two placements produce two independent setup charges',()=>{const pairCatalog=structuredClone(catalog),options=pairCatalog.products[0].variants[0].options,second=options.find(option=>option.impMethod==='Serigrafi'&&option.id!==o.id);options.find(option=>option.id===o.id).maxColours='3';second.maxColours='3';const pairPrices=structuredClone(prices),charge=pairPrices.prints[o.printCode];charge.dependence='Colors';charge.combinations=[1,2,3].map(colors=>({...charge.combinations[0],colors,setups:colors,setup:100*colors,tiers:[{min:1,net:10*colors}]}));const secondSize=designGroupSize([],'TEST',textPlacement,second),line={...decorated,decorations:[decorated.decorations[0],{...decorated.decorations[0],optionId:second.id,width:Math.round(secondSize.widthMm*10)/10,height:Math.round(secondSize.heightMm*10)/10,colors:3}]};const quote=quotePFLine(pairCatalog,line,pairPrices,rules,now);assert.equal(quote.setup,46000);assert.equal(quote.print,80000);});
 test('stock feed exposes only catalogue variants and rejects stale or invalid snapshots',()=>{const feed={stockFeed:{creationDateTime:'2026-09-17T13:00:00Z',models:{model:[{items:{item:[{itemCode:v.sku,stockDirect:42,stockNextPo:100,stockDateNextPo:'2026-09-25',StockFuture:200},{itemCode:'PRIVATE-SKU',stockDirect:9}]}}]}}},stock=normalizeStock(feed),result=listPFStock(catalog,stock,now);assert.equal(result.available,true);assert.deepEqual(result.items[v.sku],{available:42,incoming:100,incomingDate:'2026-09-25'});assert.equal(result.items['PRIVATE-SKU'],undefined);assert.equal(listPFStock(catalog,{...stock,updatedAt:'2020-01-01'},now).available,false);assert.throws(()=>normalizeStock({}));});
 test('negative direct stock from PF is exposed as zero',()=>{const feed={stockFeed:{creationDateTime:'2026-09-17T13:00:00Z',models:{model:[{items:{item:[{itemCode:v.sku,stockDirect:-3}]}}]}}};assert.equal(normalizeStock(feed).items[v.sku].available,0);});
+
+test('live estimate includes goods, print and setup before upload without enabling checkout',()=>{
+ const line={productId:p.id,sku:v.sku,quantity:25,decorations:[{optionId:o.id,colors:1}]};
+ const q=estimatePFLine(catalog,line,prices,rules,now);
+ assert.equal(q.goods,375000);assert.equal(q.print,50000);assert.equal(q.setup,10000);assert.equal(q.totalIncVat,543750);assert.equal(q.estimate,true);
+ assert.ok(validateCartLine(catalog,line));
+ const larger=estimatePFLine(catalog,{...line,quantity:50},prices,rules,now);
+ assert.ok(larger.totalIncVat/50<q.totalIncVat/25);
+ assert.equal(estimatePFLine(catalog,{...line,decorations:[]},prices,rules,now).print,0);
+ assert.equal(estimatePFLine(catalog,{...line,decorations:[{optionId:'fake',colors:1}]},prices,rules,now).totalIncVat,null);
+ assert.equal(estimatePFLine(catalog,{...line,decorations:[{optionId:o.id,colors:0}]},prices,rules,now).totalIncVat,null);
+ assert.equal(estimatePFLine(catalog,line,null,rules,now).totalIncVat,null);
+});

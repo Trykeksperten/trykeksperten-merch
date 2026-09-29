@@ -10,8 +10,8 @@ export function editorialStory(products,id){
  if(!product||!story)return '';
  return `<a class="product-story product-story--${story.crop}" href="/design/${escape(id)}"><img src="${story.image}" alt="${escape(story.label)} i hverdagen" loading="lazy" decoding="async" width="500" height="500"><div class="product-story-copy"><span>${story.label}</span><h3>${story.title}</h3><span class="product-story-link">Se produktet ↗</span></div></a>`;
 }
-export function editorialProductCard(product,prices){
- const variants=pricedVariants(product,prices),image=variants.find(v=>v.images?.[0])?.images[0];
+export function editorialProductCard(product,prices,preferredSku){
+ const variants=pricedVariants(product,prices),image=(variants.find(v=>v.sku===preferredSku&&v.images?.[0])||variants.find(v=>v.images?.[0]))?.images[0];
  if(!image)return '';
  const price=prices.products[product.id]?.fromIncVat;
  const colors=[...new Set(variants.map(v=>v.hex).filter(hex=>/^#[a-f0-9]{6}$/i.test(hex)))];

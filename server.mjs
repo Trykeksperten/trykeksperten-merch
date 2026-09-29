@@ -1,5 +1,5 @@
 import {listProductDocuments,downloadProductDocument} from './lib/pf-documents.mjs';
-import {listPFPrintPrices,listPFProductPrices,listPFProductTiers,listPFStock,loadPricing,loadStock,quotePFCart} from './lib/pf-pricing.mjs';
+import {listPFPrintPrices,listPFProductPrices,listPFProductTiers,listPFStock,loadPricing,loadStock,quotePFCart,estimatePFLine} from './lib/pf-pricing.mjs';
 import {authorized,callbackAuthorized,proofInboxAuthorized,gatewayTestOrderInput,prepareOrder,dispatchOrder,readOrder,listOrders,applyPFNotification,recordProof,readProofFile,decideProof,recordApprovalDelivery,recordExternalApproval} from './lib/pf-orders.mjs';
 import {createAdminSession,adminSessionAuthorized,closeAdminSession,loginAllowed} from './lib/admin-auth.mjs';
 import {gatewayRequirements} from './lib/pf-gateway.mjs';
@@ -145,6 +145,10 @@ const handleRequest=async(req,res)=>{
    if(!svg){const response=await fetch(url,{redirect:'error',signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error();svg=await response.text();if(svg.length>8*1024*1024)throw Error();svg=stripPFPlacementGuide(svg);placementArtCache.set(url.href,svg);while(placementArtCache.size>200)placementArtCache.delete(placementArtCache.keys().next().value);}
    res.writeHead(200,{'Content-Type':'image/svg+xml; charset=utf-8'}).end(svg);
   }catch{res.writeHead(404,{'Content-Type':'text/plain; charset=utf-8'}).end('Placeringsbilledet kunne ikke indlæses.');}return;
+ }
+ if(req.url==='/api/pf-estimate'&&req.method==='POST'){
+  if(req.headers['content-type']!=='application/json'){res.writeHead(415).end();return;}
+  try{const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>65536)throw Error();chunks.push(chunk);}const line=JSON.parse(Buffer.concat(chunks).toString());const catalog=await loadProductCatalog([line.productId]);const {prices,rules}=await loadPricing();res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify(estimatePFLine(catalog,line,prices,rules)));}catch{res.writeHead(400,{'Content-Type':'application/json'}).end(JSON.stringify({error:'Prisen kunne ikke beregnes.'}));}return;
  }
  if(req.url==='/api/pf-quote'&&req.method==='POST'){
   if(req.headers['content-type']!=='application/json'){res.writeHead(415).end();return;}
