@@ -1259,3 +1259,26 @@ header nav a:focus-visible,
   .pf-subcategory-sections section:last-child {border: 1px solid #ddd6cc}
   .pf-filter-sidebar {padding: 18px; border-radius: 12px; background: #f8f4ed}
 }
+
+/* Keep navigation compact when the public catalogue contains only a few groups. */
+.product-mega{z-index:30;overscroll-behavior:contain}
+.product-mega-groups{min-height:0;align-self:stretch}
+.product-mega-content{align-self:stretch}
+.product-mega-sections{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+
+/* Verified company details at the bottom of every customer-facing page. */
+.footer-bottom{align-items:flex-end}
+.footer-company{display:grid;grid-template-columns:auto auto;gap:5px 12px;align-items:baseline}
+.footer-company>span{grid-column:1/-1;color:#9da7a4}
+.footer-company strong{font-size:.9rem;color:#fff}
+.footer-company address{font-style:normal}
+.footer-company a{grid-column:1/-1;width:max-content;color:#fff;text-decoration:underline;text-underline-offset:4px}
+
+@media(max-width:700px){
+ .product-mega{max-height:none;overflow:visible}
+ .product-mega-groups{min-height:0}
+ .product-mega-sections{grid-template-columns:1fr}
+ .footer-bottom{align-items:flex-start}
+ .footer-company{grid-template-columns:1fr;gap:6px}
+ .footer-company>*{grid-column:1!important}
+}

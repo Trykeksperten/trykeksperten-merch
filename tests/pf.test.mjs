@@ -60,6 +60,7 @@ test('PF coordinates define the printable zone and artwork gets physical dimensi
  assert.equal(validateArtworkLayers([normalizeArtworkForOption(art,option)],option),'');
  assert.deepEqual(artworkGroupSize([{...art,x:.25,y:.5},{...art,x:.75,y:.5}],option),{widthMm:120,heightMm:30});
  assert.equal(printableBounds({},0,0).source,'fallback');
+ assert.equal(printableBounds(null,0,0).source,'fallback');
 });
 test('placement mockups are tied to the current PF model and require physical dimensions',()=>{
  const assets=placementOptionAssets(p,o);assert.equal(assets.ready,true);assert.match(assets.svg||assets.image,new RegExp(p.modelCode,'i'));

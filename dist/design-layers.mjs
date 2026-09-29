@@ -9,6 +9,7 @@ export function optionPrintSize(option={}){
 }
 
 export function printableBounds(option={},naturalWidth=0,naturalHeight=0){
+ option=option&&typeof option==='object'?option:{};
  const xs=[option.coorTopLeftX,option.coorTopRightX,option.coorBottomLeftX,option.coorBottomRightX].map(number).filter(value=>value>=0);
  const ys=[option.coorTopLeftY,option.coorTopRightY,option.coorBottomLeftY,option.coorBottomRightY].map(number).filter(value=>value>=0);
  if(xs.length<4||ys.length<4||(!xs.some(Boolean)&&!ys.some(Boolean)))return {x:.3,y:.3,width:.4,height:.4,source:'fallback'};
