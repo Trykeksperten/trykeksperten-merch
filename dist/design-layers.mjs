@@ -65,16 +65,14 @@ export function fitArtworkToOption(artwork={},option={}){
 }
 
 export function textPrintSize(text='',placement={},option={}){
- const print=optionPrintSize(option),scale=clamp(placement.scale??.24,.05,1),lines=String(text).trim().split(/\r?\n/),longest=Math.max(1,...lines.map(line=>Array.from(line).length)),lineSpacing=textLineSpacings.includes(Number(placement.lineSpacing))?Number(placement.lineSpacing):1.25,letterHeight=Math.max(.06,scale*.35),lineFactor=1+(lines.length-1)*lineSpacing,heightFraction=Math.min(.95,letterHeight*lineFactor),fontFactor=placement.font==='Lucida Calligraphy'?1.15:placement.font==='Times New Roman'?.95:1,charFactor=longest*.55*fontFactor,widthFraction=Math.max(.08,charFactor*letterHeight);
- // A vertical line is limited by the print area's height, not its narrow width.
- // Blend into that physical-size model as the user rotates the text; zero degrees
- // retains the established sizing of saved horizontal designs.
- const radians=Number(placement.rotation||0)*Math.PI/180,sin=Math.abs(Math.sin(radians)),cos=Math.abs(Math.cos(radians)),maxLetterHeight=Math.min(.95*print.width/(charFactor*cos+lineFactor*sin),.95*print.height/(charFactor*sin+lineFactor*cos));
- const targetWidth=charFactor*maxLetterHeight*scale,targetHeight=lineFactor*maxLetterHeight*scale;
- let width=(widthFraction*print.width*(1-sin)+targetWidth*sin)/print.width,height=(heightFraction*print.height*(1-sin)+targetHeight*sin)/print.height;
- const bounds=rotatedTextBounds({widthMm:width*print.width,heightMm:height*print.height},placement.rotation,option),fit=Math.min(1,.95/Math.max(bounds.widthFraction,.001),.95/Math.max(bounds.heightFraction,.001));width*=fit;height*=fit;
- if(print.round){const rotated=rotatedTextBounds({widthMm:width*print.width,heightMm:height*print.height},placement.rotation,option),diagonal=Math.hypot(rotated.widthFraction,rotated.heightFraction);if(diagonal>1){width/=diagonal;height/=diagonal;}}
- return {widthMm:width*print.width,heightMm:height*print.height,widthFraction:width,heightFraction:height};
+ const print=optionPrintSize(option),scale=clamp(placement.scale??.24,.05,1),lines=String(text).trim().split(/\r?\n/),longest=Math.max(1,...lines.map(line=>Array.from(line).length)),lineSpacing=textLineSpacings.includes(Number(placement.lineSpacing))?Number(placement.lineSpacing):1.25,lineFactor=1+(lines.length-1)*lineSpacing,fontFactor=placement.font==='Lucida Calligraphy'?1.15:placement.font==='Times New Roman'?.95:1,charFactor=Math.max(.55,longest*.55*fontFactor),radians=Number(placement.rotation||0)*Math.PI/180,sin=Math.abs(Math.sin(radians)),cos=Math.abs(Math.cos(radians));
+ // Scale is the percentage of the largest text that can fit inside this exact
+ // print area. At 100%, either the text width or its total line height reaches
+ // 95% of the available area, including when the text is rotated.
+ const maxLetterHeight=Math.min(.95*print.width/Math.max(.001,charFactor*cos+lineFactor*sin),.95*print.height/Math.max(.001,charFactor*sin+lineFactor*cos)),letterHeight=maxLetterHeight*scale;
+ let widthMm=charFactor*letterHeight,heightMm=lineFactor*letterHeight;
+ if(print.round){const rotated=rotatedTextBounds({widthMm,heightMm},placement.rotation,option),diagonal=Math.hypot(rotated.widthFraction,rotated.heightFraction);if(diagonal>1){widthMm/=diagonal;heightMm/=diagonal;}}
+ return {widthMm,heightMm,widthFraction:widthMm/print.width,heightFraction:heightMm/print.height};
 }
 
 export function rotatedTextBounds(size={},rotation=0,option={}){

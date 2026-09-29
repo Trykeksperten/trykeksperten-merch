@@ -129,6 +129,8 @@ test('PF text fonts, alignment and multiline spacing survive design validation',
  assert.ok(largerSize.widthMm>textPrintSize(text,textPlacement,o).widthMm);
  const largerGroup=designGroupSize([],text,larger,o),largerLine={...line,decorations:[{...line.decorations[0],width:Math.round(largerGroup.widthMm*10)/10,height:Math.round(largerGroup.heightMm*10)/10,textPlacement:larger}]};
  assert.equal(sanitizeDesignLine(catalog,largerLine).decorations[0].textPlacement.scale,.48);
+ const full=normalizeTextPlacement('Hej med dig',{x:.5,y:.5,scale:1,font:'Arial',align:'center',lineSpacing:1.25,rotation:0},o),fullBounds=rotatedTextBounds(textPrintSize('Hej med dig',full,o),0,o);
+ assert.ok(Math.abs(Math.max(fullBounds.widthFraction,fullBounds.heightFraction)-.95)<1e-9,'100 percent fills the limiting print dimension');
 });
 
 test('rotated text fits a tall print area and remains inside its bounds',()=>{
