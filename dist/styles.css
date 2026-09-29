@@ -1385,3 +1385,13 @@ header nav a:focus-visible,
 .footer-bottom{grid-template-columns:repeat(3,minmax(0,1fr));text-align:center}
 .footer-bottom>div{align-items:center}
 @media(max-width:700px){.footer-bottom{grid-template-columns:1fr;gap:22px}}
+
+.button.shop-continue{background:#426b56;color:#fff;border:1px solid #426b56;justify-content:center;margin-top:12px}.button.shop-continue:hover{background:#355744;border-color:#355744}.button.shop-continue:focus-visible{outline:3px solid #294c39;outline-offset:4px}
+
+.pf-overview-items{margin-bottom:24px}.pf-overview-item{padding:18px 0;border-bottom:1px solid var(--line)}.pf-overview-item h3{font-size:1rem;line-height:1.4;margin-bottom:6px}.pf-overview-item p{margin-bottom:8px}.pf-overview-decoration{padding:12px 0 0;font-size:.85rem}.pf-overview-decoration>span{display:block;color:var(--muted);margin-top:4px}.pf-overview-item .pf-price-breakdown{font-size:.85rem}.pf-overview-item .pf-price-breakdown>div{gap:12px}.pf-overview-item dd{white-space:nowrap}
+
+.pf-cart-item .pf-cart-mockup{display:block;height:auto;aspect-ratio:auto;background:transparent;align-self:start}.pf-cart-mockup figure{margin:0 0 12px}.pf-cart-mockup canvas{display:block;width:100%;height:auto;background:#fff;border-radius:12px}.pf-cart-mockup figcaption{font-size:.75rem;line-height:1.4;margin-top:6px;color:var(--muted);text-align:center}
+
+.language-switch{display:flex;align-items:center;gap:2px;margin-left:auto;flex-shrink:0}.language-switch button{background:transparent;color:var(--ink);font-size:.8rem;font-weight:700;min-width:38px;min-height:40px;border-radius:20px;padding:8px}.language-switch button[aria-pressed="true"]{background:#17201f;color:white}.language-switch button:hover{box-shadow:inset 0 0 0 1px currentColor}.language-switch[aria-busy="true"]{opacity:.65}#language-status:not(:empty){position:absolute;top:100%;right:0;background:#fff;padding:10px;color:#962c18;max-width:260px;z-index:50}.language-switch{position:relative}@media(max-width:700px){.masthead{gap:10px}.language-switch{margin-left:auto}.language-switch button{min-width:32px;padding:5px}.masthead .brand img{max-width:140px}}
+
+html[lang=en] .purchase-path .active b:after{content:'Current step'}

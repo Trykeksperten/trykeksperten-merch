@@ -1,3 +1,4 @@
+import {translate,getLanguage} from './i18n-core.mjs';
 import {pricedVariants} from './pf-visibility.mjs';
 
 export function insulationStatus(product){
@@ -36,7 +37,7 @@ export function priceBand(price){
 
 export function sortPFProducts(products,mode,priceData,tierFor=()=> 'recommended'){
  const list=[...products];
- const byName=(a,b)=>a.name.localeCompare(b.name,'da');
+ const byName=(a,b)=>translate(a.name).localeCompare(translate(b.name),getLanguage());
  const priceFor=product=>{
   const value=Number(priceData?.products?.[product.id]?.fromIncVat);
   return Number.isFinite(value)?value:null;
@@ -63,7 +64,7 @@ export function filterPFProducts(products,params,priceData,qualityTier,favorites
   if(brand&&product.brandId!==brand)return false;
   if(level&&qualityTier(product)!==level)return false;
   if(params.has('udvalgte')&&!chosen.has(product.id))return false;
-  if(q&&!`${product.name} ${product.brand} ${product.modelCode}`.toLocaleLowerCase('da').includes(q))return false;
+  if(q&&!`${product.name} ${translate(product.name)} ${product.brand} ${product.modelCode}`.toLocaleLowerCase('da').includes(q))return false;
   if(color&&!productColors(product,priceData).includes(color))return false;
   if(insulation&&product.insulation!==insulation)return false;
   if(method&&!productMethods(product,priceData).includes(method))return false;

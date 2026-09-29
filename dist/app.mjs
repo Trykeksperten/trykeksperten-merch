@@ -1,15 +1,17 @@
+import {initLanguage} from './i18n.mjs';
 import {bindProductImageHover} from './product-hover.mjs';
 import {shouldHandleNavigation} from './navigation.mjs';
 import {editorialProductCard,editorialStory} from './product-editorial.mjs?v=2';
-import {pfCartPage,bindCart,updateCartHeader,readCart as readLiveCart,writeCart as writeLiveCart} from './pf-cart.mjs?v=13';
+import {pfCartPage,bindCart,updateCartHeader,readCart as readLiveCart,writeCart as writeLiveCart} from './pf-cart.mjs?v=16';
 import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs?v=11';
-import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=32';
+import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=42';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from './pf-visibility.mjs?v=22';
 import {productGroups,groupSections,productGroupURL} from './product-groups.mjs?v=22';
 import { specialPage, bindSpecial } from './special.mjs?v=21';
 import { brandPreview, brandsPage } from './brands.mjs?v=22';
 import {filterProducts,totalQuantity,validateLine,quoteLine} from './rules.mjs?v=21';
 import {saveFile,loadFile,deleteFile} from './storage.mjs?v=22';
+await initLanguage();
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>n===null?'Få tilbud':`${new Intl.NumberFormat('da-DK',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n)} kr.`;
@@ -42,7 +44,7 @@ function homeCategoryTiles(){
 }
 function homeFeaturedProducts(){
  const products=shopProducts(pfCatalog,pfPrices).filter(product=>liveProductImage(product));
- const selections=['pf-100751','pf-120693','pf-38687','pf-107790','pf-120632','pf-107151','pf-100816','pf-100988','pf-R6561','pf-120135','pf-100817','pf-100753'];
+ const selections=['pf-120332','pf-107384','pf-100942','pf-38687','pf-100751','pf-106904','pf-100777','pf-R6561','pf-107790','pf-120693','pf-107151','pf-100988','pf-120135'];
  const featured=selections.map(id=>products.find(product=>product.id===id)).filter(Boolean);
  const cards=featured.map(product=>editorialProductCard(product,pfPrices,product.id==='pf-38687'?'38687900':undefined));
  return cards.slice(0,4).join('')+editorialStory(products,'pf-100834')+cards.slice(4).join('')+editorialStory(products,'pf-107790');

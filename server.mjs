@@ -155,8 +155,10 @@ const handleRequest=async(req,res)=>{
   try{const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>1024*1024)throw Error();chunks.push(chunk);}const body=JSON.parse(Buffer.concat(chunks).toString());if(!Array.isArray(body.lines)||body.lines.length>100)throw Error();const catalog=await loadProductCatalog(body.lines.map(line=>line.productId));const {prices,rules}=await loadPricing();res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify(quotePFCart(catalog,body.lines,prices,rules)));}catch{res.writeHead(400,{'Content-Type':'application/json'}).end(JSON.stringify({error:'Kurven kunne ikke prisberegnes.'}));}return;
  }
  if(req.url==='/api/design-check'&&req.method==='POST'){
-  const allowed=[`localhost:${port}`,`127.0.0.1:${port}`],origin=req.headers.origin;
-  if(!allowed.includes(req.headers.host)||(origin&&origin!==`http://${req.headers.host}`)||req.headers['content-type']!=='application/json'){res.writeHead(403).end();return;}
+  let sameOrigin=false;
+  try{const origin=new URL(req.headers.origin);sameOrigin=['https:','http:'].includes(origin.protocol)&&origin.host===req.headers.host;}catch{}
+  if(!sameOrigin){json(res,403,{error:'Designet kunne ikke kontrolleres. Genindlæs siden, og prøv igen.'});return;}
+  if(!String(req.headers['content-type']||'').startsWith('application/json')){json(res,415,{error:'Designet skal sendes som JSON.'});return;}
   try{const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>1024*1024)throw Error('Designet er for stort.');chunks.push(chunk);}const input=JSON.parse(Buffer.concat(chunks).toString()),catalog=await loadProductCatalog([input.line?.productId]),line=sanitizeDesignLine(catalog,input.line);res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify({line,status:'validated'}));}catch(error){res.writeHead(400,{'Content-Type':'application/json'}).end(JSON.stringify({error:error.message||'Designet kunne ikke kontrolleres.'}));}return;
  }
  if(req.url==='/api/ai-preview' &&req.method==='POST'){
@@ -174,6 +176,7 @@ const handleRequest=async(req,res)=>{
   const data=await readFile(resolve(pdfRoot,path.endsWith('worker.mjs')?'pdf.worker.mjs':'pdf.mjs'));
   res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;
  }
+ if(path==='/pf-english.json'){const data=await readFile(resolve(root,'pf-english.json'));res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-cache'}).end(req.method==='HEAD'?undefined:data);return;}
  if(path==='/api/pf-catalog'){const data=JSON.stringify(await loadCatalogIndex());res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
  if(/^\/api\/pf-product\/pf-[a-z0-9]+$/i.test(path)){const product=await loadPFProduct(path.split('/').at(-1));if(!product){res.writeHead(404).end('Produktet findes ikke');return;}const data=JSON.stringify(product);res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
  if(path==='/api/catalog'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify(publicCatalog()));return;}

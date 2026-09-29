@@ -76,3 +76,41 @@ test('live estimate includes goods, print and setup before upload without enabli
  assert.equal(estimatePFLine(catalog,{...line,decorations:[{optionId:o.id,colors:0}]},prices,rules,now).totalIncVat,null);
  assert.equal(estimatePFLine(catalog,line,null,rules,now).totalIncVat,null);
 });
+
+test('additional colour setups get 10 percent off their share with a PF cost floor in matrix, estimate and cart',()=>{
+ const multiCatalog=structuredClone(catalog);
+ multiCatalog.products[0].variants[0].options[0].maxColours='4';
+ const multiPrices=structuredClone(prices),charge=multiPrices.prints[o.printCode];
+ charge.dependence='Colors';
+ charge.combinations=[1,2,3,4].map(colors=>({...charge.combinations[0],colors,setups:colors,setup:100*colors,tiers:[{min:1,net:10*colors}]}));
+ for(const markup of [50,0]){
+  const pricingRules={...rules,setupMarkup:markup};
+  const rows=listPFPrintPrices(multiCatalog,p.id,v.sku,10,multiPrices,pricingRules,now).options[o.id].rows;
+  assert.deepEqual(rows.map(row=>row.setupExVat),markup===50?[15000,28500,42000,55500]:[10000,20000,30000,40000]);
+  for(const colors of [1,2,3,4]){
+   const line={...decorated,decorations:[{...decorated.decorations[0],colors}]};
+   const quote=quotePFLine(multiCatalog,line,multiPrices,pricingRules,now);
+   assert.equal(quote.setup,rows[colors-1].setupExVat+3000);
+   assert.equal(estimatePFLine(multiCatalog,line,multiPrices,pricingRules,now).setup,quote.setup);
+   assert.equal(quotePFCart(multiCatalog,[line],multiPrices,pricingRules,now).setup,quote.setup);
+   assert.ok(rows[colors-1].setupExVat>=10000*colors);
+  }
+ }
+});
+
+test('cart detail amounts reconcile with totals without exposing supplier prices',()=>{
+ const q=quotePFLine(catalog,decorated,prices,rules,now);
+ assert.equal(q.goods,q.goodsUnit*decorated.quantity);
+ assert.equal(q.setup,q.setupBase+q.smallOrder);
+ assert.equal(q.print,q.decorationPrices.reduce((n,d)=>n+d.print,0));
+ assert.equal(q.setupBase,q.decorationPrices.reduce((n,d)=>n+d.setup,0));
+ assert.equal(q.smallOrder,q.decorationPrices.reduce((n,d)=>n+d.smallOrder,0));
+ assert.equal(q.net,q.goods+q.print+q.setup);
+ assert.equal(q.totalIncVat,q.net+q.vat);
+ assert.deepEqual(Object.keys(q.decorationPrices[0]).sort(),['optionId','method','position','colors','printUnit','print','setup','smallOrder'].sort());
+ const cart=quotePFCart(catalog,[decorated,blank],prices,rules,now);
+ assert.equal(cart.setupBase,q.setupBase);
+ assert.equal(cart.smallOrder,q.smallOrder);
+ const unknown=quotePFLine(catalog,decorated,null,rules,now);
+ assert.equal(unknown.totalIncVat,null);
+});
