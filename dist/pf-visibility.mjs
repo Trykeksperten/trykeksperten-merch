@@ -1,8 +1,8 @@
-// Products stay in the supplier catalog, while the public shop initially shows
-// only products and variants that can be ordered from one piece.
+// Products stay in the supplier catalog. The public shop shows every product
+// with a current price, including products that have a supplier minimum.
 
 export function isShopProduct(product, priceData) {
- return Boolean(priceData?.available && priceData.products?.[product.id]?.fromQuantity===1 && pricedVariants(product,priceData).length);
+ return Boolean(priceData?.available && priceData.products?.[product.id] && pricedVariants(product,priceData).length);
 }
 
 export function isQuoteOnlyProduct(product, priceData) {
@@ -19,5 +19,5 @@ export function shopProducts(catalog, priceData) {
 
 export function pricedVariants(product, priceData) {
  if (!priceData?.available) return [];
- return product.variants.filter(variant => !variant.discontinued && Boolean(priceData.skus?.[variant.sku]) && (priceData.skuMinimums?priceData.skuMinimums[variant.sku]===1:priceData.products?.[product.id]?.fromQuantity===1));
+ return product.variants.filter(variant => !variant.discontinued && Boolean(priceData.skus?.[variant.sku]));
 }
