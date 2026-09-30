@@ -855,4 +855,30 @@ Tøj og tekstiler|Clothing and textiles
 Sæt brandanimation på pause|Pause brand animation
 Vælg en produktgruppe|Choose a product group
 Vælg en gruppe for at se underkategorierne.|Choose a group to see its subcategories.
+Varepris uden tryk|Item price without printing
+Varetotal uden tryk|Product total without printing
+Priseksempel med dekoration|Example price with decoration
+Inkl. opstart og moms · ekskl. fragt. Eksempelprisen ændrer ikke dit antal.|Including setup and VAT · excluding delivery. The example does not change your quantity.
+Dette produkt kræver dekoration, som lægges til prisen.|This product requires decoration, which is added to the price.
+Priseksempel med dekoration afventer. Vælg tryk for at se mulighederne.|Decoration example price pending. Choose a print method to see the options.
+Vælg tryk for at se din samlede pris.|Choose a print method to see your total price.
+Beregner varepris…|Calculating item price…
+Vareprisen kunne ikke hentes.|The item price could not be loaded.
+Vælg tryk eller uden tryk for at fortsætte.|Choose printing or no printing to continue.
+én placering|one position
+Om smerch|About smerch
+En del af hverdagen.|Part of everyday life.
+Smerch samler merchandise, kendte brands og jeres design ét sted. Her kan I finde produkter til kolleger, kunder og events — og gøre dem til jeres egne.|Smerch brings merchandise, recognised brands and your designs together in one place. Find products for colleagues, customers and events — and make them your own.
+Fra produkt til personligt udtryk|From product to personal expression
+Udforsk udvalget, vælg antal og dekoration, og placér jeres logo eller tekst direkte på produktet. Prisen opdateres undervejs, så I kan se, hvad jeres valg betyder.|Explore the collection, choose quantities and decoration, and position your logo or text directly on the product. The price updates as you go, so you can see how your choices affect the total.
+Udforsk produkterne|Explore the products
+I godkender, før vi producerer|You approve before we produce
+Jeres design bliver gennemgået, og I modtager en korrektur til godkendelse, før produktionen går i gang. Har I et særligt produkt eller projekt i tankerne, hjælper vi med at afklare mulighederne.|We review your design and send you a proof to approve before production begins. If you have a particular product or project in mind, we help you explore the options.
+Tal med os om jeres projekt|Talk to us about your project
+Menneskene bag Smerch|The people behind Smerch
+Smerch drives af Trykeksperten ApS.|Smerch is operated by Trykeksperten ApS.
+Mit navn er Joakim, og i 2023 var jeg med til at stifte Trykeksperten. Her hjælper vi både etablerede virksomheder og startups med grafisk design, tekstiltryk, folie, glasdekoration, print og merchandise.|My name is Joakim, and in 2023 I co-founded Trykeksperten. We help both established businesses and startups with graphic design, textile printing, vinyl graphics, glass decoration, printing and merchandise.
+Kvalitet og tæt samarbejde er fundamentet for vores arbejde. Vi følger hver opgave fra den første idé til det færdige produkt med fokus på detaljerne og den enkelte kundes behov.|Quality and close collaboration are the foundation of our work. We follow every project from the initial idea to the finished product, focusing on the details and each customer’s needs.
+Smerch er næste skridt i udviklingen af vores virksomhed. Med erfaringen fra Trykeksperten har vi skabt en online merchandisebutik for professionelle – med slutbrugeren i centrum.|Smerch is the next step in our company’s development. Drawing on our experience at Trykeksperten, we have created an online merchandise shop for professionals – with the end user at its heart.
+Vores mål er at levere gennemtænkt merchandise, der repræsenterer din virksomhed og skaber værdi for dem, der bruger det. Produkter, du er stolt af at sætte navn på, og som folk har lyst til at bruge.|Our goal is to deliver thoughtfully designed merchandise that represents your business and brings value to the people who use it. Products you are proud to put your name on, and that people want to use.
 `.trim().split('\n').map(line=>line.split('|')));
