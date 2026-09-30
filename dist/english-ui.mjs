@@ -866,6 +866,8 @@ Beregner varepris…|Calculating item price…
 Vareprisen kunne ikke hentes.|The item price could not be loaded.
 Vælg tryk eller uden tryk for at fortsætte.|Choose printing or no printing to continue.
 én placering|one position
+Priser inkl. moms, tryk og opstart.|Prices include VAT, printing and setup.
+Se prisdetaljer|View price details
 Om smerch|About smerch
 Hvem er Smerch?|Who is Smerch?
 Hvem er|Who is
