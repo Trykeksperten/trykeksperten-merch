@@ -15,8 +15,8 @@ Produktgrupper|Product groups
 Alle produkter|All products
 Specialproduktion|Custom production
 Kontakt|Contact
-Et godt indtryk.|Make a great impression.
-Helt ned i detaljen.|Down to the last detail.
+Gør indtryk.|Make an impression.
+Igen og igen.|Again and again.
 Premium merchandise med jeres logo.|Premium merchandise with your logo.
 Se produkter|Browse products
 Din tilbudskurv|Your cart
@@ -867,6 +867,9 @@ Vareprisen kunne ikke hentes.|The item price could not be loaded.
 Vælg tryk eller uden tryk for at fortsætte.|Choose printing or no printing to continue.
 én placering|one position
 Om smerch|About smerch
+Hvem er Smerch?|Who is Smerch?
+Hvem er|Who is
+Joakim fra Smerch|Joakim from Smerch
 En del af hverdagen.|Part of everyday life.
 Smerch samler merchandise, kendte brands og jeres design ét sted. Her kan I finde produkter til kolleger, kunder og events — og gøre dem til jeres egne.|Smerch brings merchandise, recognised brands and your designs together in one place. Find products for colleagues, customers and events — and make them your own.
 Fra produkt til personligt udtryk|From product to personal expression

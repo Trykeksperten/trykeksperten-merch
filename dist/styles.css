@@ -1400,6 +1400,10 @@ html[lang=en] .purchase-path .active b:after{content:'Current step'}
 
 .contact-phone{display:block;width:fit-content;margin:-10px 0 24px;font-size:1.15rem;color:var(--ink);text-decoration:underline;text-underline-offset:5px}.contact-phone:hover{color:var(--blue)}
 
-.about-page>h1{max-width:900px}.about-page>.intro{max-width:750px;font-size:1.2rem;color:var(--muted)}.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;margin-top:64px;padding-top:36px;border-top:1px solid var(--line)}.about-grid h2,.about-company h2{font-size:1.8rem;line-height:1.15}.about-grid p{max-width:580px;color:var(--muted)}.about-company{display:flex;justify-content:space-between;gap:36px;margin-top:64px;padding-top:32px;border-top:1px solid var(--line)}.about-company address{font-style:normal;line-height:1.8}.about-company a{text-decoration:underline;text-underline-offset:4px}@media(max-width:700px){.about-grid{grid-template-columns:1fr;gap:32px;margin-top:36px}.about-company{flex-direction:column;margin-top:36px;gap:12px}}
-
+.about-page{max-width:1040px;margin-inline:auto}.about-page>h1{max-width:1000px}
+.about-content{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:40px;align-items:center}
 .about-story{max-width:780px;font-size:1.15rem;line-height:1.75;color:var(--muted)}.about-story p{margin:0 0 1.3em}
+.about-portrait{display:block;width:100%;max-width:230px;height:auto;border-radius:24px;justify-self:start}
+@media(max-width:760px){.about-content{grid-template-columns:1fr;gap:24px}.about-portrait{justify-self:center}}
+
+.about-page .about-brand{color:var(--blue)}
