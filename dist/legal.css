@@ -21,3 +21,7 @@ input,textarea{padding:10px;font-size:16px}
 button,.receipt-download{font-size:15px;padding:12px 24px}
 footer{font-size:12px}
 @media(max-width:600px){header,main,footer{padding-left:20px;padding-right:20px}body{font-size:14px}main{padding-top:28px}h2,h3{font-size:17px}.legal-document{text-wrap:pretty}form{padding:16px}.check{gap:10px}fieldset{padding:10px}}
+/* Centre the legal-page footer as a single block. */
+footer{text-align:center}
+footer nav{justify-content:center}
+footer p{margin:16px auto 0}
