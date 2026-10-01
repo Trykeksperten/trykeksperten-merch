@@ -1445,3 +1445,19 @@ html[lang=en] .purchase-path .active b:after{content:'Current step'}
 .pf-overview-details{margin:12px 0 20px}.pf-overview-details>summary{cursor:pointer;font-size:.85rem;font-weight:600;text-decoration:underline;text-underline-offset:4px}.pf-overview-details[open]>summary{margin-bottom:18px}
 
 .footer-legal{display:flex;flex-wrap:wrap;gap:12px 20px;grid-column:1/-1;font-size:14px}.checkout-legal{border:1px solid #d6ded9;border-radius:12px;margin:26px 0;padding:18px}.checkout-legal legend{font-weight:700}.checkout-legal .legal-check{display:flex;align-items:flex-start;gap:12px;margin:18px 0;font-weight:400}.checkout-legal .legal-check input{flex:0 0 20px;width:20px;height:20px;margin:3px 0 0;accent-color:#ce491c}.checkout-legal a{text-decoration:underline}
+
+/* Shared storefront footer: aligned columns and a compact company row. */
+.site-footer .footer-top{display:grid;grid-template-columns:minmax(250px,1.6fr) repeat(3,minmax(0,1fr));gap:32px;padding-block:48px}
+.site-footer .footer-top h2{font-size:.875rem;font-weight:700;letter-spacing:0;line-height:1.4;margin:0 0 8px}
+.site-footer .footer-intro p{max-width:270px;margin-bottom:0}
+.site-footer .footer-links,.site-footer .footer-contact{display:flex;flex-direction:column;align-items:flex-start;gap:12px;font-size:.875rem;line-height:1.5;grid-column:auto}
+.site-footer .footer-contact address{font-style:normal;color:var(--muted);margin-top:4px;line-height:1.7}
+.site-footer .footer-links a:hover,.site-footer .footer-contact a:hover{text-decoration:underline;text-underline-offset:4px}
+.site-footer .footer-bottom{display:grid;grid-template-columns:1fr auto auto;gap:24px 40px;text-align:left;align-items:start;padding-block:22px;font-size:.75rem}
+.site-footer .footer-bottom>div{align-items:flex-start;gap:4px}
+.site-footer .footer-company a{margin:0}
+.site-footer .footer-service{grid-column:auto}
+.site-footer .footer-admin{min-width:0;font-size:.75rem}
+.site-footer .footer-admin[open]{width:240px}
+@media(max-width:1000px){.site-footer .footer-top{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 48px}.site-footer .footer-bottom{grid-template-columns:1fr 1fr}.site-footer .footer-admin{grid-column:1/-1}}
+@media(max-width:520px){.site-footer .footer-top{gap:30px 20px;padding-block:32px}.site-footer .footer-intro{grid-column:1/-1}.site-footer .footer-contact{grid-column:1/-1}.site-footer .footer-bottom{grid-template-columns:1fr;gap:18px}.site-footer .footer-admin[open]{width:100%}}
