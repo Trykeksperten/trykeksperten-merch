@@ -886,4 +886,27 @@ Mit navn er Joakim, og i 2023 var jeg med til at stifte Trykeksperten. Her hjæl
 Kvalitet og tæt samarbejde er fundamentet for vores arbejde. Vi følger hver opgave fra den første idé til det færdige produkt med fokus på detaljerne og den enkelte kundes behov.|Quality and close collaboration are the foundation of our work. We follow every project from the initial idea to the finished product, focusing on the details and each customer’s needs.
 Smerch er næste skridt i udviklingen af vores virksomhed. Med erfaringen fra Trykeksperten har vi skabt en online merchandisebutik for professionelle – med slutbrugeren i centrum.|Smerch is the next step in our company’s development. Drawing on our experience at Trykeksperten, we have created an online merchandise shop for professionals – with the end user at its heart.
 Vores mål er at levere gennemtænkt merchandise, der repræsenterer din virksomhed og skaber værdi for dem, der bruger det. Produkter, du er stolt af at sætte navn på, og som folk har lyst til at bruge.|Our goal is to deliver thoughtfully designed merchandise that represents your business and brings value to the people who use it. Products you are proud to put your name on, and that people want to use.
+
+Handelsbetingelser|Terms and conditions
+Privatlivspolitik|Privacy policy
+Fortryd aftale|Withdraw from contract
+Marketingvalg|Marketing preferences
+Kundetype og vilkår|Customer type and terms
+Køber som|Buying as
+Vælg kundetype|Select customer type
+Privatperson|Consumer
+Erhverv|Business
+Ved erhvervskøb gælder korte reklamationsfrister, produktionstolerancer og begrænset ansvar som beskrevet i afsnit 13.|Business purchases are subject to short complaint deadlines, production tolerances and limited liability as described in section 13.
+Jeg accepterer|I accept
+handelsbetingelserne|the terms and conditions
+privatlivspolitikken|the privacy policy
+Jeg er informeret om, at varer med mit eget logo, navn, tekst eller individuelle design ikke har fortrydelsesret. Reklamationsretten berøres ikke.|I have been informed that goods bearing my own logo, name, text or individual design are exempt from withdrawal. Rights concerning defects remain unaffected.
+Jeg accepterer, at betalingen for mine personligt tilpassede varer hæves efter min godkendelse af produktionskorrekturen og før produktion, fordi varerne fremstilles særligt til mig.|I agree that payment for my personalised goods will be captured after I approve the production proof and before production, because the goods are made specifically for me.
+Oplysninger til ordren bruges ikke automatisk til marketing.|Order information is not automatically used for marketing.
+Modtag tilbud (valgfrit)|Receive offers (optional)
+Bestil med betalingspligt →|Place order with obligation to pay →
+Vi bruger oplysningerne til at behandle din henvendelse.|We use your information to handle your enquiry.
+Læs privatlivspolitikken|Read the privacy policy
+Læs om designfiler og personoplysninger i|Read about artwork and personal data in
+Leveringstiden skal afklares før onlinebestilling.|Delivery times must be confirmed before online ordering.
 `.trim().split('\n').map(line=>line.split('|')));
