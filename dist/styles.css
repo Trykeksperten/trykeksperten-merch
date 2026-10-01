@@ -1413,21 +1413,23 @@ html[lang=en] .purchase-path .active b:after{content:'Current step'}
 #product-menu.has-active-group{width:900px}
 #product-menu .product-mega-layout{width:100%;display:grid;grid-template-columns:1fr;gap:20px;padding:0}
 #product-menu.has-active-group .product-mega-layout{grid-template-columns:280px minmax(0,1fr)}
-#product-menu .product-mega-groups{display:flex;min-height:0;padding:4px;background:transparent;border:0;border-radius:0;gap:2px}
+#product-menu .product-mega-groups{display:flex;min-width:0;min-height:0;padding:4px;background:transparent;border:0;border-radius:0;gap:2px;overflow:visible}
 #product-menu .product-mega-groups .eyebrow{display:none}
 #product-menu .product-mega-groups button{min-height:0;padding:10px 12px;text-align:left;justify-content:space-between;border-radius:8px;font-size:.88rem;line-height:1.25}
-#product-menu .product-mega-groups button:hover,#product-menu .product-mega-groups button.active{background:#fff2eb;color:var(--blue)}
+#product-menu .product-mega-groups button:hover,#product-menu .product-mega-groups button.active{background:#fff2eb;color:var(--blue);transform:none}
 #product-menu .product-mega-groups button.active:before{display:none}
 #product-menu .product-mega-groups>a{margin:4px 0 0;padding:12px;font-size:.85rem}
 #product-menu:not(.has-active-group) .product-mega-content{display:none}
-#product-menu .product-mega-content{padding:12px;background:transparent;border:0;border-radius:0}
+#product-menu .product-mega-content{min-width:0;padding:12px;background:transparent;border:0;border-radius:0}
 #product-menu .product-mega-heading{margin-bottom:12px;padding-bottom:12px;gap:12px}
 #product-menu .product-mega-heading .eyebrow{display:none}
 #product-menu .product-mega-heading h2{font-size:1.5rem;line-height:1.15;letter-spacing:-.03em}
 #product-menu .product-mega-sections{display:block;border:0}
 #product-menu .product-mega-sections>section{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px;padding:0;background:transparent;border:0;border-radius:0}
 #product-menu .product-mega-sections h3{grid-column:1/-1;margin-top:12px}
-#product-menu .product-mega-sections a{font-size:.85rem;padding:8px 0}
+#product-menu .product-mega-sections a{min-width:0;margin:0;font-size:.85rem;padding:8px;overflow-wrap:anywhere}
+#product-menu .product-mega-sections small{flex-shrink:0}
+#product-menu :focus-visible{outline-offset:-2px}
 @media(max-width:700px){#product-menu{left:16px;max-width:calc(100vw - 32px);max-height:60vh}#product-menu.has-active-group .product-mega-layout{grid-template-columns:1fr}#product-menu .product-mega-sections>section{grid-template-columns:1fr}}
 
 #brands-menu-toggle{border-radius:999px;padding:8px 12px}
