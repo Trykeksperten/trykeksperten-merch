@@ -44,7 +44,7 @@ Driftsansvarlig skal dokumentere databehandleraftaler/roller, eventuelle tredjel
 
 ### Udvalgt sortiment
 
-Webshoppen starter uden valgte produkter (`config/assortment.json`, version 2). Tidligere sortimentsvalg nulstilles ved overgangen til version 2; efterfølgende valg bevares. Hele PF-kataloget bevares. Under **Medarbejderlogin → Produkter** kan medarbejdere søge og filtrere alle importerede produkter, se billeder og produktdetaljer samt vælge **Vis i webshop** eller **Skjul i webshop**.
+Alle nuværende PF-produkter er valgt (`config/assortment.json`, version 3). Tidligere sortimentsvalg nulstilles ved overgangen til version 3 efter ejerens ønske; efterfølgende fravalg bevares. Produkter skal fortsat opfylde webshoppens pris- og variantkrav for at blive vist. Hele PF-kataloget bevares. Under **Medarbejderlogin → Produkter** kan medarbejdere søge og filtrere alle importerede produkter, se billeder og produktdetaljer samt vælge **Vis i webshop** eller **Skjul i webshop**.
 
 Valgene gemmes atomisk i `assortment.json` under `SMERCH_DATA_DIR` og overlever katalogimporter. Nye PF-produkter er skjult, indtil de vælges. Sørg for vedvarende lager til datamappen i produktion. Sortimentsændringer påvirker katalogvisningen; eksisterende ordrer bevarer deres produktdata.
 
