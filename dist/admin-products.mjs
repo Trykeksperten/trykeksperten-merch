@@ -1,3 +1,4 @@
+import {editProductPrices} from './admin-product-prices.mjs';
 const node=(tag,text)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;return el;};
 export async function renderProducts(parent,api){
  const host=node('section');parent.replaceChildren(host);
@@ -19,6 +20,7 @@ export async function renderProducts(parent,api){
  const card=node('article');card.className='product-admin-card';if(p.image){const image=node('img');image.src=p.image;image.alt=p.name;image.loading='lazy';card.append(image);}
  card.append(node('small',`${p.brand} · ${p.id}`),node('h2',p.name),node('p',`${p.category} · ${p.variantCount} varianter`),node('strong',p.visible?'Valgt til webshop':'Skjult i webshop'));
  const details=node('details');details.append(node('summary','Produktdetaljer'),node('p',`${p.activeVariants} aktive varianter`),node('p',`Farver: ${p.colors.join(', ')||'Ikke oplyst'}`),node('p',`Trykmuligheder: ${p.methods.join(', ')||'Ikke oplyst'}`));card.append(details);
+ const priceButton=node('button','Købs- og salgspriser');priceButton.type='button';priceButton.className='action light';priceButton.onclick=()=>editProductPrices(p,api);card.append(priceButton);
  const toggle=node('button',p.visible?'Skjul i webshop':'Vis i webshop');toggle.className='action'+(p.visible?' light':'');toggle.type='button';toggle.setAttribute('aria-label',`${toggle.textContent}: ${p.name}`);toggle.onclick=async()=>{toggle.disabled=true;feedback.textContent='';try{const updated=await(await api('/api/admin/products','POST',{id:p.id,visible:!p.visible})).json();Object.assign(p,updated);draw();feedback.textContent=`${p.name}: ${p.visible?'valgt til webshop':'skjult i webshop'}. Genindlæs webshoppen for at se ændringen.`;}catch(error){feedback.textContent=error.message;toggle.disabled=false;}};card.append(toggle);list.append(card);
  }
  if(!matches.length)list.append(node('p','Ingen produkter matcher filtrene.'));

@@ -114,3 +114,14 @@ test('cart detail amounts reconcile with totals without exposing supplier prices
  const unknown=quotePFLine(catalog,decorated,null,rules,now);
  assert.equal(unknown.totalIncVat,null);
 });
+
+test('manual SKU prices agree across cards, tiers, estimates and checkout, without changing procurement',()=>{
+ const custom={...rules,salePrices:{[v.sku]:[{min:1,unitExVat:12345},{min:40,unitExVat:10000}]}};
+ assert.equal(listPFProductPrices(catalog,prices,custom,now).products[p.id].fromExVat,12345);
+ assert.deepEqual(listPFProductTiers(catalog,p.id,v.sku,prices,custom,now).tiers,[{min:1,unitExVat:12345,unitIncVat:15431},{min:40,unitExVat:10000,unitIncVat:12500}]);
+ for(const quantity of [1,39,40,50,100]){const line={...blank,quantity},unit=quantity<40?12345:10000;assert.equal(quotePFLine(catalog,line,prices,custom,now).goodsUnit,unit);assert.equal(estimatePFLine(catalog,line,prices,custom,now).goodsUnit,unit);assert.equal(quotePFCart(catalog,[line],prices,custom,now).goods,unit*quantity);}
+ const before=quotePFLine(catalog,decorated,prices,rules,now),after=quotePFLine(catalog,decorated,prices,custom,now);assert.equal(after.print,before.print);assert.equal(after.setup,before.setup);
+ assert.equal(supplierPFOrderAmounts(catalog,[blank],prices,now).unitPrices[0],100);
+ assert.equal(listPFProductPrices(catalog,prices,rules,now).products[p.id].fromExVat,15000);
+ assert.ok(!JSON.stringify(listPFProductPrices(catalog,prices,custom,now)).includes('salePrices'));
+});

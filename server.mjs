@@ -1,10 +1,11 @@
+import {saveSalePrices} from './lib/sale-prices.mjs';
 import {readAssortment,publicAssortment,setVisibility,adminProduct} from './lib/assortment.mjs';
 import {queueOrderConfirmation,retryOrderConfirmations} from './lib/order-mail.mjs';
 import {legalPage,legalPaths} from './lib/legal-pages.mjs';
 import {subscribeMarketing,unsubscribeMarketing,recordWithdrawal,deliverWithdrawalReceipt,retryWithdrawalReceipts,listMarketing,listWithdrawals} from './lib/legal-services.mjs';
 import {validateCheckoutConsent} from './dist/legal-consent.mjs';
 import {listProductDocuments,downloadProductDocument} from './lib/pf-documents.mjs';
-import {listPFPrintPrices,listPFProductPrices,listPFProductTiers,listPFStock,loadPricing,loadStock,quotePFCart,estimatePFLine} from './lib/pf-pricing.mjs';
+import {adminProductPricing,listPFPrintPrices,listPFProductPrices,listPFProductTiers,listPFStock,loadPricing,loadStock,quotePFCart,estimatePFLine} from './lib/pf-pricing.mjs';
 import {authorized,callbackAuthorized,proofInboxAuthorized,gatewayTestOrderInput,prepareOrder,dispatchOrder,readOrder,listOrders,applyPFNotification,recordProof,readProofFile,decideProof,recordApprovalDelivery,recordExternalApproval} from './lib/pf-orders.mjs';
 import {createAdminSession,adminSessionAuthorized,closeAdminSession,loginAllowed} from './lib/admin-auth.mjs';
 import {gatewayRequirements} from './lib/pf-gateway.mjs';
@@ -95,6 +96,12 @@ const handleRequest=async(req,res)=>{
  }
  if(req.url==='/api/admin/session'&&req.method==='GET'){json(res,200,{authenticated:adminSessionAuthorized(req)});return;}
  if(req.url==='/api/admin/logout'&&req.method==='POST'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Du er ikke logget ind.'});return;}closeAdminSession(req,res);json(res,200,{authenticated:false});return;}
+ const adminPricePath=/^\/api\/admin\/products\/(pf-[a-z0-9]+)\/prices$/i.exec(req.url||'');
+ if(adminPricePath&&['GET','POST'].includes(req.method)){
+  if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}
+  res.setHeader('Cache-Control','no-store');
+  try{const catalog=await loadCatalogIndex(),{prices,rules}=await loadPricing(),id=adminPricePath[1];if(req.method==='POST'){const input=await readJSON(req,32768),product=catalog.products.find(p=>p.id===id),variant=product?.variants.find(v=>v.sku===input.sku);if(!variant)throw Error('Produktvarianten findes ikke.');const automatic=listPFProductTiers(catalog,id,input.sku,prices,{...rules,salePrices:{}});if(input.tiers!==null&&!automatic.available)throw Error(automatic.message);rules.salePrices=await saveSalePrices(input.sku,input.tiers,{minimum:automatic.minimumQuantity||1});}json(res,200,adminProductPricing(catalog,id,prices,rules));}catch(error){json(res,400,{error:error.message});}return;
+ }
  if(req.url==='/api/admin/products'&&['GET','POST'].includes(req.method)){
   if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}
   try{const catalog=await loadCatalogIndex();if(req.method==='POST'){const input=await readJSON(req,4096);const state=await setVisibility(input.id,input.visible,catalog);json(res,200,adminProduct(catalog.products.find(p=>p.id===input.id),state));}else{const state=await readAssortment();res.setHeader('Cache-Control','no-store');json(res,200,{products:catalog.products.map(p=>adminProduct(p,state))});}}catch(error){json(res,400,{error:error.message});}return;

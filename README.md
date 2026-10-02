@@ -47,3 +47,5 @@ Driftsansvarlig skal dokumentere databehandleraftaler/roller, eventuelle tredjel
 Webshoppen starter med 100 produkter fra `config/assortment.json`. Hele PF-kataloget bevares. Under **Medarbejderlogin → Produkter** kan medarbejdere søge og filtrere alle importerede produkter, se billeder og produktdetaljer samt vælge **Vis i webshop** eller **Skjul i webshop**.
 
 Valgene gemmes atomisk i `assortment.json` under `SMERCH_DATA_DIR` og overlever katalogimporter. Nye PF-produkter er skjult, indtil de vælges. Sørg for vedvarende lager til datamappen i produktion. Sortimentsændringer påvirker katalogvisningen; eksisterende ordrer bevarer deres produktdata.
+
+Under **Produkter → Købs- og salgspriser** vises PF-varepriser pr. variant og antalstrin. Salgspriser redigeres i DKK ekskl. moms med forhåndsvisning inkl. moms. Manuelle priser gemmes i `sale-prices.json` under `SMERCH_DATA_DIR`, overlever PF-synkronisering og anvendes af både produktvisning, tilbud, kurv og checkout. **Brug automatiske priser** fjerner variantens manuelle priser. Købspriser udleveres kun til medarbejdere med aktiv session; tryk, opstart og fragt ændres ikke af denne vareprisredigering.
