@@ -1,3 +1,4 @@
+import {readAssortment,publicAssortment,setVisibility,adminProduct} from './lib/assortment.mjs';
 import {queueOrderConfirmation,retryOrderConfirmations} from './lib/order-mail.mjs';
 import {legalPage,legalPaths} from './lib/legal-pages.mjs';
 import {subscribeMarketing,unsubscribeMarketing,recordWithdrawal,deliverWithdrawalReceipt,retryWithdrawalReceipts,listMarketing,listWithdrawals} from './lib/legal-services.mjs';
@@ -94,6 +95,10 @@ const handleRequest=async(req,res)=>{
  }
  if(req.url==='/api/admin/session'&&req.method==='GET'){json(res,200,{authenticated:adminSessionAuthorized(req)});return;}
  if(req.url==='/api/admin/logout'&&req.method==='POST'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Du er ikke logget ind.'});return;}closeAdminSession(req,res);json(res,200,{authenticated:false});return;}
+ if(req.url==='/api/admin/products'&&['GET','POST'].includes(req.method)){
+  if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}
+  try{const catalog=await loadCatalogIndex();if(req.method==='POST'){const input=await readJSON(req,4096);const state=await setVisibility(input.id,input.visible,catalog);json(res,200,adminProduct(catalog.products.find(p=>p.id===input.id),state));}else{const state=await readAssortment();res.setHeader('Cache-Control','no-store');json(res,200,{products:catalog.products.map(p=>adminProduct(p,state))});}}catch(error){json(res,400,{error:error.message});}return;
+ }
  if(req.url==='/api/admin/checkouts'&&req.method==='GET'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}try{json(res,200,(await listCheckouts()).map(order=>({id:order.id,status:order.status,paymentProvider:order.paymentProvider||'stripe',quickpayPaymentId:order.quickpayPaymentId||null,createdAt:order.createdAt,authorizedAt:order.authorizedAt||null,authorizationExpiresAt:order.authorizationExpiresAt||null,paidAt:order.paidAt||null,totalIncVat:order.totalIncVat,pfOrderIds:order.pfOrderIds||[],pfHandoff:order.pfHandoff||null,pfColourOverrides:order.pfColourOverrides||{},shipping:order.shipping,artworks:order.artworks?.map(({id,name,size})=>({id,name,size}))||[],lines:order.lines.map(line=>({productId:line.productId,sku:line.sku,quantity:line.quantity,decorations:line.decorations.map(deco=>({method:deco.method,position:deco.position,colors:deco.colors,text:deco.text,logos:deco.artworks?.map(art=>art.logo.name)||[]}))}))})));}catch{json(res,500,{error:'Betalingerne kunne ikke indlæses.'});}return;}
  const colourPath=/^\/api\/admin\/checkouts\/(pay-[a-f0-9-]{36})\/colours$/.exec(new URL(req.url,'http://localhost').pathname);
  if(colourPath&&req.method==='POST'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}try{const input=await readJSON(req,8192),order=await setPFColours(colourPath[1],input.lineIndex,input.decorationIndex,input.codes);json(res,200,{id:order.id,pfColourOverrides:order.pfColourOverrides});}catch(error){json(res,400,{error:error.message});}return;}
@@ -198,7 +203,7 @@ const handleRequest=async(req,res)=>{
   res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;
  }
  if(path==='/pf-english.json'){const data=await readFile(resolve(root,'pf-english.json'));res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-cache'}).end(req.method==='HEAD'?undefined:data);return;}
- if(path==='/api/pf-catalog'){const data=JSON.stringify(await loadCatalogIndex());res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
+ if(path==='/api/pf-catalog'){const data=JSON.stringify(publicAssortment(await loadCatalogIndex(),await readAssortment()));res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
  if(/^\/api\/pf-product\/pf-[a-z0-9]+$/i.test(path)){const product=await loadPFProduct(path.split('/').at(-1));if(!product){res.writeHead(404).end('Produktet findes ikke');return;}const data=JSON.stringify(product);res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
  if(path==='/api/catalog'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify(publicCatalog()));return;}
  const isPage=/^\/design\/pf-[a-z0-9]+$/i.test(path)||path==='/'||path==='/produkter'||path==='/brands'||path==='/specialproduktion'||path==='/demokurv'||path==='/kurv'||path==='/betaling'||path==='/ordre'||path==='/kontakt'||path==='/om-smerch'||path==='/gennemgang'||/^\/produkt\/[a-z0-9-]+$/.test(path);
