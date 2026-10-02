@@ -908,5 +908,6 @@ Bestil med betalingspligt →|Place order with obligation to pay →
 Vi bruger oplysningerne til at behandle din henvendelse.|We use your information to handle your enquiry.
 Læs privatlivspolitikken|Read the privacy policy
 Læs om designfiler og personoplysninger i|Read about artwork and personal data in
+Vi leverer kun til Danmark.|We deliver exclusively to Denmark.
 Leveringstiden skal afklares før onlinebestilling.|Delivery times must be confirmed before online ordering.
 `.trim().split('\n').map(line=>line.split('|')));
