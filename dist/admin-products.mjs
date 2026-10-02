@@ -1,4 +1,5 @@
 import {editProductPrices} from './admin-product-prices.mjs';
+const money=value=>new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK'}).format(value/100);
 const node=(tag,text)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;return el;};
 export async function renderProducts(parent,api){
  const host=node('section');parent.replaceChildren(host);
@@ -19,8 +20,10 @@ export async function renderProducts(parent,api){
  for(const p of matches.slice(page*size,(page+1)*size)){
  const card=node('article');card.className='product-admin-card';if(p.image){const image=node('img');image.src=p.image;image.alt=p.name;image.loading='lazy';card.append(image);}
  card.append(node('small',`${p.brand} · ${p.id}`),node('h2',p.name),node('p',`${p.category} · ${p.variantCount} varianter`),node('strong',p.visible?'Valgt til webshop':'Skjult i webshop'));
+ const priceBox=node('div');priceBox.className='product-admin-prices';
+ const renderPrice=()=>{priceBox.replaceChildren();const price=p.priceSummary;if(!price){priceBox.append(node('p','Aktuelle priser ikke tilgængelige'));return;}for(const [label,value]of [['Køb',price.costExVat],['Salg',price.saleExVat]]){const row=node('div');row.append(node('span',label),node('strong',money(value)));priceBox.append(row);}priceBox.append(node('small',`Pr. stk. ekskl. moms · ved ${price.quantity} stk.`),node('small',`Salg inkl. moms: ${money(price.saleIncVat)}`),node('small',`${price.label?price.label+' · ':''}${price.sku}`));};renderPrice();card.append(priceBox);
  const details=node('details');details.append(node('summary','Produktdetaljer'),node('p',`${p.activeVariants} aktive varianter`),node('p',`Farver: ${p.colors.join(', ')||'Ikke oplyst'}`),node('p',`Trykmuligheder: ${p.methods.join(', ')||'Ikke oplyst'}`));card.append(details);
- const priceButton=node('button','Købs- og salgspriser');priceButton.type='button';priceButton.className='action light';priceButton.onclick=()=>editProductPrices(p,api);card.append(priceButton);
+ const priceButton=node('button','Rediger pris');priceButton.type='button';priceButton.className='action light';priceButton.onclick=()=>editProductPrices(p,api,summary=>{p.priceSummary=summary;renderPrice();});card.append(priceButton);
  const toggle=node('button',p.visible?'Skjul i webshop':'Vis i webshop');toggle.className='action'+(p.visible?' light':'');toggle.type='button';toggle.setAttribute('aria-label',`${toggle.textContent}: ${p.name}`);toggle.onclick=async()=>{toggle.disabled=true;feedback.textContent='';try{const updated=await(await api('/api/admin/products','POST',{id:p.id,visible:!p.visible})).json();Object.assign(p,updated);draw();feedback.textContent=`${p.name}: ${p.visible?'valgt til webshop':'skjult i webshop'}. Genindlæs webshoppen for at se ændringen.`;}catch(error){feedback.textContent=error.message;toggle.disabled=false;}};card.append(toggle);list.append(card);
  }
  if(!matches.length)list.append(node('p','Ingen produkter matcher filtrene.'));
