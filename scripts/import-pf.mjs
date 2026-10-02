@@ -1,3 +1,4 @@
+import {packshotImages} from '../lib/pf-product-images.mjs';
 import {supplierProductGroup} from '../dist/product-groups.mjs';
 import {productDocumentMetadata} from '../lib/pf-document-metadata.mjs';
 import {readFile,writeFile,rename,mkdir,rm} from 'node:fs/promises';
@@ -51,7 +52,7 @@ for(const source of sources){
   if(!pfGroup)throw Error(`Unknown PF product group for ${m.modelCode}`);
   const classification={group:pfGroup.name,shopCategory:pfGroup.id},brand=resolvedBrand(items[0]?.brand,classification.group);
   const variants=items.map(i=>{
-   const c=list(i.colors?.color)[0]||{}, images=[...new Set(Object.entries(i.imageData||{}).filter(([k,v])=>v&&!k.includes('Logo')).map(([,v])=>`https://images.pfconcept.com/ProductImages_All/JPG/500x500/${encodeURIComponent(v)}`))];
+   const c=list(i.colors?.color)[0]||{}, images=packshotImages(i.imageData);
    return {sku:String(i.itemCode),size:i.size||'',color:c.colorDesc||'',colorCode:c.colorCode,hex:/^[a-f\d]{6}$/i.test(c.hexColor)?`#${c.hexColor}`:'#cccccc',images,discontinued:String(i.isDiscontinued)==='true',decorationMandatory:String(i.decorationSettings?.decoDefault?.decorationMandatory).toLowerCase()==='no'?false:true,options:prints.get(String(i.itemCode))||[]};
   }).filter(variant=>!variant.discontinued);
   if(!variants.length)continue;
