@@ -8,7 +8,7 @@ export const productGroups = [
  {id:'papir',code:'mc6',name:'Notesbøger og papir'},
  {id:'paraplyer',code:'mc8',name:'Paraplyer'},
  {id:'hjem',code:'mc9',name:'Hjem og livsstil'},
- {id:'giveaways',code:'mc10',name:'Giveaways'},
+ {id:'giveaways',code:'mc10',name:'Messe'},
  {id:'sport',code:'mc11',name:'Sport og fritid'},
  {id:'spil',code:'mc12',name:'Spil og legetøj'},
  {id:'vaerktoj',code:'mc13',name:'Værktøj og biltilbehør'},

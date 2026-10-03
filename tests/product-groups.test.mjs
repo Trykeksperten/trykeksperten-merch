@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {productGroups,groupSections,productGroupURL} from '../dist/product-groups.mjs';
 import {loadCatalogIndex,iteratePFProducts} from '../lib/pf-catalog-store.mjs';
 test('product navigation matches PF names and order and includes every supplier subcategory',()=>{
- assert.deepEqual(productGroups.map(g=>g.name),['Tekstil','Tasker','Drikkeartikler','Kuglepenne og skriveartikler','Teknologi','Notesbøger og papir','Paraplyer','Hjem og livsstil','Giveaways','Sport og fritid','Spil og legetøj','Værktøj og biltilbehør','Sundhed og personlig pleje']);
+ assert.deepEqual(productGroups.map(g=>g.name),['Tekstil','Tasker','Drikkeartikler','Kuglepenne og skriveartikler','Teknologi','Notesbøger og papir','Paraplyer','Hjem og livsstil','Messe','Sport og fritid','Spil og legetøj','Værktøj og biltilbehør','Sundhed og personlig pleje']);
  const products=[{shopCategory:'tasker',category:'Bomuldstasker'},{shopCategory:'tasker',category:'Muleposer'},{shopCategory:'tasker',category:'Muleposer'},{shopCategory:'tasker',category:'Ny PF-kategori'},{shopCategory:'papir',category:'Notesbøger'}];
  const items=groupSections(productGroups.find(g=>g.id==='tasker'),products)[0].items;
  assert.equal(items.find(i=>i.name==='Muleposer').count,2);assert.ok(items.some(i=>i.name==='Ny PF-kategori'));assert.ok(!items.some(i=>i.name==='Notesbøger'));
