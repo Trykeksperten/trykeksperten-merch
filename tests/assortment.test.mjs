@@ -4,15 +4,16 @@ import {mkdtemp,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {readAssortment,publicAssortment,isListed,setVisibility,adminProduct} from '../lib/assortment.mjs';
+import {isPolandProduct} from '../lib/pf-shipping-origin.mjs';
 import {loadCatalogIndex} from '../lib/pf-catalog-store.mjs';
-test('initial assortment includes all current supplier products',async()=>{
+test('initial assortment includes only confirmed Polish products; admin retains all products',async()=>{
  const catalog=await loadCatalogIndex(),state={overrides:{}},shop=publicAssortment(catalog,state);
- assert.equal(shop.products.length,catalog.products.length);assert.ok(catalog.products.length>2000);
+ assert.equal(shop.products.length,catalog.products.filter(isPolandProduct).length);assert.ok(shop.products.every(isPolandProduct));assert.ok(catalog.products.length>2000);
  assert.ok(shop.brands.length>0);
  assert.equal(catalog.products.map(p=>adminProduct(p,state)).length,catalog.products.length);
 });
 test('visibility overrides survive rereads and supplier updates; new products default hidden',async()=>{
- const dir=await mkdtemp(join(tmpdir(),'smerch-assortment-')),path=join(dir,'choices.json'),catalog={products:[{id:'pf-107384'},{id:'pf-new'}]};
+ const dir=await mkdtemp(join(tmpdir(),'smerch-assortment-')),path=join(dir,'choices.json'),catalog={products:[{id:'pf-107384',shippingOrigin:{countries:['PL'],unknown:false}},{id:'pf-new',shippingOrigin:{countries:['PL'],unknown:false}}]};
  try{assert.equal(isListed('pf-new',await readAssortment(path)),false);
  await writeFile(path,JSON.stringify({version:2,overrides:{'pf-107384':false,'pf-new':true}}));assert.equal(isListed('pf-new',await readAssortment(path)),false);assert.equal(isListed('pf-107384',await readAssortment(path)),true);
 

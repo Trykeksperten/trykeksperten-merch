@@ -1,3 +1,4 @@
+import {shippingOrigin} from '../lib/pf-shipping-origin.mjs';
 import {classifyShopProduct} from '../lib/pf-product-categories.mjs';
 import {packshotImages} from '../lib/pf-product-images.mjs';
 import {supplierProductGroup} from '../dist/product-groups.mjs';
@@ -67,6 +68,7 @@ const summary={...result,products:products.map(product=>({...product,insulation:
 await rm(temporary,{recursive:true,force:true});await mkdir(temporary,{recursive:true});
 const shards=new Map();for(const product of products){const key=pfCatalogShard(product.id);shards.set(key,[...(shards.get(key)||[]),product]);}
 for(let number=0;number<64;number++){const key=String(number).padStart(2,'0');await writeFile(`${temporary}/${key}.json.gz`,await zip(JSON.stringify(shards.get(key)||[]),{level:9}));}
+await writeFile('data/pf-shipping-origins.json',JSON.stringify(Object.fromEntries(products.map(product=>[product.id,shippingOrigin(product)]))));
 await writeFile('data/pf-document-metadata.json',JSON.stringify(documentMetadata));
 await writeFile('data/pf-catalog-index.json.tmp',JSON.stringify(summary));await rm('data/pf-products',{recursive:true,force:true});await rename(temporary,'data/pf-products');await rename('data/pf-catalog-index.json.tmp','data/pf-catalog-index.json');await rm('data/pf-catalog.json',{force:true});
 console.log(JSON.stringify({models:products.length,variants:products.reduce((s,p)=>s+p.variants.length,0),withoutPrint:products.flatMap(p=>p.variants).filter(v=>!v.options.length).length,brands:result.counts},null,2));
