@@ -1302,8 +1302,9 @@ header nav a:focus-visible,
 .home-featured .product-title,.pf-catalog .product-title{margin:0;font-size:1rem;line-height:1.4;font-weight:400;letter-spacing:-.02em}
 .home-featured .editorial-price,.pf-catalog .pf-card-price{margin:7px 0 0;font-size:.95rem;font-weight:400;color:#686b68}
 .editorial-price-note{margin:30px 0 0;font-size:.75rem;color:#686b68}
-.editorial-swatches{display:flex;gap:4px}
-.editorial-swatches i{width:9px;height:9px;border-radius:50%;border:1px solid #0002}
+.editorial-swatches{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;max-width:65%}
+.editorial-swatches i{display:block;flex:0 0 11px;width:11px;height:11px;border-radius:50%;border:1px solid #0003}
+.editorial-swatches .swatch-unknown{background:repeating-linear-gradient(135deg,#fff 0 3px,#ccc 3px 6px)}
 .pf-catalog .pf-card-actions{margin:14px 0 0;padding-top:12px;border-color:#dfdfdc;font-size:.75rem}
 .pf-catalog .pf-save{border:0;border-radius:20px;padding:8px 10px;font-weight:400;text-transform:none;letter-spacing:0}
 .pf-catalog .quality-badge{top:14px;left:14px;border:0;border-radius:20px;background:#fff9;color:#454943;font-size:.6rem;font-weight:400;text-transform:none;letter-spacing:0;padding:6px 10px}

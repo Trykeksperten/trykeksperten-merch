@@ -1,6 +1,6 @@
 import {isPolandProduct} from './lib/pf-shipping-origin.mjs';
 import {saveSalePrices} from './lib/sale-prices.mjs';
-import {readAssortment,publicAssortment,setVisibility,adminProduct} from './lib/assortment.mjs';
+import {readAssortment,publicAssortment,setVisibility,adminProduct,isVisibleProduct} from './lib/assortment.mjs';
 import {queueOrderConfirmation,retryOrderConfirmations} from './lib/order-mail.mjs';
 import {legalPage,legalPaths} from './lib/legal-pages.mjs';
 import {subscribeMarketing,unsubscribeMarketing,recordWithdrawal,deliverWithdrawalReceipt,retryWithdrawalReceipts,listMarketing,listWithdrawals} from './lib/legal-services.mjs';
@@ -212,7 +212,7 @@ const handleRequest=async(req,res)=>{
  }
  if(path==='/pf-english.json'){const data=await readFile(resolve(root,'pf-english.json'));res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-cache'}).end(req.method==='HEAD'?undefined:data);return;}
  if(path==='/api/pf-catalog'){const data=JSON.stringify(publicAssortment(await loadCatalogIndex(),await readAssortment()));res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
- if(/^\/api\/pf-product\/pf-[a-z0-9]+$/i.test(path)){const product=await loadPFProduct(path.split('/').at(-1));if(!product||!isPolandProduct(product)){res.writeHead(404).end('Produktet findes ikke');return;}const data=JSON.stringify(product);res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
+ if(/^\/api\/pf-product\/pf-[a-z0-9]+$/i.test(path)){const product=await loadPFProduct(path.split('/').at(-1));if(!product||!isVisibleProduct(product,await readAssortment())){res.writeHead(404).end('Produktet findes ikke');return;}const data=JSON.stringify(product);res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
  if(path==='/api/catalog'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify(publicCatalog()));return;}
  const isPage=/^\/design\/pf-[a-z0-9]+$/i.test(path)||path==='/'||path==='/produkter'||path==='/brands'||path==='/specialproduktion'||path==='/demokurv'||path==='/kurv'||path==='/betaling'||path==='/ordre'||path==='/kontakt'||path==='/om-smerch'||path==='/gennemgang'||/^\/produkt\/[a-z0-9-]+$/.test(path);
  const file=path==='/admin'?resolve(root,'admin-dashboard.html'):path==='/admin/pf-orders'?resolve(root,'pf-orders-admin.html'):isPage?resolve(root,'index.html'):resolve(root,'.'+path);

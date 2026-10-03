@@ -10,10 +10,21 @@ export function editorialStory(products,id){
  if(!product||!story)return '';
  return `<a class="product-story product-story--${story.crop}" href="/design/${escape(id)}"><img src="${story.image}" alt="${escape(story.label)} i hverdagen" loading="lazy" decoding="async" width="500" height="500"><div class="product-story-copy"><span>${story.label}</span><h3>${story.title}</h3><span class="product-story-link">Se produktet ↗</span></div></a>`;
 }
+// Sizes share a colour; show each supplier colour only once.
+export function productColorSwatches(variants=[]){
+ const colors=new Map();
+ for(const variant of variants){
+  const name=String(variant.color||variant.colorCode||'').trim();
+  const hex=/^#[a-f0-9]{6}$/i.test(variant.hex||'')?variant.hex.toLowerCase():'';
+  const key=String(variant.colorCode||name||hex).toLowerCase();
+  if(key&&!colors.has(key))colors.set(key,{name:name||'Farve',hex});
+ }
+ if(colors.size<2)return '';
+ return `<span class="editorial-swatches" role="group" aria-label="Produktets farver">${[...colors.values()].map(({name,hex})=>`<i role="img" aria-label="${escape(name)}" title="${escape(name)}"${hex?` style="background:${hex}"`:' class="swatch-unknown"'}></i>`).join('')}</span>`;
+}
 export function editorialProductCard(product,prices,preferredSku){
  const variants=pricedVariants(product,prices),image=(variants.find(v=>v.sku===preferredSku&&v.images?.[0])||variants.find(v=>v.images?.[0]))?.images[0];
  if(!image)return '';
  const price=prices.products[product.id]?.fromIncVat;
- const colors=[...new Set(variants.map(v=>v.hex).filter(hex=>/^#[a-f0-9]{6}$/i.test(hex)))];
- return `<article class="product-card"><a class="product-image" href="/design/${escape(product.id)}"><img src="${escape(image)}" alt="${escape(product.name)}" loading="lazy" decoding="async" width="500" height="500"></a><div class="card-meta"><span>${escape(product.brand)}</span><span class="editorial-swatches" aria-label="${colors.length} farver">${colors.slice(0,5).map(hex=>`<i style="background:${hex}"></i>`).join('')}</span></div><a class="product-title" href="/design/${escape(product.id)}">${escape(product.name)}</a>${Number.isFinite(price)?`<p class="editorial-price">Fra ${new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK'}).format(price/100)}</p>`:''}</article>`;
+ return `<article class="product-card"><a class="product-image" href="/design/${escape(product.id)}"><img src="${escape(image)}" alt="${escape(product.name)}" loading="lazy" decoding="async" width="500" height="500"></a><div class="card-meta"><span>${escape(product.brand)}</span>${productColorSwatches(variants)}</div><a class="product-title" href="/design/${escape(product.id)}">${escape(product.name)}</a>${Number.isFinite(price)?`<p class="editorial-price">Fra ${new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK'}).format(price/100)}</p>`:''}</article>`;
 }
