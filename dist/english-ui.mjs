@@ -12,6 +12,7 @@ Søg|Search
 Kurv|Cart
 Hovednavigation|Main navigation
 Produktgrupper|Product groups
+Messe|Trade fairs
 Alle produkter|All products
 Specialproduktion|Custom production
 Kontakt|Contact

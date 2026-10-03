@@ -1,3 +1,4 @@
+import {classifyShopProduct} from '../lib/pf-product-categories.mjs';
 import {packshotImages} from '../lib/pf-product-images.mjs';
 import {supplierProductGroup} from '../dist/product-groups.mjs';
 import {productDocumentMetadata} from '../lib/pf-document-metadata.mjs';
@@ -56,7 +57,7 @@ for(const source of sources){
    return {sku:String(i.itemCode),size:i.size||'',color:c.colorDesc||'',colorCode:c.colorCode,hex:/^[a-f\d]{6}$/i.test(c.hexColor)?`#${c.hexColor}`:'#cccccc',images,discontinued:String(i.isDiscontinued)==='true',decorationMandatory:String(i.decorationSettings?.decoDefault?.decorationMandatory).toLowerCase()==='no'?false:true,options:prints.get(String(i.itemCode))||[]};
   }).filter(variant=>!variant.discontinued);
   if(!variants.length)continue;
-  products.push({id:`pf-${m.modelCode}`,modelCode:String(m.modelCode),brandId:curated?.brandId||brand.id,brand:curated?.brand||brand.name,name:m.description,description:m.extDesc||'',category,shopCategory:classification.shopCategory,group:classification.group,supplierGroupCode:items[0].categoryData?.groupCode||'',material,variants});
+  products.push(classifyShopProduct({id:`pf-${m.modelCode}`,modelCode:String(m.modelCode),brandId:curated?.brandId||brand.id,brand:curated?.brand||brand.name,name:m.description,description:m.extDesc||'',category,shopCategory:classification.shopCategory,group:classification.group,supplierGroupCode:items[0].categoryData?.groupCode||'',material,variants}));
  }
 }
 if(!products.length||new Set(products.map(p=>p.id)).size!==products.length)throw Error('Empty or duplicate catalog');
