@@ -1,6 +1,8 @@
+import {recordStatistics,statisticsReport} from './lib/shop-statistics.mjs';
 import {isPolandProduct} from './lib/pf-shipping-origin.mjs';
 import {saveSalePrices} from './lib/sale-prices.mjs';
 import {readAssortment,publicAssortment,setVisibility,adminProduct,isVisibleProduct} from './lib/assortment.mjs';
+import {validateBilling} from './lib/billing.mjs';
 import {queueOrderConfirmation,retryOrderConfirmations} from './lib/order-mail.mjs';
 import {legalPage,legalPaths} from './lib/legal-pages.mjs';
 import {subscribeMarketing,unsubscribeMarketing,recordWithdrawal,deliverWithdrawalReceipt,retryWithdrawalReceipts,listMarketing,listWithdrawals} from './lib/legal-services.mjs';
@@ -36,6 +38,9 @@ const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8'
 const placementCache=new Map();
 const placementArtCache=new Map();
 const contactAttempts=new Map();
+const statisticsAttempts=new Map();
+function statisticsAllowed(req){const now=Date.now(),key=req.socket.remoteAddress||'local';let entry=statisticsAttempts.get(key);if(!entry||entry.until<now){if(statisticsAttempts.size>=10000)statisticsAttempts.delete(statisticsAttempts.keys().next().value);entry={count:0,until:now+60000};statisticsAttempts.set(key,entry);}return ++entry.count<=600;}
+
 async function readJSON(req,limit=1024*1024){if(!String(req.headers['content-type']||'').startsWith('application/json'))throw Error('JSON kræves.');const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>limit)throw Error('Anmodningen er for stor.');chunks.push(chunk);}return JSON.parse(Buffer.concat(chunks).toString());}
 async function readPFRelayJSON(req,limit=1024*1024){if(!String(req.headers['content-type']||'').startsWith('application/json'))throw Error('JSON kræves.');const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>limit)throw Error('Anmodningen er for stor.');chunks.push(chunk);}const raw=Buffer.concat(chunks),secret=process.env.PF_WEBHOOK_SIGNING_SECRET;if((secret||process.env.PF_GATEWAY_MODE==='live')&&!verifyPFRelaySignature(raw,req.headers,secret))throw Error('PF-relæets signatur mangler eller er ugyldig.');return JSON.parse(raw.toString());}
 function json(res,status,value){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'}).end(JSON.stringify(value));}
@@ -51,6 +56,17 @@ const handleRequest=async(req,res)=>{
  res.setHeader('Cache-Control','no-store');
  if(req.url==='/health'&&['GET','HEAD'].includes(req.method)){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify({status:'ok'}));return;}
  const legalURL=new URL(req.url,'http://localhost');
+ if(legalURL.pathname==='/api/shop-statistics'&&req.method==='POST'){
+  let same=false;try{const origin=new URL(req.headers.origin);same=['http:','https:'].includes(origin.protocol)&&origin.host===req.headers.host;}catch{}
+  if(!same){json(res,403,{error:'Ugyldig oprindelse.'});return;}
+  if(adminSessionAuthorized({headers:req.headers,method:'GET'})||/bot|crawler|spider|headless/i.test(String(req.headers['user-agent']||''))){res.writeHead(204).end();return;}
+  if(!statisticsAllowed(req)){res.writeHead(429).end();return;}
+  try{const input=await readJSON(req,2048);await recordStatistics(input.events);res.writeHead(204).end();}catch{json(res,400,{error:'Hændelsen kunne ikke registreres.'});}return;
+ }
+ if(legalURL.pathname==='/api/admin/statistics'&&req.method==='GET'){
+  if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}
+  try{json(res,200,await statisticsReport({days:Number(legalURL.searchParams.get('days')||7)}));}catch{json(res,400,{error:'Statistikken kunne ikke indlæses.'});}return;
+ }
  if(legalPaths.has(legalURL.pathname)&&['GET','HEAD'].includes(req.method)){
   try{const body=await legalPage(legalURL.pathname,legalURL.searchParams);res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache'}).end(req.method==='HEAD'?undefined:body);}catch{json(res,500,{error:'Siden kunne ikke indlæses.'});}return;
  }
@@ -79,7 +95,7 @@ const handleRequest=async(req,res)=>{
  if(req.url==='/api/checkout/session'&&req.method==='POST'){
   const base=process.env.SMERCH_PUBLIC_BASE_URL;let expected;try{expected=new URL(base).origin;}catch{}
   if(!expected||req.headers.origin!==expected||req.headers.host!==new URL(expected).host){json(res,403,{error:'Ugyldig oprindelse.'});return;}
-  try{const input=await readJSON(req,30*1024*1024),catalog=await loadProductCatalog(input.lines?.map(line=>line.productId)||[]),{prices,rules}=await loadPricing(),stock=await loadStock();if(catalog.products.some(p=>!isPolandProduct(p)))throw Error('En vare i kurven kan ikke længere bestilles. Webshoppen tilbyder nu kun varer fra Polen. Fjern varen fra kurven.');const legal=validateCheckoutConsent(input.legal),order=prepareCheckout(input,{catalog,prices,rules,stock});order.legal=legal;const deliveryTerms=checkoutConfiguration().deliveryTerms?.[legal.locale];if(!deliveryTerms)throw Error('Leveringstiden skal afklares før onlinebestilling.');order.legal.deliveryTerms=deliveryTerms;if(!contactConfiguration().ready)throw Error('Ordrebekræftelse på e-mail skal være klar før onlinebestilling.');order.legal.documents={terms:await readFile(new URL(`./dist/legal/terms-${legal.locale}.html`,import.meta.url),'utf8'),privacy:await readFile(new URL(`./dist/legal/privacy-${legal.locale}.html`,import.meta.url),'utf8')};if(checkoutConfiguration().mode==='live'){const handoff=handoffConfiguration();if(!handoff.ready)throw Error(handoff.reasons.join(' '));for(const group of order.fulfillment.groups)pfAssetsForGroup(order,group);}await persistCheckoutArtwork(order,input.artworks);await persistCheckout(order);if(order.paymentProvider==='quickpay'){const session=await createQuickpayLink(order.id);json(res,201,{id:order.id,url:session.url});}else{const session=await createStripeSession(order);order.stripeSessionId=session.id;order.status='awaiting_payment';order.updatedAt=new Date().toISOString();await persistCheckout(order);json(res,201,{id:order.id,url:session.url});}}catch(error){json(res,400,{error:error.message||'Betaling kunne ikke startes.'});}return;
+  try{const input=await readJSON(req,30*1024*1024),catalog=await loadProductCatalog(input.lines?.map(line=>line.productId)||[]),{prices,rules}=await loadPricing(),stock=await loadStock();if(catalog.products.some(p=>!isPolandProduct(p)))throw Error('En vare i kurven kan ikke længere bestilles. Webshoppen tilbyder nu kun varer fra Polen. Fjern varen fra kurven.');const legal=validateCheckoutConsent(input.legal),order=prepareCheckout(input,{catalog,prices,rules,stock});order.legal=legal;order.billing=validateBilling(input.billing,legal.customerType);const deliveryTerms=checkoutConfiguration().deliveryTerms?.[legal.locale];if(!deliveryTerms)throw Error('Leveringstiden skal afklares før onlinebestilling.');order.legal.deliveryTerms=deliveryTerms;if(!contactConfiguration().ready)throw Error('Ordrebekræftelse på e-mail skal være klar før onlinebestilling.');order.legal.documents={terms:await readFile(new URL(`./dist/legal/terms-${legal.locale}.html`,import.meta.url),'utf8'),privacy:await readFile(new URL(`./dist/legal/privacy-${legal.locale}.html`,import.meta.url),'utf8')};if(checkoutConfiguration().mode==='live'){const handoff=handoffConfiguration();if(!handoff.ready)throw Error(handoff.reasons.join(' '));for(const group of order.fulfillment.groups)pfAssetsForGroup(order,group);}await persistCheckoutArtwork(order,input.artworks);await persistCheckout(order);if(order.paymentProvider==='quickpay'){const session=await createQuickpayLink(order.id);json(res,201,{id:order.id,url:session.url});}else{const session=await createStripeSession(order);order.stripeSessionId=session.id;order.status='awaiting_payment';order.updatedAt=new Date().toISOString();await persistCheckout(order);json(res,201,{id:order.id,url:session.url});}}catch(error){json(res,400,{error:error.message||'Betaling kunne ikke startes.'});}return;
  }
  const reauthorizePath=/^\/api\/checkout\/(pay-[a-f0-9-]{36})\/reauthorize$/.exec(new URL(req.url,'http://localhost').pathname);
  if(reauthorizePath&&req.method==='POST'){const base=process.env.SMERCH_PUBLIC_BASE_URL;let origin;try{origin=new URL(base).origin;}catch{}if(!origin||req.headers.origin!==origin||req.headers.host!==new URL(origin).host){json(res,403,{error:'Ugyldig oprindelse.'});return;}try{const existing=await readCheckout(reauthorizePath[1]),renew=existing.paymentProvider==='quickpay'?renewQuickpay:reauthorizeCheckout;json(res,200,await renew(reauthorizePath[1],{validate:async order=>{const catalog=await loadProductCatalog(order.lines.map(line=>line.productId)),{prices,rules}=await loadPricing(),stock=await loadStock();validateRenewal(order,{catalog,prices,rules,stock});}}));}catch(error){json(res,400,{error:error.message});}return;}

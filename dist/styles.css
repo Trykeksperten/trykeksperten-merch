@@ -253,7 +253,6 @@ header nav a,header nav button{transition:color .2s}
 header nav a:hover,header nav a[aria-current],#navigation button:hover{color:#cf4d22;border-color:#cf4d22}
 .home-hero{grid-template-columns:minmax(360px,41%) minmax(0,59%);min-height:clamp(620px,74vh,840px);background:#111513}
 .home-hero .hero-copy{position:relative;padding:clamp(52px,7vw,100px) clamp(35px,5vw,80px) clamp(52px,7vw,100px) max(40px,calc((100vw - 1440px)/2));background:#111513;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
-.home-hero .hero-copy:after{content:'S / 01';position:absolute;right:30px;top:28px;color:#f7f7f6;font-size:.63rem;letter-spacing:.15em;opacity:.62}
 .home-hero .eyebrow{color:#cf4d22;margin-bottom:28px}
 .home-hero h1{max-width:720px;margin:0 0 32px;font-size:clamp(4.1rem,7vw,7.7rem);font-weight:650;line-height:.83;letter-spacing:-.075em;text-transform:uppercase}
 .home-hero h1 em{color:#cf4d22}

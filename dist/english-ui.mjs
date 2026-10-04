@@ -909,6 +909,12 @@ Bestil med betalingspligt →|Place order with obligation to pay →
 Vi bruger oplysningerne til at behandle din henvendelse.|We use your information to handle your enquiry.
 Læs privatlivspolitikken|Read the privacy policy
 Læs om designfiler og personoplysninger i|Read about artwork and personal data in
+Privat eller erhverv|Private or business
+Firmanavn *|Company name *
+CVR-nummer *|Danish company registration number *
+Faktura-e-mail *|Invoice email *
+Reference (valgfrit)|Reference (optional)
+Udfyld firmanavn, CVR-nummer (8 cifre) og faktura-e-mail.|Enter company name, an eight-digit Danish company registration number and invoice email.
 Vi leverer kun til Danmark.|We deliver exclusively to Denmark.
 Leveringstiden skal afklares før onlinebestilling.|Delivery times must be confirmed before online ordering.
 `.trim().split('\n').map(line=>line.split('|')));

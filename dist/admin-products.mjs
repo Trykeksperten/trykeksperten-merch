@@ -12,12 +12,20 @@ export async function renderProducts(parent,api){
  const select=(label,options)=>{const wrap=node('label',label),el=node('select');for(const [value,title]of options){const o=node('option',title);o.value=value;el.append(o);}wrap.append(el);filters.append(wrap);return el;};
  const searchLabel=node('label','Søg');searchLabel.append(search);filters.append(searchLabel);
  const group=select('Produktgruppe',[['','Alle produktgrupper'],...[...new Set(products.map(p=>p.group))].sort().map(s=>[s,s])]);
+ const category=select('Underkategori',[['','Alle underkategorier']]);
+ function updateCategories(){
+  const previous=category.value,categories=[...new Set(products.filter(p=>!group.value||p.group===group.value).map(p=>p.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'da'));
+  category.replaceChildren();
+  for(const value of ['',...categories]){const option=node('option',value||'Alle underkategorier');option.value=value;category.append(option);}
+  category.value=categories.includes(previous)?previous:'';
+ }
+ updateCategories();
  const brand=select('Brand',[['','Alle brands'],...[...new Set(products.map(p=>p.brand))].sort().map(s=>[s,s])]);
  const country=select('Produktions-/afsendelsesland',[['','Alle lande'],...[...new Set(products.map(p=>p.shippingCountry))].sort().map(s=>[s,s])]);
  const state=select('Synlighed',[['','Alle produkter'],['visible','Valgt til webshop'],['hidden','Skjult i webshop']]);
  const stats=node('p'),feedback=node('p'),list=node('div'),pager=node('div');feedback.setAttribute('role','status');list.className='product-admin-grid';pager.className='product-admin-pager';host.append(intro,filters,stats,feedback,list,pager);
  let page=0;const size=36;
- function draw(){const q=search.value.trim().toLocaleLowerCase('da'),matches=products.filter(p=>(!q||`${p.name} ${p.id} ${p.brand} ${p.category}`.toLocaleLowerCase('da').includes(q))&&(!group.value||p.group===group.value)&&(!brand.value||p.brand===brand.value)&&(!country.value||p.shippingCountry===country.value)&&(!state.value||(state.value==='visible')===p.visible));page=Math.min(page,Math.max(0,Math.ceil(matches.length/size)-1));stats.textContent=`${products.length} produkter i alt · ${products.filter(p=>p.visible).length} valgt til webshop · ${matches.length} matcher filtrene`;list.replaceChildren();pager.replaceChildren();
+ function draw(){const q=search.value.trim().toLocaleLowerCase('da'),matches=products.filter(p=>(!q||`${p.name} ${p.id} ${p.brand} ${p.category}`.toLocaleLowerCase('da').includes(q))&&(!group.value||p.group===group.value)&&(!category.value||p.category===category.value)&&(!brand.value||p.brand===brand.value)&&(!country.value||p.shippingCountry===country.value)&&(!state.value||(state.value==='visible')===p.visible));page=Math.min(page,Math.max(0,Math.ceil(matches.length/size)-1));stats.textContent=`${products.length} produkter i alt · ${products.filter(p=>p.visible).length} valgt til webshop · ${matches.length} matcher filtrene`;list.replaceChildren();pager.replaceChildren();
  for(const p of matches.slice(page*size,(page+1)*size)){
  const card=node('article');card.className='product-admin-card';if(p.image){const image=node('img');image.src=p.image;image.alt=p.name;image.loading='lazy';card.append(image);}
  card.append(node('small',`${p.brand} · ${p.id}`),node('h2',p.name),node('p',`${p.category} · ${p.variantCount} varianter`),node('strong',p.visible?'Valgt til webshop':'Skjult i webshop'));
@@ -31,6 +39,6 @@ export async function renderProducts(parent,api){
  if(!matches.length)list.append(node('p','Ingen produkter matcher filtrene.'));
  const prev=node('button','← Forrige'),next=node('button','Næste →');prev.disabled=page===0;next.disabled=(page+1)*size>=matches.length;prev.onclick=()=>{page--;draw();};next.onclick=()=>{page++;draw();};pager.append(prev,node('span',`Side ${page+1} af ${Math.max(1,Math.ceil(matches.length/size))}`),next);
  }
- search.oninput=()=>{page=0;draw();};for(const control of [group,brand,country,state])control.onchange=()=>{page=0;draw();};draw();
+ search.oninput=()=>{page=0;draw();};group.onchange=()=>{updateCategories();page=0;draw();};for(const control of [category,brand,country,state])control.onchange=()=>{page=0;draw();};draw();
  }catch(error){host.textContent=error.message;}
 }

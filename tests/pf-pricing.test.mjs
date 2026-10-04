@@ -125,3 +125,42 @@ test('manual SKU prices agree across cards, tiers, estimates and checkout, witho
  assert.equal(listPFProductPrices(catalog,prices,rules,now).products[p.id].fromExVat,15000);
  assert.ok(!JSON.stringify(listPFProductPrices(catalog,prices,custom,now)).includes('salePrices'));
 });
+
+test('Thule retail pricing matches Achiever target across tiers, cards and checkout',()=>{
+ const product={...p,brandId:'thule'},cat={...catalog,products:[product]},source=structuredClone(prices),pricing={...rules,goodsMarkup:100,thuleGoodsMarkup:70};
+ source.products[v.sku].tiers=[{min:1,net:325},{min:25,net:315},{min:50,net:305}];
+ const tiers=listPFProductTiers(cat,p.id,v.sku,source,pricing,now).tiers;
+ assert.equal(tiers[0].unitIncVat,69000);
+ assert.equal(tiers[1].unitIncVat,66900);
+ for(const row of tiers){const q=quotePFLine(cat,{...blank,quantity:row.min},source,pricing,now);assert.equal(q.goods,row.unitExVat*row.min);assert.ok(row.unitExVat>=source.products[v.sku].tiers.find(t=>t.min===row.min).net*100);}
+ assert.equal(listPFProductPrices(cat,source,pricing,now).products[p.id].fromIncVat,66900);
+});
+test('goods never sell below updated supplier cost, including manual overrides and rounding',()=>{
+ const cat={...catalog,products:[{...p,brandId:'thule'}]},pricing={...rules,thuleGoodsMarkup:-20,salePrices:{[v.sku]:[{min:1,unitExVat:1}]}};
+ for(const quantity of [1,50]){const net=quantity<50?10000:8000;assert.equal(quotePFLine(cat,{...blank,quantity},prices,pricing,now).goods,net*quantity);}
+ const updated=structuredClone(prices);updated.products[v.sku].tiers=[{min:1,net:120.01}];
+ for(const salePrices of [pricing.salePrices,{}]){const r={...pricing,salePrices,thuleGoodsMarkup:0};assert.equal(listPFProductTiers(cat,p.id,v.sku,updated,r,now).tiers[0].unitExVat,12001);assert.equal(quotePFLine(cat,{...blank,quantity:1},updated,r,now).goods,12001);}
+});
+
+test('agreed branded prices apply to every colour, preserve volume discounts and agree with checkout',async()=>{
+ for(const [id,cost,retail]of [['pf-100834',240,449],['pf-100990',180,349],['pf-100751',210,399],['pf-124399',310,599],['pf-124525',140,299]]){
+  const product=structuredClone(await loadPFProduct(id)),cat={...catalog,products:[product]},source={...prices,products:{}},pricing={...rules,goodsMarkup:100};
+  // Isolate goods calculations from the supplier's mandatory-decoration policy.
+  for(const variant of product.variants)variant.decorationMandatory=false;
+  for(const variant of product.variants)source.products[variant.sku]={currency:'DKK',minimumDecoration:1,tiers:[{min:1,net:cost},{min:50,net:cost*.9}]};
+  assert.equal(listPFProductPrices(cat,source,pricing,now).products[id].fromIncVat,retail*100);
+  for(const variant of product.variants){
+   const rows=listPFProductTiers(cat,id,variant.sku,source,pricing,now).tiers;
+   assert.equal(rows[0].unitIncVat,retail*100);
+   assert.equal(rows[1].unitExVat,Math.round(retail*80*.9));
+   for(const row of rows){
+    const line={productId:id,sku:variant.sku,quantity:row.min,decorations:[]};
+    assert.equal(quotePFLine(cat,line,source,pricing,now).goodsUnit,row.unitExVat);
+    assert.equal(estimatePFLine(cat,line,source,pricing,now).goodsUnit,row.unitExVat);
+    assert.equal(quotePFCart(cat,[line],source,pricing,now).goods,row.unitExVat*row.min);
+   }
+   const manual={...pricing,salePrices:{[variant.sku]:[{min:1,unitExVat:1}]}};
+   assert.equal(listPFProductTiers(cat,id,variant.sku,source,manual,now).tiers[0].unitExVat,cost*100);
+  }
+ }
+});
