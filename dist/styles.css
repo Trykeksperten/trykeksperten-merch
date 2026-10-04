@@ -1483,3 +1483,36 @@ html[lang=en] .purchase-path .active b:after{content:'Current step'}
 
 /* Keep the hero faithful to Roboto’s natural letterforms. */
 .home-hero h1{font-family:"Roboto",sans-serif;font-weight:500;letter-spacing:normal;line-height:1.03}
+
+/* Keep checkout consent readable without dominating the payment form. */
+.pf-checkout .checkout-legal{padding:16px 20px}
+.pf-checkout .checkout-legal legend{font-size:1rem;font-weight:500}
+.pf-checkout .checkout-legal p{margin:0 0 12px;font-size:.8125rem;font-weight:300;line-height:1.5}
+.pf-checkout .checkout-legal p:last-child{margin:12px 0 0}
+.pf-checkout .checkout-legal .legal-check{flex-direction:row;align-items:flex-start;gap:10px;margin:12px 0;font-size:.8125rem;font-weight:300;line-height:1.5}
+.pf-checkout .checkout-legal .legal-check input{flex:0 0 18px;width:18px;height:18px;min-height:18px;margin:1px 0 0;padding:0}
+
+/* Checkout keeps the essential choices visible and tucks away the longer explanation. */
+.pf-checkout.section{padding-top:40px}
+.pf-checkout .purchase-path{margin-bottom:26px}
+.pf-checkout>h1{margin:0 0 14px;font-size:clamp(2rem,3.2vw,3rem);font-weight:500;letter-spacing:-.045em}
+.pf-checkout .checkout-intro{display:block;max-width:760px;margin:0 0 20px}
+.pf-checkout .checkout-intro>p{margin:0;color:#575d59;font-size:.875rem;font-weight:400;line-height:1.5}
+.pf-checkout .checkout-intro details{margin-top:8px;color:#575d59;font-size:.8125rem;font-weight:400}
+.pf-checkout .checkout-intro summary{width:max-content;max-width:100%;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.pf-checkout .checkout-intro details p{margin:8px 0 0;font-size:.8125rem;line-height:1.5}
+.pf-checkout .cart-layout{margin-top:20px;gap:40px}
+.pf-checkout .checkout-customer-type{margin:0 0 24px;padding:0;border:0}
+.pf-checkout .checkout-customer-type legend{margin-bottom:8px;font-size:.9375rem;font-weight:500}
+.pf-checkout .checkout-customer-type>label{max-width:360px;margin:0;font-size:.8125rem;font-weight:400}
+.pf-checkout .checkout-customer-type select{min-height:44px}
+.pf-checkout form>h2{margin:0 0 16px;font-size:1.5rem;font-weight:500;letter-spacing:-.035em}
+.pf-checkout form>.form-grid{gap:14px 18px;margin-bottom:24px}
+.pf-checkout form>.form-grid label{gap:5px;font-size:.8125rem;font-weight:400}
+.pf-checkout form>.form-grid input{min-height:44px;padding:10px 12px}
+.pf-checkout .cart-summary{padding:24px}
+.pf-checkout .cart-summary h2{font-size:1.25rem;font-weight:500}
+@media(max-width:700px){.pf-checkout.section{padding-top:24px}.pf-checkout .purchase-path{margin-bottom:20px}.pf-checkout .cart-layout{gap:24px}.pf-checkout .checkout-customer-type>label{max-width:none}}
+.pf-checkout .checkout-back-cart{display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin-top:20px;padding:10px 18px;border:1px solid #172423;border-radius:10px;background:#fff;color:#172423;font-size:.875rem;font-weight:500;line-height:1.3;text-decoration:none;transition:background .2s,color .2s}
+.pf-checkout .checkout-back-cart:hover{background:#172423;color:#fff}
+@media(max-width:700px){.pf-checkout .checkout-back-cart{width:100%}}
