@@ -178,6 +178,17 @@ const handleRequest=async(req,res)=>{
  if(req.url==='/api/pf-stock'&&req.method==='GET'){
   try{const catalog=await loadCatalogIndex(),stock=await loadStock();res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify(listPFStock(catalog,stock)));}catch{res.writeHead(500,{'Content-Type':'application/json'}).end(JSON.stringify({available:false,message:'Lagerstatus kunne ikke indlæses.',items:{}}));}return;
  }
+ if(req.url?.startsWith('/api/pf-imprint-image?')&&req.method==='GET'){
+  try{
+   const source=new URL(req.url,'http://localhost').searchParams.get('src'),url=new URL(source);
+   if(url.protocol!=='https:'||url.hostname!=='images.pfconcept.com'||!/^\/ImprintImages_All\/JPG\/500x500\/[A-Za-z0-9_-]+\.jpe?g$/i.test(url.pathname))throw Error();
+   const response=await fetch(url,{redirect:'error',signal:AbortSignal.timeout(10000)});
+   if(!response.ok||Number(response.headers.get('content-length')||0)>8*1024*1024)throw Error();
+   const image=Buffer.from(await response.arrayBuffer());
+   if(image.length>8*1024*1024||image[0]!==255||image[1]!==216||image[2]!==255)throw Error();
+   res.writeHead(200,{'Content-Type':'image/jpeg','Cache-Control':'public, max-age=86400'}).end(image);
+  }catch{res.writeHead(404,{'Content-Type':'text/plain; charset=utf-8'}).end('Placeringsbilledet kunne ikke indlæses.');}return;
+ }
  if(req.url?.startsWith('/api/pf-placement?')&&req.method==='GET'){
   try{
    const source=new URL(req.url,'http://localhost').searchParams.get('src'),url=new URL(source);

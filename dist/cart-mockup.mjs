@@ -20,7 +20,7 @@ async function productDetail(id){
 export async function renderCartMockup(product,option,design){
  const assets=placementOptionAssets(product,option);
  if(!assets.ready)throw Error('Der mangler et placeringsbillede.');
- const image=await loadImage(assets.svg?'/api/pf-placement-art?src='+encodeURIComponent(assets.svg):assets.image);
+ const image=await loadImage(assets.svg?'/api/pf-placement-art?src='+encodeURIComponent(assets.svg):'/api/pf-imprint-image?src='+encodeURIComponent(assets.image));
  let bounds=printableBounds(option,image.naturalWidth,image.naturalHeight);
  if(assets.svg){
   const response=await fetch('/api/pf-placement?src='+encodeURIComponent(assets.svg));
@@ -69,6 +69,20 @@ export async function renderCartMockup(product,option,design){
  return canvas;
 }
 export function bindCartMockups(root,lines){
+ const lightbox=document.createElement('dialog');
+ lightbox.className='pf-mockup-lightbox';
+ lightbox.innerHTML='<div class="pf-mockup-lightbox-content"><button type="button" class="pf-mockup-close" aria-label="Luk stort mockup">×</button><img alt=""><p></p></div>';
+ root.append(lightbox);
+ root.addEventListener('click',event=>{
+  const trigger=event.target.closest('[data-pf-expand-mockup]');
+  if(!trigger||!root.contains(trigger))return;
+  const image=trigger.querySelector('img');
+  lightbox.querySelector('img').src=image.src;
+  lightbox.querySelector('img').alt=image.alt;
+  lightbox.querySelector('p').textContent=trigger.dataset.caption;
+  lightbox.showModal();
+ });
+ lightbox.addEventListener('click',event=>{if(event.target===lightbox||event.target.closest('.pf-mockup-close'))lightbox.close();});
  for(const line of lines){
   if(!line.decorations?.length)continue;
   const target=[...root.querySelectorAll('[data-pf-mockup]')].find(el=>el.dataset.pfMockup===line.id);
@@ -83,7 +97,11 @@ export function bindCartMockups(root,lines){
      if(!option)throw Error('Placeringen findes ikke længere.');
      const canvas=await renderCartMockup(product,option,design);
      if(!target.isConnected)return;
-     figure.prepend(canvas);caption.textContent=option.impLocation+' · Dit design';
+     const image=document.createElement('img'),button=document.createElement('button'),captionText=option.impLocation+' · Dit design';
+     image.src=canvas.toDataURL('image/png');image.alt=`Mockup af ${product.name}, ${option.impLocation}`;
+     button.type='button';button.className='pf-mockup-expand';button.dataset.pfExpandMockup='';button.dataset.caption=captionText;button.setAttribute('aria-label',`Forstør mockup: ${captionText}`);
+     button.append(image);button.insertAdjacentHTML('beforeend','<span class="pf-mockup-plus" aria-hidden="true">+</span>');
+     figure.prepend(button);caption.textContent=captionText;
     }catch(error){if(target.isConnected)caption.textContent=(design.position?design.position+': ':'')+(error.message||'Mockuppet kunne ikke vises.')+' Åbn designet for at se eller rette det.';}
    })();
   }
