@@ -216,6 +216,7 @@ header{position:relative;z-index:20}
  --ink:#111513;
  --blue:#cf4d22;
  --paper:#f7f7f6;
+ --home-cream:#eceeea;
  --soft:#e9ebea;
  --frame:#eff0ee;
  --line:#d9ddda;
@@ -779,7 +780,7 @@ header{border-bottom-color:#d2ccc2}
 
 .home-value-strip{
  padding:15px max(40px,calc((100vw - 1440px)/2));
- background:#ffffff;
+ background:var(--home-cream);
  color:#55524d;
  border-bottom:1px solid #dce0dc;
  text-transform:none;
@@ -794,7 +795,7 @@ header{border-bottom-color:#d2ccc2}
  grid-template-columns:repeat(4,minmax(0,1fr));
  gap:0;
  padding:0 max(40px,calc((100vw - 1440px)/2));
- background:#ffffff;
+ background:var(--home-cream);
  color:#171b19;
  border-top:1px solid #dce0dc;
  border-bottom:1px solid #dce0dc;
@@ -1386,7 +1387,7 @@ header nav a:focus-visible,
 .product-mega-sections>section:only-child>h3{grid-column:1/-1}
 @media(max-width:700px){.product-mega-sections>section:only-child{grid-template-columns:1fr}}
 
-.home-proof-note{margin:0;padding:18px 24px;text-align:center;background:#ffffff;color:var(--ink);font-size:.9375rem;line-height:1.6;border-bottom:1px solid #dce0dc}
+.home-proof-note{margin:0;padding:18px 24px;text-align:center;background:var(--home-cream);color:var(--ink);font-size:.9375rem;line-height:1.6;border-bottom:1px solid #dce0dc}
 
 .pf-price-summary{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 22px;margin:0 0 24px;background:#ffffff;border:1px solid #d5c5b7;border-radius:12px;box-shadow:0 5px 20px #17201f12}.pf-price-summary span,.pf-price-summary small{display:block;font-size:.8rem;line-height:1.5}.pf-price-summary strong{display:block;font-size:1.6rem}.pf-price-summary small{color:var(--muted)}@media(max-width:700px){.pf-price-summary{gap:10px;flex-wrap:wrap;padding:12px}.pf-price-summary strong{font-size:1.2rem}.pf-price-summary>div:nth-child(2){order:3;width:100%}}
 
@@ -1499,7 +1500,7 @@ html[lang=en] .purchase-path .active b:after{content:'Current step'}
 @media(max-width:520px){.site-footer .footer-top{grid-template-columns:1fr;gap:30px 20px;padding-block:32px}.site-footer .footer-intro{grid-column:1/-1}.site-footer .footer-contact{grid-column:1/-1}.site-footer .footer-bottom{gap:14px}.site-footer .footer-admin[open]{width:100%}}
 
 /* Smerch tote campaign photograph above the footer. */
-.home-campaign{margin:0;background:#eceeea}
+.home-campaign{margin:0;background:var(--home-cream)}
 .home-campaign img{display:block;width:100%;max-width:1440px;height:auto;margin-inline:auto}
 
 .home-process .process-heading{text-align:center}
@@ -1509,8 +1510,11 @@ html[lang=en] .purchase-path .active b:after{content:'Current step'}
 .home-hero h1{font-family:"Roboto",sans-serif;font-weight:500;letter-spacing:normal;line-height:1.03}
 
 /* The brand ribbon opens the homepage. */
-.home-brand-preview{padding:18px 0 0}
+.home-brand-preview{padding:18px 0 0;background:var(--home-cream)}
+.home-brand-preview .brand-wordmarks{background:var(--home-cream)}
 .home-brand-preview .brand-marquee-group a{min-height:284px}
+.home-brand-preview .brand-marquee-group a,
+.home-brand-preview .brand-marquee-group a:hover{background:transparent}
 @media(max-width:700px){
  .home-brand-preview{padding-top:8px}
  .home-brand-preview .brand-marquee-group a{min-height:226px}
