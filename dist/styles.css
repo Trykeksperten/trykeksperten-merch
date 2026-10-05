@@ -1384,6 +1384,17 @@ header nav a:focus-visible,
 .brand-preview{padding-bottom:16px}
 .home-categories{padding-top:24px}
 
+/* Let the moving wordmarks sit directly on the page, without visible tiles. */
+.brand-preview .brand-marquee{border:0}
+.brand-preview .brand-marquee-group a,
+.brand-preview .brand-marquee-group a:hover{border:0;background:var(--paper)}
+.brand-preview .brand-marquee-group a:hover .brand-logo{opacity:.72}
+.brand-preview .brand-marquee-group a{justify-content:center;gap:8px;min-height:282px;padding:18px 24px 24px}
+.brand-preview .brand-product-image{width:190px;height:190px;max-width:100%;object-fit:contain;mix-blend-mode:multiply}
+.brand-preview .brand-marquee-group .brand-logo{width:96px;height:38px;max-width:100%;object-fit:contain}
+.brand-preview .brand-marquee-group .brand-logo-text{font-size:1rem}
+@media(max-width:700px){.brand-preview .brand-marquee-group a{min-height:232px;padding:14px 18px 20px}.brand-preview .brand-product-image{width:150px;height:150px}.brand-preview .brand-marquee-group .brand-logo{width:84px;height:34px}}
+
 @media(max-width:700px){.footer-bottom{grid-template-columns:1fr 1fr;gap:26px 20px;padding-block:28px 32px}.footer-service{grid-column:1/-1}}
 @media(max-width:380px){.footer-bottom{grid-template-columns:1fr}}
 
