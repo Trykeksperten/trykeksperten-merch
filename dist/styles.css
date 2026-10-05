@@ -802,28 +802,41 @@ header{border-bottom-color:#d2ccc2}
  font-weight:inherit;
 }
 .home-value-strip>span{
- min-height:96px;
+ min-height:128px;
  display:flex;
+ flex-direction:column;
  align-items:center;
- gap:16px;
- padding:22px clamp(18px,2.5vw,34px);
+ gap:12px;
+ padding:20px clamp(12px,2vw,28px);
  border-right:1px solid #dce0dc;
  white-space:normal;
 }
 .home-value-strip>span:last-child{border-right:0}
 .home-value-strip b{
- flex:0 0 42px;
+ flex:none;
  width:42px;
  height:42px;
  display:grid;
  place-items:center;
- border-radius:50%;
- background:#cf4d22;
+ position:relative;
+ isolation:isolate;
  color:#fff;
  font-size:.78rem;
  font-weight:800;
  letter-spacing:.04em;
 }
+.home-value-strip b::before{
+ content:"";
+ position:absolute;
+ inset:0;
+ z-index:-1;
+ background:#cf4d22;
+ border-radius:38% 62% 57% 43% / 58% 39% 61% 42%;
+ transform:rotate(-12deg);
+}
+.home-value-strip>span:nth-child(2) b::before{border-radius:59% 41% 39% 61% / 43% 61% 39% 57%;transform:rotate(9deg)}
+.home-value-strip>span:nth-child(3) b::before{border-radius:43% 57% 62% 38% / 61% 42% 58% 39%;transform:rotate(-7deg)}
+.home-value-strip>span:nth-child(4) b::before{border-radius:61% 39% 44% 56% / 41% 58% 42% 59%;transform:rotate(14deg)}
 .home-value-strip strong{
  color:#171b19;
  font-size:clamp(1rem,1.2vw,1.16rem);
@@ -835,19 +848,20 @@ header{border-bottom-color:#d2ccc2}
 @media(max-width:700px){
  .home-value-strip{
   display:grid;
-  grid-template-columns:1fr;
+  grid-template-columns:repeat(2,minmax(0,1fr));
   padding:0 18px;
   overflow:visible;
   white-space:normal;
  }
  .home-value-strip>span{
-  min-height:72px;
-  padding:14px 0;
-  border-right:0;
+  min-height:112px;
+  padding:16px 8px;
+  border-right:1px solid #dce0dc;
   border-bottom:1px solid #dce0dc;
  }
- .home-value-strip>span:last-child{border-bottom:0}
- .home-value-strip b{flex-basis:36px;width:36px;height:36px;font-size:.72rem}
+ .home-value-strip>span:nth-child(2n){border-right:0}
+ .home-value-strip>span:nth-last-child(-n+2){border-bottom:0}
+ .home-value-strip b{width:36px;height:36px;font-size:.72rem}
  .home-value-strip strong{font-size:1rem}
 }
 
@@ -1301,7 +1315,6 @@ header nav a:focus-visible,
 .home-featured .card-meta,.pf-catalog .card-meta{margin:16px 0 7px;font-size:.72rem;letter-spacing:0;text-transform:none;color:#686b68;font-weight:400;display:flex;justify-content:space-between;align-items:center}
 .home-featured .product-title,.pf-catalog .product-title{margin:0;font-size:1rem;line-height:1.4;font-weight:400;letter-spacing:-.02em}
 .home-featured .editorial-price,.pf-catalog .pf-card-price{margin:7px 0 0;font-size:.95rem;font-weight:400;color:#686b68}
-.editorial-price-note{margin:30px 0 0;font-size:.75rem;color:#686b68}
 .editorial-swatches{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;max-width:65%}
 .editorial-swatches i{display:block;flex:0 0 11px;width:11px;height:11px;border-radius:50%;border:1px solid #0003}
 .editorial-swatches .swatch-unknown{background:repeating-linear-gradient(135deg,#fff 0 3px,#ccc 3px 6px)}
@@ -1494,6 +1507,14 @@ html[lang=en] .purchase-path .active b:after{content:'Current step'}
 
 /* Keep the hero faithful to Roboto’s natural letterforms. */
 .home-hero h1{font-family:"Roboto",sans-serif;font-weight:500;letter-spacing:normal;line-height:1.03}
+
+/* The brand ribbon opens the homepage. */
+.home-brand-preview{padding:18px 0 0}
+.home-brand-preview .brand-marquee-group a{min-height:284px}
+@media(max-width:700px){
+ .home-brand-preview{padding-top:8px}
+ .home-brand-preview .brand-marquee-group a{min-height:226px}
+}
 
 /* Keep checkout consent readable without dominating the payment form. */
 .pf-checkout .checkout-legal{padding:16px 20px}

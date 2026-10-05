@@ -37,10 +37,10 @@ Bestil|Place your order
 Du modtager altid en korrektur til godkendelse, før vi sætter produktionen i gang.|You always receive a proof to approve before we start production.
 Jeres logo.|Your logo.
 Deres nye favorit.|Their new favourite.
+Nye favoritter!|New favourites!
 Se hele kollektionen|Browse the collection
 Udvalgt lige nu.|Our current picks.
 Udforsk kataloget|Explore the catalogue
-Fra-priser pr. stk. inkl. moms · uden tryk og opstart.|Starting prices per item include VAT, excluding printing and setup.
 Fra idé til færdigt merch|From idea to finished merch
 Et enkelt flow.|A simple process.
 Et skarpere resultat.|A sharper result.
@@ -642,7 +642,7 @@ tilføjet · vælg et lag for at redigere|added · select a layer to edit
 logoer|logos
 Opdatér kurv|Update cart
 Tilføj tekst|Add text
-Billige kuglepenne|Affordable pens
+Kuglepenne|Pens
 Fede caps|Great caps
 Sætter brandanimation på pause|Pause brand animation
 Se produkter fra|Browse products from
