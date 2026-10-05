@@ -29,6 +29,7 @@ import { fileURLToPath } from 'node:url';
 import { publicCatalog } from './lib/catalog.mjs';
 import {sanitizeDesignLine} from './lib/design-validation.mjs';
 import {loadCatalogIndex,loadPFProduct,loadProductCatalog} from './lib/pf-catalog-store.mjs';
+import {seoPage,seoHead,seoMain,sitemapXML,robotsTXT} from './dist/seo-pages.mjs';
 import {parsePFPlacementSVG,stripPFPlacementGuide} from './lib/pf-placement.mjs';
 const root=resolve(fileURLToPath(new URL('./dist/',import.meta.url)));
 const pdfRoot=resolve(fileURLToPath(new URL('./node_modules/pdfjs-dist/build/',import.meta.url)));
@@ -54,6 +55,7 @@ async function quoteOnlyProductIds(catalog,priceResult){
 const handleRequest=async(req,res)=>{
  res.setHeader('X-Content-Type-Options','nosniff');
  res.setHeader('Cache-Control','no-store');
+ if(/^\/(?:api|admin)(?:\/|$)/.test(new URL(req.url,'http://localhost').pathname))res.setHeader('X-Robots-Tag','noindex');
  if(req.url==='/health'&&['GET','HEAD'].includes(req.method)){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify({status:'ok'}));return;}
  const legalURL=new URL(req.url,'http://localhost');
  if(legalURL.pathname==='/api/shop-statistics'&&req.method==='POST'){
@@ -241,9 +243,21 @@ const handleRequest=async(req,res)=>{
  if(path==='/api/pf-catalog'){const data=JSON.stringify(publicAssortment(await loadCatalogIndex(),await readAssortment()));res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
  if(/^\/api\/pf-product\/pf-[a-z0-9]+$/i.test(path)){const product=await loadPFProduct(path.split('/').at(-1));if(!product||!isVisibleProduct(product,await readAssortment())){res.writeHead(404).end('Produktet findes ikke');return;}const data=JSON.stringify(product);res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
  if(path==='/api/catalog'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify(publicCatalog()));return;}
+ if(path==='/robots.txt'){const data=Buffer.from(robotsTXT);res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'public, max-age=3600','Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);return;}
+ if(path==='/sitemap.xml'){const catalog=publicAssortment(await loadCatalogIndex(),await readAssortment()),data=Buffer.from(sitemapXML(catalog));res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'public, max-age=3600','Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);return;}
  const isPage=/^\/design\/pf-[a-z0-9]+$/i.test(path)||path==='/'||path==='/produkter'||path==='/brands'||path==='/specialproduktion'||path==='/demokurv'||path==='/kurv'||path==='/betaling'||path==='/ordre'||path==='/kontakt'||path==='/om-smerch'||path==='/gennemgang'||/^\/produkt\/[a-z0-9-]+$/.test(path);
  const file=path==='/admin'?resolve(root,'admin-dashboard.html'):path==='/admin/pf-orders'?resolve(root,'pf-orders-admin.html'):isPage?resolve(root,'index.html'):resolve(root,'.'+path);
  if(!file.startsWith(root+sep)||!types[extname(file)]){res.writeHead(404).end('Siden findes ikke');return;}
+ if(isPage){
+  const catalog=publicAssortment(await loadCatalogIndex(),await readAssortment()),visible=/^\/design\/pf-/i.test(path)?catalog.products.find(product=>product.id===path.split('/').at(-1)):null;
+  if(/^\/design\/pf-/i.test(path)&&!visible){res.writeHead(404,{'Content-Type':'text/plain; charset=utf-8','X-Robots-Tag':'noindex'}).end(req.method==='HEAD'?undefined:'Produktet findes ikke');return;}
+  const detail=visible?await loadPFProduct(visible.id):null,checkout=visible?checkoutConfiguration():null;
+  const commerce=visible&&checkout.ready&&checkout.mode==='live'?await (async()=>{const {prices,rules}=await loadPricing();return {prices:listPFProductPrices(catalog,prices,rules),stock:listPFStock(catalog,await loadStock()),checkout};})():null;
+  const page=seoPage(path,legalURL.search,catalog,detail,commerce);
+  const template=await readFile(file,'utf8');
+  const html=template.replace('<title>Smerch</title>',`<title>${page.title.replaceAll('&','&amp;').replaceAll('<','&lt;')}</title>${seoHead(page)}${path==='/'?'<link rel="preload" as="image" href="/assets/smerch-orange-tote-lifestyle-960.jpg" imagesrcset="/assets/smerch-orange-tote-lifestyle-640.jpg 640w, /assets/smerch-orange-tote-lifestyle-960.jpg 960w, /assets/smerch-orange-tote-lifestyle-1280.jpg 1280w, /assets/smerch-orange-tote-lifestyle.jpg 1536w" imagesizes="100vw" fetchpriority="high">':''}`).replace('<main id="main" tabindex="-1" data-loading><div class="wrap loading">Indlæser produkter…</div></main>',`<main id="main" tabindex="-1" data-loading>${seoMain(page,catalog)}</main>`);
+  const data=Buffer.from(html);res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache','Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);return;
+ }
  const data=await readFile(file),extension=extname(file),cacheControl=['.html','.css','.mjs','.js'].includes(extension)?'no-cache':'public, max-age=604800, stale-while-revalidate=86400';
  res.writeHead(200,{'Content-Type':types[extension],'Cache-Control':cacheControl,'Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);
  }catch{res.writeHead(404).end('Siden findes ikke');}

@@ -4,7 +4,7 @@ export const englishUI=Object.fromEntries(`
 Gå til indhold|Skip to content
 Design dit merch|Design your merch
 Korrektur før produktion|Proof approval before production
-Leveret direkte til jer|Delivered straight to you
+Leveret direkte til dig|Delivered straight to you
 Smerch, forside|Smerch, home
 Søg produkter|Search products
 Hvad skal have dit logo?|What should carry your logo?

@@ -164,3 +164,17 @@ test('agreed branded prices apply to every colour, preserve volume discounts and
   }
  }
 });
+
+test('Sencha coaster costs 10 DKK including VAT on cards, tiers and in the cart',async()=>{
+ const product=await loadPFProduct('pf-113415'),sku='11341506',cat={...catalog,products:[product]};
+ const source={...prices,products:{[sku]:{currency:'DKK',minimumDecoration:25,tiers:[{min:1,net:1.15},{min:25,net:1.15},{min:50,net:1.15}]}}};
+ assert.deepEqual(listPFProductPrices(cat,source,rules,now).products[product.id],{fromExVat:800,fromIncVat:1000,fromQuantity:25});
+ assert.equal(listPFProductTiers(cat,product.id,sku,source,rules,now).tiers[0].unitIncVat,1000);
+ for(const quantity of [1,25,50]){
+  const line={productId:product.id,sku,quantity,decorations:[]};
+  assert.equal(quotePFLine(cat,line,source,rules,now).goodsUnit,800);
+  assert.equal(quotePFCart(cat,[line],source,rules,now).totalIncVat,quantity*1000);
+ }
+ const higherCost={...source,products:{[sku]:{...source.products[sku],tiers:[{min:1,net:9}]}}};
+ assert.equal(listPFProductPrices(cat,higherCost,rules,now).products[product.id].fromIncVat,1125);
+});

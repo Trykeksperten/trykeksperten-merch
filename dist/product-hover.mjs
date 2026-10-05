@@ -19,17 +19,18 @@ export function bindProductImageHover(root){
  for(const card of root.querySelectorAll('.product-card')){
   const link=card.querySelector('a.product-image[href^="/design/"]'),image=link?.querySelector('img');
   if(!image)continue;
-  const id=link.getAttribute('href').split('/').pop(),primary=image.getAttribute('src');
-  let hovered=false,focused=false,alternate=null,pending=null;
+  const id=link.getAttribute('href').split('/').pop();
+  let primary=image.getAttribute('src'),hovered=false,focused=false,alternate=null,pending=null,generation=0;
   const paint=()=>{if(image.isConnected)image.src=(hovered||focused)&&alternate?alternate:primary;};
   const prepare=async()=>{
    if(alternate){paint();return;}
-   if(!pending)pending=(async()=>{try{const product=await productDetails(id);for(const source of alternateProductImages(product,primary)){if(await loadPhoto(source)){alternate=source;break;}}}catch{}finally{pending=null;}})();
+   if(!pending){const current=primary,version=generation;pending=(async()=>{try{const product=await productDetails(id);for(const source of alternateProductImages(product,current)){if(await loadPhoto(source)){if(version===generation)alternate=source;break;}}}catch{}finally{if(version===generation)pending=null;}})();}
    await pending;paint();
   };
+  image.addEventListener('product-card-color-change',()=>{primary=image.dataset.colorPrimary||image.getAttribute('src');generation++;alternate=null;pending=null;hovered=false;focused=false;paint();});
   card.addEventListener('pointerenter',event=>{if(event.pointerType!=='mouse')return;hovered=true;prepare();});
   card.addEventListener('pointerleave',()=>{hovered=false;paint();});
-  card.addEventListener('focusin',()=>{focused=true;prepare();});
+  card.addEventListener('focusin',event=>{if(!link.contains(event.target))return;focused=true;prepare();});
   card.addEventListener('focusout',event=>{if(card.contains(event.relatedTarget))return;focused=false;paint();});
  }
 }
