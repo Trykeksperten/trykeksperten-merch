@@ -12,6 +12,8 @@ Søg|Search
 Kurv|Cart
 Hovednavigation|Main navigation
 Produktgrupper|Product groups
+Muleposer|Tote bags
+Madposer|Food bags
 Messe|Trade fairs
 Alle produkter|All products
 Specialproduktion|Custom production
@@ -43,13 +45,12 @@ Udvalgt lige nu.|Our current picks.
 Udforsk kataloget|Explore the catalogue
 Fra idé til færdigt merch|From idea to finished merch
 Et enkelt flow.|A simple process.
-Et skarpere resultat.|A sharper result.
-Find jeres favoritter|Find your favourites
-Vælg de produkter, der passer til menneskerne og anledningen.|Choose products that suit your people and occasion.
-Tilføj jeres identitet|Add your identity
-Vælg farver, antal og tryk. Placér logoet direkte på produktet.|Choose colours, quantities and printing. Position your logo on the product.
-Godkend udtrykket|Approve the design
-Se korrekturen, godkend detaljerne og send først derefter i produktion.|Review the proof and approve the details before production begins.
+Find noget, de vil bruge|Find something they’ll use
+Tænk på dem, der skal have det. Vælg noget, der passer til deres hverdag – og som I selv ville være stolte af at give.|Think about the people receiving it. Choose something that fits their everyday life – and that you’d be proud to give.
+Sæt jeres præg på det|Make it yours
+Vælg farve og antal, og læg jeres logo på. Prøv jer frem, til det føles som jer.|Choose a colour and quantity, then add your logo. Try it out until it feels like you.
+Vi viser jer det først|We’ll show you first
+I får en korrektur at se. Når I har godkendt den, sætter vi produktionen i gang.|You’ll receive a proof. Once you’ve approved it, we’ll start production.
 Smerch · København|Smerch · Copenhagen
 Jeres brand fortjener|Your brand deserves
 mere end standard.|more than standard.
@@ -84,7 +85,6 @@ Alle niveauer|All ranges
 Anbefalet|Recommended
 God værdi|Great value
 Smerchs inddeling efter brand.|Smerch's classification by brand.
-Mit udvalg|My favourites
 Vis|Show
 Nulstil filtre|Reset filters
 Sortér efter|Sort by
@@ -93,7 +93,6 @@ Pris: højeste først|Price: high to low
 Navn: A–Å|Name: A–Z
 Navn: Å–A|Name: Z–A
 Brand: A–Å|Brand: A–Z
-Hent mit udvalg|Download my favourites
 Priser inkl. moms. Tryk beregnes i designprocessen.|Prices include VAT. Printing is calculated as you design.
 Pris indlæses…|Loading price…
 Kommer snart|Coming soon
@@ -134,7 +133,6 @@ Produkt|Product
 Betaling|Payment
 Korrektur|Proof
 AKTUELT TRIN|CURRENT STEP
-Gem til mit udvalg|Save to favourites
 Beregner enhedspris…|Calculating unit price…
 Vælg produkt og antal|Choose product and quantity
 Farve og størrelse|Colour and size

@@ -15,6 +15,7 @@ export const productGroups = [
  {id:'sundhed',code:'mc14',name:'Sundhed og personlig pleje'}
 ];
 export function supplierProductGroup(code){return productGroups.find(group=>group.code===code);}
+export function canonicalSubcategory(name){return name==='Bomuldstasker'?'Muleposer':name;}
 export function groupSections(group,products){
  const categories=new Map();
  for(const product of products)if(product.shopCategory===group.id&&product.category)categories.set(product.category,(categories.get(product.category)||0)+1);

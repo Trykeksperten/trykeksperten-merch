@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {productGroups,groupSections,productGroupURL} from '../dist/product-groups.mjs';
 import {loadCatalogIndex,iteratePFProducts} from '../lib/pf-catalog-store.mjs';
+import {seoPage} from '../dist/seo-pages.mjs';
 test('product navigation matches PF names and order and includes every supplier subcategory',()=>{
  assert.deepEqual(productGroups.map(g=>g.name),['Tekstil','Tasker','Drikkeartikler','Kuglepenne og skriveartikler','Teknologi','Notesbøger og papir','Paraplyer','Hjem og livsstil','Messe','Sport og fritid','Spil og legetøj','Værktøj og biltilbehør','Sundhed og personlig pleje']);
  const products=[{shopCategory:'tasker',category:'Bomuldstasker'},{shopCategory:'tasker',category:'Muleposer'},{shopCategory:'tasker',category:'Muleposer'},{shopCategory:'tasker',category:'Ny PF-kategori'},{shopCategory:'papir',category:'Notesbøger'}];
@@ -15,4 +16,16 @@ test('catalogue summaries and product details use matching PF groups without los
   const group=productGroups.find(g=>g.id===product.shopCategory);assert.ok(group,product.id);assert.equal(product.group,group.name,product.id);assert.equal(summaries.get(product.id).shopCategory,product.shopCategory);count++;
  }
  assert.equal(count,index.products.length);
+});
+test('cotton tote bags join Muleposer while food bags have their own category',async()=>{
+ const index=await loadCatalogIndex(),byId=id=>index.products.find(product=>product.id===id),bags=['pf-119411','pf-120131','pf-120331','pf-120332'];
+ for(const id of bags){assert.equal(byId(id).category,'Muleposer');assert.equal(byId(id).supplierCategory,'Bomuldstasker');}
+ for(const id of ['pf-126369','pf-1PZ017'])assert.equal(byId(id).category,'Madposer');
+ const sections=groupSections(productGroups.find(group=>group.id==='tasker'),index.products)[0].items;
+ assert.ok(!sections.some(item=>item.name==='Bomuldstasker'));
+ assert.ok(sections.some(item=>item.name==='Muleposer'));
+ assert.ok(sections.some(item=>item.name==='Madposer'));
+ const old=seoPage('/produkter','?kategori=tasker&underkategori=Bomuldstasker',index);
+ assert.equal(old.canonical,'https://smerch.dk/produkter?kategori=tasker&underkategori=Muleposer');
+ assert.equal(old.robots,'noindex,follow');
 });

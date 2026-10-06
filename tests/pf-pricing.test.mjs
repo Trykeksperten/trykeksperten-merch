@@ -16,6 +16,23 @@ const prices=normalizePrices(goods,print),rules={goodsMarkup:50,printMarkup:100}
 const blank={productId:p.id,sku:v.sku,quantity:10,decorations:[]};
 const textPlacement={x:.5,y:.5,scale:.24},textSize=designGroupSize([],'TEST',textPlacement,o),decorated={...blank,decorations:[{optionId:o.id,width:Math.round(textSize.widthMm*10)/10,height:Math.round(textSize.heightMm*10)/10,colors:1,text:'TEST',textPlacement}]};
 test('blank goods use quantity tier and never charge printing or setup',()=>{const q=quotePFLine(catalog,blank,prices,rules,now);assert.equal(q.goods,150000);assert.equal(q.print,0);assert.equal(q.setup,0);assert.equal(q.totalIncVat,187500);assert.equal(quotePFLine(catalog,{...blank,quantity:50},prices,rules,now).goods,600000);});
+test('a one-piece price tier does not override the decorated minimum without a less-than-minimum charge',()=>{
+ const current=structuredClone(prices);current.prints[o.printCode].ltm=0;
+ assert.equal(listPFProductTiers(catalog,p.id,v.sku,current,rules,now).minimumQuantity,1);
+ assert.ok(quotePFLine(catalog,{...blank,quantity:1},current,rules,now).totalIncVat>0);
+ const below={...decorated,quantity:1};
+ assert.match(quotePFLine(catalog,below,current,rules,now).message,/mindst 25 stk/);
+ assert.equal(listPFPrintPrices(catalog,p.id,v.sku,1,current,rules,now).available,false);
+ assert.throws(()=>supplierPFOrderAmounts(catalog,[below],current,now),/under 25 stk/);
+ assert.ok(quotePFLine(catalog,{...decorated,quantity:25},current,rules,now).totalIncVat>0);
+});
+test('decoration-required products start at their confirmed decorated minimum',()=>{
+ const required={...p,variants:[{...v,decorationMandatory:true}]},requiredCatalog={...catalog,products:[required]};
+ const result=listPFProductTiers(requiredCatalog,p.id,v.sku,prices,rules,now);
+ assert.equal(result.minimumQuantity,25);
+ assert.equal(result.tiers[0].min,25);
+ assert.equal(listPFProductPrices(requiredCatalog,prices,rules,now).products[p.id].fromQuantity,25);
+});
 test('decorated totals include rounded startup once per placement and the small-order fee',()=>{const q=quotePFLine(catalog,decorated,prices,rules,now);assert.equal(q.print,20000);assert.equal(q.setup,13000);assert.equal(q.net,183000);assert.equal(q.vat,45750);assert.equal(q.totalIncVat,228750);const many=quotePFLine(catalog,{...decorated,quantity:50},prices,rules,now);assert.equal(many.setup,10000);assert.equal(many.print,80000);});
 test('Gateway procurement total uses PF net goods, print and setup rather than customer markup',()=>{const supplier=supplierPFOrderAmounts(catalog,[decorated],prices,now);assert.deepEqual(supplier,{unitPrices:[100],total:1230,currency:'DKK'});assert.ok(supplier.total*100<quotePFLine(catalog,decorated,prices,rules,now).net);});
 test('PF proof versions invalidate older Smerch approvals and wait for PF confirmation',async()=>{const fresh=structuredClone(prices),created=new Date().toISOString();fresh.productDate=created;fresh.printDate=created;const stock={updatedAt:created,items:{[v.sku]:{available:100}}},input={lines:[decorated],shipping:{name:'Joakim',email:'joakim@example.dk',phone:'12345678',address:{street:'Testvej 1',postalCode:'1000',city:'København',country:'DK'}},assets:{'0:0':{pmsColors:['Black C'],files:{raw:'https://example.dk/raw.pdf',proof:'https://example.dk/proof.pdf'}}}};let order;try{order=await prepareOrder(input,{catalog,prices:fresh,rules,stock,env:{PF_GATEWAY_SENDER_ID:'SMERCH',PF_COMMUNICATION_EMAIL:'proof@example.dk',PF_GATEWAY_MODE:'test'}});const notice={messageId:'pf-confirm-1',reference:order.purchaseOrderNumber,orderNumber:1234};const confirmed=await applyPFNotification('confirmation',notice);assert.equal(confirmed.status,'awaiting_proof');assert.equal((await applyPFNotification('confirmation',notice)).events.length,confirmed.events.length);const withProof=await recordProof(order.id,{proofReference:'PF-1',proofUrl:'https://example.dk/proof.pdf'});assert.equal(withProof.status,'proof_received');await assert.rejects(recordExternalApproval(order.id,{pfApprovalReference:'PF-approval-1'}),/godkendes hos Smerch/);const approved=await decideProof(order.id,{version:1,decision:'approve'});assert.equal(approved.status,'approval_pending_pf');assert.equal((await applyPFNotification('confirmation',{...notice,messageId:'late-confirm'})).status,'approval_pending_pf');const pdf=Buffer.from('%PDF-1.4\n1 0 obj\nendobj\n');const newer=await recordProof(order.id,{purchaseOrderNumber:order.purchaseOrderNumber,proofReference:'PF-2',contentBase64:pdf.toString('base64'),mimeType:'application/pdf',messageId:'mail-2',source:'inbox'});assert.equal(newer.proof.version,2);assert.equal(newer.status,'proof_received');assert.deepEqual((await readProofFile(order.id,2)).data,pdf);assert.equal((await recordProof(order.id,{purchaseOrderNumber:order.purchaseOrderNumber,proofReference:'PF-2',contentBase64:pdf.toString('base64'),mimeType:'application/pdf',messageId:'mail-2',source:'inbox'})).proof.version,2);await assert.rejects(decideProof(order.id,{version:1,decision:'approve'}),/seneste/);await assert.rejects(recordExternalApproval(order.id,{pfApprovalReference:'PF-approval-1'}),/godkendes hos Smerch/);await decideProof(order.id,{version:2,decision:'approve'});const confirmedByPf=await recordExternalApproval(order.id,{pfApprovalReference:'PF-approval-2'});assert.equal(confirmedByPf.status,'approval_recorded');const processing=await applyPFNotification('status',{StatusChangedNotification:{messageId:'pf-status-1',poNumber:order.purchaseOrderNumber,statusCode:'PROCESSING'}});assert.equal(processing.status,'processing');}finally{if(order){await rm(new URL(`../.private/orders/${order.id}.json`,import.meta.url),{force:true});await rm(new URL(`../.private/proofs/${order.id}/`,import.meta.url),{recursive:true,force:true});}}});
@@ -161,6 +178,23 @@ test('agreed branded prices apply to every colour, preserve volume discounts and
    }
    const manual={...pricing,salePrices:{[variant.sku]:[{min:1,unitExVat:1}]}};
    assert.equal(listPFProductTiers(cat,id,variant.sku,source,manual,now).tiers[0].unitExVat,cost*100);
+  }
+ }
+});
+
+test('EcoSeal retail uplift applies to every model and colour, preserving quantity discounts',async()=>{
+ for(const id of ['pf-130103','pf-130105','pf-130106','pf-130136']){
+  const product=await loadPFProduct(id),cat={...catalog,products:[product]},source={...prices,products:{}};
+  for(const variant of product.variants)source.products[variant.sku]={currency:'DKK',minimumDecoration:100,tiers:[{min:1,net:1.25},{min:250,net:1}]};
+  assert.equal(listPFProductPrices(cat,source,rules,now).products[id].fromIncVat,375);
+  for(const variant of product.variants){
+   const tiers=listPFProductTiers(cat,id,variant.sku,source,rules,now).tiers;
+   assert.deepEqual(tiers,[{min:1,unitExVat:300,unitIncVat:375},{min:250,unitExVat:240,unitIncVat:300}]);
+   for(const quantity of [100,250]){
+    const line={productId:id,sku:variant.sku,quantity,decorations:[]},unit=quantity===100?300:240;
+    assert.equal(quotePFLine(cat,line,source,rules,now).goodsUnit,unit);
+    assert.equal(quotePFCart(cat,[line],source,rules,now).goods,unit*quantity);
+   }
   }
  }
 });

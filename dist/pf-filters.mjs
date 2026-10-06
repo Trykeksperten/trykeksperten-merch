@@ -1,5 +1,6 @@
 import {translate,getLanguage} from './i18n-core.mjs';
 import {pricedVariants} from './pf-visibility.mjs';
+import {canonicalSubcategory} from './product-groups.mjs?v=23';
 
 export function insulationStatus(product){
  const text=`${product.name||''} ${product.description||''}`.toLowerCase();
@@ -56,14 +57,13 @@ export function sortPFProducts(products,mode,priceData,tierFor=()=> 'recommended
  return list.sort((a,b)=>(tierRank[tierFor(a)]??99)-(tierRank[tierFor(b)]??99)||byName(a,b));
 }
 
-export function filterPFProducts(products,params,priceData,qualityTier,favorites=[]){
- const q=(params.get('q')||'').toLocaleLowerCase('da'),category=params.get('kategori')||'',subcategory=params.get('underkategori')||'',brand=params.get('brand')||'',level=params.get('niveau')||'',color=params.get('farve')||'',insulation=params.get('isolering')||'',method=params.get('tryk')||'',price=params.get('pris')||'',chosen=new Set(favorites);
+export function filterPFProducts(products,params,priceData,qualityTier){
+ const q=(params.get('q')||'').toLocaleLowerCase('da'),category=params.get('kategori')||'',subcategory=canonicalSubcategory(params.get('underkategori')||''),brand=params.get('brand')||'',level=params.get('niveau')||'',color=params.get('farve')||'',insulation=params.get('isolering')||'',method=params.get('tryk')||'',price=params.get('pris')||'';
  return products.filter(product=>{
   if(category==='caps'){if(!['Caps & hatte','Huer'].includes(product.category))return false;}else if(category==='bomuldstasker'){if(product.shopCategory!=='tasker'||!(/bomuld|cotton/i.test(product.name+' '+(product.material||''))||product.category==='Bomuldstasker'))return false;}else if(category&&product.shopCategory!==category)return false;
   if(subcategory&&product.category!==subcategory)return false;
   if(brand&&product.brandId!==brand)return false;
   if(level&&qualityTier(product)!==level)return false;
-  if(params.has('udvalgte')&&!chosen.has(product.id))return false;
   if(q&&!`${product.name} ${translate(product.name)} ${product.brand} ${product.modelCode}`.toLocaleLowerCase('da').includes(q))return false;
   if(color&&!productColors(product,priceData).includes(color))return false;
   if(insulation&&product.insulation!==insulation)return false;

@@ -954,7 +954,7 @@ header{border-bottom-color:#d2ccc2}
 }
 .home-process .steps h3{margin-top:34px;color:#ffffff;font-size:1.25rem}
 .home-process .steps>div{text-align:center}
-.home-process .steps p{color:#ffffff;margin-inline:auto}
+.home-process .steps p{color:#ffffff;margin-inline:auto;font-weight:400;line-height:1.5}
 .home-process .steps span{color:#ffffff}
 
 .home-manifesto{
@@ -1140,7 +1140,7 @@ header nav a:focus-visible,
 }
 .catalog-heading h1 {
   max-width: 960px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   font-size: clamp(3rem, 5.4vw, 5.7rem);
   line-height: .94;
   font-weight: 600;
