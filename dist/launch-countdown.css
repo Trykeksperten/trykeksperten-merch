@@ -1,0 +1,7 @@
+body.launch-pending{padding-top:var(--launch-height,86px)}
+.launch-pending .pf-editor-zoom,.launch-pending .pf-studio>.pf-price-summary{top:var(--launch-height,86px)}
+html{scroll-padding-top:calc(var(--launch-height,0px) + 16px)}
+.launch-banner{position:fixed;inset:0 0 auto;z-index:1100;display:flex;align-items:center;justify-content:center;gap:40px;padding:14px 24px;background:#17201f;color:#fff;border-bottom:1px solid #34403b;pointer-events:none}
+.launch-copy{display:grid;gap:5px}.launch-copy strong{font-size:20px;font-weight:500;letter-spacing:-.025em;line-height:1.2}.launch-copy>span{font-size:12px;font-weight:400;color:#d5dcd7;line-height:1.4}
+.launch-clock{display:flex;gap:8px;flex-shrink:0}.launch-clock>span{display:grid;justify-items:center;gap:4px;min-width:48px}.launch-clock b{font:500 28px/1.15 ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;color:#ffb18e;letter-spacing:-.04em}.launch-clock small{font-size:10px;font-weight:400;color:#d5dcd7}
+@media(max-width:640px){.launch-banner{gap:12px;padding:10px 16px;justify-content:space-between}.launch-copy strong{font-size:15px}.launch-copy>span{font-size:10px;max-width:190px}.launch-clock{gap:3px}.launch-clock>span{min-width:30px}.launch-clock b{font-size:21px}.launch-clock small{font-size:9px}}

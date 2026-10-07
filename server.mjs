@@ -1,3 +1,4 @@
+import {launchConfig,launchMessage,blocksLaunchOrder} from './dist/launch-config.mjs';
 import {sanitizeSpecial,sendSpecial} from './lib/special-inquiry.mjs';
 import {recordStatistics,statisticsReport} from './lib/shop-statistics.mjs';
 import {isPolandProduct} from './lib/pf-shipping-origin.mjs';
@@ -54,6 +55,7 @@ async function quoteOnlyProductIds(catalog,priceResult){
  }catch{return [];}
 }
 const handleRequest=async(req,res)=>{
+ if(blocksLaunchOrder(new URL(req.url,'http://localhost').pathname,req.method)){json(res,503,{error:launchMessage});return;}
  res.setHeader('X-Content-Type-Options','nosniff');
  res.setHeader('Cache-Control','no-store');
  if(/^\/(?:api|admin)(?:\/|$)/.test(new URL(req.url,'http://localhost').pathname))res.setHeader('X-Robots-Tag','noindex');
@@ -93,7 +95,7 @@ const handleRequest=async(req,res)=>{
   if(!contactAllowed(req)){json(res,429,{error:'Der er sendt for mange beskeder. Prøv igen om lidt.'});return;}
   try{const special=req.url==='/api/special-inquiry';const inquiry=(special?sanitizeSpecial:sanitizeContact)(await readJSON(req,special?22*1024*1024:16*1024));if(inquiry.website){json(res,201,{sent:true});return;}await (special?sendSpecial:sendContact)(inquiry);json(res,201,{sent:true});}catch(error){const unavailable=/ikke færdigkonfigureret/.test(error.message);json(res,unavailable?503:400,{error:unavailable?'Mailforbindelsen er ved at blive gjort klar. Skriv direkte til hello@smerch.dk indtil da.':error.message||'Beskeden kunne ikke sendes.'});}return;
  }
- if(req.url==='/api/checkout/status'&&req.method==='GET'){json(res,200,checkoutConfiguration());return;}
+ if(req.url==='/api/checkout/status'&&req.method==='GET'){json(res,200,{...checkoutConfiguration(),...(!launchConfig.ordersEnabled?{ready:false,reason:launchMessage}:{}),launch:launchConfig});return;}
  if(req.url==='/api/checkout/fulfillment'&&req.method==='POST'){try{const input=await readJSON(req),lines=input.lines;if(!Array.isArray(lines)||lines.length>20)throw Error();const catalog=await loadProductCatalog(lines.map(line=>line.productId));json(res,200,checkoutFulfillmentAssessment(catalog,lines,checkoutConfiguration().freightByLocation));}catch{json(res,400,{error:'Forsendelserne kunne ikke vurderes.'});}return;}
  if(req.url==='/api/checkout/session'&&req.method==='POST'){
   const base=process.env.SMERCH_PUBLIC_BASE_URL;let expected;try{expected=new URL(base).origin;}catch{}
@@ -253,7 +255,7 @@ const handleRequest=async(req,res)=>{
   const catalog=publicAssortment(await loadCatalogIndex(),await readAssortment()),visible=/^\/design\/pf-/i.test(path)?catalog.products.find(product=>product.id===path.split('/').at(-1)):null;
   if(/^\/design\/pf-/i.test(path)&&!visible){res.writeHead(404,{'Content-Type':'text/plain; charset=utf-8','X-Robots-Tag':'noindex'}).end(req.method==='HEAD'?undefined:'Produktet findes ikke');return;}
   const detail=visible?await loadPFProduct(visible.id):null,checkout=visible?checkoutConfiguration():null;
-  const commerce=visible&&checkout.ready&&checkout.mode==='live'?await (async()=>{const {prices,rules}=await loadPricing();return {prices:listPFProductPrices(catalog,prices,rules),stock:listPFStock(catalog,await loadStock()),checkout};})():null;
+  const commerce=launchConfig.ordersEnabled&&visible&&checkout.ready&&checkout.mode==='live'?await (async()=>{const {prices,rules}=await loadPricing();return {prices:listPFProductPrices(catalog,prices,rules),stock:listPFStock(catalog,await loadStock()),checkout};})():null;
   const page=seoPage(path,legalURL.search,catalog,detail,commerce);
   const template=await readFile(file,'utf8');
   const html=template.replace('<title>Smerch</title>',`<title>${page.title.replaceAll('&','&amp;').replaceAll('<','&lt;')}</title>${seoHead(page)}${path==='/'?'<link rel="preload" as="image" href="/assets/smerch-orange-tote-lifestyle-960.jpg" imagesrcset="/assets/smerch-orange-tote-lifestyle-640.jpg 640w, /assets/smerch-orange-tote-lifestyle-960.jpg 960w, /assets/smerch-orange-tote-lifestyle-1280.jpg 1280w, /assets/smerch-orange-tote-lifestyle.jpg 1536w" imagesizes="100vw" fetchpriority="high">':''}`).replace('<main id="main" tabindex="-1" data-loading><div class="wrap loading">Indlæser produkter…</div></main>',`<main id="main" tabindex="-1" data-loading>${seoMain(page,catalog)}</main>`);

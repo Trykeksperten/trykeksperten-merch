@@ -382,6 +382,11 @@ Vi vender tilbage på din e-mail hurtigst muligt.|We will reply to your email as
 Gennemgå oplysningerne. Når du sender, modtager hello@smerch.dk din forespørgsel og alle vedhæftede bilag.|Review your details. When you send, hello@smerch.dk receives your enquiry and all attachments.
 Din forespørgsel og dine bilag sendes til hello@smerch.dk, når du har gennemgået og sendt den.|Your enquiry and attachments are sent to hello@smerch.dk once you have reviewed and sent it.
 Op til 3 filer · PNG, JPG eller PDF · maks. 5 MB pr. fil. Sendes sammen med din forespørgsel.|Up to 3 files · PNG, JPG or PDF · max. 5 MB per file. Sent with your enquiry.
+VI ÅBNER SNART|OPENING SOON
+Dit design kan godt være klar før os.|Your design can be ready before we are.
+Vi afventer godkendelse, før vi kan modtage ordrer. Du kan stadig udforske produkter og prøve at designe.|We are awaiting approval before accepting orders. You can still explore products and try designing.
+Din kurv er gemt i denne browser, så du kan arbejde videre med dit design.|Your cart is saved in this browser so you can keep working on your design.
+Tilbage til kurven|Back to your cart
 Send besked|Send message
 Vi bruger kun oplysningerne til at besvare din henvendelse.|We only use your details to respond to your enquiry.
 Hjemmeside|Website
