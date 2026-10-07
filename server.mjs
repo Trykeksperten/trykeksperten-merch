@@ -1,3 +1,4 @@
+import {sanitizeSpecial,sendSpecial} from './lib/special-inquiry.mjs';
 import {recordStatistics,statisticsReport} from './lib/shop-statistics.mjs';
 import {isPolandProduct} from './lib/pf-shipping-origin.mjs';
 import {saveSalePrices} from './lib/sale-prices.mjs';
@@ -86,11 +87,11 @@ const handleRequest=async(req,res)=>{
   try{json(res,200,await(req.url.endsWith('/marketing')?listMarketing:listWithdrawals)());}catch{json(res,500,{error:'Oplysningerne kunne ikke hentes.'});}return;
  }
  if(req.url==='/api/contact/status'&&req.method==='GET'){json(res,200,{ready:contactConfiguration().ready,email:'hello@smerch.dk'});return;}
- if(req.url==='/api/contact'&&req.method==='POST'){
+ if(['/api/contact','/api/special-inquiry'].includes(req.url)&&req.method==='POST'){
   const expectedHost=req.headers.host,origin=req.headers.origin;let validOrigin=false;try{validOrigin=new URL(origin).host===expectedHost;}catch{}
   if(!validOrigin){json(res,403,{error:'Ugyldig oprindelse.'});return;}
   if(!contactAllowed(req)){json(res,429,{error:'Der er sendt for mange beskeder. Prøv igen om lidt.'});return;}
-  try{const inquiry=sanitizeContact(await readJSON(req,16*1024));if(inquiry.website){json(res,201,{sent:true});return;}await sendContact(inquiry);json(res,201,{sent:true});}catch(error){const unavailable=/ikke færdigkonfigureret/.test(error.message);json(res,unavailable?503:400,{error:unavailable?'Mailforbindelsen er ved at blive gjort klar. Skriv direkte til hello@smerch.dk indtil da.':error.message||'Beskeden kunne ikke sendes.'});}return;
+  try{const special=req.url==='/api/special-inquiry';const inquiry=(special?sanitizeSpecial:sanitizeContact)(await readJSON(req,special?22*1024*1024:16*1024));if(inquiry.website){json(res,201,{sent:true});return;}await (special?sendSpecial:sendContact)(inquiry);json(res,201,{sent:true});}catch(error){const unavailable=/ikke færdigkonfigureret/.test(error.message);json(res,unavailable?503:400,{error:unavailable?'Mailforbindelsen er ved at blive gjort klar. Skriv direkte til hello@smerch.dk indtil da.':error.message||'Beskeden kunne ikke sendes.'});}return;
  }
  if(req.url==='/api/checkout/status'&&req.method==='GET'){json(res,200,checkoutConfiguration());return;}
  if(req.url==='/api/checkout/fulfillment'&&req.method==='POST'){try{const input=await readJSON(req),lines=input.lines;if(!Array.isArray(lines)||lines.length>20)throw Error();const catalog=await loadProductCatalog(lines.map(line=>line.productId));json(res,200,checkoutFulfillmentAssessment(catalog,lines,checkoutConfiguration().freightByLocation));}catch{json(res,400,{error:'Forsendelserne kunne ikke vurderes.'});}return;}

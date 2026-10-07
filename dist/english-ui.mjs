@@ -360,6 +360,11 @@ Kontrollerer betalingen…|Checking payment…
 Godkend betalingen igen|Authorise payment again
 Leveringstid bekræftes med ordren|Lead time confirmed with your order
 Leveringstiden bekræftes med ordren|Lead time confirmed with your order
+Kontakt os|Contact us
+Har du et spørgsmål? Send os en besked, så hjælper vi dig videre.|Have a question? Send us a message and we will be happy to help.
+Din besked|Your message
+Skriv dit spørgsmål eller din besked her|Write your question or message here
+Du er også velkommen her|You can also reach us here
 Hvad kan vi hjælpe med?|How can we help?
 Skriv til os|Get in touch
 Find Smerch|Find Smerch
@@ -368,6 +373,15 @@ send en mail.|send us an email.
 Hvad handler det om?|What is it about?
 Vælg emne|Choose a subject
 Fortæl om projektet|Tell us about your project
+Send forespørgsel|Send enquiry
+Sendt|Sent
+FORESPØRGSEL SENDT|ENQUIRY SENT
+Sender forespørgsel og bilag…|Sending enquiry and attachments…
+Tak! Din forespørgsel og dine bilag er sendt til hello@smerch.dk.|Thank you! Your enquiry and attachments have been sent to hello@smerch.dk.
+Vi vender tilbage på din e-mail hurtigst muligt.|We will reply to your email as soon as possible.
+Gennemgå oplysningerne. Når du sender, modtager hello@smerch.dk din forespørgsel og alle vedhæftede bilag.|Review your details. When you send, hello@smerch.dk receives your enquiry and all attachments.
+Din forespørgsel og dine bilag sendes til hello@smerch.dk, når du har gennemgået og sendt den.|Your enquiry and attachments are sent to hello@smerch.dk once you have reviewed and sent it.
+Op til 3 filer · PNG, JPG eller PDF · maks. 5 MB pr. fil. Sendes sammen med din forespørgsel.|Up to 3 files · PNG, JPG or PDF · max. 5 MB per file. Sent with your enquiry.
 Send besked|Send message
 Vi bruger kun oplysningerne til at besvare din henvendelse.|We only use your details to respond to your enquiry.
 Hjemmeside|Website
