@@ -1,3 +1,4 @@
+import {sendPublicJSON} from './lib/json-response.mjs';
 import {launchConfig,launchMessage,blocksLaunchOrder} from './dist/launch-config.mjs';
 import {sanitizeSpecial,sendSpecial} from './lib/special-inquiry.mjs';
 import {recordStatistics,statisticsReport} from './lib/shop-statistics.mjs';
@@ -172,7 +173,7 @@ const handleRequest=async(req,res)=>{
   }catch{json(res,404,{error:'Dokumenterne kunne ikke hentes. Prøv igen senere.'});}return;
  }
  if(req.url==='/api/pf-product-prices'&&req.method==='GET'){
-  try{const catalog=await loadCatalogIndex();const {prices,rules}=await loadPricing(),result=listPFProductPrices(catalog,prices,rules);result.quoteOnlyIds=await quoteOnlyProductIds(catalog,result);result.comingSoonIds=result.available?catalog.products.filter(product=>product.brandId==='citizen-green'&&!result.products[product.id]&&product.variants.some(variant=>!variant.discontinued)).map(product=>product.id):[];res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify(result));}catch{res.writeHead(500,{'Content-Type':'application/json'}).end(JSON.stringify({available:false,message:'Priserne kunne ikke indlæses.',products:{},skus:{},quoteOnlyIds:[],comingSoonIds:[]}));}return;
+  try{const catalog=await loadCatalogIndex();const {prices,rules}=await loadPricing(),result=listPFProductPrices(catalog,prices,rules);result.quoteOnlyIds=await quoteOnlyProductIds(catalog,result);result.comingSoonIds=result.available?catalog.products.filter(product=>product.brandId==='citizen-green'&&!result.products[product.id]&&product.variants.some(variant=>!variant.discontinued)).map(product=>product.id):[];await sendPublicJSON(req,res,result);}catch{res.writeHead(500,{'Content-Type':'application/json'}).end(JSON.stringify({available:false,message:'Priserne kunne ikke indlæses.',products:{},skus:{},quoteOnlyIds:[],comingSoonIds:[]}));}return;
  }
  if(req.url?.startsWith('/api/pf-print-prices?')&&req.method==='GET'){
   try{const query=new URL(req.url,'http://localhost').searchParams,productId=query.get('productId')||'',sku=query.get('sku')||'',quantity=Number(query.get('quantity')),catalog=await loadProductCatalog([productId]),{prices,rules}=await loadPricing();res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify(listPFPrintPrices(catalog,productId,sku,quantity,prices,rules)));}catch{res.writeHead(400,{'Content-Type':'application/json'}).end(JSON.stringify({available:false,message:'Trykpriserne kunne ikke indlæses.',currency:'DKK',options:{}}));}return;
@@ -243,8 +244,8 @@ const handleRequest=async(req,res)=>{
   res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;
  }
  if(path==='/pf-english.json'){const data=await readFile(resolve(root,'pf-english.json'));res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-cache'}).end(req.method==='HEAD'?undefined:data);return;}
- if(path==='/api/pf-catalog'){const data=JSON.stringify(publicAssortment(await loadCatalogIndex(),await readAssortment()));res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
- if(/^\/api\/pf-product\/pf-[a-z0-9]+$/i.test(path)){const product=await loadPFProduct(path.split('/').at(-1));if(!product||!isVisibleProduct(product,await readAssortment())){res.writeHead(404).end('Produktet findes ikke');return;}const data=JSON.stringify(product);res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;}
+ if(path==='/api/pf-catalog'){await sendPublicJSON(req,res,publicAssortment(await loadCatalogIndex(),await readAssortment()));return;}
+ if(/^\/api\/pf-product\/pf-[a-z0-9]+$/i.test(path)){const product=await loadPFProduct(path.split('/').at(-1));if(!product||!isVisibleProduct(product,await readAssortment())){res.writeHead(404).end('Produktet findes ikke');return;}await sendPublicJSON(req,res,product);return;}
  if(path==='/api/catalog'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify(publicCatalog()));return;}
  if(path==='/robots.txt'){const data=Buffer.from(robotsTXT);res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'public, max-age=3600','Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);return;}
  if(path==='/sitemap.xml'){const catalog=publicAssortment(await loadCatalogIndex(),await readAssortment()),data=Buffer.from(sitemapXML(catalog));res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'public, max-age=3600','Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);return;}
