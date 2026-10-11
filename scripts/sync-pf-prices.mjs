@@ -1,7 +1,10 @@
 import {loadEnvFile} from 'node:process';
-import {readFile,mkdir,writeFile,rename} from 'node:fs/promises';
-import {normalizePrices,normalizeStock} from '../lib/pf-pricing.mjs';
-import {dataPath} from '../lib/data-path.mjs';
-try{loadEnvFile();}catch(e){if(e.code!=='ENOENT')throw e;}
-async function input(file,url){if(file)return JSON.parse(await readFile(file,'utf8'));if(!url)throw Error('Angiv PF_PRICE_FILE / PF_PRINT_PRICE_FILE eller begge feed-URLer i .env.');const parsed=new URL(url);if(parsed.hostname!=='www.pfconcept.com'||!parsed.pathname.startsWith('/portal/datafeed/')||!['http:','https:'].includes(parsed.protocol))throw Error('Brug PF Concepts datafeed eller en lokal JSON-fil.');parsed.protocol='https:';const r=await fetch(parsed,{redirect:'follow',signal:AbortSignal.timeout(60000)});if(!r.ok)throw Error(`Prisfeed svarede HTTP ${r.status}.`);return r.json();}
-try{const directory=dataPath(),pricesFile=dataPath('pf-prices.json'),stockFile=dataPath('pf-stock.json'),product=await input(process.env.PF_PRICE_FILE,process.env.PF_PRICE_FEED_URL),print=await input(process.env.PF_PRINT_PRICE_FILE,process.env.PF_PRINT_PRICE_FEED_URL),stockFeed=await input(process.env.PF_STOCK_FILE,process.env.PF_STOCK_FEED_URL);const prices=normalizePrices(product,print),stock=normalizeStock(stockFeed);await mkdir(directory,{recursive:true,mode:0o700});await writeFile(`${pricesFile}.tmp`,JSON.stringify(prices),{mode:0o600});await writeFile(`${stockFile}.tmp`,JSON.stringify(stock),{mode:0o600});await rename(`${pricesFile}.tmp`,pricesFile);await rename(`${stockFile}.tmp`,stockFile);console.log('Pris-, trykpris- og lagerfeeds importeret server-side. Ingen indkøbspriser offentliggjort.');}catch{console.error('Feedimporten kunne ikke fuldføres. Kontrollér feedfiler, format og adgang i .env. Tidligere data er bevaret.');process.exitCode=1;}
+import {syncPFFeeds} from '../lib/pf-feed-sync.mjs';
+try{loadEnvFile();}catch(error){if(error.code!=='ENOENT')throw error;}
+const result=await syncPFFeeds();
+for(const [name,status] of Object.entries(result)){
+ const label=name==='prices'?'Pris- og trykprisfeed':'Lagerfeed';
+ if(status.ok)console.log(`${label} opdateret: ${status.productDate||status.updatedAt}${status.printDate?' / '+status.printDate:''}`);
+ else console.error(`${label}: ${status.error}`);
+}
+if(Object.values(result).some(status=>!status.ok))process.exitCode=1;

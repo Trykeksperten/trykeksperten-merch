@@ -272,10 +272,10 @@ setInterval(()=>{retryWithdrawalReceipts().catch(()=>{});retryOrderConfirmations
 server.listen(port,host,()=>console.log(`Smerch server listening on ${host}:${port}`));
 process.on('SIGTERM',()=>server.close(()=>process.exit(0)));
 const syncMinutes=Number(process.env.PF_PRICE_SYNC_INTERVAL_MINUTES||60);
-const hasPriceFeeds=Boolean((process.env.PF_PRICE_FEED_URL||process.env.PF_PRICE_FILE)&&(process.env.PF_PRINT_PRICE_FEED_URL||process.env.PF_PRINT_PRICE_FILE)&&(process.env.PF_STOCK_FEED_URL||process.env.PF_STOCK_FILE));
+const hasPriceFeeds=Boolean((process.env.PF_PRICE_FEED_URL||process.env.PF_PRICE_FILE)&&(process.env.PF_PRINT_PRICE_FEED_URL||process.env.PF_PRINT_PRICE_FILE));
 if(hasPriceFeeds&&Number.isFinite(syncMinutes)&&syncMinutes>=15){
  let syncing=false;
- const sync=()=>{if(syncing)return;syncing=true;const child=spawn(process.execPath,[fileURLToPath(new URL('./scripts/sync-pf-prices.mjs',import.meta.url))],{cwd:fileURLToPath(new URL('.',import.meta.url)),stdio:'ignore'});child.on('error',()=>{syncing=false;console.error('PF-feedsynkronisering kunne ikke startes. Tidligere priser er bevaret.');});child.on('exit',code=>{syncing=false;if(code!==0)console.error('PF-feedsynkronisering mislykkedes. Tidligere priser er bevaret.');});};
- setTimeout(sync,60_000).unref();
+ const sync=()=>{if(syncing)return;syncing=true;const child=spawn(process.execPath,[fileURLToPath(new URL('./scripts/sync-pf-prices.mjs',import.meta.url))],{cwd:fileURLToPath(new URL('.',import.meta.url)),stdio:['ignore','inherit','inherit']});child.on('error',()=>{syncing=false;console.error('PF-feedsynkronisering kunne ikke startes. Tidligere priser er bevaret.');});child.on('exit',code=>{syncing=false;if(code!==0)console.error('En eller flere PF-feedopdateringer mislykkedes. Se feedstatus ovenfor.');});};
+ setTimeout(sync,5_000).unref();
  setInterval(sync,syncMinutes*60_000).unref();
 }

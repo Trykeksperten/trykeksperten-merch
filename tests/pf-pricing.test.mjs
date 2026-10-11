@@ -212,3 +212,29 @@ test('Sencha coaster costs 10 DKK including VAT on cards, tiers and in the cart'
  const higherCost={...source,products:{[sku]:{...source.products[sku],tiers:[{min:1,net:9}]}}};
  assert.equal(listPFProductPrices(cat,higherCost,rules,now).products[product.id].fromIncVat,1125);
 });
+
+test('stock import deduplicates identical supplier rows without double counting',()=>{
+ const row={itemCode:'TEST-SKU',stockDirect:42,stockNextPo:100,stockDateNextPo:'2026-10-20',StockFuture:200};
+ const feed={creationDateTime:'2026-10-11T12:00:00Z',models:[row,{...row}]};
+ assert.equal(normalizeStock(feed).items['TEST-SKU'].available,42);
+ feed.models[1].stockDirect=43;
+ assert.throws(()=>normalizeStock(feed),/Modstridende/);
+});
+test('bad stock data does not block new prices and bad prices do not overwrite the last snapshot',async()=>{
+ const {syncPFFeeds}=await import('../lib/pf-feed-sync.mjs');
+ const env={PF_PRICE_FILE:'goods',PF_PRINT_PRICE_FILE:'print',PF_STOCK_FILE:'stock'};
+ const stock={creationDateTime:'2026-10-11T12:00:00Z',models:[{itemCode:'TEST-SKU',stockDirect:42}]};
+ const saved=new Map([['pf-prices.json','previous-prices'],['pf-stock.json','previous-stock']]);
+ const write=async(name,data)=>saved.set(name,data);
+ let result=await syncPFFeeds({env,write,read:async file=>({goods,print,stock:{}}[file])});
+ assert.equal(result.prices.ok,true);assert.equal(result.stock.ok,false);
+ assert.deepEqual(saved.get('pf-prices.json'),prices);assert.equal(saved.get('pf-stock.json'),'previous-stock');
+ result=await syncPFFeeds({env,write,read:async file=>({goods:{},print,stock}[file])});
+ assert.equal(result.prices.ok,false);assert.equal(result.stock.ok,true);
+ assert.deepEqual(saved.get('pf-prices.json'),prices);assert.deepEqual(saved.get('pf-stock.json'),normalizeStock(stock));
+});
+test('feed errors do not expose private feed URLs in status output',async()=>{
+ const {syncPFFeeds}=await import('../lib/pf-feed-sync.mjs');
+ const result=await syncPFFeeds({read:async()=>{throw Error('https://example.test/?secret=private');},write:async()=>assert.fail('No failed feed may replace a snapshot')});
+ assert.equal(result.prices.ok,false);assert.equal(result.stock.ok,false);assert.ok(!JSON.stringify(result).includes('secret'));
+});
