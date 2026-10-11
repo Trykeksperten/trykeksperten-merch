@@ -27,3 +27,10 @@ export function productGroupURL(groupId,subcategory){
  const params=new URLSearchParams({kategori:groupId});if(subcategory)params.set('underkategori',subcategory);
  return `/produkter?${params}`;
 }
+
+// Navigation must remain usable while catalogue or price requests are pending.
+export function navigationProductGroups(products=[]){
+ const available=new Set(products.map(product=>product.shopCategory));
+ const groups=productGroups.filter(group=>available.has(group.id));
+ return groups.length?groups:productGroups;
+}

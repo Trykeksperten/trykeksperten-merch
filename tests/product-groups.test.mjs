@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {productGroups,groupSections,productGroupURL} from '../dist/product-groups.mjs';
+import {productGroups,groupSections,productGroupURL,navigationProductGroups} from '../dist/product-groups.mjs';
 import {loadCatalogIndex,iteratePFProducts} from '../lib/pf-catalog-store.mjs';
 import {seoPage} from '../dist/seo-pages.mjs';
 test('product navigation matches PF names and order and includes every supplier subcategory',()=>{
@@ -28,4 +28,12 @@ test('cotton tote bags join Muleposer while food bags have their own category',a
  const old=seoPage('/produkter','?kategori=tasker&underkategori=Bomuldstasker',index);
  assert.equal(old.canonical,'https://smerch.dk/produkter?kategori=tasker&underkategori=Muleposer');
  assert.equal(old.robots,'noindex,follow');
+});
+
+test('navigation stays usable without loaded catalogue or price data',()=>{
+ assert.deepEqual(navigationProductGroups(),productGroups);
+ assert.deepEqual(navigationProductGroups([]),productGroups);
+ const groups=navigationProductGroups([{shopCategory:'tasker'},{shopCategory:'toj'},{shopCategory:'tasker'}]);
+ assert.deepEqual(groups.map(group=>group.id),['toj','tasker']);
+ for(const group of navigationProductGroups())assert.match(productGroupURL(group.id),/^\/produkter\?kategori=/);
 });
