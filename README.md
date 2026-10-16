@@ -49,3 +49,15 @@ Alle nuværende PF-produkter er valgt (`config/assortment.json`, version 3). Tid
 Valgene gemmes atomisk i `assortment.json` under `SMERCH_DATA_DIR` og overlever katalogimporter. Nye PF-produkter er skjult, indtil de vælges. Sørg for vedvarende lager til datamappen i produktion. Sortimentsændringer påvirker katalogvisningen; eksisterende ordrer bevarer deres produktdata.
 
 Under **Produkter → Købs- og salgspriser** vises PF-varepriser pr. variant og antalstrin. Salgspriser redigeres i DKK ekskl. moms med forhåndsvisning inkl. moms. Manuelle priser gemmes i `sale-prices.json` under `SMERCH_DATA_DIR`, overlever PF-synkronisering og anvendes af både produktvisning, tilbud, kurv og checkout. **Brug automatiske priser** fjerner variantens manuelle priser. Købspriser udleveres kun til medarbejdere med aktiv session; tryk, opstart og fragt ændres ikke af denne vareprisredigering.
+
+### Kundekorrektur via Smerch
+
+I `/admin/pf-orders` uploades PF's PDF/PNG/JPG med korrekturreferencen. Vælg **Send korrektur til kunden**, og tilføj en kort forklaring på eventuelle tekniske rettelser. Et eksternt PF-link skal erstattes med selve filen før udsendelse. Kundens mailadresse hentes fra checkout, ikke fra et frit modtagerfelt.
+
+Kunden modtager et personligt link til `/korrektur`, kan godkende den aktuelle version eller sende et ændringsønske med op til tre bilag. En ny filversion eller et nyt personligt link gør det gamle link ugyldigt. Links udløber efter 30 dage. Filhash, version, tidspunkt, kommentarer og bilag gemmes med beslutningen. Kundevisningen indeholder ikke indkøbspriser eller PF-adgangsoplysninger.
+
+Backend opdeler sagerne i **Kræver Smerch**, **Afventer kunde**, **Afventer PF** og **Produktion / afsluttet**. Kopiér kundens beslutning til PF's aftalte kanal; vedhæft kundens bilag manuelt, og registrér afsendelsesreference og PF's kvittering. Kundeordrer kan ikke længere godkendes på kundens vegne med medarbejderknappen. Kundens godkendelse hæver ikke automatisk betaling og sender ikke automatisk noget til PF. Eksisterende betalings- og produktionsspærrer gælder stadig.
+
+Mailkøen bruger den eksisterende `CONTACT_SMTP_*`-forbindelse og gemmes privat i `SMERCH_DATA_DIR/proof-mail`. Serveren forsøger levering hvert minut, med mindst 15 minutter mellem fejlede forsøg. Der sendes højst to påmindelser med 48 timers mellemrum; de stopper ved svar, udløb eller ny korrektur. Se mailstatus på ordren. `SMERCH_CUSTOMER_BASE_URL` kan sætte kundesidens HTTPS-origin (standard `https://smerch.dk`); leverandørens API-host bruges ikke som kundelink.
+
+Modtagelse fra PF kan fortsat ske via den eksisterende signerede korrekturindbakke eller manuel upload. Ingen mailindbakke-integration eller automatisk godkendelseskanal hos PF er aktiveret af denne ændring. Pris-, produkt- eller leveringsændringer skal afklares særskilt; en korrekturgodkendelse ændrer ikke den betalte ordre.

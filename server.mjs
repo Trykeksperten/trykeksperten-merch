@@ -1,3 +1,5 @@
+import {retryProofMail,proofMailStatus} from './lib/proof-mail.mjs';
+import {publishCustomerProof,customerProof,customerProofFile,readFeedbackFile} from './lib/pf-orders.mjs';
 import {sendPublicJSON} from './lib/json-response.mjs';
 import {launchConfig,launchMessage,blocksLaunchOrder} from './dist/launch-config.mjs';
 import {sanitizeSpecial,sendSpecial} from './lib/special-inquiry.mjs';
@@ -62,6 +64,25 @@ const handleRequest=async(req,res)=>{
  if(/^\/(?:api|admin)(?:\/|$)/.test(new URL(req.url,'http://localhost').pathname))res.setHeader('X-Robots-Tag','noindex');
  if(req.url==='/health'&&['GET','HEAD'].includes(req.method)){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify({status:'ok'}));return;}
  const legalURL=new URL(req.url,'http://localhost');
+ const customerPath=/^\/api\/customer-proofs\/(ord-[a-f0-9-]{36})(?:\/(file|decision))?$/.exec(legalURL.pathname);
+ if(customerPath){
+  res.setHeader('Referrer-Policy','no-referrer');
+  const [,id,action]=customerPath,token=String(req.headers.authorization||'').replace(/^Bearer /,'');
+  try{
+   if(req.method==='GET'&&!action){json(res,200,await customerProof(id,token));return;}
+   if(req.method==='GET'&&action==='file'){const proof=await customerProofFile(id,token);res.writeHead(200,{'Content-Type':proof.mimeType,'Content-Disposition':'inline','Content-Security-Policy':'sandbox','X-Frame-Options':'SAMEORIGIN'}).end(proof.data);return;}
+   if(req.method==='POST'&&action==='decision'){
+    if(req.headers.origin!==`https://${req.headers.host}`&&req.headers.origin!==`http://${req.headers.host}`)throw Error('Ugyldig oprindelse.');
+    await customerProof(id,token);
+    const input=await readJSON(req,22*1024*1024);
+    if(input.decision==='approve'&&input.confirmed!==true)throw Error('Bekræft, at du har gennemgået korrekturen.');
+    await decideProof(id,{version:input.version,decision:input.decision,comment:input.comment,attachments:input.decision==='reject'?input.attachments:[],customerToken:token});
+    json(res,200,await customerProof(id,token));return;
+   }
+   json(res,405,{error:'Handlingen er ikke tilladt.'});
+  }catch(error){json(res,400,{error:error.code==='ENOENT'?'Linket er ugyldigt eller udløbet.':error.message});}return;
+ }
+
  if(legalURL.pathname==='/api/shop-statistics'&&req.method==='POST'){
   let same=false;try{const origin=new URL(req.headers.origin);same=['http:','https:'].includes(origin.protocol)&&origin.host===req.headers.host;}catch{}
   if(!same){json(res,403,{error:'Ugyldig oprindelse.'});return;}
@@ -152,8 +173,8 @@ const handleRequest=async(req,res)=>{
    }
    if(pathname==='/api/pf-orders'&&req.method==='GET'){json(res,200,(await listOrders()).map(({gatewayPayload,lines,supplierTotal,...order})=>({...order,lines:lines.map(({supplierUnitPrice,...line})=>line)})));return;}
    if(pathname==='/api/pf-orders'&&req.method==='POST'){const input=await readJSON(req,2*1024*1024);if(input.checkoutId)throw Error('Kundeordrer oprettes kun gennem det interne betalingsflow.');const catalog=await loadProductCatalog(input.lines?.map(line=>line.productId)||[]),{prices,rules}=await loadPricing(),stock=await loadStock(),order=await prepareOrder(input,{catalog,prices,rules,stock});json(res,201,{id:order.id,status:order.status,quote:order.quote});return;}
-   const match=/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})(?:\/(send|proof|proof-file|decision|approval-delivery|external-approval))?$/.exec(pathname);
-   if(match){const [,id,action]=match;if(req.method==='GET'&&!action){json(res,200,await readOrder(id));return;}if(req.method==='GET'&&action==='proof-file'){const version=new URL(req.url,'http://localhost').searchParams.get('version'),proof=await readProofFile(id,version);res.writeHead(200,{'Content-Type':proof.mimeType,'Content-Disposition':'inline','Content-Security-Policy':'sandbox','X-Frame-Options':'SAMEORIGIN'}).end(proof.data);return;}if(req.method==='POST'&&action==='send'){const order=await dispatchOrder(id);json(res,200,{id:order.id,status:order.status,gatewayResponse:order.gatewayResponse});return;}if(req.method==='POST'&&action==='proof'){const order=await recordProof(id,await readJSON(req,15*1024*1024));json(res,200,{id:order.id,status:order.status,proof:order.proof});return;}if(req.method==='POST'&&action==='decision'){const current=await readOrder(id);if(current.checkoutId&&!adminSessionAuthorized(req))throw Error('Kun medarbejderlogin må godkende kundeordrer.');const order=await decideProof(id,await readJSON(req));let captureIssue=null;if(order.checkoutId&&order.decision?.decision==='approve'){try{await captureApprovedCheckout(order.checkoutId);}catch(error){captureIssue=error.message;}}json(res,200,{id:order.id,status:order.status,decision:order.decision,captureIssue});return;}if(req.method==='POST'&&action==='approval-delivery'){const current=await readOrder(id);if(current.checkoutId&&!adminSessionAuthorized(req))throw Error('Kun medarbejderlogin må registrere godkendelse til PF.');const order=await recordApprovalDelivery(id,await readJSON(req));json(res,200,{id:order.id,status:order.status,decision:order.decision});return;}if(req.method==='POST'&&action==='external-approval'){const current=await readOrder(id);if(current.checkoutId&&!adminSessionAuthorized(req))throw Error('Kun medarbejderlogin må frigive kundeordrer.');const order=await recordExternalApproval(id,await readJSON(req));json(res,200,{id:order.id,status:order.status,proof:order.proof});return;}}
+   const match=/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})(?:\/(send|proof|proof-file|decision|approval-delivery|external-approval|publish|mail-status|feedback-file))?$/.exec(pathname);
+   if(match){const [,id,action]=match;if(action==='publish'&&req.method==='POST'){if(!adminSessionAuthorized(req))throw Error('Medarbejderlogin kræves.');const result=await publishCustomerProof(id,await readJSON(req,8192));retryProofMail().catch(()=>{});json(res,200,result);return;}if(action==='mail-status'&&req.method==='GET'){json(res,200,await proofMailStatus(id));return;}if(action==='feedback-file'&&req.method==='GET'){const attachment=await readFeedbackFile(id,new URL(req.url,'http://localhost').searchParams.get('hash'));res.writeHead(200,{'Content-Type':attachment.mimeType,'Content-Disposition':'attachment','Content-Security-Policy':'sandbox'}).end(attachment.data);return;}if(req.method==='GET'&&!action){json(res,200,await readOrder(id));return;}if(req.method==='GET'&&action==='proof-file'){const version=new URL(req.url,'http://localhost').searchParams.get('version'),proof=await readProofFile(id,version);res.writeHead(200,{'Content-Type':proof.mimeType,'Content-Disposition':'inline','Content-Security-Policy':'sandbox','X-Frame-Options':'SAMEORIGIN'}).end(proof.data);return;}if(req.method==='POST'&&action==='send'){const order=await dispatchOrder(id);json(res,200,{id:order.id,status:order.status,gatewayResponse:order.gatewayResponse});return;}if(req.method==='POST'&&action==='proof'){const order=await recordProof(id,await readJSON(req,15*1024*1024));json(res,200,{id:order.id,status:order.status,proof:order.proof});return;}if(req.method==='POST'&&action==='decision'){const current=await readOrder(id);if(current.checkoutId&&!adminSessionAuthorized(req))throw Error('Kun medarbejderlogin må godkende kundeordrer.');const input=await readJSON(req);const order=await decideProof(id,{version:input.version,decision:input.decision,comment:input.comment});json(res,200,{id:order.id,status:order.status,decision:order.decision});return;}if(req.method==='POST'&&action==='approval-delivery'){const current=await readOrder(id);if(current.checkoutId&&!adminSessionAuthorized(req))throw Error('Kun medarbejderlogin må registrere godkendelse til PF.');const order=await recordApprovalDelivery(id,await readJSON(req));json(res,200,{id:order.id,status:order.status,decision:order.decision});return;}if(req.method==='POST'&&action==='external-approval'){const current=await readOrder(id);if(current.checkoutId&&!adminSessionAuthorized(req))throw Error('Kun medarbejderlogin må frigive kundeordrer.');const order=await recordExternalApproval(id,await readJSON(req));json(res,200,{id:order.id,status:order.status,proof:order.proof});return;}}
    json(res,404,{error:'Ordrehandlingen findes ikke.'});
   }catch(error){json(res,400,{error:error.message||'Ordren kunne ikke behandles.'});}return;
  }
@@ -250,7 +271,8 @@ const handleRequest=async(req,res)=>{
  if(path==='/robots.txt'){const data=Buffer.from(robotsTXT);res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'public, max-age=3600','Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);return;}
  if(path==='/sitemap.xml'){const catalog=publicAssortment(await loadCatalogIndex(),await readAssortment()),data=Buffer.from(sitemapXML(catalog));res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'public, max-age=3600','Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);return;}
  const isPage=/^\/design\/pf-[a-z0-9]+$/i.test(path)||path==='/'||path==='/produkter'||path==='/brands'||path==='/specialproduktion'||path==='/demokurv'||path==='/kurv'||path==='/betaling'||path==='/ordre'||path==='/kontakt'||path==='/om-smerch'||path==='/gennemgang'||/^\/produkt\/[a-z0-9-]+$/.test(path);
- const file=path==='/admin'?resolve(root,'admin-dashboard.html'):path==='/admin/pf-orders'?resolve(root,'pf-orders-admin.html'):isPage?resolve(root,'index.html'):resolve(root,'.'+path);
+ if(path==='/korrektur'){res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Robots-Tag','noindex, nofollow');}
+ const file=path==='/korrektur'?resolve(root,'customer-proof.html'):path==='/admin'?resolve(root,'admin-dashboard.html'):path==='/admin/pf-orders'?resolve(root,'pf-orders-admin.html'):isPage?resolve(root,'index.html'):resolve(root,'.'+path);
  if(!file.startsWith(root+sep)||!types[extname(file)]){res.writeHead(404).end('Siden findes ikke');return;}
  if(isPage){
   const catalog=publicAssortment(await loadCatalogIndex(),await readAssortment()),visible=/^\/design\/pf-/i.test(path)?catalog.products.find(product=>product.id===path.split('/').at(-1)):null;
@@ -268,7 +290,7 @@ const handleRequest=async(req,res)=>{
 };
 const server=createServer(handleRequest);
 server.on('error',e=>{console.error(e.message);process.exit(1)});
-setInterval(()=>{retryWithdrawalReceipts().catch(()=>{});retryOrderConfirmations().catch(()=>{});},60000).unref();
+setInterval(()=>{retryWithdrawalReceipts().catch(()=>{});retryOrderConfirmations().catch(()=>{});retryProofMail().catch(()=>{});},60000).unref();
 server.listen(port,host,()=>console.log(`Smerch server listening on ${host}:${port}`));
 process.on('SIGTERM',()=>server.close(()=>process.exit(0)));
 const syncMinutes=Number(process.env.PF_PRICE_SYNC_INTERVAL_MINUTES||60);
