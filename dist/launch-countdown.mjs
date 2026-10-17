@@ -1,4 +1,4 @@
-import {launchConfig,countdown} from './launch-config.mjs?v=2';
+import {launchConfig,countdown} from './launch-config.mjs?v=3';
 if(!launchConfig.ordersEnabled){
  const banner=document.createElement('aside');
  banner.className='launch-banner';banner.setAttribute('aria-label','Webshoppen åbner snart');banner.setAttribute('translate','no');
