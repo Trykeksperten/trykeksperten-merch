@@ -22,6 +22,12 @@ services:
         value: https://smerch.dk
       - key: SMERCH_BLANK_SHIPPING_COUNTRY
         value: PL
+      - key: SMERCH_FREIGHT_EX_VAT_DKK
+        value: "200"
+      - key: SMERCH_FREIGHT_PL_EX_VAT_DKK
+        value: "200"
+      - key: SMERCH_FREIGHT_BLANK_EX_VAT_DKK
+        value: "200"
       - key: PF_GATEWAY_MODE
         value: test
       - key: PF_PRICE_SYNC_INTERVAL_MINUTES
