@@ -1658,7 +1658,7 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 @media(max-width:480px){.customer-choice{padding:26px 20px 20px}.customer-pricing-bar{padding:4px 16px}}
 
 /* Delivery information belongs with the proof approval explanation. */
-.home-proof-note.home-delivery-note{font-size:.875rem;font-weight:300;line-height:1.6}
+.home-proof-note.home-delivery-note{font-size:.875rem;font-weight:400;line-height:1.6}
 .home-proof-note.home-delivery-note>span{font-weight:inherit}
 @media(min-width:1000px){.home-proof-note.home-delivery-note{white-space:nowrap}}
 @media(max-width:700px){.home-delivery-note>span{display:block}.home-delivery-note .home-delivery-separator{display:none}}
