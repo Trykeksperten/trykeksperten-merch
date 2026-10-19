@@ -1,6 +1,11 @@
 // Danish source copy and reviewed English interface copy. Product copy is
 // maintained separately from PF's public English feed.
 export const englishUI=Object.fromEntries(`
+Vælg din fulde adresse fra forslagene, inklusive etage og dør.|Choose your complete address from the suggestions, including floor and door.
+Adressen er ændret. Vælg den igen fra forslagene.|The address has changed. Select it again from the suggestions.
+Adressen findes ikke som en gældende dansk adresse. Vælg en anden adresse.|This is not a current Danish address. Please choose another address.
+Adressesøgningen er midlertidigt utilgængelig. Prøv igen om lidt, eller kontakt hello@smerch.dk.|Address search is temporarily unavailable. Try again shortly or contact hello@smerch.dk.
+Adressen kunne ikke kontrolleres. Vælg den igen.|The address could not be checked. Please select it again.
 Formularen er midlertidigt utilgængelig. Skriv direkte til|The form is temporarily unavailable. Email us directly at
 Produkt og design|Product and design
 Prisdetaljer|Price details

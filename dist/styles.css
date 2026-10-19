@@ -1728,3 +1728,23 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 @media(max-width:700px){.editorial-swatches{max-width:100%;gap:0}.editorial-swatches .editorial-swatch{flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px}}
 
 .site-footer .footer-bottom>.footer-logins{align-items:baseline;gap:12px 24px}.site-footer .footer-logins .footer-admin{margin-top:0;font:inherit}.footer-company-login{font:inherit;color:inherit;text-decoration:underline;text-underline-offset:4px}
+
+/* Checkout address search: one field, authoritative address, clear selection. */
+.pf-checkout .address-picker{grid-column:1/-1;min-width:0;margin-top:8px}
+.pf-checkout .address-picker>label{display:block;margin-bottom:8px;font-weight:500}
+.pf-checkout .address-search-wrap{position:relative}
+.pf-checkout .address-search-wrap>input{width:100%;min-height:54px;font:400 16px/1.5 var(--font-sans);padding:14px 16px;box-sizing:border-box;border:1px solid #bfc8c3;border-radius:10px;background:#fff;color:var(--ink)}
+.pf-checkout .address-search-wrap>input:focus{outline:2px solid var(--orange,#cf4a1b);outline-offset:2px}
+.pf-checkout .address-options{position:absolute;z-index:30;top:calc(100% + 6px);left:0;right:0;margin:0;padding:6px;list-style:none;max-height:300px;overflow-y:auto;overscroll-behavior:contain;background:#fff;border:1px solid #d7ded9;border-radius:12px;box-shadow:0 12px 32px #17201f1a}
+.pf-checkout .address-options[hidden]{display:none}
+.pf-checkout .address-options li{display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:7px;min-height:48px;box-sizing:border-box;cursor:pointer;font-size:16px;font-weight:400;line-height:1.4;overflow-wrap:anywhere}
+.pf-checkout .address-options li+li{border-top:1px solid #eef0ed}
+.pf-checkout .address-options li:hover,.pf-checkout .address-options li[aria-selected=true]{background:#fcefe7}
+.pf-checkout .address-options small{font-size:13px;font-weight:400;color:#64706b}
+.pf-checkout .address-help,.pf-checkout .address-status{font-size:14px;font-weight:400;line-height:1.5;margin:10px 0;color:#59645f}
+.pf-checkout .address-status:empty{display:none}
+.pf-checkout .address-selected .address-status{color:#286341}
+.pf-checkout .address-selected .address-search-wrap>input{border-color:#528464}
+.pf-checkout .address-location{display:grid;grid-template-columns:110px minmax(0,1fr);gap:14px;margin-top:18px;align-items:end}
+.pf-checkout .address-location input{width:100%;min-width:0;box-sizing:border-box;background:#eef1ed;color:#415048;font-size:16px;font-weight:400}
+.pf-checkout .address-country{grid-column:1/-1;font-size:14px;font-weight:400;color:#64706b}
