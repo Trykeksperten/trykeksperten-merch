@@ -24,10 +24,35 @@ export function productColorSwatches(variants=[],selectedImage=''){
  if(colors.size<2)return '';
  return `<span class="editorial-swatches" role="group" aria-label="Vælg produktfarve">${[...colors.values()].map(({name,hex,image})=>`<button type="button" class="editorial-swatch${hex?'':' swatch-unknown'}" aria-label="Vis ${escape(name)}" aria-pressed="${image===selectedImage}" title="${escape(name)}" data-card-image="${escape(image)}" data-card-color="${escape(name)}"${hex?` style="--swatch:${hex}"`:''}></button>`).join('')}</span>`;
 }
-export function bindProductColorSwatches(root){
+// A card shows the cheapest size of the pictured colour, never another colour's price.
+export function cardPrice(product,prices,image){
+ const variants=pricedVariants(product,prices),shown=variants.find(v=>v.images?.includes(image));
+ const choices=variants.filter(v=>shown&&(v.colorCode||v.color)===(shown.colorCode||shown.color)).map(v=>prices.variantPrices?.[v.sku]).filter(Boolean);
+ if(!choices.length)return null;
+ const sorted=choices.toSorted((a,b)=>a.fromIncVat-b.fromIncVat||a.fromQuantity-b.fromQuantity);
+ return {...sorted[0],varies:choices.some(p=>p.fromIncVat!==sorted[0].fromIncVat||p.fromQuantity!==sorted[0].fromQuantity)};
+}
+export function cardPriceHTML(price){
+ if(!price)return 'Pris på forespørgsel';
+ return `<strong>${price.varies?'Fra ':''}${new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK'}).format(fromInc(price.fromIncVat,price.fromExVat)/100)} / stk.</strong><small>Ved ${price.fromQuantity} stk. · ${vatLabel()} · uden tryk${price.varies?' · afhænger af størrelse':''}</small>`;
+}
+export function bindProductColorSwatches(root,products=[],prices={}){
  for(const card of root.querySelectorAll('.product-card')){
   const image=card.querySelector('.product-image img');
   const swatches=card.querySelector('.editorial-swatches');
+  const product=products.find(p=>p.id===card.dataset.cardProduct);
+  const updatePrice=source=>{const node=card.querySelector('.editorial-price, .pf-card-price');if(product&&prices.products?.[product.id]&&node)node.innerHTML=cardPriceHTML(cardPrice(product,prices,source));};
+  const updateLinks=source=>{
+   const variant=product&&pricedVariants(product,prices).find(v=>v.images?.includes(source));
+   if(!variant)return;
+   for(const link of card.querySelectorAll('a.product-image,a.product-title')){
+    const url=new URL(link.getAttribute('href'),'https://smerch.dk');
+    if(!url.pathname.startsWith('/design/'))continue;
+    url.searchParams.set('sku',variant.sku);link.setAttribute('href',url.pathname+url.search);
+   }
+  };
+  if(image){updatePrice(image.getAttribute('src'));updateLinks(image.getAttribute('src'));}
+
   if(!image||!swatches)continue;
   swatches.addEventListener('click',event=>{
    const button=event.target.closest('[data-card-image]');
@@ -35,6 +60,8 @@ export function bindProductColorSwatches(root){
    const source=button.dataset.cardImage;
    if(!source)return;
    image.src=source;
+   updatePrice(source);
+   updateLinks(source);
    image.alt=`${card.querySelector('.product-title')?.textContent?.trim()||'Produkt'} – ${button.dataset.cardColor}`;
    image.dataset.colorPrimary=source;
    for(const swatch of swatches.querySelectorAll('[data-card-image]'))swatch.setAttribute('aria-pressed',String(swatch===button));
@@ -45,6 +72,6 @@ export function bindProductColorSwatches(root){
 export function editorialProductCard(product,prices,preferredSku){
  const variants=pricedVariants(product,prices),image=(variants.find(v=>v.sku===preferredSku&&v.images?.[0])||variants.find(v=>v.images?.[0]))?.images[0];
  if(!image)return '';
- const price=prices.products[product.id]?.fromIncVat;
- return `<article class="product-card"><a class="product-image" href="/design/${escape(product.id)}"><img src="${escape(image)}" alt="${escape(product.name)}" loading="lazy" decoding="async" width="500" height="500"></a><div class="card-meta">${productColorSwatches(variants,image)}</div><a class="product-title" href="/design/${escape(product.id)}">${escape(product.name)}</a>${Number.isFinite(price)?`<p class="editorial-price">Fra ${new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK'}).format(fromInc(price)/100)} · ${vatLabel()}<small>Ved ${prices.products[product.id].fromQuantity} stk. · uden tryk</small></p>`:''}</article>`;
+ const price=cardPrice(product,prices,image);
+ return `<article class="product-card" data-card-product="${escape(product.id)}"><a class="product-image" href="/design/${escape(product.id)}"><img src="${escape(image)}" alt="${escape(product.name)}" loading="lazy" decoding="async" width="500" height="500"></a><div class="card-meta">${productColorSwatches(variants,image)}</div><a class="product-title" href="/design/${escape(product.id)}">${escape(product.name)}</a>${price?`<p class="editorial-price">${cardPriceHTML(price)}</p>`:''}</article>`;
 }
