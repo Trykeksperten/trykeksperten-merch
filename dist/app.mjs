@@ -1,3 +1,4 @@
+import {bindContactAvailability} from './contact-availability.mjs';
 import {initCustomerPricing} from './customer-pricing.mjs';
 import {fetchJSON} from './fetch-json.mjs';
 import {homeHero} from './home-hero.mjs';
@@ -129,6 +130,7 @@ function bind(){
  if(pfCatalog){bindPF(pfCatalog,nav,notify,pfPrices);bindCart(pfCatalog,nav,notify);}
  bindCheckout(notify);
  bindSpecial();
+ bindContactAvailability($('#contact-form'));
  $('#contact-form')?.addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,button=form.querySelector('button[type="submit"]'),status=$('#contact-status');button.disabled=true;status.className='contact-status';status.textContent='Sender beskeden…';try{const response=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(form)))}),result=await response.json();if(!response.ok)throw Error(result.error||'Beskeden kunne ikke sendes.');form.reset();status.className='contact-status success';status.textContent='Tak — din besked er sendt. Vi svarer inden for 24 timer.';}catch(error){status.className='contact-status error';status.textContent=error.message;}finally{button.disabled=false;}});
  $('#filters')?.addEventListener('submit',e=>{e.preventDefault();const params=new URLSearchParams(new FormData(e.currentTarget));for(const [k,v] of [...params])if(!v)params.delete(k);const sort=$('#sort').value;if(sort)params.set('sortering',sort);nav('/produkter'+(params.size?'?'+params:''));});
  $('#sort')?.addEventListener('change',e=>{const params=new URLSearchParams(location.search);if(e.target.value)params.set('sortering',e.target.value);else params.delete('sortering');nav('/produkter'+(params.size?'?'+params:''));});

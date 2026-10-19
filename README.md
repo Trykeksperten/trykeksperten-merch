@@ -73,7 +73,7 @@ PF-afsendelse af lagervarer uden tryk fra Polen er bekræftet af butiksejeren (1
 
 ## Virksomhedssider og faste designs
 
-Virksomhedslogin findes i footeren og på `/virksomhed`, adskilt fra medarbejderadgang. Racketclub er defineret i `config/companies.json` uden adgangskode. Aktivér login under **Administration → Virksomheder → Loginoplysninger**. Adgangskoden hashes med scrypt og gemmes kun i den private `companies.json` under `SMERCH_DATA_DIR`; ingen adgangskode eller hash publiceres til GitHub. Virksomhedssessioner har særskilt HttpOnly-cookie, udløber efter 8 timer og giver ingen administratoradgang.
+Virksomhedslogin er midlertidigt fjernet fra footeren. Funktionen findes stadig på `/virksomhed` og i administrationen, adskilt fra medarbejderadgang. Racketclub er defineret i `config/companies.json` uden adgangskode. Aktivér login under **Administration → Virksomheder → Loginoplysninger**. Adgangskoden hashes med scrypt og gemmes kun i den private `companies.json` under `SMERCH_DATA_DIR`; ingen adgangskode eller hash publiceres til GitHub. Virksomhedssessioner har særskilt HttpOnly-cookie, udløber efter 8 timer og giver ingen administratoradgang.
 
 Under **Administration → Virksomheder** vælger medarbejderen Racketclub. Design varen med det almindelige produktværktøj, læg den i kurven, og gem den derefter til virksomheden. Samme farves kompatible størrelser findes automatisk; trykplaceringer kontrolleres for hver variant. Navn, design, PNG-mockups og originale AI/EPS/PDF-filer gemmes privat og varigt under `SMERCH_DATA_DIR/company-products/`. Gemte designs kan fjernes fra sortimentet uden at fjerne filer fra allerede oprettede ordrer. Priser er shoppens aktuelle priser; der er ikke indført særskilte aftalepriser.
 

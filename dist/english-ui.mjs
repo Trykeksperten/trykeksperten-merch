@@ -1,6 +1,16 @@
 // Danish source copy and reviewed English interface copy. Product copy is
 // maintained separately from PF's public English feed.
 export const englishUI=Object.fromEntries(`
+Formularen er midlertidigt utilgængelig. Skriv direkte til|The form is temporarily unavailable. Email us directly at
+Produkt og design|Product and design
+Prisdetaljer|Price details
+Forstør mockup|Enlarge preview
+Smerch – forsiden|Smerch – home
+Alle priser er ekskl. moms|All prices exclude VAT
+Priser ekskl. moms · inkl. tryk og opstart.|Prices exclude VAT and include printing and setup.
+Priser inkl. moms · inkl. tryk og opstart.|Prices include VAT, printing and setup.
+Vare-, tryk- og opstartsbeløb er ekskl. moms.|Product, printing and setup amounts exclude VAT.
+Vare-, tryk- og opstartsbeløb er inkl. moms.|Product, printing and setup amounts include VAT.
 Virksomhedslogin|Company login
 Fast virksomhedsdesign|Fixed company design
 Log ind på virksomhedssiden for at se designet.|Log in to the company page to view the design.

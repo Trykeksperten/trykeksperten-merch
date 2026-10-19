@@ -34,7 +34,7 @@ function detailedCartOverviewHTML(data,lines,quote){
 }
 export function cartOverviewHTML(data,lines,quote,freight=null){
  const total=Number.isFinite(quote.totalIncVat)?`<dl class="pf-price-breakdown"><div class="pf-price-total"><dt>Subtotal ${vatLabel()} · ekskl. fragt</dt><dd>${kroner(quoteAmount(quote))}</dd></div></dl>`:priceHTML(quote);
- return `<p class="small muted">Priser ${vatLabel()}, tryk og opstart.</p>${total}<p class="small muted">${freight?`Fragt ${vatLabel()}: ${kroner(fromInc(freight.incVat,freight.exVat))}`:'Fragt beregnes før betaling.'}</p><details class="pf-overview-details"><summary>Prisdetaljer</summary>${detailedCartOverviewHTML(data,lines,quote)}</details>`;
+ return `<p class="small muted">Priser ${vatLabel()} · inkl. tryk og opstart.</p>${total}<p class="small muted">${freight?`Fragt ${vatLabel()}: ${kroner(fromInc(freight.incVat,freight.exVat))}`:'Fragt beregnes før betaling.'}</p><details class="pf-overview-details"><summary>Prisdetaljer</summary>${detailedCartOverviewHTML(data,lines,quote)}</details>`;
 }
 let headerVersion=0;
 export async function updateCartHeader(){const version=++headerVersion,lines=readCart(),badge=document.querySelector('#cart-count'),sum=document.querySelector('#pf-header-sum');if(badge)badge.textContent=lines.length;if(!sum)return;if(!lines.length){sum.textContent='';return;}sum.textContent='…';try{const q=await fetchQuote(lines);if(version!==headerVersion)return;sum.textContent=q.totalIncVat===null?'Pris afventer':kroner(quoteAmount(q));}catch{if(version===headerVersion)sum.textContent='Pris afventer';}}

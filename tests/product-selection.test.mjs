@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import {colorGroups,selectedSizeRows,selectionLines} from '../dist/product-selection.mjs';
 const option={id:'front',impMethodCode:'screen',impLocation:'Front',printCode:'A',impWidthMm:100,impHeightMm:100};
 const variants=['M','L','XL'].map((size,i)=>({sku:`s${i}`,color:'Navy',colorCode:'55',size,options:[{...option,id:`front${i}`}]}));
+test('clothing sizes display in wearing order rather than supplier SKU order',()=>{
+ const sizes=['XS','XL','2XL','3XL','L','M','S'];
+ const input=sizes.map(size=>({sku:size,colorCode:'black',size}));
+ assert.deepEqual(colorGroups(input)[0].variants.map(variant=>variant.size),['XS','S','M','L','XL','2XL','3XL']);
+ assert.deepEqual(input.map(variant=>variant.size),sizes);
+ const numeric=['42','8','40','10'].map(size=>({sku:size,size}));
+ assert.deepEqual(colorGroups(numeric)[0].variants.map(variant=>variant.size),['8','10','40','42']);
+});
 test('one colour contains all sizes and selected quantities remain separate',()=>{
  assert.equal(colorGroups([...variants,{sku:'white',color:'Hvid',colorCode:'01'}]).length,2);
  const rows=selectedSizeRows(variants,{s0:10,s1:10,s2:10});

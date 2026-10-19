@@ -1,8 +1,16 @@
 export const variantColorKey=variant=>String(variant.colorCode||variant.color||'standard');
+const sizeOrder=['XXXS','XXS','XS','S','M','L','XL','XXL','XXXL','4XL','5XL','6XL','7XL','8XL'];
+const normalizedSize=value=>String(value||'').trim().toUpperCase().replace(/^2XL$/,'XXL').replace(/^3XL$/,'XXXL');
+function compareSizes(a,b){
+ const left=normalizedSize(a.size),right=normalizedSize(b.size),li=sizeOrder.indexOf(left),ri=sizeOrder.indexOf(right);
+ if(li>=0&&ri>=0)return li-ri;
+ if(li>=0||ri>=0)return li>=0?-1:1;
+ return left.localeCompare(right,'da',{numeric:true});
+}
 export function colorGroups(variants){
  const groups=new Map();
  for(const variant of variants){const key=variantColorKey(variant);if(!groups.has(key))groups.set(key,{key,name:variant.color||'Standard',hex:variant.hex,variants:[]});groups.get(key).variants.push(variant);}
- return [...groups.values()];
+ return [...groups.values()].map(group=>({...group,variants:group.variants.sort(compareSizes)}));
 }
 export function selectedSizeRows(variants,quantities){
  const rows=[];
