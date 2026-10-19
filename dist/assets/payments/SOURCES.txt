@@ -1,0 +1,6 @@
+Official assets supplied for merchant use by Clearhaus:
+https://www.clearhaus.com/assets/
+https://www.clearhaus.com/resources/assets/acceptance-logos.zip
+https://www.clearhaus.com/resources/assets/mobile-payments.zip
+Downloaded 2026-10-19. Unmodified SVGs.
+MobilePay is labelled Vipps MobilePay on the storefront; this does not enable a separate Vipps payment route.
