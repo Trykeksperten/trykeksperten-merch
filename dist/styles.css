@@ -1716,3 +1716,6 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 .site-footer .footer-payments .payment-methods{margin:0;text-align:center}
 .site-footer .footer-payments .payment-method-list{justify-content:center}
 @media(max-width:520px){.payment-method-list{gap:20px}.payment-method-list>li{padding:0;min-height:28px}.payment-method-list img{width:auto;height:24px}.payment-method-list .payment-method-mobilepay img{width:94px}}
+
+/* Product cards show colour options without repeating the brand above the name. */
+.product-card .card-meta{justify-content:flex-end}
