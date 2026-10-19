@@ -1814,3 +1814,8 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 #product-menu .product-mega-groups button:focus-visible,
 #product-menu .product-mega-sections a:focus-visible,
 #brands-menu a:focus-visible{background:#fff2eb;color:var(--blue)}
+
+/* Category levels share the same menu label typography. */
+#product-menu .product-mega-groups button,
+#product-menu .product-mega-sections a{font-family:var(--font-sans);font-size:var(--header-font-size);font-weight:var(--header-font-weight);line-height:1.5;letter-spacing:0}
+#product-menu .product-mega-sections small{font-weight:inherit}
