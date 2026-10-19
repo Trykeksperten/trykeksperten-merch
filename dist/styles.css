@@ -1786,3 +1786,11 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
  .masthead .header-preferences .language-switch button{min-height:40px}
  .masthead #search,.masthead .menu-toggle{grid-row:3}
 }
+
+
+/* Use weight consistently; selected state is conveyed by the background. */
+.masthead .header-preferences .customer-pricing-bar button,
+.masthead .header-preferences .language-switch button,
+.masthead .header-preferences .language-switch button[aria-pressed="true"]{font-weight:400}
+.masthead .header-preferences .language-switch button{display:flex;align-items:center;justify-content:center;width:40px;padding:8px}
+.language-flag{display:block;width:22px;height:16px;border-radius:2px;overflow:hidden}
