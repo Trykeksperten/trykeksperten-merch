@@ -39,3 +39,5 @@ body.storefront .launch-copy>span,body.storefront .launch-clock small{font-size:
 body.storefront .launch-clock b{font-size:1.5rem;line-height:1.2;font-variant-numeric:tabular-nums}
 
 body.storefront .payment-methods>p,body.storefront #main .payment-methods>p{font-size:var(--type-meta);font-weight:var(--type-weight);color:var(--muted);letter-spacing:0}
+
+body.storefront #main .editorial-price small{display:block;font-size:var(--type-meta);line-height:1.5}

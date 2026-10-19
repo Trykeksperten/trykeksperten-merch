@@ -1721,3 +1721,8 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 
 /* Product cards show colour options without repeating the brand above the name. */
 .product-card .card-meta{justify-content:flex-end}
+
+.legal-check[hidden]{display:none}
+
+/* Keep the colour mark small while providing a full mobile tap target. */
+@media(max-width:700px){.editorial-swatches{max-width:100%;gap:0}.editorial-swatches .editorial-swatch{flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px}}

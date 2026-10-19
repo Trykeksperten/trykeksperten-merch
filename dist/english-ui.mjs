@@ -1,6 +1,33 @@
 // Danish source copy and reviewed English interface copy. Product copy is
 // maintained separately from PF's public English feed.
 export const englishUI=Object.fromEntries(`
+Varepris inkl. moms, uden tryk. Antallet fremgår på produktkortet.|Product price including VAT, without printing. The quantity is shown on the product card.
+Varepris ekskl. moms, uden tryk. Antallet fremgår på produktkortet.|Product price excluding VAT, without printing. The quantity is shown on the product card.
+Valg|Selection
+Levering|Delivery
+Status|Status
+Vi behandler din ordre. Betalingen hæves tidligst ved afsendelse.|We are processing your order. Payment is captured no earlier than dispatch.
+Dine varer er afsendt. Se leveringsstatus nedenfor.|Your products have been dispatched. See the delivery status below.
+
+Fragt beregnes før betaling.|Delivery is calculated before payment.
+Fragt lægges til subtotalen før betaling.|Delivery is added to the subtotal before payment.
+Kontakt os om bestillingen →|Contact us about your order →
+Se bestillingsstatus →|View ordering status →
+Webshoppen er endnu ikke åben for bestillinger.|The webshop is not yet open for orders.
+Bestilling afventer afklaring. Kontakt os, hvis du vil bestille nu.|Ordering requires clarification. Contact us if you would like to order now.
+Bestil varer med og uden tryk i hver sin ordre, så fragt og betaling kan håndteres korrekt.|Order products with and without printing separately so delivery and payment can be handled correctly.
+Fragt og afsendelsessted for varer uden tryk skal bekræftes før betaling. Kontakt hello@smerch.dk.|Delivery costs and dispatch location for unprinted products must be confirmed before payment. Contact hello@smerch.dk.
+
+Andet|Other
+Subtotal inkl. moms · ekskl. fragt|Subtotal including VAT · excluding delivery
+Subtotal ekskl. moms · ekskl. fragt|Subtotal excluding VAT · excluding delivery
+varelinje|item line
+Produktniveau|Product range
+Standard|Standard
+Korrektur før produktion af varer med logo|Proof approval before production of personalised items
+Beløbet reserveres ved bestilling. For varer uden tryk hæves beløbet tidligst ved afsendelse.|Payment is authorised when ordering. For products without printing, payment is captured no earlier than dispatch.
+Beløbet reserveres ved bestilling. Beløbet hæves efter din godkendelse af produktionskorrekturen og før produktion.|Payment is authorised when ordering. Payment is captured after you approve the production proof and before production.
+
 Betalingsmetoder|Payment methods
 Betal sikkert med|Pay securely with
 Visa, Mastercard, Apple Pay og Vipps MobilePay vises på den sikre betalingsside. Du modtager status på e-mail.|Visa, Mastercard, Apple Pay and Vipps MobilePay appear on the secure payment page. Updates are sent by email.

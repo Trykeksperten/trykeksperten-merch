@@ -18,6 +18,8 @@ services:
         value: /var/data
       - key: SMERCH_PUBLIC_BASE_URL
         value: https://api.smerch.dk
+      - key: SMERCH_CUSTOMER_BASE_URL
+        value: https://smerch.dk
       - key: PF_GATEWAY_MODE
         value: test
       - key: PF_PRICE_SYNC_INTERVAL_MINUTES
