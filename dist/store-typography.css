@@ -1,0 +1,39 @@
+@import url('/typography.css?v=1');
+
+/* Shared public-site typography. Product artwork keeps its own chosen fonts. */
+:root{
+ --type-body:.875rem;
+ --type-meta:.75rem;
+ --type-weight:500;
+ --type-h1:clamp(2rem,4vw,3rem);
+ --type-h2:clamp(1.5rem,3vw,2rem);
+ --type-h3:1.125rem;
+}
+body.storefront{font-family:var(--font-sans);font-size:var(--type-body);font-weight:var(--type-weight);line-height:1.6;letter-spacing:0}
+body.storefront :is(#main,.legal-document,.legal-form-page,.proof-main){font:inherit}
+body.storefront :is(#main,.legal-document,.legal-form-page,.proof-main) :is(p,li,dt,dd,label,input,select,textarea,button,a,span,small,summary,legend,table,strong,b,em):not(:where(.pf-design-layer,.pf-design-layer *,.pf-designer-text,.pf-designer-text *,#pf-art-text,#pf-art-text *,.print-art,.print-art *,[aria-hidden="true"])){
+ font-family:var(--font-sans);
+ font-size:var(--type-body);
+ font-weight:var(--type-weight);
+ line-height:1.6;
+ letter-spacing:0;
+ text-transform:none;
+}
+body.storefront :is(#main,.legal-document,.legal-form-page,.proof-main) :is(h1,h2,h3,h4,h5,h6){font-family:var(--font-sans);font-weight:var(--type-weight);line-height:1.25;letter-spacing:0;text-transform:none}
+body.storefront :is(#main,.legal-document,.legal-form-page,.proof-main) h1{font-size:var(--type-h1)}
+body.storefront :is(#main,.legal-document,.legal-form-page,.proof-main) h2{font-size:var(--type-h2)}
+body.storefront :is(#main,.legal-document,.legal-form-page,.proof-main) :is(h3,h4,h5,h6){font-size:var(--type-h3)}
+body.storefront :is(#main,.legal-document,.legal-form-page,.proof-main) :is(h1,h2,h3,h4,h5,h6) :is(a,span,strong,b,em){font:inherit;letter-spacing:inherit;text-transform:inherit}
+body.storefront #main :is(.card-meta,.card-meta *,.eyebrow,.price-note,.small,.muted,.pf-card-price small,.pf-card-price span,.home-value-strip b){font-size:var(--type-meta);font-weight:var(--type-weight);letter-spacing:0;line-height:1.5}
+body.storefront #main :is(.product-title,.editorial-price,.pf-card-price,.pf-card-price strong){font-size:var(--type-body);font-weight:var(--type-weight);letter-spacing:0;line-height:1.6}
+body.storefront :is(.site-footer,footer:not(.site-footer)){font-family:var(--font-sans);font-size:var(--type-body);font-weight:var(--type-weight);line-height:1.6;letter-spacing:0}
+body.storefront :is(.site-footer,footer:not(.site-footer)) :is(h2,h3,p,a,span,small,address){font:inherit;letter-spacing:0;text-transform:none}
+body.storefront .customer-choice{font-family:var(--font-sans)}
+body.storefront .customer-choice h2{font-size:var(--type-h3);font-weight:var(--type-weight);letter-spacing:0}
+/* Keep iOS form fields at 16px to avoid automatic page zoom. */
+@media(max-width:700px){body.storefront :is(#main,.legal-form-page,.proof-main) :is(input,select,textarea){font-size:1rem}}
+body.storefront #navigation :is(a,button,h2,h3,p,.eyebrow){font-family:var(--font-sans);font-size:var(--type-body);font-weight:var(--type-weight);line-height:1.6;letter-spacing:0;text-transform:none}
+body.storefront .launch-banner :is(strong,span,small,b){font-family:var(--font-sans);font-weight:var(--type-weight);letter-spacing:0}
+body.storefront .launch-copy strong{font-size:var(--type-body)}
+body.storefront .launch-copy>span,body.storefront .launch-clock small{font-size:var(--type-meta)}
+body.storefront .launch-clock b{font-size:1.5rem;line-height:1.2;font-variant-numeric:tabular-nums}
