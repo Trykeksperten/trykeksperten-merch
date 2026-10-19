@@ -1690,3 +1690,16 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 .customer-choice h2{font-weight:500}
 .customer-choice-options strong{font-size:var(--header-font-size);font-weight:500;line-height:1.4}
 .customer-choice-options span,.customer-choice p.small{font-size:var(--header-meta-size);font-weight:400;line-height:1.5}
+
+/* Purchase steps and delivery information use the same UI type scale as the header. */
+.home-value-strip strong,
+.home-proof-note.home-delivery-note,
+.home-proof-note.home-delivery-note>span{
+ font-family:var(--font-sans);
+ font-size:var(--header-font-size);
+ font-weight:var(--header-font-weight);
+ line-height:1.6;
+ letter-spacing:0;
+ text-transform:none;
+}
+.home-value-strip b{font-family:var(--font-sans);font-size:var(--header-meta-size);font-weight:var(--header-font-weight);letter-spacing:0}
