@@ -3,7 +3,6 @@
 export const englishUI=Object.fromEntries(`
 Levering med logo: 7–10 hverdage efter godkendt korrektur|Delivery with a logo: 7–10 business days after proof approval
 Uden logo: 2–4 hverdage|Without a logo: 2–4 business days
-Specialproduktion: Leveringstid aftales særskilt.|Custom production: Delivery time is agreed separately.
 Lagervarer kan bestilles med logo fra 1 stk. Specialproduktion aftales særskilt.|Stocked products can be ordered with a logo from 1 piece. Custom production is agreed separately.
 Levering med logo/personalisering:|Delivery with a logo/personalisation:
 7–10 hverdage efter godkendt korrektur.|7–10 business days after proof approval.

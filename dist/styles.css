@@ -1660,6 +1660,4 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 /* Delivery information belongs with the proof approval explanation. */
 .home-proof-note>p{margin:0}
 .home-proof-note .home-delivery-note{margin-top:10px;font-size:.875rem;line-height:1.6}
-.home-proof-note .home-special-delivery{margin-top:4px;font-size:.8125rem;color:var(--muted)}
-.home-special-delivery a{text-decoration:underline;text-underline-offset:3px}
 @media(max-width:700px){.home-delivery-note>span{display:block}.home-delivery-note .home-delivery-separator{display:none}}
