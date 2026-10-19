@@ -655,7 +655,7 @@ header{border-bottom-color:#d2ccc2}
  border-radius:10px 3px 10px 3px;
  transition:background .2s,color .2s;
 }
-.product-mega-sections a:hover{background:#e7eae6}
+.product-mega-sections a:hover{background:#fff2eb}
 
 @media(max-width:700px){
  #product-menu-toggle{margin-left:-8px;padding-inline:8px}
@@ -1809,3 +1809,8 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 
 /* Keep input focus inside the existing search surface. */
 .masthead #search input:focus,.masthead #search input:focus-visible{outline:none;box-shadow:none}
+
+/* Match category and subcategory highlights across pointer and keyboard navigation. */
+#product-menu .product-mega-groups button:focus-visible,
+#product-menu .product-mega-sections a:focus-visible,
+#brands-menu a:focus-visible{background:#fff2eb;color:var(--blue)}
