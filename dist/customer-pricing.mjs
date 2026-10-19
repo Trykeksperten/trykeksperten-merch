@@ -12,12 +12,12 @@ export function setCustomerType(value){
  globalThis.dispatchEvent?.(new Event('customer-pricing-change'));
 }
 export function initCustomerPricing(){
- const button=document.querySelector('#customer-pricing-toggle');
+ const buttons=document.querySelectorAll('[data-pricing-customer]');
  const dialog=document.createElement('dialog');dialog.className='customer-choice';dialog.setAttribute('aria-labelledby','customer-choice-title');
  dialog.innerHTML='<button type="button" class="customer-choice-close" aria-label="Luk"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14"><path d="m3 3 8 8M11 3l-8 8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button><h2 id="customer-choice-title" tabindex="-1" autofocus>Privat eller erhverv?</h2><div class="customer-choice-options"><button type="button" data-customer="consumer"><strong>Privat</strong><span>Inkl. moms</span></button><button type="button" data-customer="business"><strong>Erhverv</strong><span>Ekskl. moms</span></button></div><p class="small muted">Du kan ændre valget øverst på siden.</p>';
  document.body.append(dialog);
- const update=()=>{const footer=document.querySelector('#footer-vat-label');if(footer)footer.textContent='Alle priser er '+vatLabel();button.textContent=customerType()==='business'?'Erhverv · ekskl. moms':'Privat · inkl. moms';};
- button.onclick=()=>dialog.showModal();
+ const update=()=>{const footer=document.querySelector('#footer-vat-label');if(footer)footer.textContent='Alle priser er '+vatLabel();buttons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.pricingCustomer===customerType())));};
+ buttons.forEach(button=>button.onclick=()=>setCustomerType(button.dataset.pricingCustomer));
  dialog.querySelectorAll('[data-customer]').forEach(node=>node.onclick=()=>{setCustomerType(node.dataset.customer);dialog.close();});
  dialog.querySelector('.customer-choice-close').onclick=()=>{if(!choice)setCustomerType('consumer');dialog.close();};
  dialog.addEventListener('cancel',()=>{if(!choice)setCustomerType('consumer');});

@@ -1647,7 +1647,11 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 .pf-studio #pf-tier-size-label{max-width:260px;margin-top:16px;font-size:14px}
 
 .customer-pricing-bar{display:flex;justify-content:flex-end;padding:8px max(20px,calc((100vw - 1440px)/2));background:#eef0ed;border-bottom:1px solid #d8ddda}
-.customer-pricing-bar button{font:inherit;font-size:14px;background:none;border:0;text-decoration:underline;text-underline-offset:4px;cursor:pointer;min-height:36px;color:#17201f}
+.customer-pricing-options{display:flex;gap:4px;padding:3px;border:1px solid #d8ddda;border-radius:9px;max-width:100%}
+.customer-pricing-bar button{font:inherit;font-size:14px;background:transparent;border:1px solid transparent;border-radius:6px;padding:8px 12px;text-decoration:none;cursor:pointer;min-height:40px;color:#59625d}
+.customer-pricing-bar button[aria-pressed="true"]{background:#fafbf9;border-color:#d8ddda;color:#17201f;box-shadow:0 1px 2px rgb(23 32 31 / .04)}
+.customer-pricing-bar button:hover{color:#17201f;background:#e5e9e4}
+.customer-pricing-bar button:focus-visible{outline:2px solid #64766a;outline-offset:2px}
  .customer-choice{width:min(380px,calc(100% - 32px));max-height:calc(100dvh - 32px);overflow:auto;padding:28px 24px 22px;border:1px solid #dfe3df;border-radius:14px;color:#17201f;background:#fafbf9;box-sizing:border-box;font-family:var(--font-sans)}
 .customer-choice::backdrop{background:rgb(15 25 23 / .38)}
 .customer-choice h2{font-family:inherit;font-size:22px;font-weight:600;letter-spacing:-.5px;line-height:1.25;margin:0 24px 20px 0;outline:none}
@@ -1688,7 +1692,7 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 #search input{font-family:var(--font-sans);font-size:var(--header-font-size);font-weight:400;line-height:1.4;letter-spacing:0}
 #search input::placeholder{font-weight:400;opacity:1}
 .demo-bar{font-family:var(--font-sans);font-size:var(--header-meta-size);font-weight:400;line-height:1.5;letter-spacing:0}
-.customer-pricing-bar button{text-decoration-thickness:1px}
+@media(max-width:480px){.customer-pricing-bar{justify-content:center}.customer-pricing-bar button{font-size:12px;padding:8px}}
 .customer-choice h2{font-weight:500}
 .customer-choice-options strong{font-size:var(--header-font-size);font-weight:500;line-height:1.4}
 .customer-choice-options span,.customer-choice p.small{font-size:var(--header-meta-size);font-weight:400;line-height:1.5}
