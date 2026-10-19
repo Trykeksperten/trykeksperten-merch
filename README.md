@@ -87,3 +87,23 @@ Checkout bruger Klimadatastyrelsens **Adressevælger** (DAWA lukkede 1. oktober 
 Ved oprettelse af en betalingssession slår serveren adressens id op igen og kontrollerer, at gade, postnummer og by svarer til valget. Etage, dør og eventuelt supplerende bynavn indgår i `shipping.street`, som følger med til PF. En redigeret eller manglende adresse kan ikke starte betaling. Ved nedbrud skal kunden prøve igen eller kontakte Smerch; der er ingen ukontrolleret manuel omgåelse.
 
 `ADDRESS_PROVIDER_TOKEN` kan sættes på serveren. Indtil KDS indfører brugerstyring, bruges deres anbefalede offentlige token `adressevaelger123` (ikke en hemmelighed). KDS forventer brugerstyring ultimo 2026/primo 2027; følg [deres vejledning og notifikationsservice](https://confluence.kds.dk/display/ADV/Brugerstyring), og opdatér serverkonfigurationen ved overgangen. Ingen nøgle sendes til browseren. Lancering og betaling åbnes fortsat kun via den eksisterende lanceringkonfiguration.
+
+### e-conomic: fakturakladder med manuel bogføring
+
+Ejeren har valgt **manuel godkendelse i starten**. Integrationen opretter kun kunder og kladder. Ingen kode kan bogføre, oprette regnskabsposteringer eller sende en kladde til kunden; POST er begrænset til `/customers` og `/invoices/drafts`. Bogføringen foretages i e-conomic. Administrationens ordrevisning viser kladdenummer, bogført fakturanummer og afvigelser.
+
+Forbindelsen er slået fra som standard. Før aktivering skal følgende sættes på serveren (tokens må ikke lægges i Git eller browserkode):
+
+- `ECONOMIC_APP_SECRET_TOKEN`, `ECONOMIC_AGREEMENT_GRANT_TOKEN`: adgang til den korrekte aftale, jf. https://www.e-conomic.com/developer/connect
+- `ECONOMIC_CUSTOMER_GROUP_NUMBER`: kundegruppen til nye kunder.
+- `ECONOMIC_PAYMENT_TERMS_NUMBER`: betalingsvilkår til webshopbetaling, afstemt med bogholderen, så kunder ikke får en ny betalingsopfordring. Integrationen bogfører ikke QuickPay-afregning, gebyrer eller betalinger.
+- `ECONOMIC_LAYOUT_NUMBER`: godkendt Smerch-fakturalayout.
+- `ECONOMIC_VAT_ZONE_NUMBER`: aftalens danske momszone.
+- `ECONOMIC_PRODUCT_NUMBER`, `ECONOMIC_FREIGHT_PRODUCT_NUMBER`: eksisterende varer med korrekte salgskonti og 25 % moms til henholdsvis merchandise/tryk og fragt.
+- `ECONOMIC_ENABLED=1`: aktiveres først efter kontrol af ovenstående og en gennemgået prøvekladde i den relevante aftale.
+
+Hvert minut behandles bekræftede **QuickPay-liveordrer** med status `authorized` eller `paid`; testordrer, Stripe-ordrer uden tilsvarende verificeret betalingsmiljø og annullerede ordrer udelades. Kladder kan oprettes, mens beløbet kun er reserveret, og er derfor ikke dokumentation for hævning. Kontrollér faktisk betaling før manuel bogføring. Eksisterende kunder søges på CVR eller e-mail/navn; tvetydige fund stopper forløbet. Fakturaadressen tager foreløbig udgangspunkt i leveringsadressen og skal kontrolleres ved erhvervsordrer med en anden fakturaadresse. Særskilt fakturaadresse skal understøttes før dette automatiseres yderligere.
+
+Hver varelinje overføres som én samlet linje inklusive tryk/opstart, med det faktiske antal og SKU i beskrivelsen. Det bevarer ordrens ørebeløb; fragt er en separat linje. API-svarets netto- og bruttobeløb skal matche ordren præcist, ellers vises manuel afklaring. Ordre-id gemmes som `references.other` og må ikke slettes ved manuel bogføring. Systemet søger både kladder og bogførte fakturaer på denne reference før oprettelse. Et uafklaret oprettelseskald genafsendes ikke automatisk. Hvis ingen entydig faktura kan genfindes efter en fejl, skal udfaldet afstemmes, og eventuel nulstilling af forsøgsmarkeringen udføres kontrolleret af administrator med dokumenteret kontrol i e-conomic. Annullering i shoppen ændrer ikke kladder eller fakturaer i e-conomic.
+
+Den bogførte fakturas status læses tilbage ved næste kontrol (op til 15 minutter eller knappen **Opdatér fakturastatus**). Tilslutningen er ikke en færdig afsendelsesmail-/PDF-integration: den del og PF's samlede afsendelse af varer med/uden logo skal fortsat færdiggøres og testes, før hele kundemailflowet kan kaldes automatisk. Ingen produktion eller livebetaling åbnes af denne integration.
