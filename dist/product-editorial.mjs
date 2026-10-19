@@ -1,3 +1,4 @@
+import {fromInc,vatLabel} from './customer-pricing.mjs';
 import {pricedVariants} from './pf-visibility.mjs';
 const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 // Supplier lifestyle photographs, verified against the full product records.
@@ -45,5 +46,5 @@ export function editorialProductCard(product,prices,preferredSku){
  const variants=pricedVariants(product,prices),image=(variants.find(v=>v.sku===preferredSku&&v.images?.[0])||variants.find(v=>v.images?.[0]))?.images[0];
  if(!image)return '';
  const price=prices.products[product.id]?.fromIncVat;
- return `<article class="product-card"><a class="product-image" href="/design/${escape(product.id)}"><img src="${escape(image)}" alt="${escape(product.name)}" loading="lazy" decoding="async" width="500" height="500"></a><div class="card-meta"><span>${escape(product.brand)}</span>${productColorSwatches(variants,image)}</div><a class="product-title" href="/design/${escape(product.id)}">${escape(product.name)}</a>${Number.isFinite(price)?`<p class="editorial-price">Fra ${new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK'}).format(price/100)}</p>`:''}</article>`;
+ return `<article class="product-card"><a class="product-image" href="/design/${escape(product.id)}"><img src="${escape(image)}" alt="${escape(product.name)}" loading="lazy" decoding="async" width="500" height="500"></a><div class="card-meta"><span>${escape(product.brand)}</span>${productColorSwatches(variants,image)}</div><a class="product-title" href="/design/${escape(product.id)}">${escape(product.name)}</a>${Number.isFinite(price)?`<p class="editorial-price">Fra ${new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK'}).format(fromInc(price)/100)} · ${vatLabel()}</p>`:''}</article>`;
 }

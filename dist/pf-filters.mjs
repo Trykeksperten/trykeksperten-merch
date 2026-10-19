@@ -1,3 +1,4 @@
+import {fromInc} from './customer-pricing.mjs';
 import {translate,getLanguage} from './i18n-core.mjs';
 import {pricedVariants} from './pf-visibility.mjs';
 import {canonicalSubcategory} from './product-groups.mjs?v=23';
@@ -29,6 +30,7 @@ export function productColors(product,priceData){
 
 export function priceBand(price){
  if(!Number.isFinite(price))return '';
+ price=fromInc(price);
  if(price<5000)return 'under-50';
  if(price<10000)return '50-100';
  if(price<25000)return '100-250';
