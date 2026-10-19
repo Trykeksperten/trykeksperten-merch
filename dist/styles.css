@@ -1794,3 +1794,15 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 .masthead .header-preferences .language-switch button[aria-pressed="true"]{font-weight:400}
 .masthead .header-preferences .language-switch button{display:flex;align-items:center;justify-content:center;width:40px;padding:8px}
 .language-flag{display:block;width:22px;height:16px;border-radius:2px;overflow:hidden}
+
+
+/* Search shares the header's soft surfaces and regular type. */
+.masthead #search{background:#e8ece7;border:1px solid #d8dfd7;border-radius:999px;padding:5px 6px 5px 18px;box-shadow:none;gap:12px}
+.masthead #search:focus-within{border-color:#8c9b8f}
+.masthead #search>span{display:flex;align-items:center;color:#59625d;font-size:20px}
+.masthead #search input{background:transparent;color:#17201f;font-weight:400}
+.masthead #search input::placeholder{color:#68716b;font-weight:400}
+.masthead #search button{background:#dbe2d9;color:#17201f;border:0;border-radius:999px;font-weight:400;padding:10px 18px;min-height:40px}
+.masthead #search button:hover{background:#cfd9cd}
+.masthead #search button:focus-visible{outline:2px solid #64766a;outline-offset:2px}
+@media(max-width:1024px){.masthead #search{gap:8px;padding-left:14px}.masthead #search button{padding:8px 12px}}
