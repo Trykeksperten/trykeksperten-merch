@@ -1,6 +1,9 @@
 // Danish source copy and reviewed English interface copy. Product copy is
 // maintained separately from PF's public English feed.
 export const englishUI=Object.fromEntries(`
+Virksomhedslogin →|Company login →
+Fast virksomhedsdesign|Fixed company design
+Log ind på virksomhedssiden for at se designet.|Log in to the company page to view the design.
 Varepris inkl. moms, uden tryk. Antallet fremgår på produktkortet.|Product price including VAT, without printing. The quantity is shown on the product card.
 Varepris ekskl. moms, uden tryk. Antallet fremgår på produktkortet.|Product price excluding VAT, without printing. The quantity is shown on the product card.
 Valg|Selection

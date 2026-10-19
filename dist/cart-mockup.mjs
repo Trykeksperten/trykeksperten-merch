@@ -88,6 +88,14 @@ export function bindCartMockups(root,lines){
   const target=[...root.querySelectorAll('[data-pf-mockup]')].find(el=>el.dataset.pfMockup===line.id);
   if(!target)continue;
   target.replaceChildren();
+  if(line.companyTemplate){
+   for(const [index,design]of line.decorations.entries()){
+    const figure=document.createElement('figure'),image=document.createElement('img'),caption=document.createElement('figcaption');
+    image.src=`/api/company/previews/${encodeURIComponent(line.companyTemplate.id)}/${index}`;image.alt=`Fast design · ${design.position||'Tryk'}`;image.loading='lazy';caption.textContent=design.position||'Virksomhedens design';
+    image.onerror=()=>{image.remove();caption.textContent='Log ind på virksomhedssiden for at se designet.';};figure.append(image,caption);target.append(figure);
+   }
+   continue;
+  }
   for(const design of line.decorations){
    const figure=document.createElement('figure'),caption=document.createElement('figcaption');
    caption.textContent='Indlæser dit mockup…';figure.append(caption);target.append(figure);
