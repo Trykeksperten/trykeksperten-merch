@@ -1707,12 +1707,12 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 /* Consistent payment acceptance marks at the point of purchase and in the footer. */
 .payment-methods{margin:20px 0 0}
 .payment-methods>p{margin:0 0 10px;font-family:var(--font-sans);font-size:var(--header-font-size);font-weight:var(--header-font-weight);line-height:1.5}
-.payment-method-list{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:stretch;gap:8px;list-style:none;margin:0;padding:0}
-.payment-method-list>li{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:58px;padding:10px 12px;border:1px solid #d8ddda;border-radius:8px;background:#fff}
-.payment-method-list img{display:block;width:64px;height:28px;object-fit:contain}
+.payment-method-list{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:28px;list-style:none;margin:0;padding:0}
+.payment-method-list>li{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-height:32px;padding:0;border:0;border-radius:0;background:transparent}
+.payment-method-list img{display:block;width:auto;max-width:108px;height:28px;object-fit:contain}
 .payment-method-list .payment-method-mobilepay img{width:108px}
 .payment-method-list .payment-method-mobilepay span{font-family:var(--font-sans);font-size:12px;font-weight:500;line-height:1.3;color:var(--ink)}
 .site-footer .footer-payments{padding-block:30px;border-bottom:1px solid #d8ddda}
 .site-footer .footer-payments .payment-methods{margin:0;text-align:center}
 .site-footer .footer-payments .payment-method-list{justify-content:center}
-@media(max-width:520px){.payment-method-list>li{padding:8px;min-height:54px}.payment-method-list img{width:54px;height:24px}.payment-method-list .payment-method-mobilepay img{width:94px}}
+@media(max-width:520px){.payment-method-list{gap:20px}.payment-method-list>li{padding:0;min-height:28px}.payment-method-list img{width:auto;height:24px}.payment-method-list .payment-method-mobilepay img{width:94px}}

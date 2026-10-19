@@ -37,3 +37,5 @@ body.storefront .launch-banner :is(strong,span,small,b){font-family:var(--font-s
 body.storefront .launch-copy strong{font-size:var(--type-body)}
 body.storefront .launch-copy>span,body.storefront .launch-clock small{font-size:var(--type-meta)}
 body.storefront .launch-clock b{font-size:1.5rem;line-height:1.2;font-variant-numeric:tabular-nums}
+
+body.storefront .payment-methods>p,body.storefront #main .payment-methods>p{font-size:var(--type-meta);font-weight:var(--type-weight);color:var(--muted);letter-spacing:0}
