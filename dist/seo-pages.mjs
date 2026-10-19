@@ -34,7 +34,7 @@ export function seoPage(path,search='',catalog={products:[],brands:[]},detail=nu
  }else if(/^\/design\/pf-[a-z0-9]+$/i.test(path)){
   product=products.find(item=>item.id===path.split('/').at(-1));
   if(!product)return null;
-  const descriptionText=productEditorial(product.id)?.intro||detail?.description||`${product.name} fra ${product.brand}. Se farver og muligheder for eget logo, og godkend korrektur før produktion.`;
+  const descriptionText=productEditorial(product.id)?.intro||detail?.description||`${product.name}${product.brand?` fra ${product.brand}`:''}. Se farver og muligheder for eget logo, og godkend korrektur før produktion.`;
   heading=product.name;title=`${product.name} med logo | Smerch`;description=excerpt(descriptionText);canonical=origin+productURL(product);image=mainImage(product)||image;kind='product';
  }else if(path==='/brands'){
   heading='Brands hos Smerch';title='Brands til merchandise | Smerch';description='Udforsk udvalgte brands til merchandise med logo. Find produkter fra blandt andre Stanley, Thule og Moleskine hos Smerch.';canonical=origin+path;
@@ -50,7 +50,7 @@ export function seoPage(path,search='',catalog={products:[],brands:[]},detail=nu
  if(search&&path!=='/produkter'&&path!=='/')robots='noindex,follow';
  const schema=[{ '@context':'https://schema.org','@type':'Organization',name:'Smerch',url:origin+'/',logo:origin+'/assets/smerch.svg',email:'hello@smerch.dk',telephone:'+45 27 82 22 77',address:{'@type':'PostalAddress',streetAddress:'Raffinaderivej 10e',postalCode:'2300',addressLocality:'København S',addressCountry:'DK'} }];
  if(path==='/')schema.push({'@context':'https://schema.org','@type':'WebSite',name:'Smerch',url:origin+'/',inLanguage:'da-DK'});
- if(product){const productSchema={'@context':'https://schema.org','@type':'Product',name:product.name,description:cleanText(detail?.description||description),image:[absolute(image)],sku:product.modelCode||product.id,brand:{'@type':'Brand',name:product.brand}};const offer=verifiedProductOffer(product,commerce?.prices,commerce?.stock,commerce?.checkout);if(offer)productSchema.offers=offer;schema.push(productSchema);}
+ if(product){const productSchema={'@context':'https://schema.org','@type':'Product',name:product.name,description:cleanText(detail?.description||description),image:[absolute(image)],sku:product.modelCode||product.id,...(product.brand?{brand:{'@type':'Brand',name:product.brand}}:{})};const offer=verifiedProductOffer(product,commerce?.prices,commerce?.stock,commerce?.checkout);if(offer)productSchema.offers=offer;schema.push(productSchema);}
  if(path==='/produkter'||product)schema.push({'@context':'https://schema.org','@type':'BreadcrumbList',itemListElement:[{ '@type':'ListItem',position:1,name:'Forside',item:origin+'/'},{'@type':'ListItem',position:2,name:product?'Produkter':heading,item:product?origin+'/produkter':canonical},...(product?[{'@type':'ListItem',position:3,name:product.name,item:canonical}]:[])]});
  return {title,description,canonical,heading,image:absolute(image),robots,kind,product,schema};
 }

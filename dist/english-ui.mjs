@@ -16,7 +16,7 @@ Se bestillingsstatus →|View ordering status →
 Webshoppen er endnu ikke åben for bestillinger.|The webshop is not yet open for orders.
 Bestilling afventer afklaring. Kontakt os, hvis du vil bestille nu.|Ordering requires clarification. Contact us if you would like to order now.
 Bestil varer med og uden tryk i hver sin ordre, så fragt og betaling kan håndteres korrekt.|Order products with and without printing separately so delivery and payment can be handled correctly.
-Fragt og afsendelsessted for varer uden tryk skal bekræftes før betaling. Kontakt hello@smerch.dk.|Delivery costs and dispatch location for unprinted products must be confirmed before payment. Contact hello@smerch.dk.
+Fragtprisen for varer uden tryk skal beregnes før betaling. Kontakt hello@smerch.dk.|Delivery costs for unprinted products must be calculated before payment. Contact hello@smerch.dk.
 
 Andet|Other
 Subtotal inkl. moms · ekskl. fragt|Subtotal including VAT · excluding delivery
@@ -941,9 +941,9 @@ Jeres design bliver gennemgået, og I modtager en korrektur til godkendelse, fø
 Tal med os om jeres projekt|Talk to us about your project
 Menneskene bag Smerch|The people behind Smerch
 Smerch drives af Trykeksperten ApS.|Smerch is operated by Trykeksperten ApS.
-Mit navn er Joakim, og i 2023 var jeg med til at stifte Trykeksperten. Her hjælper vi både etablerede virksomheder og startups med grafisk design, tekstiltryk, folie, glasdekoration, print og merchandise.|My name is Joakim, and in 2023 I co-founded Trykeksperten. We help both established businesses and startups with graphic design, textile printing, vinyl graphics, glass decoration, printing and merchandise.
+Mit navn er Joakim. Jeg hjælper både etablerede virksomheder og startups med grafisk design, tryk og merchandise.|My name is Joakim. I help both established businesses and startups with graphic design, printing and merchandise.
 Kvalitet og tæt samarbejde er fundamentet for vores arbejde. Vi følger hver opgave fra den første idé til det færdige produkt med fokus på detaljerne og den enkelte kundes behov.|Quality and close collaboration are the foundation of our work. We follow every project from the initial idea to the finished product, focusing on the details and each customer’s needs.
-Smerch er næste skridt i udviklingen af vores virksomhed. Med erfaringen fra Trykeksperten har vi skabt en online merchandisebutik for professionelle - med slutbrugeren i centrum.|Smerch is the next step in our company’s development. Drawing on our experience at Trykeksperten, we have created an online merchandise shop for professionals – with the end user at its heart.
+Med vores erfaring inden for design, tryk og merchandise har vi skabt Smerch - en online merchandisebutik med slutbrugeren i centrum.|Drawing on our experience in design, printing and merchandise, we created Smerch - an online merchandise shop with the end user at its heart.
 Vores mål er at levere gennemtænkt merchandise, der repræsenterer din virksomhed og skaber værdi for dem, der bruger det. Produkter, du er stolt af at sætte navn på, og som folk har lyst til at bruge.|Our goal is to deliver thoughtfully designed merchandise that represents your business and brings value to the people who use it. Products you are proud to put your name on, and that people want to use.
 
 Handelsbetingelser|Terms and conditions
@@ -975,4 +975,10 @@ Reference (valgfrit)|Reference (optional)
 Udfyld firmanavn, CVR-nummer (8 cifre) og faktura-e-mail.|Enter company name, an eight-digit Danish company registration number and invoice email.
 Vi leverer kun til Danmark.|We deliver exclusively to Denmark.
 Leveringstiden skal afklares før onlinebestilling.|Delivery times must be confirmed before online ordering.
+
+
+Har du et spørgsmål? Send os en besked. Vi svarer inden for 24 timer.|Have a question? Send us a message. We reply within 24 hours.
+Tak — din besked er sendt. Vi svarer inden for 24 timer.|Thank you — your message has been sent. We reply within 24 hours.
+Vi svarer på din e-mail inden for 24 timer.|We reply to your email within 24 hours.
+
 `.trim().split('\n').map(line=>line.split('|')));

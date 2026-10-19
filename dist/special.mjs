@@ -33,7 +33,7 @@ export function bindSpecial(){
     const result=await response.json();if(!response.ok||!result.sent)throw Error(result.error||'Forespørgslen kunne ikke sendes.');
     status.textContent='Tak! Din forespørgsel og dine bilag er sendt til hello@smerch.dk.';
     review.querySelector('.eyebrow').textContent='FORESPØRGSEL SENDT';
-    review.querySelector('.notice').textContent='Vi vender tilbage på din e-mail hurtigst muligt.';
+    review.querySelector('.notice').textContent='Vi svarer på din e-mail inden for 24 timer.';
     button.textContent='Sendt';draft={};references=[];form.reset();document.querySelector('#special-file-list').textContent='';
    }catch(error){status.textContent=error.message;button.disabled=false;}
   });
