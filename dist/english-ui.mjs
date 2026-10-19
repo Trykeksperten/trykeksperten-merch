@@ -1,6 +1,14 @@
 // Danish source copy and reviewed English interface copy. Product copy is
 // maintained separately from PF's public English feed.
 export const englishUI=Object.fromEntries(`
+Levering med logo/personalisering:|Delivery with a logo/personalisation:
+7–10 hverdage efter godkendt korrektur.|7–10 business days after proof approval.
+Levering uden logo:|Delivery without a logo:
+2–4 hverdage.|2–4 business days.
+Levering: 7–10 hverdage efter godkendt korrektur.|Delivery: 7–10 business days after proof approval.
+Levering: 2–4 hverdage uden logo.|Delivery: 2–4 business days without a logo.
+Leveringstider|Delivery times
+Beløbet reserveres først og hæves efter godkendt korrektur. Personaliserede produkter og produkter med logo leveres 7–10 hverdage efter godkendt korrektur. Tiden frem til godkendt korrektur kommer oveni. Produkter uden logo leveres på 2–4 hverdage.|Payment is authorised first and captured after proof approval. Personalised products and products with a logo are delivered within 7–10 business days after proof approval. Time spent awaiting proof approval is additional. Products without a logo are delivered within 2–4 business days.
 Gå til indhold|Skip to content
 Design dit merch|Design your merch
 Korrektur før produktion|Proof approval before production

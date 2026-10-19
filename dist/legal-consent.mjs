@@ -1,4 +1,4 @@
-export const LEGAL_VERSION='2026-10-01';
+export const LEGAL_VERSION='2026-10-19';
 export const MARKETING_VERSION='2026-10-01';
 export const marketingConsent={
  da:{email:'Ja tak, Smerch (Trykeksperten ApS) må sende mig tilbud, produktnyheder og inspiration om merchandise, profilbeklædning, tryk og specialproduktion via e-mail.',sms:'Ja tak, Smerch (Trykeksperten ApS) må sende mig tilbud, produktnyheder og inspiration om merchandise, profilbeklædning, tryk og specialproduktion via SMS.'},
