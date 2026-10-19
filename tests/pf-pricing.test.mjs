@@ -16,21 +16,23 @@ const prices=normalizePrices(goods,print),rules={goodsMarkup:50,printMarkup:100}
 const blank={productId:p.id,sku:v.sku,quantity:10,decorations:[]};
 const textPlacement={x:.5,y:.5,scale:.24},textSize=designGroupSize([],'TEST',textPlacement,o),decorated={...blank,decorations:[{optionId:o.id,width:Math.round(textSize.widthMm*10)/10,height:Math.round(textSize.heightMm*10)/10,colors:1,text:'TEST',textPlacement}]};
 test('blank goods use quantity tier and never charge printing or setup',()=>{const q=quotePFLine(catalog,blank,prices,rules,now);assert.equal(q.goods,150000);assert.equal(q.print,0);assert.equal(q.setup,0);assert.equal(q.totalIncVat,187500);assert.equal(quotePFLine(catalog,{...blank,quantity:50},prices,rules,now).goods,600000);});
-test('a one-piece price tier does not override the decorated minimum without a less-than-minimum charge',()=>{
+test('stocked products can be printed from one piece with a confirmed zero small-order fee',()=>{
  const current=structuredClone(prices);current.prints[o.printCode].ltm=0;
  assert.equal(listPFProductTiers(catalog,p.id,v.sku,current,rules,now).minimumQuantity,1);
  assert.ok(quotePFLine(catalog,{...blank,quantity:1},current,rules,now).totalIncVat>0);
  const below={...decorated,quantity:1};
- assert.match(quotePFLine(catalog,below,current,rules,now).message,/mindst 25 stk/);
- assert.equal(listPFPrintPrices(catalog,p.id,v.sku,1,current,rules,now).available,false);
- assert.throws(()=>supplierPFOrderAmounts(catalog,[below],current,now),/under 25 stk/);
+ assert.ok(quotePFLine(catalog,below,current,rules,now).totalIncVat>0);
+ assert.equal(quotePFLine(catalog,below,current,rules,now).smallOrder,0);
+ assert.equal(listPFPrintPrices(catalog,p.id,v.sku,1,current,rules,now).available,true);
+ assert.deepEqual(supplierPFOrderAmounts(catalog,[below],current,now),{unitPrices:[100],total:210,currency:'DKK'});
+ for(const invalid of [undefined,-1,NaN]){current.prints[o.printCode].ltm=invalid;assert.equal(quotePFLine(catalog,below,current,rules,now).totalIncVat,null);assert.throws(()=>supplierPFOrderAmounts(catalog,[below],current,now),/småordregebyr/);}
  assert.ok(quotePFLine(catalog,{...decorated,quantity:25},current,rules,now).totalIncVat>0);
 });
-test('decoration-required products start at their confirmed decorated minimum',()=>{
+test('decoration-required stocked products start at the first priced quantity',()=>{
  const required={...p,variants:[{...v,decorationMandatory:true}]},requiredCatalog={...catalog,products:[required]};
  const result=listPFProductTiers(requiredCatalog,p.id,v.sku,prices,rules,now);
- assert.equal(result.minimumQuantity,25);
- assert.equal(result.tiers[0].min,25);
+ assert.equal(result.minimumQuantity,1);
+ assert.equal(result.tiers[0].min,1);
  assert.equal(listPFProductPrices(requiredCatalog,prices,rules,now).products[p.id].fromQuantity,25);
 });
 test('decorated totals include rounded startup once per placement and the small-order fee',()=>{const q=quotePFLine(catalog,decorated,prices,rules,now);assert.equal(q.print,20000);assert.equal(q.setup,13000);assert.equal(q.net,183000);assert.equal(q.vat,45750);assert.equal(q.totalIncVat,228750);const many=quotePFLine(catalog,{...decorated,quantity:50},prices,rules,now);assert.equal(many.setup,10000);assert.equal(many.print,80000);});
