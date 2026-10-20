@@ -1,6 +1,6 @@
 import {loadArtworkPreview} from './artwork-preview.mjs';
 import {placementOptionAssets} from './pf-rules.mjs?v=2';
-import {artworkPrintSize,textPrintSize,optionPrintSize,printableBounds,containMappedBounds} from './design-layers.mjs?v=4';
+import {artworkPrintSize,textPrintSize,optionPrintSize,printableBounds,containMappedBounds,proportionalPrintBounds} from './design-layers.mjs?v=5';
 import {fontFamily} from './pf-text.mjs?v=2';
 import {foilFinish,isFoilOption} from './foil-options.mjs';
 import {recolorArtworkPreview,tintArtworkPreview} from './vector-preview.mjs?v=2';
@@ -32,7 +32,7 @@ export async function renderCartMockup(product,option,design){
  const ctx=canvas.getContext('2d'),scale=Math.min(1024/image.naturalWidth,1024/image.naturalHeight);
  ctx.fillStyle='#fff';ctx.fillRect(0,0,1024,1024);
  ctx.drawImage(image,(1024-image.naturalWidth*scale)/2,(1024-image.naturalHeight*scale)/2,image.naturalWidth*scale,image.naturalHeight*scale);
- const zone=containMappedBounds(bounds,image.naturalWidth,image.naturalHeight,1024,1024),print=optionPrintSize(option);
+ const zone=proportionalPrintBounds(containMappedBounds(bounds,image.naturalWidth,image.naturalHeight,1024,1024),option,1024,1024),print=optionPrintSize(option);
  const place=(placement,draw)=>{
   ctx.save();ctx.translate((zone.x+zone.width*placement.x)*1024,(zone.y+zone.height*placement.y)*1024);
   ctx.scale(zone.width*1024/print.width,zone.height*1024/print.height);

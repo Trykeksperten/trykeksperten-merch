@@ -5,7 +5,7 @@ import {fromInc,quoteAmount,vatLabel,customerType,setCustomerType} from './custo
 import {launchConfig,launchMessage} from './launch-config.mjs';
 import {LEGAL_VERSION,prepaymentConsent} from './legal-consent.mjs';
 import {getLanguage} from './i18n-core.mjs';
-import {readCart,writeCart,fetchQuote,kroner,escape} from './pf-cart.mjs?v=23';
+import {readCart,writeCart,fetchQuote,kroner,escape} from './pf-cart.mjs?v=24';
 import {loadFile} from './storage.mjs';
 
 const get=async url=>{const response=await fetch(url);if(!response.ok)throw Error('Oplysningerne kunne ikke hentes.');return response.json();};

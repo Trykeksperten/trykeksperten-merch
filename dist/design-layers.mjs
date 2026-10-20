@@ -31,6 +31,15 @@ export function containMappedBounds(bounds,naturalWidth=0,naturalHeight=0,contai
  return {...bounds,x:clamp((offsetX+bounds.x*renderedWidth)/cw),y:clamp((offsetY+bounds.y*renderedHeight)/ch),width:clamp(bounds.width*renderedWidth/cw,.001,1),height:clamp(bounds.height*renderedHeight/ch,.001,1)};
 }
 
+// Fit the physical print area inside the supplier's image bounds with one scale.
+export function proportionalPrintBounds(bounds,option,containerWidth,containerHeight){
+ const print=optionPrintSize(option),cw=Number(containerWidth),ch=Number(containerHeight);
+ if(!(cw>0&&ch>0))return {...bounds};
+ const scale=Math.min(bounds.width*cw/print.width,bounds.height*ch/print.height);
+ const width=print.width*scale/cw,height=print.height*scale/ch;
+ return {...bounds,x:bounds.x+(bounds.width-width)/2,y:bounds.y+(bounds.height-height)/2,width,height};
+}
+
 export function artworkPrintSize(artwork={},option={}){
  const print=optionPrintSize(option),pixelWidth=number(artwork.logo?.pixelWidth),pixelHeight=number(artwork.logo?.pixelHeight);
  const aspect=pixelWidth>0&&pixelHeight>0?pixelWidth/pixelHeight:number(artwork.aspect)||1;

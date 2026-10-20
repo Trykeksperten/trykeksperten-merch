@@ -2,7 +2,7 @@ import {hasPersonalisation,paymentDescription,freightEstimate} from './purchase-
 import {paymentMethodsHTML} from './payment-methods.mjs';
 import {fromInc,fromEx,quoteAmount,vatLabel,customerType} from './customer-pricing.mjs';
 import {cartStatistics,sendStatistics} from './shop-statistics.mjs';
-import {bindCartMockups} from './cart-mockup.mjs?v=3';
+import {bindCartMockups} from './cart-mockup.mjs?v=4';
 import {readJSONResponse} from './api-response.mjs';
 import {foilFinish} from './foil-options.mjs';
 import {loadFile} from './storage.mjs';
