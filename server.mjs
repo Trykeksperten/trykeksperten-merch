@@ -85,6 +85,7 @@ const handleRequest=async(req,res)=>{
     const input=await readJSON(req,22*1024*1024);
     if(input.decision==='approve'&&input.confirmed!==true)throw Error('Bekræft, at du har gennemgået korrekturen.');
     await decideProof(id,{version:input.version,decision:input.decision,comment:input.comment,attachments:input.decision==='reject'?input.attachments:[],customerToken:token});
+    retryProofMail().catch(()=>{});
     json(res,200,await customerProof(id,token));return;
    }
    json(res,405,{error:'Handlingen er ikke tilladt.'});

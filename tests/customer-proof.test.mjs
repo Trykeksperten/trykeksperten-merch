@@ -33,3 +33,17 @@ test('proof sandbox permanently blocks PF dispatch and release and sends one tes
  await assert.rejects(recordExternalApproval(id,{pfApprovalReference:'TEST'}),/Korrekturtesten/);
  assert.equal((await readOrder(id)).status,'approval_pending_pf');
 });
+test('customer decisions queue receipts, retry delivery and survive a new proof without duplicate sends',async()=>{
+ for(const decision of ['approve','reject']){
+  const {id}=await fixture(),token=await invite(id),sent=[];
+  await decideProof(id,{version:1,decision,comment:'Flyt logoet op',customerToken:token});
+  const now=Date.now();
+  await retryProofMail({orderIds:[id],now,transport:{sendMail:async()=>{throw Error('offline');}}});
+  await recordProof(id,{proofReference:'NEXT',mimeType:'application/pdf',contentBase64:Buffer.from('%PDF-1.4\nNext').toString('base64')});
+  await retryProofMail({orderIds:[id],now:now+16*60000,transport:{sendMail:async mail=>sent.push(mail)}});
+  await retryProofMail({orderIds:[id],now:now+32*60000,transport:{sendMail:async mail=>sent.push(mail)}});
+  assert.equal(sent.length,1);assert.equal(sent[0].from.address,'korrektur@smerch.dk');
+  assert.match(sent[0].subject,decision==='approve'?/modtaget din godkendelse/:/registreret dine ændringsønsker/);
+  if(decision==='reject'){assert.match(sent[0].text,/Flyt logoet op/);assert.match(sent[0].text,/snart en ny korrektur/);}
+ }
+});
