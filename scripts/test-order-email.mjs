@@ -3,6 +3,7 @@ import {mkdtemp,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {contactConfiguration} from '../lib/contact.mjs';
+import {loadProductCatalog} from '../lib/pf-catalog-store.mjs';
 import {readCheckout} from '../lib/checkout.mjs';
 import {queueOrderConfirmation,retryOrderConfirmations} from '../lib/order-mail.mjs';
 
@@ -24,6 +25,8 @@ try{
  await sender.verify();
  console.log('SMTP-forbindelse og login godkendt.');
  if(order){
+  const catalog=await loadProductCatalog(order.lines.map(line=>line.productId));
+  order.lines=order.lines.map(line=>({...line,productName:line.productName||catalog.products.find(p=>p.id===line.productId)?.name}));
   root=await mkdtemp(join(tmpdir(),'smerch-mail-test-'));
   process.env.SMERCH_DATA_DIR=root;
   await queueOrderConfirmation({...order,shipping:{...order.shipping,email:to}});
