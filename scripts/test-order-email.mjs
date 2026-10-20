@@ -32,7 +32,7 @@ try{
   await queueOrderConfirmation({...order,shipping:{...order.shipping,email:to}});
   let delivered=false;
   await retryOrderConfirmations({transport:{sendMail:async message=>{
-   const result=await sender.sendMail({...message,subject:'[TEST] '+message.subject,text:'TEST – Dette er en testmail, ikke en bestilling. Ingen produktion eller betaling sættes i gang.\n\n'+message.text});
+   const result=await sender.sendMail({...message,subject:'[TEST] '+message.subject,html:'<p><strong>TEST – Dette er en testmail, ikke en bestilling. Ingen produktion eller betaling sættes i gang.</strong></p>'+message.html,text:'TEST – Dette er en testmail, ikke en bestilling. Ingen produktion eller betaling sættes i gang.\n\n'+message.text});
    if(!result.accepted?.length||result.rejected?.length)throw Error('Modtageren blev ikke accepteret af mailserveren.');
    delivered=true;
    return result;
