@@ -1,0 +1,43 @@
+/* Shared Smerch presentation for administration and proof review. */
+:root{--admin-ink:#17201f;--admin-muted:#68716c;--admin-line:#dde2dc;--admin-paper:#fff;--admin-bg:#f5f6f3;--admin-orange:#cf4d22;--admin-soft:#fff2eb;color:var(--admin-ink);background:var(--admin-bg);font:400 14px/1.6 "Roboto",sans-serif}
+body{color:var(--admin-ink);background:var(--admin-bg)}
+button,input,select,textarea{font:inherit}
+h1,h2,h3,strong,b{font-weight:500}
+h1{letter-spacing:-.035em;line-height:1.15}h2{letter-spacing:-.015em}
+button,a,input,select,textarea,summary{outline-offset:3px}
+:where(button,a,input,select,textarea,summary):focus-visible{outline:2px solid var(--admin-orange)}
+:where(input,select,textarea){min-height:44px;border:1px solid var(--admin-line);border-radius:12px;background:#fafbf9;color:var(--admin-ink);padding:11px 14px;max-width:100%;min-width:0}
+:where(input,select,textarea):focus{border-color:var(--admin-orange)}
+label{font-weight:400;font-size:13px;gap:7px}
+.eyebrow,.main-area>header small{font-size:11px;font-weight:400;letter-spacing:.1em;color:var(--admin-muted)}
+.app{grid-template-columns:220px minmax(0,1fr)}
+.sidebar{background:#edf0eb;color:var(--admin-ink);border-right:1px solid var(--admin-line);padding:28px 16px;gap:32px;position:sticky;top:0;height:100dvh;overflow:auto}
+.brand{padding:0 12px;letter-spacing:0}.brand img{display:block;width:140px;height:auto}.brand span{font-size:11px;font-weight:400;letter-spacing:.08em;color:var(--admin-muted);margin-top:3px}
+.sidebar nav{gap:4px}.sidebar nav button,.sidebar-bottom button{color:var(--admin-muted);font-weight:400;border-radius:12px;padding:11px 14px}
+.sidebar nav button.active{color:var(--admin-orange);background:var(--admin-soft);font-weight:500}
+.sidebar nav button:hover,.sidebar-bottom button:hover{color:var(--admin-ink);background:#e1e6df}
+.sidebar nav span{color:var(--admin-orange)}.sidebar-bottom{border-top:1px solid var(--admin-line);padding-top:18px;gap:8px}.sidebar-bottom a{color:var(--admin-muted)}
+.main-area>header{background:var(--admin-bg);padding:30px clamp(20px,4vw,52px);border-color:var(--admin-line)}
+.main-area>header h1{font-size:clamp(26px,3vw,36px);font-weight:500;margin-top:6px}
+.main-area>header button,.admin-proofs header button{border:1px solid var(--admin-line);border-radius:99px;background:transparent;font-size:13px;padding:9px 16px}
+#content{padding:28px clamp(20px,4vw,52px);max-width:1540px}
+.intro{max-width:780px;font-size:14px;color:var(--admin-muted);margin-bottom:24px}
+.metrics{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.metric,.panel,.order-card,.card,.product-admin-card{border:1px solid var(--admin-line);border-radius:18px;box-shadow:none;padding:24px}
+.metric strong{font-size:32px;font-weight:400;line-height:1.2;margin-bottom:8px}.metric span{font-size:13px}
+.panel h2{font-size:17px;font-weight:500}.grid{gap:18px;margin-top:24px}.panel+.panel{margin-top:20px}.grid>.panel{margin-top:0}
+.row,.order-card{gap:20px}.row strong,.order-card strong{font-size:14px;overflow-wrap:anywhere}.row small,.order-card small{font-size:13px;line-height:1.65}.order-card>div{min-width:0;flex:1}.order-card>.status{flex-shrink:0}
+.status,.pill{font-weight:400;font-size:12px;padding:5px 11px;background:#edf0eb;color:#59645d;white-space:normal}.status.pending{background:var(--admin-soft);color:#a53e1a}.status.ready{background:#eaf2eb;color:#37694a}
+#content a.action,.product-admin-card button.action,.invoice-panel button.action,.invoice-setup .action,button.action{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 17px;font:400 13px/1.4 "Roboto",sans-serif;border-radius:99px;border:1px solid var(--admin-line);background:white;color:var(--admin-ink);text-decoration:none;cursor:pointer}
+#content a.action:not(.light),.product-admin-card button.action:not(.light),button.primary,.login-card form button{background:var(--admin-orange);color:#fff;border-color:var(--admin-orange)}
+#content .action:hover{filter:brightness(.96)}button:disabled{cursor:not-allowed;opacity:.5}
+.product-admin-card h2{font-weight:500}.product-admin-filters{gap:12px;margin-bottom:22px}.product-admin-filters input,.product-admin-filters select,.statistics-period select,.company-admin-picker select,.company-admin-name,.product-price-dialog select,.product-price-dialog input{border-color:var(--admin-line);border-radius:12px;background:#fafbf9}
+.product-price-dialog{border-color:var(--admin-line);border-radius:20px;padding:28px}.product-price-dialog::backdrop{background:#17201f66}.product-price-dialog button{border-radius:99px}.product-price-dialog th{font-weight:500}.invoice-panel{background:#f7f8f5;border-color:var(--admin-line);border-radius:14px}
+.login-view{padding:32px 20px;background:#edf0eb}.login-card{width:min(420px,100%);padding:36px;border-radius:24px;box-shadow:none;border:1px solid var(--admin-line)}
+.login-brand{display:block;margin-bottom:28px}.login-brand img{display:block;width:145px;height:auto}.login-card .eyebrow{display:block}.login-card h1{font-size:30px;font-weight:500;margin:10px 0}.login-card p{font-size:14px}.login-card label{font-size:13px;font-weight:400;gap:7px}.login-card input{min-height:46px;border-radius:12px;border-color:var(--admin-line);background:#f7f8f5;padding:12px 14px;width:100%}.login-card form{gap:18px;margin:26px 0 12px}.login-card form button{border-radius:99px;font-weight:400;min-height:46px}.login-card [role=alert]:empty{display:none}.login-card>a:not(.login-brand){display:inline-block;color:var(--admin-muted);font-size:12px;margin-top:12px;text-decoration:none}
+.admin-proofs>header{background:#edf0eb;color:var(--admin-ink);border-bottom:1px solid var(--admin-line);padding:24px max(24px,4vw)}
+.proof-brand{display:block;margin-bottom:14px}.proof-brand img{display:block;width:116px;height:auto}.admin-proofs header h1{font-size:30px;font-weight:500;margin-top:6px}.admin-proofs header p{color:var(--admin-muted);font-size:14px}.admin-proofs .back-link{color:var(--admin-ink);border:0;font-size:13px}.admin-proofs header .actions{align-self:flex-end}
+.admin-proofs main{max-width:1600px;margin:auto;padding:28px max(24px,4vw)}.admin-proofs button{border-radius:99px;font-size:13px}.admin-proofs aside{border-radius:18px;border-color:var(--admin-line)}.order.active{background:var(--admin-soft);border-left-color:var(--admin-orange)}.admin-proofs .order{border-radius:0}.order strong{overflow-wrap:anywhere;font-weight:500}.facts strong{font-size:14px;overflow-wrap:anywhere}.facts span{font-size:12px}.facts div{background:#f6f7f4;border-radius:12px;padding:14px}.event{font-size:12px;padding:10px 0;overflow-wrap:anywhere}.test-panel{background:#f6f7f4;border-color:var(--admin-line)}.test-panel .eyebrow{color:var(--admin-muted)}.admin-proofs #login{padding:30px}.admin-proofs #login .primary{width:100%;margin-top:12px}.admin-proofs #detail{min-width:0;overflow-wrap:anywhere}
+@media(max-width:1100px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.order-card{align-items:flex-start;flex-wrap:wrap}}
+@media(max-width:760px){.app{display:block}.sidebar{position:fixed;top:80px;bottom:0;height:calc(100dvh - 80px);width:min(300px,82vw);z-index:20;padding-top:26px;box-shadow:12px 0 40px #17201f18}.app.menu-open #menu-toggle{position:relative;z-index:21}.main-area>header{padding:20px}.main-area>header small{display:none}.main-area>header h1{font-size:26px}#content{padding:22px 18px}.metric,.panel,.order-card,.card{padding:20px}.admin-proofs>header{align-items:flex-start;flex-direction:column;gap:8px}.admin-proofs header .actions{align-self:flex-start;margin:8px 0}.admin-proofs main{padding:20px 16px}.login-card{padding:28px}.product-price-dialog{padding:18px}}
+@media(prefers-reduced-motion:no-preference){button,a{transition:background-color .15s,color .15s,border-color .15s}}
