@@ -24,5 +24,5 @@ try{
   await publishCustomerProof(id,{version:1,message});
   console.log(`Korrekturtest oprettet: ${scenario} (${id})`);
  }
- await retryProofMail({orderIds});console.log('Kontrollér hello-indbakken for to korrekturtests. Testbilledet er et mockup, ikke en PF-produktionskorrektur.');
+ await retryProofMail({orderIds});console.log('Kontrollér modtagerens indbakke for to korrekturtests. Testbilledet er et mockup, ikke en PF-produktionskorrektur.');
 }catch(error){console.error(error.message);process.exitCode=1;}
