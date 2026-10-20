@@ -1,3 +1,4 @@
+import {sendCartTest,validateCartTest} from './lib/pf-cart-test.mjs';
 import {economicConfiguration,syncEconomicInvoice,syncEconomicInvoices} from './lib/economic-invoices.mjs';
 import {searchDanishAddresses,resolveDanishAddress,verifyDeliveryAddress,createAddressLimiter} from './lib/danish-address.mjs';
 const addressAllowed=createAddressLimiter();
@@ -209,6 +210,13 @@ const handleRequest=async(req,res)=>{
   try{
    const pathname=new URL(req.url,'http://localhost').pathname;
    if(pathname==='/api/pf-orders/status'&&req.method==='GET'){json(res,200,{...gatewayRequirements(),automaticHandoff:handoffConfiguration(),captureEnabled:process.env.PAYMENT_PROVIDER==='quickpay'?process.env.QUICKPAY_CAPTURE_ENABLED==='1':process.env.STRIPE_CAPTURE_ENABLED==='1'});return;}
+   if(pathname==='/api/pf-orders/test-cart'&&req.method==='POST'){
+    if(!adminSessionAuthorized(req))throw Error('Medarbejderlogin kræves.');
+    const input=await readJSON(req,30*1024*1024);validateCartTest(input);
+    const catalog=await loadProductCatalog(input.lines.map(line=>line.productId)),{prices,rules}=await loadPricing(),stock=await loadStock();
+    const sent=await sendCartTest(input,{catalog,prices,rules,stock});
+    json(res,201,{id:sent.id,purchaseOrderNumber:sent.purchaseOrderNumber,status:sent.status,test:true,paymentCreated:false});return;
+   }
    if(pathname==='/api/pf-orders/test'&&req.method==='POST'){
     const input=await readJSON(req);
     const catalog=await loadProductCatalog(['pf-38687']),{prices,rules}=await loadPricing(),stock=await loadStock();
