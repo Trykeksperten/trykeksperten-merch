@@ -4,7 +4,7 @@ import {mkdtemp,mkdir,writeFile,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {randomUUID} from 'node:crypto';
-import {recordProof,publishCustomerProof,customerProof,customerProofFile,decideProof,readOrder,readFeedbackFile} from '../lib/pf-orders.mjs';
+import {dispatchOrder,recordApprovalDelivery,recordExternalApproval,recordProof,publishCustomerProof,customerProof,customerProofFile,decideProof,readOrder,readFeedbackFile} from '../lib/pf-orders.mjs';
 import {retryProofMail,proofMailStatus} from '../lib/proof-mail.mjs';
 import {proofQueue} from '../dist/proof-status.mjs';
 const directory=await mkdtemp(join(tmpdir(),'smerch-proof-test-')),previous=process.env.SMERCH_DATA_DIR;process.env.SMERCH_DATA_DIR=directory;
@@ -19,3 +19,17 @@ test('customer changes require a comment and preserve validated attachments with
 test('mail queue retries failures, sends reminders and stops when the customer answers',async()=>{const {id}=await fixture(),token=await invite(id),now=Date.now();await retryProofMail({now,transport:{sendMail:async()=>{throw Error('offline');}}});assert.equal((await proofMailStatus(id))[0].sentCount,0);const sent=[];await retryProofMail({now:now+16*60000,transport:{sendMail:async mail=>sent.push(mail)}});assert.equal((await proofMailStatus(id))[0].sentCount,1);assert.ok(sent.some(mail=>mail.text.includes(token)));await retryProofMail({now:now+49*3600000,transport:{sendMail:async mail=>sent.push(mail)}});assert.equal((await proofMailStatus(id))[0].sentCount,2);await decideProof(id,{version:1,decision:'reject',comment:'Ret teksten',customerToken:token});await retryProofMail({now:now+98*3600000,transport:{sendMail:async mail=>sent.push(mail)}});assert.equal((await proofMailStatus(id))[0].status,'obsolete');});
 test('invalid feedback files never register a customer decision',async()=>{const {id}=await fixture(),token=await invite(id);await assert.rejects(decideProof(id,{version:1,decision:'reject',comment:'Ret logo',customerToken:token,attachments:[{name:'fake.pdf',mimeType:'application/pdf',contentBase64:Buffer.from('<script>bad</script>').toString('base64')}]}),/ugyldig/);assert.equal((await readOrder(id)).status,'proof_received');assert.equal((await readOrder(id)).decision,null);});
 test('mail reminders are limited to two and superseded links are not mailed',async()=>{const {id}=await fixture();await invite(id);await invite(id);const now=Date.now()+61000;let sent=0;const transport={sendMail:async()=>sent++};await retryProofMail({now,transport});await retryProofMail({now:now+49*3600000,transport});await retryProofMail({now:now+98*3600000,transport});await retryProofMail({now:now+147*3600000,transport});const records=await proofMailStatus(id);assert.equal(records.filter(record=>record.status==='obsolete').length,1);assert.equal(records.find(record=>record.status==='complete').sentCount,3);});
+
+test('proof sandbox permanently blocks PF dispatch and release and sends one test invitation only',async()=>{
+ const {id}=await fixture(),order=await readOrder(id);order.adminTest=true;await writeFile(join(directory,'orders',id+'.json'),JSON.stringify(order));
+ const token=await invite(id),sent=[];
+ await retryProofMail({transport:{sendMail:async mail=>sent.push(mail)}});
+ assert.ok(sent.some(mail=>mail.subject.startsWith('[TEST]')&&mail.text.includes(token)));
+ await retryProofMail({now:Date.now()+49*3600000,transport:{sendMail:async mail=>sent.push(mail)}});
+ assert.equal(sent.filter(mail=>mail.text.includes(token)).length,1);
+ await decideProof(id,{version:1,decision:'approve',customerToken:token});
+ await assert.rejects(dispatchOrder(id),/Korrekturtesten/);
+ await assert.rejects(recordApprovalDelivery(id,{channel:'E-mail',reference:'TEST'}),/Korrekturtesten/);
+ await assert.rejects(recordExternalApproval(id,{pfApprovalReference:'TEST'}),/Korrekturtesten/);
+ assert.equal((await readOrder(id)).status,'approval_pending_pf');
+});
