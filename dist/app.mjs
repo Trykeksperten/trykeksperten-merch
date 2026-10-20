@@ -8,7 +8,7 @@ import {getLanguage} from './i18n-core.mjs';
 import {aboutPage} from './about.mjs?v=3';
 import {initLanguage} from './i18n.mjs';
 import {bindProductImageHover} from './product-hover.mjs?v=2';
-import {shouldHandleNavigation} from './navigation.mjs';
+import {shouldHandleNavigation} from './navigation.mjs?v=2';
 import {editorialProductCard,editorialStory,bindProductColorSwatches} from './product-editorial.mjs?v=6';
 import {pfCartPage,bindCart,updateCartHeader,readCart as readLiveCart,writeCart as writeLiveCart} from './pf-cart.mjs?v=22';
 import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs?v=16';

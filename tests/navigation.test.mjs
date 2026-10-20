@@ -13,3 +13,7 @@ test('router preserves browser link behavior for other tabs, anchors and modifie
  for(const l of [link('/produkter',{target:'_blank'}),link('/#kontakt'),link('https://example.com/')])assert.equal(shouldHandleNavigation(l,click,origin),false);
  for(const event of [{button:1},{button:0,ctrlKey:true},{button:0,metaKey:true},{button:0,altKey:true},{button:0,defaultPrevented:true}])assert.equal(shouldHandleNavigation(link('/produkter'),event,origin),false);
 });
+test('staff login and administration routes load their own server pages',()=>{
+ for(const path of ['/admin','/admin/','/admin/pf-orders','/admin?next=orders'])assert.equal(shouldHandleNavigation(link(path),click,origin),false);
+ assert.equal(shouldHandleNavigation(link('/produkter'),click,origin),true);
+});
