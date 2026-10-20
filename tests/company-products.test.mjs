@@ -12,7 +12,7 @@ import {pfAssetsForGroup} from '../lib/order-flow.mjs';
 test('company designs keep original files server-side, reject other accounts and attach trusted artwork to PF checkout',async()=>{
  const company={id:'test-'+randomUUID()},other={id:'other-'+randomUUID()},product=await loadPFProduct('pf-37538'),source=product.variants[0],option=source.options[0];
  const pdf=Buffer.from('%PDF-1.4\nOriginal customer artwork'),logo={id:randomUUID(),name:'customer.pdf',type:'application/pdf',size:pdf.length,pixelWidth:1000,pixelHeight:1000};
- const art=normalizeArtworkForOption({id:randomUUID(),logo,x:.5,y:.5,scale:.4,color:'#000000'},option),size=designGroupSize([art],'',{},option);
+ const art=normalizeArtworkForOption({id:randomUUID(),logo,x:.5,y:.5,scale:.4,paletteColors:[{source:'#000000',target:'#000000'}]},option),size=designGroupSize([art],'',{},option);
  const line={productId:product.id,sku:source.sku,quantity:25,decorations:[{optionId:option.id,width:Math.round(size.widthMm*10)/10,height:Math.round(size.heightMm*10)/10,colors:1,text:'',artworks:[art]}]};
  const catalog={products:[product]},loadCatalog=async()=>catalog,previews=['iVBORw0KGgo='];
  let checkoutId;

@@ -1,4 +1,4 @@
-import {bindCartTest} from './pf-cart-test.mjs';
+import {bindCartTest} from './pf-cart-test.mjs?v=2';
 import {proofQueue,proofQueueLabel} from './proof-status.mjs';
 import {foilFinish} from './foil-options.mjs';
 const $=id=>document.getElementById(id);let orders=[],selectedId=null,previewUrl=null;

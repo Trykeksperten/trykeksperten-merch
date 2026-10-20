@@ -1,9 +1,9 @@
-import {loadFile} from './storage.mjs';
+import {loadArtworkPreview} from './artwork-preview.mjs';
 import {placementOptionAssets} from './pf-rules.mjs?v=2';
 import {artworkPrintSize,textPrintSize,optionPrintSize,printableBounds,containMappedBounds} from './design-layers.mjs?v=4';
 import {fontFamily} from './pf-text.mjs?v=2';
 import {foilFinish,isFoilOption} from './foil-options.mjs';
-import {createVectorPreview,recolorArtworkPreview,tintArtworkPreview} from './vector-preview.mjs?v=2';
+import {recolorArtworkPreview,tintArtworkPreview} from './vector-preview.mjs?v=2';
 
 const loadImage=src=>new Promise((resolve,reject)=>{
  const img=new Image();
@@ -41,9 +41,7 @@ export async function renderCartMockup(product,option,design){
  const foil=isFoilOption(option)?foilFinish(design.foilFinish)?.hex:null;
  const artworks=design.artworks?.length?design.artworks:design.logo?[{logo:design.logo,x:.5,y:.5,scale:.34}]:[];
  for(const art of artworks){
-  const original=await loadFile(art.logo.previewId||art.logo.id);
-  if(!original)throw Error('Logofilen mangler i denne browser.');
-  const file=original.type.startsWith('image/')?original:await createVectorPreview(original);
+  const file=await loadArtworkPreview(art.logo);
   if(!file)throw Error('Logofilen kan ikke vises som skitse.');
   let url;
   try{
