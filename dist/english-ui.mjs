@@ -48,7 +48,7 @@ Beløbet reserveres ved bestilling. Beløbet hæves efter din godkendelse af pro
 
 Betalingsmetoder|Payment methods
 Betal sikkert med|Pay securely with
-Visa, Mastercard, Apple Pay og Vipps MobilePay vises på den sikre betalingsside. Du modtager status på e-mail.|Visa, Mastercard, Apple Pay and Vipps MobilePay appear on the secure payment page. Updates are sent by email.
+Visa, Mastercard, Apple Pay, Google Pay og MobilePay vises på den sikre betalingsside. Du modtager status på e-mail.|Visa, Mastercard, Apple Pay, Google Pay and MobilePay appear on the secure payment page. Updates are sent by email.
 Levering med logo: 7–10 hverdage efter godkendt korrektur|Delivery with a logo: 7–10 business days after proof approval
 Uden logo: 2–4 hverdage|Without a logo: 2–4 business days
 Lagervarer kan bestilles med logo fra 1 stk. Specialproduktion aftales særskilt.|Stocked products can be ordered with a logo from 1 piece. Custom production is agreed separately.

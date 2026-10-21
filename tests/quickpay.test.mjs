@@ -62,6 +62,6 @@ test('Quickpay sends the customer back to the shop while callbacks stay on the A
   await createQuickpayLink(id,{env:{...env,SMERCH_PUBLIC_BASE_URL:'https://api.smerch.dk',SMERCH_CUSTOMER_BASE_URL:'https://smerch.dk'},fetchImpl:async(url,options)=>{
    const body=JSON.parse(options.body);if(options.method==='POST')return response({id:12345,order_id:body.order_id});link=body;return response({url:'https://payment.quickpay.net/payments/test-return'});
   }});
-  assert.equal(link.continue_url,`https://smerch.dk/ordre?checkout=${id}`);assert.equal(link.cancel_url,'https://smerch.dk/betaling?annulleret=1');assert.equal(link.callback_url,'https://api.smerch.dk/api/quickpay/callback');assert.equal(link.auto_capture,false);
+  assert.equal(link.continue_url,`https://smerch.dk/ordre?checkout=${id}`);assert.equal(link.cancel_url,'https://smerch.dk/betaling?annulleret=1');assert.equal(link.callback_url,'https://api.smerch.dk/api/quickpay/callback');assert.equal(link.auto_capture,false);assert.equal(link.payment_methods,'mobilepay,apple-pay,google-pay,creditcard');assert.equal(link.auto_fee,false);
  }finally{await rm(new URL(`../.private/checkouts/${id}.json`,import.meta.url),{force:true});}
 });

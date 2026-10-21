@@ -5,6 +5,7 @@ try{loadEnvFile();}catch(error){if(error.code!=='ENOENT')throw error;}
 
 const report=pfReadiness();
 console.log('PF-integration – sikker statuskontrol');
+console.log('Kontrollerer kun lokal konfiguration. KLAR dokumenterer ikke en gennemført PF-test eller produktionsserverens opsætning.');
 console.log(`Gateway-mode: ${report.mode}`);
 for(const check of report.checks)console.log(`${check.ready?'✓':'○'} ${check.label} [${check.source}]`);
 console.log('');

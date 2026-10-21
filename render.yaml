@@ -55,7 +55,7 @@ services:
       - key: QUICKPAY_MODE
         value: test
       - key: QUICKPAY_PAYMENT_METHODS
-        value: mobilepay,apple-pay,creditcard
+        value: mobilepay,apple-pay,google-pay,creditcard
       - key: QUICKPAY_LIVE_ENABLED
         value: "0"
       - key: QUICKPAY_CAPTURE_ENABLED
