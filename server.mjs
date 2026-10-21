@@ -1,3 +1,4 @@
+import {savePFConfirmation,readPFConfirmation} from './lib/pf-confirmations.mjs';
 import {assertAdminCheckoutTest} from './lib/admin-checkout-test.mjs';
 import {sendCartTest,validateCartTest} from './lib/pf-cart-test.mjs';
 import {economicConfiguration,syncEconomicInvoice,syncEconomicInvoices} from './lib/economic-invoices.mjs';
@@ -211,6 +212,11 @@ const handleRequest=async(req,res)=>{
  const artworkPath=/^\/api\/admin\/checkouts\/(pay-[a-f0-9-]{36})\/artwork\/([a-f0-9-]{36})$/.exec(new URL(req.url,'http://localhost').pathname);
  if(artworkPath&&req.method==='GET'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}try{const order=await readCheckout(artworkPath[1]),asset=order.artworks?.find(item=>item.id===artworkPath[2]);if(!asset)throw Error();const data=await readFile(asset.path);res.writeHead(200,{'Content-Type':'application/octet-stream','Content-Disposition':`attachment; filename="${asset.name.replace(/[^a-zA-Z0-9._-]/g,'_')}"`,'X-Content-Type-Options':'nosniff'}).end(data);}catch{json(res,404,{error:'Logofilen blev ikke fundet.'});}return;}
  if(req.url?.startsWith('/api/pf-artwork?')&&req.method==='GET'){try{const asset=await readSignedArtwork(new URL(req.url,'http://localhost').searchParams);res.writeHead(200,{'Content-Type':asset.mimeType,'Content-Disposition':`attachment; filename="${asset.name.replace(/[^a-zA-Z0-9._-]/g,'_')}"`,'X-Robots-Tag':'noindex, nofollow'}).end(asset.data);}catch{json(res,404,{error:'Trykfilen blev ikke fundet.'});}return;}
+ const confirmationPath=/^\/api\/admin\/pf-confirmations\/(ord-[a-f0-9-]{36})$/.exec(legalURL.pathname);
+ if(confirmationPath&&['GET','POST'].includes(req.method)){
+  if(!adminSessionAuthorized(req)){json(res,401,{error:'Medarbejderlogin kræves.'});return;}
+  try{if(req.method==='POST'){json(res,200,await savePFConfirmation(confirmationPath[1],await readJSON(req,15*1024*1024)));}else{const doc=await readPFConfirmation(confirmationPath[1]);if(legalURL.searchParams.get('download')==='1'){res.writeHead(200,{'Content-Type':'application/pdf','Content-Disposition':`attachment; filename="${doc.name}"`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':'sandbox'}).end(Buffer.from(doc.contentBase64,'base64'));}else json(res,200,{name:doc.name,uploadedAt:doc.uploadedAt});}}catch(error){json(res,req.method==='GET'?404:400,{error:req.method==='GET'?'Ingen PF-bekræftelse gemt.':error.message});}return;
+ }
  const adminPath=req.url?.startsWith('/api/pf-orders');
  if(adminPath){
   if(!authorized(req,process.env.PF_ORDER_ADMIN_TOKEN)&&!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}

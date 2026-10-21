@@ -20,6 +20,6 @@ test('confirmation delivers thank-you copy, named product, preview and legal att
  const sent=[],transport={sendMail:async message=>sent.push(message)};
  await retryOrderConfirmations({transport});await retryOrderConfirmations({transport});
  assert.equal(sent.length,1);assert.match(sent[0].text,/Tak for din ordre!/);assert.match(sent[0].text,/10 × Lexi drikkeflaske/);assert.match(sent[0].text,/Denne korrektur skal godkendes af dig/);assert.match(sent[0].text,/ikke den endelige produktionskorrektur/);
- assert.match(sent[0].html,/width="280"/);assert.match(sent[0].html,/cid:mockup-0@smerch.dk/);assert.equal(sent[0].attachments[0].cid,"mockup-0@smerch.dk");assert.equal(sent[0].attachments.length,3);assert.deepEqual(sent[0].attachments[0].content,Buffer.from(png,'base64'));assert.equal(sent[0].disableFileAccess,true);
+ assert.match(sent[0].html,/width="280"/);assert.match(sent[0].html,/cid:mockup-0@smerch.dk/);assert.equal(sent[0].attachments.find(a=>a.cid).cid,"mockup-0@smerch.dk");assert.equal(sent[0].attachments.length,4);assert.deepEqual(sent[0].attachments.find(a=>a.cid).content,Buffer.from(png,'base64'));assert.equal(sent[0].disableFileAccess,true);
  }finally{if(previous===undefined)delete process.env.SMERCH_DATA_DIR;else process.env.SMERCH_DATA_DIR=previous;await rm(root,{recursive:true,force:true});}
 });

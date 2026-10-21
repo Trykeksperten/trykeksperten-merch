@@ -56,6 +56,6 @@ test('order confirmation is queued once and includes the accepted document snaps
  await Promise.all([queueOrderConfirmation(order),queueOrderConfirmation(order)]);let messages=[];
  await retryOrderConfirmations({env:{},transport:{sendMail:async message=>messages.push(message)}});
  await retryOrderConfirmations({env:{},transport:{sendMail:async message=>messages.push(message)}});
- assert.equal(messages.length,1);assert.equal(messages[0].to,'test@example.invalid');assert.equal(messages[0].attachments.length,2);assert.match(messages[0].attachments[0].content,/Accepted terms/);assert.match(messages[0].text,/Separate acceptance/);assert.match(messages[0].text,/Agreed delivery/);
+ assert.equal(messages.length,1);assert.equal(messages[0].to,'test@example.invalid');assert.equal(messages[0].attachments.length,3);assert.match(messages[0].attachments.find(a=>a.filename==='smerch-terms-en.html').content,/Accepted terms/);assert.match(messages[0].text,/Separate acceptance/);assert.match(messages[0].text,/Agreed delivery/);
  }finally{if(previous===undefined)delete process.env.SMERCH_DATA_DIR;else process.env.SMERCH_DATA_DIR=previous;await rm(base,{recursive:true,force:true});}
 });
