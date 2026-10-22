@@ -1511,7 +1511,7 @@ header nav a:focus-visible,
 
 /* Smerch tote campaign photograph above the footer. */
 .home-campaign{margin:0;background:var(--home-cream)}
-.home-campaign img{display:block;width:100%;max-width:1440px;height:auto;margin-inline:auto}
+.home-campaign img{display:block;width:100%;max-width:none;height:auto;margin:0}
 
 .home-process .process-heading{text-align:center}
 .home-process .process-heading h2{margin-inline:auto}
