@@ -1997,3 +1997,13 @@ body.storefront #main .pf-studio .pf-product-tiers>p{margin:10px 0 0}
  .masthead .menu-toggle{grid-column:1;grid-row:3}
  .masthead #search{grid-column:2/-1;grid-row:3}
 }
+
+/* Compact catalogue filters. */
+.pf-filter-sidebar>.mobile-filter-toggle{padding:8px 14px;font-size:13px;gap:10px}
+.pf-filter-sidebar[open] form{gap:10px 14px;padding-top:14px}
+.pf-filter-sidebar label{gap:6px;font-size:12px;line-height:1.4}
+.pf-filter-sidebar input,.pf-filter-sidebar select{min-height:38px;padding:7px 9px;font-size:13px;border-radius:8px}
+.pf-filter-sidebar label small{font-size:11px;font-weight:400;line-height:1.4;margin:0}
+@media(max-width:700px){
+ .pf-filter-sidebar input,.pf-filter-sidebar select{font-size:16px;min-height:44px}
+}
