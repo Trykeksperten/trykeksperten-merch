@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "nodemailer": "^7.0.13",
+    "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.3.289"
   }
 }

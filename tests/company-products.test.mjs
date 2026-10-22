@@ -32,6 +32,8 @@ test('company designs keep original files server-side, reject other accounts and
   assert.equal(resolved.lines[0].productId,product.id);assert.equal(resolved.lines[0].quantity,3);assert.equal(resolved.lines[0].decorations.length,1);assert.equal(resolved.artworks[0].base64,pdf.toString('base64'));
   checkoutId='pay-'+randomUUID();const checkout={id:checkoutId,lines:resolved.lines};await persistCheckoutArtwork(checkout,resolved.artworks);
   assert.deepEqual(await readFile(checkout.artworks[0].path),pdf);
+  assert.throws(()=>pfAssetsForGroup(checkout,{lineIndexes:[0]},{env:{SMERCH_ARTWORK_SIGNING_SECRET:'x'.repeat(40),SMERCH_PUBLIC_BASE_URL:'https://api.example',SMERCH_PMS_COLOR_MAP:'{\"#000000\":\"Black C\"}'}}),/manuelt/);
+  checkout.pfColourOverrides={'0:0':['Black C']};
   const assets=pfAssetsForGroup(checkout,{lineIndexes:[0]},{env:{SMERCH_ARTWORK_SIGNING_SECRET:'x'.repeat(40),SMERCH_PUBLIC_BASE_URL:'https://api.example',SMERCH_PMS_COLOR_MAP:'{"#000000":"Black C"}'}});
   const url=new URL(assets['0:0'].files.raw[0]);assert.equal(url.searchParams.get('artwork'),checkout.artworks[0].id);assert.equal(url.searchParams.get('checkout'),checkoutId);
   assert.ok((await companyProductPreview(company.id,item.id,0)).length>0);

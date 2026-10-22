@@ -12,7 +12,7 @@ export function createArtworkPreviewLoader({loadFile,createVectorPreview}){
 }
 export function retainLocalPreviews(checked,source){
  const logos=new Map((source.decorations||[]).flatMap(d=>(d.artworks||[]).map(a=>a.logo)).map(logo=>[logo.id,logo]));
- const restore=logo=>{const local=logos.get(logo?.id);return local?.previewId?{...logo,previewId:local.previewId,previewType:local.previewType}:logo;};
+ const restore=logo=>{const local=logos.get(logo?.id);return local?{...logo,...(local.previewId?{previewId:local.previewId,previewType:local.previewType}:{}),...(local.pantone?{pantone:local.pantone}:{})}:logo;};
  return {...checked,decorations:checked.decorations.map(d=>({...d,logo:d.logo?restore(d.logo):null,artworks:(d.artworks||[]).map(a=>({...a,logo:restore(a.logo)}))}))};
 }
 
