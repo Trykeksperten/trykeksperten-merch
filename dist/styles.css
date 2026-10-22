@@ -1731,8 +1731,8 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 
 .legal-check[hidden]{display:none}
 
-/* Keep the colour mark small while providing a full mobile tap target. */
-@media(max-width:700px){.editorial-swatches{max-width:100%;gap:0}.editorial-swatches .editorial-swatch{flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px}}
+/* Compact mobile colour options with separate 28px tap targets. */
+@media(max-width:700px){.editorial-swatches{max-width:100%;gap:0}.editorial-swatches .editorial-swatch{flex:0 0 28px;width:28px;height:28px;min-width:28px;min-height:28px}}
 
 .site-footer .footer-bottom>.footer-logins{align-items:baseline;gap:12px 24px}.site-footer .footer-logins .footer-admin{margin-top:0;font:inherit}.footer-company-login{font:inherit;color:inherit;text-decoration:underline;text-underline-offset:4px}
 
