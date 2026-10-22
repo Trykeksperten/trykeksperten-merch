@@ -1,0 +1,160 @@
+{
+  "at": "2026-10-22T08:40:25.232Z",
+  "products": 1475,
+  "variants": 7553,
+  "tiers": 25568,
+  "estimates": 25568,
+  "checkouts": 4001,
+  "decorated": 2629,
+  "manualSkus": 1,
+  "failures": [],
+  "blocked": {
+    "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.": 24,
+    "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.": 28,
+    "Vælg guld eller sølv til folieprægningen.": 8,
+    "Der mangler en aktuel pris for denne variant.": 17
+  },
+  "examples": [
+    {
+      "id": "pf-124525",
+      "sku": "12452511",
+      "label": "uden logo",
+      "quantity": 10,
+      "goodsUnit": 23920,
+      "productsInc": 299000,
+      "freightInc": 18750,
+      "totalInc": 317750
+    },
+    {
+      "id": "pf-124525",
+      "sku": "12452511",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 23920,
+      "productsInc": 363075,
+      "freightInc": 18750,
+      "totalInc": 381825
+    },
+    {
+      "id": "pf-124525",
+      "sku": "12452511",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 23920,
+      "productsInc": 368350,
+      "freightInc": 18750,
+      "totalInc": 387100
+    },
+    {
+      "id": "pf-100834",
+      "sku": "10083410",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 35920,
+      "productsInc": 513075,
+      "freightInc": 18750,
+      "totalInc": 531825
+    },
+    {
+      "id": "pf-100834",
+      "sku": "10083410",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 35920,
+      "productsInc": 522400,
+      "freightInc": 18750,
+      "totalInc": 541150
+    },
+    {
+      "id": "pf-100990",
+      "sku": "10099001",
+      "label": "uden logo",
+      "quantity": 10,
+      "goodsUnit": 27920,
+      "productsInc": 349000,
+      "freightInc": 18750,
+      "totalInc": 367750
+    },
+    {
+      "id": "pf-100990",
+      "sku": "10099001",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 27920,
+      "productsInc": 432500,
+      "freightInc": 18750,
+      "totalInc": 451250
+    },
+    {
+      "id": "pf-100990",
+      "sku": "10099001",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 27920,
+      "productsInc": 429050,
+      "freightInc": 18750,
+      "totalInc": 447800
+    },
+    {
+      "id": "pf-100751",
+      "sku": "10075101",
+      "label": "uden logo",
+      "quantity": 10,
+      "goodsUnit": 31920,
+      "productsInc": 399000,
+      "freightInc": 18750,
+      "totalInc": 417750
+    },
+    {
+      "id": "pf-100751",
+      "sku": "10075101",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 31920,
+      "productsInc": 521975,
+      "freightInc": 18750,
+      "totalInc": 540725
+    },
+    {
+      "id": "pf-100751",
+      "sku": "10075101",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 31920,
+      "productsInc": 501175,
+      "freightInc": 18750,
+      "totalInc": 519925
+    },
+    {
+      "id": "pf-124399",
+      "sku": "12439990",
+      "label": "uden logo",
+      "quantity": 10,
+      "goodsUnit": 39418,
+      "productsInc": 492725,
+      "freightInc": 18750,
+      "totalInc": 511475
+    },
+    {
+      "id": "pf-124399",
+      "sku": "12439990",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 39418,
+      "productsInc": 576225,
+      "freightInc": 18750,
+      "totalInc": 594975
+    },
+    {
+      "id": "pf-124399",
+      "sku": "12439990",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 39418,
+      "productsInc": 576225,
+      "freightInc": 18750,
+      "totalInc": 594975
+    }
+  ],
+  "priceRulesUnchanged": true
+}

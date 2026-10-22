@@ -1,0 +1,1075 @@
+{
+  "at": "2026-10-22T09:03:27.436Z",
+  "products": 1475,
+  "variants": 7553,
+  "tiers": 25568,
+  "estimates": 25568,
+  "checkouts": 4001,
+  "decorated": 2629,
+  "manualSkus": 1,
+  "failures": [],
+  "blocked": {
+    "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.": 24,
+    "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.": 28,
+    "Vælg guld eller sølv til folieprægningen.": 8,
+    "Der mangler en aktuel pris for denne variant.": 17
+  },
+  "blockedCases": [
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100980",
+      "sku": "10098040",
+      "decorations": []
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-104605",
+      "sku": "10460571",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:1652",
+          "width": 16,
+          "height": 7.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-104605",
+      "sku": "10460571",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:1653",
+          "width": 16,
+          "height": 7.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Vælg guld eller sølv til folieprægningen.",
+      "productId": "pf-107135",
+      "sku": "10713500",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:2576",
+          "width": 18.2,
+          "height": 8.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100834",
+      "sku": "10083410",
+      "decorations": []
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100948",
+      "sku": "10094890",
+      "decorations": []
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100946",
+      "sku": "10094610",
+      "decorations": []
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-100905",
+      "sku": "10090501"
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-113195",
+      "sku": "11319501",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:4456",
+          "width": 5,
+          "height": 2.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-113195",
+      "sku": "11319501",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:4457",
+          "width": 6.5,
+          "height": 3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-124514",
+      "sku": "12451464",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:6750",
+          "width": 4,
+          "height": 1.8,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-104603",
+      "sku": "10460371"
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-130103",
+      "sku": "13010301",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:7428",
+          "width": 61.6,
+          "height": 28,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-220523",
+      "sku": "22052301",
+      "decorations": []
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100981",
+      "sku": "10098182",
+      "decorations": []
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100827",
+      "sku": "10082764",
+      "decorations": []
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-120744",
+      "sku": "12074406",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:5941",
+          "width": 63.8,
+          "height": 29,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-120769",
+      "sku": "12076922"
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100881",
+      "sku": "10088141",
+      "decorations": []
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-38324",
+      "sku": "38324493"
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-38324",
+      "sku": "38324494"
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-38324",
+      "sku": "38324893"
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-38324",
+      "sku": "38324894"
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-38324",
+      "sku": "38324895"
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100947",
+      "sku": "10094790",
+      "decorations": []
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-39311",
+      "sku": "39311496"
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100973",
+      "sku": "10097390",
+      "decorations": []
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-107091",
+      "sku": "10709100",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:2457",
+          "width": 18.2,
+          "height": 8.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Vælg guld eller sølv til folieprægningen.",
+      "productId": "pf-107091",
+      "sku": "10709100",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:2458",
+          "width": 18.2,
+          "height": 8.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100979",
+      "sku": "10097982",
+      "decorations": []
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-100979",
+      "sku": "10097982",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:1364",
+          "width": 17.8,
+          "height": 8.1,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-107920",
+      "sku": "10792051"
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-38323",
+      "sku": "38323494"
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-38323",
+      "sku": "38323495"
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-38323",
+      "sku": "38323992"
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100985",
+      "sku": "10098540",
+      "decorations": []
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-39312",
+      "sku": "39312250"
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-120134",
+      "sku": "12013400",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:5349",
+          "width": 34.2,
+          "height": 15.5,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-120765",
+      "sku": "12076502",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:5991",
+          "width": 13.7,
+          "height": 6.2,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100885",
+      "sku": "10088541",
+      "decorations": []
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-124475",
+      "sku": "12447501"
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-220522",
+      "sku": "22052201",
+      "decorations": []
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100982",
+      "sku": "10098201",
+      "decorations": []
+    },
+    {
+      "reason": "Vælg guld eller sølv til folieprægningen.",
+      "productId": "pf-106269",
+      "sku": "10626900",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:1872",
+          "width": 12.5,
+          "height": 5.7,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-130079",
+      "sku": "13007901",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:7365",
+          "width": 61.6,
+          "height": 28,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100879",
+      "sku": "10087910",
+      "decorations": []
+    },
+    {
+      "reason": "Vælg guld eller sølv til folieprægningen.",
+      "productId": "pf-107812",
+      "sku": "10781201",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:3192",
+          "width": 18.2,
+          "height": 8.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-120331",
+      "sku": "12033100",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:5408",
+          "width": 22.6,
+          "height": 10.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-220001",
+      "sku": "22000121",
+      "decorations": []
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-120537",
+      "sku": "12053705",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:5515",
+          "width": 22.6,
+          "height": 10.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-130091",
+      "sku": "13009190"
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-220521",
+      "sku": "22052101",
+      "decorations": []
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-39507",
+      "sku": "39507550",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_label_v3:9880",
+          "width": 20.5,
+          "height": 9.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-39507",
+      "sku": "39507550",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_label_v3:9881",
+          "width": 25.1,
+          "height": 11.4,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-107090",
+      "sku": "10709000",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:2441",
+          "width": 18.2,
+          "height": 8.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Vælg guld eller sølv til folieprægningen.",
+      "productId": "pf-107090",
+      "sku": "10709000",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:2442",
+          "width": 18.2,
+          "height": 8.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Der mangler en aktuel pris for denne variant.",
+      "productId": "pf-100978",
+      "sku": "10097810"
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100978",
+      "sku": "10097840",
+      "decorations": []
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-220002",
+      "sku": "22000211",
+      "decorations": []
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100945",
+      "sku": "10094510",
+      "decorations": []
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-120532",
+      "sku": "12053221",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:5499",
+          "width": 38.8,
+          "height": 17.6,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-127055",
+      "sku": "12705511",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:7240",
+          "width": 15,
+          "height": 6.8,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100884",
+      "sku": "10088401",
+      "decorations": []
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-113196",
+      "sku": "11319601",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:4459",
+          "width": 10,
+          "height": 4.6,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-113196",
+      "sku": "11319601",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:4460",
+          "width": 7.5,
+          "height": 3.4,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-100983",
+      "sku": "10098301",
+      "decorations": []
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-120541",
+      "sku": "12054101",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:5522",
+          "width": 57,
+          "height": 25.9,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-120541",
+      "sku": "12054101",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:5523",
+          "width": 57,
+          "height": 25.9,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-107811",
+      "sku": "10781101",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:3183",
+          "width": 2.5,
+          "height": 1.1,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-107811",
+      "sku": "10781101",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:3184",
+          "width": 9.1,
+          "height": 4.1,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-120783",
+      "sku": "12078301",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:6045",
+          "width": 52.4,
+          "height": 23.8,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-120783",
+      "sku": "12078301",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:6046",
+          "width": 52.4,
+          "height": 23.8,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Vælg guld eller sølv til folieprægningen.",
+      "productId": "pf-106904",
+      "sku": "10690400",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:2294",
+          "width": 18.2,
+          "height": 8.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Vælg guld eller sølv til folieprægningen.",
+      "productId": "pf-107925",
+      "sku": "10792571",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:3527",
+          "width": 18.2,
+          "height": 8.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "PF Concept mangler et gyldigt mockup eller trykmål for denne placering.",
+      "productId": "pf-120789",
+      "sku": "12078901",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:6079",
+          "width": 52.4,
+          "height": 23.8,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Vælg guld eller sølv til folieprægningen.",
+      "productId": "pf-210215",
+      "sku": "21021500",
+      "decorations": [
+        {
+          "optionId": "printdata_cse1_dk_v3:7819",
+          "width": 18.2,
+          "height": 8.3,
+          "colors": 1,
+          "text": "TEST",
+          "textPlacement": {
+            "x": 0.5,
+            "y": 0.5,
+            "scale": 0.24
+          }
+        }
+      ]
+    },
+    {
+      "reason": "Produktet kræver dekoration, eller muligheden for køb uden tryk er ikke bekræftet.",
+      "productId": "pf-220520",
+      "sku": "22052001",
+      "decorations": []
+    }
+  ],
+  "examples": [
+    {
+      "id": "pf-124525",
+      "sku": "12452511",
+      "label": "uden logo",
+      "quantity": 10,
+      "goodsUnit": 23920,
+      "productsInc": 299000,
+      "freightInc": 18750,
+      "totalInc": 317750
+    },
+    {
+      "id": "pf-124525",
+      "sku": "12452511",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 23920,
+      "productsInc": 363075,
+      "freightInc": 18750,
+      "totalInc": 381825
+    },
+    {
+      "id": "pf-124525",
+      "sku": "12452511",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 23920,
+      "productsInc": 368350,
+      "freightInc": 18750,
+      "totalInc": 387100
+    },
+    {
+      "id": "pf-100834",
+      "sku": "10083410",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 35920,
+      "productsInc": 513075,
+      "freightInc": 18750,
+      "totalInc": 531825
+    },
+    {
+      "id": "pf-100834",
+      "sku": "10083410",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 35920,
+      "productsInc": 522400,
+      "freightInc": 18750,
+      "totalInc": 541150
+    },
+    {
+      "id": "pf-100990",
+      "sku": "10099001",
+      "label": "uden logo",
+      "quantity": 10,
+      "goodsUnit": 27920,
+      "productsInc": 349000,
+      "freightInc": 18750,
+      "totalInc": 367750
+    },
+    {
+      "id": "pf-100990",
+      "sku": "10099001",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 27920,
+      "productsInc": 432500,
+      "freightInc": 18750,
+      "totalInc": 451250
+    },
+    {
+      "id": "pf-100990",
+      "sku": "10099001",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 27920,
+      "productsInc": 429050,
+      "freightInc": 18750,
+      "totalInc": 447800
+    },
+    {
+      "id": "pf-100751",
+      "sku": "10075101",
+      "label": "uden logo",
+      "quantity": 10,
+      "goodsUnit": 31920,
+      "productsInc": 399000,
+      "freightInc": 18750,
+      "totalInc": 417750
+    },
+    {
+      "id": "pf-100751",
+      "sku": "10075101",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 31920,
+      "productsInc": 521975,
+      "freightInc": 18750,
+      "totalInc": 540725
+    },
+    {
+      "id": "pf-100751",
+      "sku": "10075101",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 31920,
+      "productsInc": 501175,
+      "freightInc": 18750,
+      "totalInc": 519925
+    },
+    {
+      "id": "pf-124399",
+      "sku": "12439990",
+      "label": "uden logo",
+      "quantity": 10,
+      "goodsUnit": 39418,
+      "productsInc": 492725,
+      "freightInc": 18750,
+      "totalInc": 511475
+    },
+    {
+      "id": "pf-124399",
+      "sku": "12439990",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 39418,
+      "productsInc": 576225,
+      "freightInc": 18750,
+      "totalInc": 594975
+    },
+    {
+      "id": "pf-124399",
+      "sku": "12439990",
+      "label": "med dekoration",
+      "quantity": 10,
+      "goodsUnit": 39418,
+      "productsInc": 576225,
+      "freightInc": 18750,
+      "totalInc": 594975
+    }
+  ],
+  "priceRulesUnchanged": true
+}
