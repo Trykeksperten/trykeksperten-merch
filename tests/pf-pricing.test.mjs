@@ -162,7 +162,7 @@ test('goods never sell below updated supplier cost, including manual overrides a
 });
 
 test('agreed branded prices apply to every colour, preserve volume discounts and agree with checkout',async()=>{
- for(const [id,cost,retail]of [['pf-100834',240,449],['pf-100990',180,349],['pf-100751',210,399],['pf-124399',310,599],['pf-124525',140,299]]){
+ for(const [id,cost,retail]of [['pf-100834',240,449],['pf-100990',180,349],['pf-100751',210,399],['pf-100816',175,349],['pf-100753',210,429],['pf-100856',240,479],['pf-100879',160,299],['pf-124399',310,599],['pf-124525',140,299]]){
   const product=structuredClone(await loadPFProduct(id)),cat={...catalog,products:[product]},source={...prices,products:{}},pricing={...rules,goodsMarkup:100};
   // Isolate goods calculations from the supplier's mandatory-decoration policy.
   for(const variant of product.variants)variant.decorationMandatory=false;
