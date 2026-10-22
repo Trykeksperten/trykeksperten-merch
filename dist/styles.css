@@ -2036,4 +2036,4 @@ body.storefront #main .pf-studio .pf-product-tiers>p{margin:10px 0 0}
 
 .catalog-brand-heading .catalog-brand-logo{filter:brightness(0)}
 
-.catalog-brand-heading h1:not(:has(img)){font-size:calc(var(--brand-logo-height) / .7109375);line-height:.7109375;letter-spacing:0;color:#000}
+body.storefront #main .catalog-brand-heading h1:not(:has(img)){font-size:calc(var(--brand-logo-height) / .7109375);line-height:.7109375;letter-spacing:0;color:#000}
