@@ -2012,3 +2012,9 @@ body.storefront #main .pf-studio .pf-product-tiers>p{margin:10px 0 0}
  .home-value-strip>span{min-height:104px;padding:16px 8px}
  .home-proof-note.home-delivery-note{padding:18px 16px;gap:6px}
 }
+
+.catalog-brand-heading{display:flex;align-items:center;gap:32px}
+.catalog-brand-heading .catalog-brand-logo{width:180px;height:90px;object-fit:contain;flex:none}
+.catalog-brand-heading h1{margin:0}
+.catalog-brand-heading p{margin:12px 0 0;color:var(--muted)}
+@media(max-width:700px){.catalog-brand-heading{gap:20px;flex-wrap:wrap}.catalog-brand-heading .catalog-brand-logo{width:120px;height:60px}}
