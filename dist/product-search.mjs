@@ -36,6 +36,11 @@ export function bindProductSearch({form,input,getCatalog,getPrices,navigate}){
   e.preventDefault();if(panel.hidden)update();const links=[...panel.querySelectorAll('a')];if(!links.length)return;
   const index=links.indexOf(document.activeElement);links[index<0?(e.key==='ArrowDown'?0:links.length-1):(index+(e.key==='ArrowDown'?1:-1)+links.length)%links.length].focus();
  });
+ // Keep focus in the search field until the link click is dispatched. Mobile
+ // browsers can blur with relatedTarget=null before click and hide the target.
+ panel.addEventListener('pointerdown',e=>{
+  if(e.isPrimary!==false&&e.button===0&&e.target.closest('a'))e.preventDefault();
+ });
  panel.addEventListener('click',e=>{const link=e.target.closest('a');if(!link)return;e.preventDefault();e.stopPropagation();close();navigate(link.getAttribute('href'));});
  form.addEventListener('submit',close);
  window.addEventListener('popstate',close);
