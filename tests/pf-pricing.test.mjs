@@ -162,7 +162,7 @@ test('goods never sell below updated supplier cost, including manual overrides a
 });
 
 test('agreed branded prices apply to every colour, preserve volume discounts and agree with checkout',async()=>{
- for(const [id,cost,retail]of [['pf-100834',240,449],['pf-100990',180,349],['pf-100751',210,399],['pf-100816',175,349],['pf-100856',240,479],['pf-100879',160,299],['pf-124399',310,599],['pf-124525',140,299]]){
+ for(const [id,cost,retail]of [['pf-100834',240,449],['pf-100990',180,349],['pf-100751',210,399],['pf-100856',240,479],['pf-100879',160,299],['pf-124399',310,599],['pf-124525',140,299]]){
   const product=structuredClone(await loadPFProduct(id)),cat={...catalog,products:[product]},source={...prices,products:{}},pricing={...rules,goodsMarkup:100};
   // Isolate goods calculations from the supplier's mandatory-decoration policy.
   for(const variant of product.variants)variant.decorationMandatory=false;
@@ -255,6 +255,32 @@ test('Big Ocean Bottle stays at 479 incl VAT across supplier promotion expiry an
     assert.equal(estimatePFLine(cat,line,source,pricing,now).goodsUnit,38320);
     assert.equal(quotePFLine(cat,line,source,pricing,now).totalIncVat,47900*quantity);
     assert.equal(quotePFCart(cat,[line],source,pricing,now).goods,38320*quantity);
+   }
+  }
+ }
+});
+
+
+test('approved fixed premium prices survive promotion expiry and preserve other gift-set colours',async()=>{
+ for(const [id,promo,normal,retail,onlySku] of [
+  ['pf-100816',175,215,379],['pf-100817',155,180,329],
+  ['pf-100818',145,160,299],['pf-100827',230,265,449],
+  ['pf-113185',290,320,599,'11318506']
+ ]){
+  const product=structuredClone(await loadPFProduct(id)),cat={...catalog,products:[product]},pricing={...rules,goodsMarkup:100};
+  for(const v of product.variants)v.decorationMandatory=false;
+  for(const cost of [promo,normal]){
+   const source={...prices,products:Object.fromEntries(product.variants.map(v=>[v.sku,{currency:'DKK',minimumDecoration:1,tiers:[{min:1,net:cost},{min:50,net:cost*.9}]}]))};
+   for(const v of product.variants){
+    const fixed=!onlySku||v.sku===onlySku;
+    assert.equal(listPFProductTiers(cat,id,v.sku,source,pricing,now).tiers[0].unitIncVat,fixed?retail*100:cost*250);
+    for(const quantity of [1,50]){
+     const line={productId:id,sku:v.sku,quantity,decorations:[]};
+     const unit=fixed?retail*80:Math.round(cost*(quantity===50?.9:1)*200);
+     assert.equal(quotePFLine(cat,line,source,pricing,now).goodsUnit,unit);
+     assert.equal(estimatePFLine(cat,line,source,pricing,now).goodsUnit,unit);
+     assert.equal(quotePFCart(cat,[line],source,pricing,now).goods,unit*quantity);
+    }
    }
   }
  }
