@@ -2030,3 +2030,5 @@ body.storefront #main .pf-studio .pf-product-tiers>p{margin:10px 0 0}
 
 .seo-category-links{display:flex;flex-wrap:wrap;gap:12px 20px;margin-bottom:24px}
 .seo-product-image{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain}
+
+.pf-product-loading{min-height:75vh}.pf-loading-photo{display:block;width:100%;max-height:540px;object-fit:contain}.pf-loading-options{padding-top:24px}.pf-loading-field{height:48px;background:#e9ece8;border-radius:10px;margin:20px 0}.pf-loading-field:last-child{height:100px}@media(max-width:700px){.pf-loading-photo{height:280px}.pf-loading-options{padding-top:0}}

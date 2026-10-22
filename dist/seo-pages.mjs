@@ -1,3 +1,4 @@
+import {productLoading} from './product-loading.mjs';
 import {shopProducts} from './pf-visibility.mjs';
 import {homeHero} from './home-hero.mjs';
 // Shared by the HTTP response and client-side navigation. Keep metadata tied to the visible page.
@@ -53,12 +54,12 @@ export function seoPage(path,search='',catalog={products:[],brands:[]},detail=nu
  if(path==='/')schema.push({'@context':'https://schema.org','@type':'WebSite',name:'Smerch',url:origin+'/',inLanguage:'da-DK'});
  if(product){const productSchema={'@context':'https://schema.org','@type':'Product',name:product.name,description:cleanText(detail?.description||description),image:[absolute(image)],sku:product.modelCode||product.id,...(product.brand?{brand:{'@type':'Brand',name:product.brand}}:{})};const offer=verifiedProductOffer(product,commerce?.prices,commerce?.stock,commerce?.checkout);if(offer)productSchema.offers=offer;schema.push(productSchema);}
  if(path==='/produkter'||product)schema.push({'@context':'https://schema.org','@type':'BreadcrumbList',itemListElement:[{ '@type':'ListItem',position:1,name:'Forside',item:origin+'/'},{'@type':'ListItem',position:2,name:product?'Produkter':heading,item:product?origin+'/produkter':canonical},...(product?[{'@type':'ListItem',position:3,name:product.name,item:canonical}]:[])]});
- return {title,description,canonical,heading,image:absolute(image),robots,kind,product,schema};
+ return {title,description,canonical,heading,image:absolute(image),robots,kind,product,schema,selectedSku:params.get('sku')};
 }
 export function seoHead(page){return `<meta name="description" content="${escapeHTML(page.description)}"><meta name="robots" content="${escapeHTML(page.robots)}"><link rel="canonical" href="${escapeHTML(page.canonical)}"><meta property="og:type" content="${page.kind==='product'?'product':'website'}"><meta property="og:site_name" content="Smerch"><meta property="og:locale" content="da_DK"><meta property="og:title" content="${escapeHTML(page.title)}"><meta property="og:description" content="${escapeHTML(page.description)}"><meta property="og:url" content="${escapeHTML(page.canonical)}"><meta property="og:image" content="${escapeHTML(page.image)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${escapeHTML(page.title)}"><meta name="twitter:description" content="${escapeHTML(page.description)}"><meta name="twitter:image" content="${escapeHTML(page.image)}"><script type="application/ld+json" id="seo-jsonld">${JSON.stringify(page.schema).replace(/</g,'\\u003c')}</script>`;}
 export function seoMain(page,catalog){
  const products=catalog?.products||[];
- if(page.product){const product=page.product,variant=product.variants.find(item=>!item.discontinued&&item.images?.[0]),photo=variant?.images?.[0],editorial=productEditorial(product.id);return `<section class="wrap section seo-initial"><nav aria-label="Brødkrumme"><a href="/">Forside</a> / <a href="/produkter">Produkter</a></nav><h1>${escapeHTML(product.name)}</h1>${photo?`<img src="${escapeHTML(photo)}" alt="${escapeHTML(product.name)} i farven ${escapeHTML(variant.color||'vist variant')}" width="500" height="500" fetchpriority="high">`:''}<p>${escapeHTML(editorial?.intro||page.description)}</p>${editorial?`<p>${escapeHTML(editorial.guide)}</p>`:''}${product.brand?`<p>Brand: ${escapeHTML(product.brand)}</p>`:''}<a href="/produkter">Se flere produkter</a></section>`;}
+ if(page.product)return productLoading(page.product,page.selectedSku)+`<noscript><section class="wrap"><p>${escapeHTML(page.description)}</p><a href="/produkter">Se flere produkter</a></section></noscript>`;
  if(page.canonical.includes('/produkter')){
   const url=new URL(page.canonical),group=url.searchParams.get('kategori'),subcategory=url.searchParams.get('underkategori'),brandId=url.searchParams.get('brand');
   const brand=catalog?.brands?.find(item=>item.id===brandId),logo=brand?.logo?.replace(/\.(png|svg)(?:\?.*)?$/,'.svg?v=2');
