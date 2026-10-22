@@ -59,7 +59,7 @@ function homeCategoryTiles(){
   if(item.cheapest)matches.sort((a,b)=>(pfPrices.products[a.id].fromIncVat??Infinity)-(pfPrices.products[b.id].fromIncVat??Infinity));
   const product=matches.find(candidate=>candidate.modelCode===item.modelCode)||matches[0];
   if(!product)return '';
-  return `<a class="category-tile" href="${esc(item.href)}"><div><img src="${esc(liveProductImage(product))}" alt="${esc(product.name)}" loading="lazy" decoding="async" width="700" height="700"></div><h3>${item.name}<span>↗</span></h3></a>`;
+  return `<a class="category-tile" href="${esc(item.href)}"><div><img src="${esc(liveProductImage(product))}" alt="${esc(product.name)}" loading="lazy" decoding="async" width="700" height="700"></div><h3>${item.name}</h3></a>`;
  }).join('');
  return tiles;
 }

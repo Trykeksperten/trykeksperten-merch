@@ -1381,11 +1381,11 @@ header nav a:focus-visible,
 .pf-documents{border-top:1px solid var(--line);padding-top:22px;margin-bottom:28px}
 .pf-documents h3{font-size:1.1rem;margin-bottom:14px}
 .pf-documents>div{display:grid;gap:10px}
-.pf-documents a{display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:15px 18px}
+.pf-documents a{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:14px}
 .pf-documents a:hover{border-color:var(--blue)}
 .pf-documents a strong,.pf-documents a small{display:block}
-.pf-documents a small{margin-top:4px;color:var(--muted)}
-.pf-documents a>span:last-child{font-size:1.5rem;color:var(--blue)}
+.pf-documents a small{margin-top:2px;color:var(--muted);font-size:12px}
+.pf-documents a>span:last-child{font-size:1.2rem;color:var(--blue)}
 .pf-documents>p{margin:12px 0 0}
 @media(max-width:600px){.pf-product-gallery{grid-template-columns:54px minmax(0,1fr);gap:10px}.pf-product-gallery .pf-gallery{max-height:390px;gap:7px}}
 
@@ -1612,6 +1612,7 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 .pf-studio .pf-size-selection>p:first-child{margin:0 0 12px;font-size:14px}
 .pf-studio .pf-step{padding-bottom:24px;margin-bottom:24px}
 .pf-studio .pf-step>h2,.pf-studio .pf-buy-box>h2{font-size:22px;font-weight:500;margin:0 0 18px}
+.pf-buy-box #pf-live-price+p.small{margin-bottom:4px}
 .pf-studio .pf-method-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .pf-studio .pf-method-card{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;min-height:128px;padding:16px;border-radius:12px;gap:6px;border-width:1px;box-shadow:none}
 .pf-studio .pf-method-card.selected{border:2px solid var(--orange,#cd491d);padding:15px}
@@ -1965,6 +1966,10 @@ body.storefront #main .pf-studio .pf-product-inputs select{
  text-align:left;height:48px;min-height:48px;padding:10px 14px;border-radius:8px;
  font-size:16px;font-weight:400;color:var(--ink);background:#fff;
 }
+body.storefront #main .pf-studio #pf-product-color{
+ width:100%;max-width:320px;height:40px;min-height:40px;padding:7px 12px;
+}
+@media(max-width:700px){body.storefront #main .pf-studio #pf-product-color{height:44px;min-height:44px}}
 body.storefront #main .pf-studio .pf-product-tiers{
  padding:16px;border:1px solid #dce1dc;border-radius:10px;background:#fff;
 }
