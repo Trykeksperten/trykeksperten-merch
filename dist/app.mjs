@@ -64,7 +64,7 @@ function homeCategoryTiles(){
 }
 function homeFeaturedProducts(){
  const products=shopProducts(pfCatalog,pfPrices).filter(product=>liveProductImage(product));
- const selections=['pf-120332','pf-107384','pf-100942','pf-38687','pf-100751','pf-106904','pf-100777','pf-R6561','pf-107790','pf-120693','pf-107151','pf-100988','pf-120135'];
+ const selections=['pf-120332','pf-107384','pf-100942','pf-38687','pf-100751','pf-106904','pf-100777','pf-R6561','pf-107790','pf-R6560','pf-107151','pf-100988','pf-120135'];
  const featured=selections.map(id=>products.find(product=>product.id===id)).filter(Boolean);
  const cards=featured.map(product=>editorialProductCard(product,pfPrices,product.id==='pf-38687'?'38687900':undefined));
  return cards.slice(0,4).join('')+editorialStory(products,'pf-100834')+cards.slice(4,12).join('')+editorialStory(products,'pf-107790')+cards.slice(12).join('');
