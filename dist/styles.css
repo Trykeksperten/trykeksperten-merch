@@ -2032,3 +2032,6 @@ body.storefront #main .pf-studio .pf-product-tiers>p{margin:10px 0 0}
 .seo-product-image{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain}
 
 .pf-product-loading{min-height:65vh}
+
+.catalog-heading:has(.catalog-brand-heading){background:var(--blue);color:#000;border-bottom-color:var(--blue)}
+.catalog-brand-heading .catalog-brand-logo{filter:brightness(0)}
