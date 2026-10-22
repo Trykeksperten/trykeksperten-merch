@@ -1,6 +1,11 @@
 // Danish source copy and reviewed English interface copy. Product copy is
 // maintained separately from PF's public English feed.
 export const englishUI=Object.fromEntries(`
+Gravering udføres uden trykfarve. Udseendet afhænger af produktets materiale og overflade. Logoets farver i skitsen viser ikke den færdige gravering.|Engraving uses no ink colour. Its appearance depends on the product material and surface. The logo colours in the preview do not represent the finished engraving.
+Flere indstillinger|More options
+Fil og trykfarver|File and print colours
+Originalfilens farver bruges til tryk.|The original file colours are used for printing.
+Uden trykfarve|No ink colour
 Ingen produkter fundet|No products found
 Se alle søgeresultater|See all search results
 Vælg din fulde adresse fra forslagene, inklusive etage og dør.|Choose your complete address from the suggestions, including floor and door.
@@ -147,6 +152,8 @@ Anbefalet|Recommended
 God værdi|Great value
 Smerchs inddeling efter brand.|Smerch's classification by brand.
 Vis|Show
+Nulstil|Reset
+Nulstil zoom til 100%|Reset zoom to 100%
 Nulstil filtre|Reset filters
 Sortér efter|Sort by
 Pris: laveste først|Price: low to high

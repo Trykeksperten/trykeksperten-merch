@@ -1848,3 +1848,64 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
   width:min(1440px,calc(100vw - 80px));
  }
 }
+
+/* At 100% the square canvas fits the actual workspace, including its toolbar. */
+.pf-visual-designer .pf-canvas-shell{overflow:hidden}
+.pf-visual-designer .pf-canvas-shell.is-zoomed{overflow:auto}
+.pf-visual-designer .pf-canvas-shell>.pf-editor-zoom,
+.pf-visual-designer .pf-canvas-shell>.pf-canvas-help{flex-shrink:0}
+.pf-visual-designer .pf-canvas-shell.is-zoomed>.pf-designer-stage{margin-top:0;margin-left:0}
+
+/* A quieter, compact sidebar with secondary controls tucked away. */
+.pf-visual-designer .pf-designer-sidebar{gap:12px;padding:14px;background:#fff}
+.pf-visual-designer .pf-designer-panel,.pf-visual-designer .pf-layer-controls{padding:12px;background:#fff;border:1px solid #e2e5df;border-radius:12px;box-shadow:none;margin:0}
+.pf-designer-sidebar .pf-panel-kicker{display:none}
+.pf-designer-sidebar .pf-designer-panel h3{font-size:15px;margin:0 0 10px}
+.pf-designer-sidebar #pf-logo-panel>h3{display:none}
+.pf-designer-sidebar .pf-upload-launch{grid-template-columns:32px 1fr;padding:10px 12px;gap:2px 8px;border-radius:9px}
+.pf-designer-sidebar .pf-upload-launch>span{width:30px;height:30px;font-size:18px}
+.pf-designer-sidebar .pf-upload-launch strong{font-size:14px}
+.pf-designer-sidebar .pf-upload-launch small{font-size:12px;line-height:1.4}
+.pf-designer-sidebar .pf-layer-list{gap:6px}
+.pf-designer-sidebar .pf-layer-list button{padding:8px 10px;min-height:40px;font-size:13px;border-radius:8px;overflow-wrap:anywhere}
+.pf-designer-sidebar .pf-layer-controls label{font-size:13px;margin:0 0 6px;gap:4px}
+.pf-designer-sidebar .pf-layer-controls input[type=range]{min-height:28px;margin:0 0 8px;padding:0}
+.pf-designer-sidebar .pf-layer-actions{gap:6px;margin:0}
+.pf-designer-sidebar .pf-layer-actions button{padding:8px;min-height:36px;font-size:13px;border-radius:8px}
+.pf-designer-sidebar .pf-advanced-controls,.pf-designer-sidebar .pf-file-details{margin-top:10px;border:0;padding:0}
+.pf-designer-sidebar .pf-advanced-controls>summary,.pf-designer-sidebar .pf-file-details>summary{font-size:13px;font-weight:500;padding:8px 0;cursor:pointer;color:#59635e}
+.pf-designer-sidebar .pf-advanced-controls[open]>summary,.pf-designer-sidebar .pf-file-details[open]>summary{margin-bottom:8px}
+.pf-designer-sidebar .pf-text-rotation-presets{gap:5px;margin:0 0 12px}
+.pf-designer-sidebar .pf-text-rotation-presets button,.pf-designer-sidebar .pf-layer-nudge button{min-height:36px;padding:7px;font-size:12px;border-radius:7px}
+.pf-designer-sidebar #pf-file-note,.pf-designer-sidebar #pf-logo-color-control p{font-size:12px;line-height:1.5;margin:8px 0}
+.pf-designer-sidebar #pf-logo-color-control{padding-top:8px;margin-top:8px}
+.pf-designer-sidebar .pf-design-details{margin:10px 0;font-size:13px}
+@media(max-width:700px){.pf-designer-sidebar .pf-layer-actions button,.pf-designer-sidebar .pf-layer-list button,.pf-designer-sidebar .pf-text-rotation-presets button,.pf-designer-sidebar .pf-layer-nudge button{min-height:44px}}
+.pf-visual-designer .pf-layer-controls{gap:8px}
+.pf-designer-sidebar .pf-layer-controls>label{margin:0}
+
+/* Compact confirmation, using the storefront's warm neutral surfaces. */
+#pf-check-modal .pf-check-card{width:min(600px,100%);padding:24px;border:1px solid #dde2dc;border-radius:18px;text-align:left;display:flex;flex-direction:column;gap:14px}
+#pf-check-title{order:-2;font-size:26px;line-height:1.2;margin:0;font-weight:700}
+#pf-check-modal .pf-check-preview{padding:12px;background:#f1f3ef;border-radius:12px;gap:0}
+#pf-check-modal .pf-proof-stage{width:min(28dvh,240px)!important;border-radius:8px}
+#pf-check-modal .pf-proof-caption{font-size:12px;line-height:1.4;font-weight:500}
+#pf-check-modal .pf-check-context{margin:0;font-size:13px;line-height:1.5;color:#626c66;overflow-wrap:anywhere}
+#pf-check-modal .pf-preflight{margin:0;padding:14px 16px;border-radius:10px;text-align:left;font-size:14px;line-height:1.5}
+#pf-check-modal .pf-preflight.status-review{background:#f7f5f0;border:1px solid #e2dfd5;color:#354039}
+#pf-check-modal .pf-preflight>strong{font-size:14px}
+#pf-check-modal .pf-preflight>span{display:inline;margin-left:10px;color:#626c66;font-size:12px}
+#pf-check-modal .pf-preflight ul{max-width:none;margin:8px 0 0;padding-left:18px;font-size:13px;font-weight:400}
+#pf-check-modal .pf-check-actions{gap:12px;border-top:1px solid #e1e5df;padding-top:16px;margin-top:2px}
+#pf-check-modal .pf-check-actions .button{min-width:110px;min-height:44px;padding:10px 18px;font-size:14px;line-height:1.3}
+#pf-check-modal .pf-check-actions .button.light{border-color:#d6ddd6;background:#fff}
+#pf-check-count{font-size:12px;color:#626c66;font-weight:500;white-space:nowrap}
+@media(max-width:600px){#pf-check-modal{padding:12px}#pf-check-modal .pf-check-card{padding:18px;max-height:calc(100dvh - 24px);gap:12px}#pf-check-title{font-size:23px}#pf-check-modal .pf-proof-stage{width:min(24dvh,200px)!important}#pf-check-modal .pf-check-actions{gap:8px}#pf-check-modal .pf-check-actions .button{min-width:0;padding:11px 14px}}
+
+/* Keep canvas tools in their own row, outside the zoomed scroll surface. */
+.pf-visual-designer .pf-canvas-area{display:flex;flex-direction:column;min-width:0;min-height:0;background:#efede9;overflow:hidden}
+.pf-visual-designer .pf-canvas-area>.pf-editor-zoom{position:relative;top:auto;left:auto;align-self:stretch;justify-content:center;flex:0 0 auto;gap:4px;margin:0;padding:7px 12px;border:0;border-bottom:1px solid #dde2dc;border-radius:0;background:#f8f9f6;box-shadow:none;backdrop-filter:none}
+.pf-visual-designer .pf-canvas-area>.pf-canvas-shell{flex:1;min-height:0;width:100%}
+.pf-visual-designer .pf-editor-zoom button,.pf-visual-designer .pf-editor-zoom output{height:36px;font-size:13px}
+.pf-visual-designer #pf-zoom-reset{margin-left:6px;font-size:12px;font-weight:500;color:#626c66}
+@media(max-width:700px){.pf-visual-designer .pf-canvas-area{order:1;flex:0 0 45%}.pf-visual-designer .pf-canvas-area>.pf-canvas-shell{flex:1;order:0}.pf-visual-designer .pf-canvas-area>.pf-editor-zoom{padding:3px 8px}.pf-visual-designer .pf-editor-zoom button{min-width:44px;height:44px}}

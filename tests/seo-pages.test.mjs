@@ -46,3 +46,13 @@ test('offer is published only for a live checkout with current price and suffici
  assert.equal(offer.eligibleQuantity.minValue,25);
  assert.equal(offer.availability,'https://schema.org/InStock');
 });
+
+test('sitemap follows shop prices and uses canonical category encoding',()=>{
+ const extra={...catalog.products[0],id:'pf-hidden',name:'Missing price'},visible={...catalog.products[0],category:'Isoleret krus'};
+ const data={products:[visible,extra],brands:catalog.brands};
+ const prices={available:true,products:{'pf-123':{fromIncVat:1000}},skus:{'12301':true}};
+ const xml=sitemapXML(data,prices);
+ assert.doesNotMatch(xml,/pf-hidden/);
+ assert.match(xml,/underkategori=Isoleret\+krus/);
+ assert.doesNotMatch(sitemapXML(data,{available:false}),/\/design\//);
+});
