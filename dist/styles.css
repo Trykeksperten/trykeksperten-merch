@@ -27,8 +27,8 @@
 .brand-marquee-group a{flex:0 0 clamp(220px,22vw,320px);width:clamp(220px,22vw,320px);border:0;padding:36px 24px;white-space:nowrap}
 @keyframes brand-drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .brand-preview:has(.brand-motion-control input:checked) .brand-wordmarks{animation-play-state:paused}
-.brand-marquee:focus-within{overflow-x:auto}
-.brand-marquee:focus-within .brand-wordmarks{animation:none;transform:none}
+.brand-marquee:has(a:focus-visible){overflow-x:auto}
+.brand-marquee:has(a:focus-visible) .brand-wordmarks{animation:none;transform:none}
 .brand-preview-bottom{display:flex;align-items:baseline;justify-content:flex-end;gap:20px}
 .brand-motion-control{display:flex;flex-direction:row;align-items:center;white-space:nowrap;font-size:.8125rem;color:var(--muted);padding-block:12px;cursor:pointer}
 .brand-motion-control input{min-height:0;width:16px;height:16px;padding:0;accent-color:var(--blue)}
