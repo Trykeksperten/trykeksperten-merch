@@ -26,7 +26,7 @@
 .brand-marquee-group{display:flex;flex-shrink:0}
 .brand-marquee-group a{flex:0 0 clamp(220px,22vw,320px);width:clamp(220px,22vw,320px);border:0;padding:36px 24px;white-space:nowrap}
 @keyframes brand-drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.brand-marquee:hover .brand-wordmarks,.brand-preview:has(.brand-motion-control input:checked) .brand-wordmarks{animation-play-state:paused}
+.brand-preview:has(.brand-motion-control input:checked) .brand-wordmarks{animation-play-state:paused}
 .brand-marquee:focus-within{overflow-x:auto}
 .brand-marquee:focus-within .brand-wordmarks{animation:none;transform:none}
 .brand-preview-bottom{display:flex;align-items:baseline;justify-content:flex-end;gap:20px}
