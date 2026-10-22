@@ -22,7 +22,7 @@
 
 /* Two identical groups produce a seamless right-to-left brand ribbon. */
 .brand-marquee{overflow:hidden}
-.brand-marquee .brand-wordmarks{display:flex;width:max-content;border:0;animation:brand-drift 60s linear infinite;will-change:transform}
+.brand-marquee .brand-wordmarks{display:flex;width:max-content;border:0;animation:brand-drift 48s linear infinite;will-change:transform}
 .brand-marquee-group{display:flex;flex-shrink:0}
 .brand-marquee-group a{flex:0 0 clamp(220px,22vw,320px);width:clamp(220px,22vw,320px);border:0;padding:36px 24px;white-space:nowrap}
 @keyframes brand-drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
