@@ -1,5 +1,7 @@
 import {launchConfig,countdown} from './launch-config.mjs?v=3';
-if(!launchConfig.ordersEnabled){
+// Keep the launch restrictions active while previewing the site without the banner.
+const showCountdown = false;
+if(showCountdown && !launchConfig.ordersEnabled){
  const banner=document.createElement('aside');
  banner.className='launch-banner';banner.setAttribute('aria-label','Webshoppen åbner snart');banner.setAttribute('translate','no');
  banner.innerHTML='<div class="launch-copy"><strong id="launch-title">COUNTDOWN</strong></div><div class="launch-clock" role="timer" aria-live="off"></div>';
