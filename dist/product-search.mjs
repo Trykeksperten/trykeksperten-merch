@@ -20,7 +20,7 @@ export function bindProductSearch({form,input,getCatalog,getPrices,navigate}){
   for(const product of products){
    const link=document.createElement('a');link.href='/design/'+encodeURIComponent(product.id);
    const source=pricedVariants(product,getPrices())[0]?.images?.[0];
-   if(source){const image=document.createElement('img');image.src=source;image.alt='';image.width=48;image.height=48;link.append(image);}
+   if(source){const image=document.createElement('img');image.src=source;image.alt='';image.draggable=false;image.width=48;image.height=48;link.append(image);}
    const label=document.createElement('span');label.textContent=translate(product.name);link.append(label);panel.append(link);
   }
   if(!products.length){const empty=document.createElement('p');empty.textContent=translate('Ingen produkter fundet');panel.append(empty);}
@@ -28,18 +28,16 @@ export function bindProductSearch({form,input,getCatalog,getPrices,navigate}){
   panel.hidden=false;input.setAttribute('aria-expanded','true');
  };
  input.addEventListener('input',update);input.addEventListener('focus',update);
- form.addEventListener('focusout',e=>{if(!form.contains(e.relatedTarget))close();});
+ // A mobile keyboard dismissal can report no next focus target before the tap
+ // reaches the image/link. Only a known outside focus target should close it.
+ form.addEventListener('focusout',e=>{if(e.relatedTarget&&!form.contains(e.relatedTarget))close();});
+ document.addEventListener('pointerdown',e=>{if(!form.contains(e.target))close();});
  document.addEventListener('click',e=>{if(!form.contains(e.target))close();});
  form.addEventListener('keydown',e=>{
   if(e.key==='Escape'){close();input.focus();close();return;}
   if(!['ArrowDown','ArrowUp'].includes(e.key))return;
   e.preventDefault();if(panel.hidden)update();const links=[...panel.querySelectorAll('a')];if(!links.length)return;
   const index=links.indexOf(document.activeElement);links[index<0?(e.key==='ArrowDown'?0:links.length-1):(index+(e.key==='ArrowDown'?1:-1)+links.length)%links.length].focus();
- });
- // Keep focus in the search field until the link click is dispatched. Mobile
- // browsers can blur with relatedTarget=null before click and hide the target.
- panel.addEventListener('pointerdown',e=>{
-  if(e.isPrimary!==false&&e.button===0&&e.target.closest('a'))e.preventDefault();
  });
  panel.addEventListener('click',e=>{const link=e.target.closest('a');if(!link)return;e.preventDefault();e.stopPropagation();close();navigate(link.getAttribute('href'));});
  form.addEventListener('submit',close);
