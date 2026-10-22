@@ -2024,7 +2024,7 @@ body.storefront #main .pf-studio .pf-product-tiers>p{margin:10px 0 0}
 .pf-catalog-controls .pf-filter-sidebar{margin:0}
 .pf-catalog-controls .mobile-filter-toggle{box-sizing:border-box;height:44px;padding:0 18px;font-size:14px;font-weight:500;background:transparent}
 .pf-catalog-controls .pf-results-actions{position:absolute;right:0;top:0;width:auto;margin:0;display:block}
-.pf-catalog-controls #pf-sort{box-sizing:border-box;min-width:210px;width:auto;height:44px;margin:0;padding:0 36px 0 18px;border:1px solid #d2d6d2;border-radius:24px;background-color:transparent;font-size:14px;font-weight:500;color:var(--ink)}
+.pf-catalog-controls #pf-sort{box-sizing:border-box;min-width:0;width:auto;height:44px;margin:0;padding:0 16px;appearance:none;-webkit-appearance:none;background-image:none;border:1px solid #d2d6d2;border-radius:24px;background-color:transparent;font-size:14px;font-weight:500;color:var(--ink)}
 .pf-catalog-controls .pf-filter-sidebar[open] form{padding-top:20px}
 @media(max-width:700px){.pf-catalog-controls #pf-sort{min-width:0;max-width:calc(100vw - 150px);font-size:14px;padding-left:14px}.pf-catalog-controls .mobile-filter-toggle{padding-inline:14px}}
 
