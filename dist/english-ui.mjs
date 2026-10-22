@@ -1,6 +1,8 @@
 // Danish source copy and reviewed English interface copy. Product copy is
 // maintained separately from PF's public English feed.
 export const englishUI=Object.fromEntries(`
+Ingen produkter fundet|No products found
+Se alle søgeresultater|See all search results
 Vælg din fulde adresse fra forslagene, inklusive etage og dør.|Choose your complete address from the suggestions, including floor and door.
 Adressen er ændret. Vælg den igen fra forslagene.|The address has changed. Select it again from the suggestions.
 Adressen findes ikke som en gældende dansk adresse. Vælg en anden adresse.|This is not a current Danish address. Please choose another address.

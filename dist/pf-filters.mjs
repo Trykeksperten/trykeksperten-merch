@@ -1,3 +1,4 @@
+import {matchesProductSearch} from './product-search.mjs';
 import {fromInc} from './customer-pricing.mjs';
 import {translate,getLanguage} from './i18n-core.mjs';
 import {pricedVariants} from './pf-visibility.mjs';
@@ -66,7 +67,7 @@ export function filterPFProducts(products,params,priceData,qualityTier){
   if(subcategory&&product.category!==subcategory)return false;
   if(brand&&product.brandId!==brand)return false;
   if(level&&qualityTier(product)!==level)return false;
-  if(q&&!`${product.name} ${translate(product.name)} ${product.brand} ${product.modelCode}`.toLocaleLowerCase('da').includes(q))return false;
+  if(q&&!matchesProductSearch(product,q))return false;
   if(color&&!productColors(product,priceData).includes(color))return false;
   if(insulation&&product.insulation!==insulation)return false;
   if(method&&!productMethods(product,priceData).includes(method))return false;

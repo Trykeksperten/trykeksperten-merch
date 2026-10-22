@@ -1,3 +1,4 @@
+import {bindProductSearch} from './product-search.mjs';
 import {bindContactAvailability} from './contact-availability.mjs';
 import {initCustomerPricing} from './customer-pricing.mjs';
 import {fetchJSON} from './fetch-json.mjs';
@@ -12,7 +13,7 @@ import {shouldHandleNavigation} from './navigation.mjs?v=2';
 import {editorialProductCard,editorialStory,bindProductColorSwatches} from './product-editorial.mjs?v=6';
 import {pfCartPage,bindCart,updateCartHeader,readCart as readLiveCart,writeCart as writeLiveCart} from './pf-cart.mjs?v=25';
 import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs?v=20';
-import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=79';
+import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=80';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from './pf-visibility.mjs?v=24';
 import {productGroups,groupSections,productGroupURL,navigationProductGroups} from './product-groups.mjs?v=24';
 import { specialPage, bindSpecial } from './special.mjs?v=22';
@@ -151,6 +152,7 @@ $('#product-menu').addEventListener('click',event=>{const mobileGroup=event.targ
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#product-menu').hidden){closeProductMenu();closeBrandsMenu();$('#product-menu-toggle').focus();}});
 document.addEventListener('click',event=>{if(!event.target.closest('#product-menu, #product-menu-toggle'))closeProductMenu();if(!event.target.closest('#brands-menu, #brands-menu-toggle'))closeBrandsMenu();});
 document.addEventListener('click',async e=>{const link=e.target.closest('a');if(link&&['/handelsbetingelser','/privatlivspolitik','/fortryd-aftale','/marketing'].includes(link.pathname)){const url=new URL(link.href);url.searchParams.set('lang',getLanguage());link.href=url.href;}if(shouldHandleNavigation(link,e,location.origin)){e.preventDefault();nav(link.pathname+link.search,{scrollTop:Boolean(link.closest('.pf-pagination'))});return;}const remove=e.target.closest('[data-remove]');if(remove){const item=cart.find(l=>l.id===remove.dataset.remove);const previous=cart;cart=cart.filter(l=>l.id!==remove.dataset.remove);if(!persist()){cart=previous;return;}if(item?.logo)deleteFile(item.logo.id).catch(()=>{});render();notify('Produktet er fjernet.');}const gallery=e.target.closest('[data-gallery]');if(gallery){$('#main-image').src=gallery.dataset.gallery;$('#main-image').alt=`${activeProduct.name} — ${gallery.getAttribute('aria-label')}`;document.querySelectorAll('[data-gallery]').forEach(b=>b.setAttribute('aria-pressed',b===gallery));}const dl=e.target.closest('[data-download]');if(dl){try{const file=await loadFile(dl.dataset.download);if(!file)throw Error();downloadBlob(file,dl.dataset.filename);}catch{notify('Filen findes ikke længere i browseren. Tilføj produktet igen med logoet.');}}});
+bindProductSearch({form:$('#search'),input:$('#search-input'),getCatalog:()=>pfCatalog,getPrices:()=>pfPrices,navigate:nav});
 $('#search').addEventListener('submit',e=>{e.preventDefault();const q=$('#search-input').value.trim();nav('/produkter'+(q?'?q='+encodeURIComponent(q):''));});
 $('.menu-toggle').addEventListener('click',()=>{const open=$('#navigation').classList.toggle('open');$('.menu-toggle').setAttribute('aria-expanded',open);});
 window.addEventListener('popstate',()=>{closeProductMenu();closeBrandsMenu();$('#navigation').classList.remove('open');$('.menu-toggle').setAttribute('aria-expanded','false');render();});

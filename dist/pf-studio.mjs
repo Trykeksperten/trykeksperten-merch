@@ -26,7 +26,7 @@ import {placementColourOptions,hasColourDependentSetup} from './pf-colour-option
 import {productGroups,groupLeaves,canonicalSubcategory} from './product-groups.mjs?v=23';
 import {placementThumbnailImage,originalProductImage} from './pf-images.mjs?v=3';
 import {availableTextFonts,defaultTextPlacement,fontFamily} from './pf-text.mjs?v=2';
-import {filterPFProducts,productColors,productMethods,priceBand,sortPFProducts} from './pf-filters.mjs?v=6';
+import {filterPFProducts,productColors,productMethods,priceBand,sortPFProducts} from './pf-filters.mjs?v=7';
 export function productTierView(data,quantity,{decorationMandatory=false}={}){
  if(!data?.available||!data.tiers?.length)return `<p class="small muted">${e(data?.message||'Varepriserne kunne ikke indlæses.')}</p>`;
  const money=value=>new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK'}).format(value/100),tiers=data.tiers,first=tiers[0];
