@@ -2007,3 +2007,11 @@ body.storefront #main .pf-studio .pf-product-tiers>p{margin:10px 0 0}
 @media(max-width:700px){
  .pf-filter-sidebar input,.pf-filter-sidebar select{font-size:16px;min-height:44px}
 }
+
+/* Keep the introductory steps compact above the product carousel. */
+.home-value-strip>span{min-height:112px;padding:18px 12px;gap:10px}
+.home-proof-note.home-delivery-note{padding:20px 24px;gap:8px 16px}
+@media(max-width:700px){
+ .home-value-strip>span{min-height:104px;padding:16px 8px}
+ .home-proof-note.home-delivery-note{padding:18px 16px;gap:6px}
+}
