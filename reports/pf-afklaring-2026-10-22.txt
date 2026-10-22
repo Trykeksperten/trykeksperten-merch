@@ -1,0 +1,38 @@
+PF-afklaring før lancering 23. oktober 2026 kl. 13
+Kilde: Thomas' mail, fremsendt af Joakim 22. oktober.
+
+IMPLEMENTERET
+- shipContact.shipMail indeholder kundens leverings-e-mail. Eksisterende Email bevares.
+- Digital/Digitaltryk: PMSColors ["Full Color"].
+- Laser Engraving/Gravering: PMSColors ["Laser Engraving"].
+- Debossing/Prægning: PMSColors ["Debossing"].
+- Analogt tryk: én bekræftet Pantone-kode pr. farve. Kontrol af Coated-format (C).
+  Dette er ikke en komplet kontrol mod Pantones farvebibliotek. Medarbejderen skal
+  bekræfte den konkrete Solid Coated-farve fra originalfil/kunde. Ingen automatisk
+  RGB-til-Pantone-tilnærmelse er tilføjet.
+- Metallic 871 C–877 C afvises ved serigrafi/rundtryk.
+- Andre teknikker, bl.a. broderi, sublimation og digital transfer, kræver fortsat
+  manuelt afklarede PF-koder. Thomas' svar fastlægger ikke entydigt disse varianter.
+- PF_COMMUNICATION_EMAIL_ACTIVE=1 kræves før dekoreret live-afsendelse.
+  Sæt først værdien efter oprettelse/bekræftelse af adressen som PF Store-bruger.
+- Ingen ændringer af kundens priser, prisregler, fragtbeløb eller live-indstillinger.
+
+KONTROLLERET EKSISTERENDE ADFÆRD
+- Blandede køb med/uden tryk blokeres før betaling med besked om separate ordrer.
+- Gateway-payload afviser også blandede blanke og dekorerede linjer.
+- Dekorerede linjer anmoder om EPROOF og sender originalfiler, ConfigurationID og mål.
+- Kundens korrekturgodkendelse er ikke en automatisk PF-produktionsgodkendelse.
+  Godkendelsen skal videreformidles via PF's normale kanal og PF-kvittering registreres.
+
+MANGLER EKSTERN AFKLARING
+1. Opret/bekræft korrektur@smerch.dk som aktiv PF Store-bruger. Mailen skal modtage
+   korrekturer; ændring af serverflag alene opretter ingen bruger hos PF.
+2. Indhent Gateway-manual og vedhæftede eksempler for Order Confirmation, Order
+   Status og ASN. Eksisterende /api/pf-callback/confirmation, /status og /shipment
+   forventer Basic Auth OG relæsignatur i live. De må ikke gives til Thomas som
+   færdige direkte PF-endpoints uden aftale om transport, autentifikation og format.
+3. Aftal aktivering af de tre notifikationstjenester hos Thomas.
+4. Support skal bekræfte fragt og neutral afsender. Beløb er ikke ændret.
+5. E-proof kan ikke testes i PF-testmiljøet ifølge Thomas. En eventuel rigtig
+   dekoreret ordre til kontrol af mail/PDF, revision og godkendelse kræver særskilt
+   aftale. Ingen sådan ordre er oprettet eller sendt som del af disse rettelser.

@@ -26,7 +26,7 @@ test('complete test flow requires secure delivery, freight and PF colour data',(
  assert.equal(report.phases.live.ready,false);
 });
 
-const complete={...base,SMERCH_PUBLIC_BASE_URL:'https://smerch.dk',SMERCH_ARTWORK_SIGNING_SECRET:'a'.repeat(32),PF_PROOF_INBOX_TOKEN:'b'.repeat(32),PF_CALLBACK_USERNAME:'pf',PF_CALLBACK_PASSWORD:'c'.repeat(32),PF_WEBHOOK_SIGNING_SECRET:'d'.repeat(32),SMERCH_FREIGHT_PL_EX_VAT_DKK:'100',SMERCH_FREIGHT_UK_EX_VAT_DKK:'150',SMERCH_PMS_COLOR_MAP:'{"#e84a12":"Orange 021 C"}',PF_PROOF_DELIVERY_CONFIRMED:'1',PF_WHITE_LABEL_CONFIRMED:'1'};
+const complete={...base,PF_COMMUNICATION_EMAIL_ACTIVE:'1',SMERCH_PUBLIC_BASE_URL:'https://smerch.dk',SMERCH_ARTWORK_SIGNING_SECRET:'a'.repeat(32),PF_PROOF_INBOX_TOKEN:'b'.repeat(32),PF_CALLBACK_USERNAME:'pf',PF_CALLBACK_PASSWORD:'c'.repeat(32),PF_WEBHOOK_SIGNING_SECRET:'d'.repeat(32),SMERCH_FREIGHT_PL_EX_VAT_DKK:'100',SMERCH_FREIGHT_UK_EX_VAT_DKK:'150',SMERCH_PMS_COLOR_MAP:'{"#e84a12":"Orange 021 C"}',PF_PROOF_DELIVERY_CONFIRMED:'1',PF_WHITE_LABEL_CONFIRMED:'1'};
 test('complete test configuration cannot be reported ready for live production',()=>{
  assert.equal(pfReadiness(complete).phases.live.ready,false);
  assert.equal(pfReadiness({...complete,PF_GATEWAY_MODE:'off',PF_GATEWAY_LIVE_ENABLED:'1'}).phases.live.ready,false);
