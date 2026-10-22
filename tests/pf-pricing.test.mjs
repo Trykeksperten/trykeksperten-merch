@@ -162,7 +162,7 @@ test('goods never sell below updated supplier cost, including manual overrides a
 });
 
 test('agreed branded prices apply to every colour, preserve volume discounts and agree with checkout',async()=>{
- for(const [id,cost,retail]of [['pf-100834',240,449],['pf-100990',180,349],['pf-100751',210,399],['pf-100816',175,349],['pf-100753',210,429],['pf-100856',240,479],['pf-100879',160,299],['pf-124399',310,599],['pf-124525',140,299]]){
+ for(const [id,cost,retail]of [['pf-100834',240,449],['pf-100990',180,349],['pf-100751',210,399],['pf-100816',175,349],['pf-100856',240,479],['pf-100879',160,299],['pf-124399',310,599],['pf-124525',140,299]]){
   const product=structuredClone(await loadPFProduct(id)),cat={...catalog,products:[product]},source={...prices,products:{}},pricing={...rules,goodsMarkup:100};
   // Isolate goods calculations from the supplier's mandatory-decoration policy.
   for(const variant of product.variants)variant.decorationMandatory=false;
@@ -239,4 +239,23 @@ test('feed errors do not expose private feed URLs in status output',async()=>{
  const {syncPFFeeds}=await import('../lib/pf-feed-sync.mjs');
  const result=await syncPFFeeds({read:async()=>{throw Error('https://example.test/?secret=private');},write:async()=>assert.fail('No failed feed may replace a snapshot')});
  assert.equal(result.prices.ok,false);assert.equal(result.stock.ok,false);assert.ok(!JSON.stringify(result).includes('secret'));
+});
+
+
+test('Big Ocean Bottle stays at 479 incl VAT across supplier promotion expiry and all colours',async()=>{
+ const product=structuredClone(await loadPFProduct('pf-100753')),cat={...catalog,products:[product]},pricing={...rules,goodsMarkup:100};
+ for(const variant of product.variants)variant.decorationMandatory=false;
+ for(const cost of [210,270]){
+  const source={...prices,products:Object.fromEntries(product.variants.map(v=>[v.sku,{currency:'DKK',minimumDecoration:1,tiers:[{min:1,net:cost},{min:50,net:cost*.9}]}]))};
+  assert.equal(listPFProductPrices(cat,source,pricing,now).products[product.id].fromIncVat,47900);
+  for(const variant of product.variants){
+   assert.equal(listPFProductTiers(cat,product.id,variant.sku,source,pricing,now).tiers[0].unitIncVat,47900);
+   for(const quantity of [1,50]){
+    const line={productId:product.id,sku:variant.sku,quantity,decorations:[]};
+    assert.equal(estimatePFLine(cat,line,source,pricing,now).goodsUnit,38320);
+    assert.equal(quotePFLine(cat,line,source,pricing,now).totalIncVat,47900*quantity);
+    assert.equal(quotePFCart(cat,[line],source,pricing,now).goods,38320*quantity);
+   }
+  }
+ }
 });
