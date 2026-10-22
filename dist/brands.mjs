@@ -1,6 +1,7 @@
+import {brandLogoURL} from './brand-logos.mjs';
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 import {pricedVariants} from './pf-visibility.mjs';
-const logo=b=>b.logo?`<img class="brand-logo" src="${escape(b.logo)}" alt="${escape(b.name)}" decoding="async">`:`<span class="brand-logo brand-logo-text">${escape(b.name)}</span>`;
+const logo=b=>brandLogoURL(b)?`<img class="brand-logo" src="${escape(brandLogoURL(b))}" alt="${escape(b.name)}" decoding="async">`:`<span class="brand-logo brand-logo-text">${escape(b.name)}</span>`;
 const previewProducts={camelbak:'pf-100886',elevate:'pf-38687',herschel:'pf-120691','hydro-flask':'pf-100990',karst:'pf-107790',larq:'pf-100897',miir:'pf-100932',moleskine:'pf-107151','ocean-bottle':'pf-100751',parker:'pf-106476','stanley-1913':'pf-100834',thule:'pf-120632',waterman:'pf-106367'};
 const previewSkus={camelbak:'10088664','hydro-flask':'10099052',larq:'10089790',miir:'10093255'};
 export function brandPreview(brands,products=[],prices){

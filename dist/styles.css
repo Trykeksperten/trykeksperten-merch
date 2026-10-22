@@ -2014,7 +2014,7 @@ body.storefront #main .pf-studio .pf-product-tiers>p{margin:10px 0 0}
 }
 
 /* Brand pages use a single, centered logo. */
-.catalog-brand-heading{--brand-logo-height:min(160px,calc((100vw - 48px)/8));display:flex;align-items:center;justify-content:center;text-align:center}
+.catalog-brand-heading{--brand-logo-height:min(160px,calc((100vw - 48px)/8.1));display:flex;align-items:center;justify-content:center;text-align:center}
 .catalog-brand-heading h1{margin:0;max-width:100%}
 .catalog-brand-heading .catalog-brand-logo{display:block;width:auto;max-width:none;height:var(--brand-logo-height);object-fit:contain}
 

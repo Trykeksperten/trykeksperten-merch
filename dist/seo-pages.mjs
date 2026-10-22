@@ -1,3 +1,4 @@
+import {brandLogoURL} from './brand-logos.mjs';
 import {productLoading} from './product-loading.mjs';
 import {shopProducts} from './pf-visibility.mjs';
 import {homeHero} from './home-hero.mjs';
@@ -62,7 +63,7 @@ export function seoMain(page,catalog){
  if(page.product)return productLoading(page.product,page.selectedSku)+`<noscript><section class="wrap"><p>${escapeHTML(page.description)}</p><a href="/produkter">Se flere produkter</a></section></noscript>`;
  if(page.canonical.includes('/produkter')){
   const url=new URL(page.canonical),group=url.searchParams.get('kategori'),subcategory=url.searchParams.get('underkategori'),brandId=url.searchParams.get('brand');
-  const brand=catalog?.brands?.find(item=>item.id===brandId),logo=brand?.logo?.replace(/\.(png|svg)(?:\?.*)?$/,'.svg?v=2');
+  const brand=catalog?.brands?.find(item=>item.id===brandId),logo=brandLogoURL(brand);
   const matching=products.filter(item=>(!group||item.shopCategory===group)&&(!subcategory||item.category===subcategory)&&(!brandId||item.brandId===brandId));
   const heading=brand?`<h1>${logo?`<img class="catalog-brand-logo" src="${escapeHTML(logo)}" alt="${escapeHTML(brand.name)}" width="360" height="160" fetchpriority="high">`:escapeHTML(brand.name)}</h1>`:`<h1>${subcategory?escapeHTML(subcategory):groups[group]?escapeHTML(groups[group]):'Find favoritterne.<br>Gør dem til jeres.'}</h1>`;
   return `<section class="catalog-heading"><div class="wrap${brand?' catalog-brand-heading':''}">${heading}</div></section><div class="wrap loading seo-catalog-loading" role="status">Indlæser produkter…</div><noscript><style>.seo-catalog-loading{display:none}</style><section class="wrap section seo-initial"><nav class="seo-category-links" aria-label="Produktgrupper">${Object.entries(groups).map(([id,name])=>`<a href="/produkter?kategori=${id}">${escapeHTML(name)}</a>`).join('')}</nav><div class="product-grid">${matching.slice(0,24).map(item=>`<article class="product-card"><a href="${productURL(item)}">${mainImage(item)?`<img class="seo-product-image" src="${escapeHTML(mainImage(item))}" alt="${escapeHTML(item.name)} fra ${escapeHTML(item.brand)}" loading="lazy" width="500" height="500">`:''}<h2>${escapeHTML(item.name)}</h2></a></article>`).join('')}</div></section></noscript>`;
