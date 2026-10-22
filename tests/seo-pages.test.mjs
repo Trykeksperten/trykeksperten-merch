@@ -68,10 +68,12 @@ test('brand initial HTML shows the vector logo before hydration, with products r
 });
 
 
-test('product first paint uses the same product preview as client loading',()=>{
+test('product loading never paints an alternative product layout before the real studio',()=>{
  const html=seoMain(seoPage('/design/pf-123','?sku=12301',catalog),catalog);
- assert.match(html,/class="wrap section pf-product-loading"/);
- assert.match(html,/<h1>Blå flaske &amp; kop<\/h1>/);
- assert.match(html,/class="pf-loading-photo"/);
- assert.doesNotMatch(html,/Indlæser produktets muligheder|DESIGNVÆRKTØJ/);
+ const visible=html.split('<noscript>')[0];
+ assert.match(visible,/aria-busy="true"><\/section>$/);
+ assert.doesNotMatch(visible,/Indlæser|Henter|role="status"/);
+ assert.doesNotMatch(visible,/<h1|<img|pf-design-|pf-loading-field|pf-studio/);
+ assert.match(html,/<noscript>[\s\S]*<h1>Blå flaske &amp; kop<\/h1>/);
+ assert.match(html,/alt="Blå flaske &amp; kop i farven Blå"/);
 });

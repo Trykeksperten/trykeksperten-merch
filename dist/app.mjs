@@ -1,4 +1,4 @@
-import {productLoading} from './product-loading.mjs';
+import {productLoading} from './product-loading.mjs?v=2';
 import {bindProductSearch} from './product-search.mjs';
 import {bindContactAvailability} from './contact-availability.mjs';
 import {initCustomerPricing} from './customer-pricing.mjs';
