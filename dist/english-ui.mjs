@@ -152,6 +152,10 @@ Anbefalet|Recommended
 God værdi|Great value
 Smerchs inddeling efter brand.|Smerch's classification by brand.
 Vis|Show
+Bredde · mm|Width · mm
+Højde · mm|Height · mm
+Gravering vises i grå uden trykfarve. Det endelige udseende afhænger af materialet.|Engraving is previewed in grey without ink. The final appearance depends on the material.
+Træk logoet på produktet for at placere det.|Drag the logo on the product to position it.
 Nulstil|Reset
 Nulstil zoom til 100%|Reset zoom to 100%
 Nulstil filtre|Reset filters
