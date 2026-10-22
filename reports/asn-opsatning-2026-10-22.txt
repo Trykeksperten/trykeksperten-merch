@@ -1,0 +1,29 @@
+ASN-modtagelse — 22. oktober 2026
+
+IMPLEMENTERET OG TESTET LOKALT
+- POST /api/pf-callback/shipment modtager PF's ShipmentNotification.
+- Ordrebekræftelse: /api/pf-callback/confirmation.
+- Ordrestatus: /api/pf-callback/status.
+- PF_CALLBACK_AUTH_MODE=relay er standard og kræver Basic Auth + HMAC.
+- PF_CALLBACK_AUTH_MODE=basic er eksplicit tilvalg til PF's direkte HTTPS-kald.
+  Kræver eksisterende PF_CALLBACK_USERNAME, mindst 32 tegn i PF_CALLBACK_PASSWORD,
+  receiverId lig PF_GATEWAY_SENDER_ID og senderId=PF for status/ASN.
+- Korrekturindbakken bruger fortsat separat token og relæsignatur.
+- Trackingnummer og sikkert HTTP(S)-link bevares. Kunden og administrationen
+  viser "Følg pakken". Manglende tracking vises som afventende.
+- Alle leverancer behandles; delleverance er ikke fuld afsendelse.
+- Testkørslen bruger midlertidige data og en lokal server uden .env, SMTP,
+  betalingsnøgler eller PF-afsendelsesnøgler.
+- 251 automatiske tests bestået. HTTP-test: afvisning af forkert adgang og konto,
+  ASN → lagring → offentlig ordrestatus, gentagelser, delvis/fuld afsendelse.
+- Browserkontrol: kunde- og administrationsvisning, klikbare trackinglinks,
+  afventende tracking samt afvisning af javascript-links og HTML-indhold.
+- Ingen betaling, faktura, ordremail eller PF-ordre oprettet under testen.
+
+FØR THOMAS AKTIVERER TJENESTEN
+1. Godkend og sæt auth-mode på Render; standarden er fortsat relay indtil da.
+2. Udlever endpoint og eksisterende callback-adgang via aftalt sikker kanal.
+   Brug ikke Gateway-login eller andre serviceadgangskoder til callbacks.
+3. Thomas skal bekræfte receiverId og sende en kontrolleret testnotifikation.
+   Lokale tests dokumenterer ikke PF's faktiske levering over internettet.
+4. Bekræft at ASN erstatter PF's tilsvarende afsendelsesmails (manual side 7).
