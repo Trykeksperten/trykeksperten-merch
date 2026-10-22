@@ -26,7 +26,7 @@ test('blank orders can be captured only after a real PF shipment notification',a
  await mkdir(dataPath('orders'),{recursive:true});await writeFile(path,JSON.stringify(order));
  try{
   assert.equal(await checkoutReadyForCapture(checkout),false);
-  const received=await applyPFNotification('shipment',{ShipmentNotification:{messageId:randomUUID(),deliveries:[{deliveryLocation:{customerPONumber:order.purchaseOrderNumber,carrier:'Test carrier',shipDate:new Date(Date.now()-60000).toISOString(),trackAndTrace:['https://example.invalid/tracking']}}]}});
+  const received=await applyPFNotification('shipment',{ShipmentNotification:{messageId:randomUUID(),deliveries:[{deliveryLocation:{isOrderComplete:true,customerPONumber:order.purchaseOrderNumber,carrier:'Test carrier',shipDate:new Date(Date.now()-60000).toISOString(),trackAndTrace:['https://example.invalid/tracking']}}]}});
   assert.equal(received.status,'shipped');assert.equal(await checkoutReadyForCapture(checkout),true);
   received.shipment.shipDate=new Date(Date.now()+86400000).toISOString();await writeFile(path,JSON.stringify(received));assert.equal(await checkoutReadyForCapture(checkout),false);
   received.shipment.shipDate=new Date(Date.now()-60000).toISOString();received.checkoutId='another-checkout';await writeFile(path,JSON.stringify(received));assert.equal(await checkoutReadyForCapture(checkout),false);
@@ -43,7 +43,7 @@ test('blank Quickpay capture is rejected before dispatch and runs once after con
  const fetchImpl=async(url,options)=>{const payment={id:12345,order_id:'TESTBLANK',currency:'DKK',type:'Payment',accepted:true,link:{amount:10000},operations:[{id:1,type:'authorize',amount:10000,pending:false,qp_status_code:'20000',created_at:new Date().toISOString()}]};if(options.method==='POST'){posts++;payment.operations.push({id:2,type:'capture',amount:10000,pending:false,qp_status_code:'20000'});}return {ok:true,json:async()=>payment};};
  try{
   await assert.rejects(captureApprovedCheckout(id,{env,fetchImpl}),/ikke godkendt/);assert.equal(posts,0);
-  await applyPFNotification('shipment',{ShipmentNotification:{messageId:randomUUID(),deliveries:[{deliveryLocation:{customerPONumber:pf.purchaseOrderNumber,shipDate:new Date(Date.now()-60000).toISOString()}}]}});
+  await applyPFNotification('shipment',{ShipmentNotification:{messageId:randomUUID(),deliveries:[{deliveryLocation:{isOrderComplete:true,customerPONumber:pf.purchaseOrderNumber,shipDate:new Date(Date.now()-60000).toISOString()}}]}});
   assert.equal((await captureApprovedCheckout(id,{env,fetchImpl})).status,'paid');assert.equal(posts,1);
   assert.equal((await captureApprovedCheckout(id,{env,fetchImpl})).status,'paid');assert.equal(posts,1);
  }finally{await rm(pfPath,{force:true});await rm(checkoutPath,{force:true});}

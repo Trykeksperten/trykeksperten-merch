@@ -24,7 +24,7 @@ import {subscribeMarketing,unsubscribeMarketing,recordWithdrawal,deliverWithdraw
 import {validateCheckoutConsent} from './dist/legal-consent.mjs';
 import {listProductDocuments,downloadProductDocument} from './lib/pf-documents.mjs';
 import {adminPriceSummary,adminProductPricing,listPFPrintPrices,listPFProductPrices,listPFProductTiers,listPFStock,loadPricing,loadStock,quotePFCart,estimatePFLine} from './lib/pf-pricing.mjs';
-import {authorized,callbackAuthorized,proofInboxAuthorized,gatewayTestOrderInput,prepareOrder,dispatchOrder,readOrder,listOrders,applyPFNotification,recordProof,readProofFile,decideProof,recordApprovalDelivery,recordExternalApproval} from './lib/pf-orders.mjs';
+import {authorized,callbackAuthorized,proofInboxAuthorized,gatewayTestOrderInput,prepareOrder,dispatchOrder,readOrder,listOrders,applyPFNotificationBatch,recordProof,readProofFile,decideProof,recordApprovalDelivery,recordExternalApproval} from './lib/pf-orders.mjs';
 import {createAdminSession,adminSessionAuthorized,closeAdminSession,loginAllowed} from './lib/admin-auth.mjs';
 import {gatewayRequirements} from './lib/pf-gateway.mjs';
 import {applyStripeEvent,cancelCheckout,checkoutConfiguration,checkoutFulfillmentAssessment,checkoutPublic,createStripeSession,listCheckouts,persistCheckout,persistCheckoutArtwork,prepareCheckout,readCheckout,reauthorizeCheckout,refreshAuthorizationExpiry,updateCheckout,verifyStripeEvent} from './lib/checkout.mjs';
@@ -251,7 +251,7 @@ const handleRequest=async(req,res)=>{
  }
  if(req.url?.startsWith('/api/pf-callback/')&&req.method==='POST'){
   if(!callbackAuthorized(req)){json(res,401,{error:'PF-adgang kræves.'});return;}
-  try{const kind=new URL(req.url,'http://localhost').pathname.split('/').at(-1),order=await applyPFNotification(kind,await readPFRelayJSON(req));if(order.checkoutId&&order.shipment)await updateCheckout(order.checkoutId,checkout=>{checkout.shipment={...(checkout.shipment||{}),[order.id]:order.shipment};return checkout;});json(res,200,{received:true,orderId:order.id});}catch(error){json(res,400,{error:error.message||'PF-beskeden kunne ikke behandles.'});}return;
+  try{const kind=new URL(req.url,'http://localhost').pathname.split('/').at(-1),orders=await applyPFNotificationBatch(kind,await readPFRelayJSON(req));for(const order of orders)if(order.checkoutId&&order.shipment)await updateCheckout(order.checkoutId,checkout=>{checkout.shipment={...(checkout.shipment||{}),[order.id]:order.shipment};return checkout;});json(res,200,{received:true,orderId:orders[0]?.id,orderIds:orders.map(order=>order.id)});}catch(error){json(res,400,{error:error.message||'PF-beskeden kunne ikke behandles.'});}return;
  }
  if(req.url==='/api/ai-status'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify({enabled:process.env.AI_ENABLED==='1'&&Boolean(process.env.OPENAI_API_KEY)}));return;}
  if(req.url?.startsWith('/api/pf-documents?')&&req.method==='GET'){

@@ -27,12 +27,34 @@ KONTROLLERET EKSISTERENDE ADFÆRD
 MANGLER EKSTERN AFKLARING
 1. Opret/bekræft korrektur@smerch.dk som aktiv PF Store-bruger. Mailen skal modtage
    korrekturer; ændring af serverflag alene opretter ingen bruger hos PF.
-2. Indhent Gateway-manual og vedhæftede eksempler for Order Confirmation, Order
-   Status og ASN. Eksisterende /api/pf-callback/confirmation, /status og /shipment
-   forventer Basic Auth OG relæsignatur i live. De må ikke gives til Thomas som
-   færdige direkte PF-endpoints uden aftale om transport, autentifikation og format.
+2. Gateway-manual 2.2.2 og alle tre JSON-eksempler er nu modtaget og gennemgået.
+   PF bruger som standard Basic Auth. Eksisterende /api/pf-callback/confirmation,
+   /status og /shipment forventer Basic Auth OG relæsignatur i live. Der mangler
+   derfor stadig en aftale/opsætning af direkte PF-auth eller signerende relæ,
+   inden disse adresser kan gives til Thomas som færdige endpoints.
 3. Aftal aktivering af de tre notifikationstjenester hos Thomas.
 4. Support skal bekræfte fragt og neutral afsender. Beløb er ikke ændret.
 5. E-proof kan ikke testes i PF-testmiljøet ifølge Thomas. En eventuel rigtig
    dekoreret ordre til kontrol af mail/PDF, revision og godkendelse kræver særskilt
    aftale. Ingen sådan ordre er oprettet eller sendt som del af disse rettelser.
+
+LOKALE RETTELSER EFTER GENNEMGANG AF MANUAL OG EKSEMPLER
+- Ordrebekræftelse accepterer POreference fra Thomas' eksempel og reference fra
+  manualen. Modstridende referencer afvises. Leverandørpriser kopieres ikke til
+  kundens priser eller kundens ordrebekræftelse.
+- ASN behandler alle leverancer og ordrer i beskeden, og gentagelser er idempotente.
+- Trackingobjekter vises som trackingnumre, ikke [object Object].
+- Leverancer gemmes samlet. Kun isOrderComplete=true markerer hele ordren afsendt.
+  Manglende/false betyder delvist afsendt og åbner ikke for hævning.
+- Forventet afsendelsesdato og PF-statusinformation gemmes. Forsinket PROCESSING
+  overskriver ikke en allerede registreret afsendelse.
+- Dekorerede kundeordrer kræver stadig registreret PF-korrekturgodkendelse.
+- Verificeret lokalt: 248 automatiske tests bestået, herunder flere ASN-leverancer,
+  gentagelser, ukendt ordre, referencekonflikt og blokering af for tidlig hævning.
+- Ikke deployet som del af denne gennemgang. Ingen betaling eller PF-ordre oprettet.
+
+VIGTIGE OPLYSNINGER FRA MANUALEN (SIDE 7)
+- Aktivering af ASN betyder, at tilsvarende afsendelsesbeskeder ikke længere
+  modtages via e-mail. Aftal dette med Thomas inden aktivering.
+- Ordrestatus opdateres flere gange dagligt mellem 08:15 og 16:15. Senere
+  ændringer kommer næste morgen; tidszone fremgår ikke. Det er ikke realtid.
