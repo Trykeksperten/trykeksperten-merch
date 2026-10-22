@@ -162,7 +162,7 @@ test('goods never sell below updated supplier cost, including manual overrides a
 });
 
 test('agreed branded prices apply to every colour, preserve volume discounts and agree with checkout',async()=>{
- for(const [id,cost,retail]of [['pf-100834',240,449],['pf-100990',180,349],['pf-100751',210,399],['pf-100856',240,479],['pf-100879',160,299],['pf-124399',310,599],['pf-124525',140,299]]){
+ for(const [id,cost,retail]of [['pf-100834',240,449],['pf-100990',180,349],['pf-100751',210,399],['pf-100856',240,479],['pf-124399',310,599],['pf-124525',140,299]]){
   const product=structuredClone(await loadPFProduct(id)),cat={...catalog,products:[product]},source={...prices,products:{}},pricing={...rules,goodsMarkup:100};
   // Isolate goods calculations from the supplier's mandatory-decoration policy.
   for(const variant of product.variants)variant.decorationMandatory=false;
@@ -285,3 +285,23 @@ test('approved fixed premium prices survive promotion expiry and preserve other 
   }
  }
 });
+
+ test('approved Stanley prices cover every colour and agree across product, estimate and cart',async()=>{
+ for(const [code,cost,retail] of [[100831,155,269],[100879,160,279],[100881,220,379],[100884,240,399],[100885,205,349],[100943,145,269],[100944,170,299],[100945,645,1049],[100946,430,699],[100947,645,1049],[100948,360,599],[100949,170,279],[100973,130,219],[100979,285,479],[100980,215,349],[100981,240,399],[100982,240,399],[100983,115,199],[100985,215,349]]){
+ const id=`pf-${code}`,product=structuredClone(await loadPFProduct(id)),cat={...catalog,products:[product]},pricing={...rules,goodsMarkup:100};
+ for(const v of product.variants)v.decorationMandatory=false;
+ const source={...prices,products:Object.fromEntries(product.variants.map(v=>[v.sku,{currency:'DKK',minimumDecoration:1,tiers:[{min:1,net:cost},{min:50,net:cost*.9}]}]))};
+ assert.equal(listPFProductPrices(cat,source,pricing,now).products[id].fromIncVat,retail*100);
+ for(const v of product.variants){
+ assert.equal(listPFProductTiers(cat,id,v.sku,source,pricing,now).tiers[0].unitIncVat,retail*100);
+ for(const quantity of [1,50]){
+ const line={productId:id,sku:v.sku,quantity,decorations:[]};
+ assert.equal(quotePFLine(cat,line,source,pricing,now).goodsUnit,retail*80);
+ assert.equal(estimatePFLine(cat,line,source,pricing,now).goodsUnit,retail*80);
+ assert.equal(quotePFCart(cat,[line],source,pricing,now).goods,retail*80*quantity);
+ }
+ source.products[v.sku].tiers=[{min:1,net:retail}];
+ assert.equal(listPFProductTiers(cat,id,v.sku,source,pricing,now).tiers[0].unitExVat,retail*100);
+ }
+ }
+ });
