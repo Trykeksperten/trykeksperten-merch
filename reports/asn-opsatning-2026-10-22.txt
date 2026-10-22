@@ -27,3 +27,17 @@ FØR THOMAS AKTIVERER TJENESTEN
 3. Thomas skal bekræfte receiverId og sende en kontrolleret testnotifikation.
    Lokale tests dokumenterer ikke PF's faktiske levering over internettet.
 4. Bekræft at ASN erstatter PF's tilsvarende afsendelsesmails (manual side 7).
+
+OPDATERING: BASIC AUTH AKTIVERET PÅ RENDER
+Brugeren godkendte eksplicit skiftet 22. oktober 2026.
+PF_CALLBACK_AUTH_MODE=basic er gemt og Render viser den nye miljødeployment Live.
+Verificeret på https://smerch.dk uden at ændre nogen ordre:
+- Manglende og forkert Basic Auth: HTTP 401.
+- Korrekt Basic Auth, forkert receiverId: HTTP 400, Gateway-konto afvist.
+- Korrekt Basic Auth/konto, tom ASN: HTTP 400, leverancer mangler.
+- Korrekt Basic Auth/konto, tom status/bekræftelse: HTTP 400, ordrenummer mangler.
+Disse 400-svar er forventede: autentifikation er bestået, derefter afvises de
+bevidst ufuldstændige beskeder før lagring. Ingen HMAC blev sendt i disse tests.
+Driftskontrol: /health HTTP 200, status ok.
+Thomas' faktiske testbesked og aftalt aktivering mangler stadig. Adgangskoder er
+hverken udskrevet i rapporten eller sendt til Thomas.

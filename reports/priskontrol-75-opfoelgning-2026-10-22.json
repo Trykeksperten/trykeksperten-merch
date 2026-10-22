@@ -1,0 +1,464 @@
+{
+  "count": 75,
+  "unchanged": true,
+  "unresolved": [],
+  "outcomes": {
+    "Mandatory decoration selected and checked": 22,
+    "Blank purchase passed; decoration remains unavailable pending PF": 9,
+    "Gold and silver selected and checked": 8,
+    "Unpriced variant excluded from storefront": 17,
+    "Invalid placement excluded; valid alternative passed": 19
+  },
+  "cases": [
+    {
+      "id": "pf-100980",
+      "sku": "10098040",
+      "name": "Stanley Classic Wellspring 710 ml isoleret vandflaske i genvundet rustfrit stål",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-104605",
+      "sku": "10460571",
+      "name": "Ceibo aftagelig telefonholder i bambus",
+      "outcome": "Blank purchase passed; decoration remains unavailable pending PF"
+    },
+    {
+      "id": "pf-104605",
+      "sku": "10460571",
+      "name": "Ceibo aftagelig telefonholder i bambus",
+      "outcome": "Blank purchase passed; decoration remains unavailable pending PF"
+    },
+    {
+      "id": "pf-107135",
+      "sku": "10713500",
+      "name": "Spectrum hvid A5 notesbog med farvet elastik",
+      "outcome": "Gold and silver selected and checked"
+    },
+    {
+      "id": "pf-100834",
+      "sku": "10083410",
+      "name": "Stanley Quencher H2.0 1200 ml krus ",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-100948",
+      "sku": "10094890",
+      "name": "Stanley Vitalize™ Macro Method genvundet crossbody taske 9,5L",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-100946",
+      "sku": "10094610",
+      "name": "Stanley The All-Day Julienne Minikøletaske til 10 dåser af genvundet materialer ",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-100905",
+      "sku": "10090501",
+      "name": "LARQ Swig Top 1000 ml vandflaske",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-113195",
+      "sku": "11319501",
+      "name": "Mepal Cirqula 500 ml rektangulær skål med flere rum",
+      "outcome": "Blank purchase passed; decoration remains unavailable pending PF"
+    },
+    {
+      "id": "pf-113195",
+      "sku": "11319501",
+      "name": "Mepal Cirqula 500 ml rektangulær skål med flere rum",
+      "outcome": "Blank purchase passed; decoration remains unavailable pending PF"
+    },
+    {
+      "id": "pf-124514",
+      "sku": "12451464",
+      "name": "Avior nødradio af RCS genvundet plast",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-104603",
+      "sku": "10460371",
+      "name": "Bubup 2 vinklet tablet- og telefonholder i bambus",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-130103",
+      "sku": "13010301",
+      "name": "EcoSeal genvundet GRS mulepose på 5 l",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-220523",
+      "sku": "22052301",
+      "name": "Alto POP 350 ml krus",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-100827",
+      "sku": "10082764",
+      "name": "Stanley Classic 1000 ml flaske",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-120744",
+      "sku": "12074406",
+      "name": "Florida 270 g/m² GRS genvundet strandmulepose 18L",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-120769",
+      "sku": "12076922",
+      "name": "Swift GRS toilettaskesæt i genvundet fløjl",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-100881",
+      "sku": "10088141",
+      "name": "Stanley Legendary 400 ml madbeholder med ske",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-38324",
+      "sku": "38324493",
+      "name": "Orion jakke med blødt ydre til kvinder",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-38324",
+      "sku": "38324494",
+      "name": "Orion jakke med blødt ydre til kvinder",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-38324",
+      "sku": "38324893",
+      "name": "Orion jakke med blødt ydre til kvinder",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-38324",
+      "sku": "38324894",
+      "name": "Orion jakke med blødt ydre til kvinder",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-38324",
+      "sku": "38324895",
+      "name": "Orion jakke med blødt ydre til kvinder",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-100947",
+      "sku": "10094790",
+      "name": "Stanley Vitalize™ Macro Method genvunden rygsæk 29L",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-39311",
+      "sku": "39311496",
+      "name": "Langley softshell jakke",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-100973",
+      "sku": "10097382",
+      "name": "Stanley Stay Hot 295 ml rustfrit stål isoleret stabelbar camp kop",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-107091",
+      "sku": "10709100",
+      "name": "Spectrum A5 notesbog med blanke sider",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-107091",
+      "sku": "10709100",
+      "name": "Spectrum A5 notesbog med blanke sider",
+      "outcome": "Gold and silver selected and checked"
+    },
+    {
+      "id": "pf-100979",
+      "sku": "10097982",
+      "name": "Stanley Quencher® ProTour 1180 ml isoleret flip sugerørs krus i genvundet rustfrit stål ",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-100979",
+      "sku": "10097982",
+      "name": "Stanley Quencher® ProTour 1180 ml isoleret flip sugerørs krus i genvundet rustfrit stål ",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-107920",
+      "sku": "10792051",
+      "name": "Alejandra A5 genvundet læderindbundet hardcover notesbog",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-38323",
+      "sku": "38323494",
+      "name": "Orion jakke med blødt ydre til mænd",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-38323",
+      "sku": "38323495",
+      "name": "Orion jakke med blødt ydre til mænd",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-38323",
+      "sku": "38323992",
+      "name": "Orion jakke med blødt ydre til mænd",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-100985",
+      "sku": "10098540",
+      "name": "Stanley Everyday Suburban 710 ml isoleret krus i genvundet rustfrit stål",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-39312",
+      "sku": "39312250",
+      "name": "Langley softshell dame jakke",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-120134",
+      "sku": "12013400",
+      "name": "Chennai jute gavepose 16L",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-120765",
+      "sku": "12076502",
+      "name": "Trip Aware™ genvundet rejsetaske til flasker 2 L",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-100885",
+      "sku": "10088541",
+      "name": "Stanley IceFlow™ 2.0 700 ml vandflaske med vippesugerør",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-124475",
+      "sku": "12447501",
+      "name": "Xtorm XG2SL025 Go2 SlimLine 25 W oplader",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-220522",
+      "sku": "22052201",
+      "name": "Alto POP 350 ml krus med 360° låg",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-106269",
+      "sku": "10626900",
+      "name": "Zuse A7 noteringsblok af genbrugsmaterialer med kuglepen",
+      "outcome": "Gold and silver selected and checked"
+    },
+    {
+      "id": "pf-130079",
+      "sku": "13007901",
+      "name": "Panama GRS genvundet strandkøletaske med håndtag 23L",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-100879",
+      "sku": "10087910",
+      "name": "Stanley Café-To-Go 350 ml termokop",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-107812",
+      "sku": "10781201",
+      "name": "Fabianna trykpapir hardcover notesbog",
+      "outcome": "Gold and silver selected and checked"
+    },
+    {
+      "id": "pf-120331",
+      "sku": "12033100",
+      "name": "Ningbo 320 g/m² mulepose med lynlås 15L",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-220001",
+      "sku": "22000121",
+      "name": "Americano® 350 ml termokrus",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-120537",
+      "sku": "12053705",
+      "name": "Pheebs mulepose med kile af 210 g/m2 genvundet materiale 13L",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-130091",
+      "sku": "13009190",
+      "name": "EcoFold RPET foldbar mulepose 16 l",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-220521",
+      "sku": "22052101",
+      "name": "Cirrus POP 350 ml krus",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-39507",
+      "sku": "39507550",
+      "name": "Natron 320 g/m² sherpa hættetrøje med fuld lynlås",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-39507",
+      "sku": "39507550",
+      "name": "Natron 320 g/m² sherpa hættetrøje med fuld lynlås",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-107090",
+      "sku": "10709000",
+      "name": "Spectrum A5 notesbog med prikkede sider",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-107090",
+      "sku": "10709000",
+      "name": "Spectrum A5 notesbog med prikkede sider",
+      "outcome": "Gold and silver selected and checked"
+    },
+    {
+      "id": "pf-100978",
+      "sku": "10097810",
+      "name": "Stanley Everyday Suburban 473 ml isoleret krus i genvundet rustfrit stål",
+      "outcome": "Unpriced variant excluded from storefront"
+    },
+    {
+      "id": "pf-100978",
+      "sku": "10097840",
+      "name": "Stanley Everyday Suburban 473 ml isoleret krus i genvundet rustfrit stål",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-220002",
+      "sku": "22000211",
+      "name": "Americano® 350 ml termokrus med grip",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-100945",
+      "sku": "10094510",
+      "name": "Stanley All Day Julienne Max 20 dåse genvundet køletaske",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-120532",
+      "sku": "12053221",
+      "name": "Retrend RPET rygsæk 16L",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-127055",
+      "sku": "12705511",
+      "name": "Sunny oppustelig strandpude",
+      "outcome": "Blank purchase passed; decoration remains unavailable pending PF"
+    },
+    {
+      "id": "pf-100884",
+      "sku": "10088401",
+      "name": "Stanley IceFlow™ 2.0 1,06 liters vandflaske med vippesugerør",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-113196",
+      "sku": "11319601",
+      "name": "Mepal Cirqula 1000 ml rektangulær skål med flere rum",
+      "outcome": "Blank purchase passed; decoration remains unavailable pending PF"
+    },
+    {
+      "id": "pf-113196",
+      "sku": "11319601",
+      "name": "Mepal Cirqula 1000 ml rektangulær skål med flere rum",
+      "outcome": "Blank purchase passed; decoration remains unavailable pending PF"
+    },
+    {
+      "id": "pf-100983",
+      "sku": "10098301",
+      "name": "Stanley Stacking 470 ml isoleret drikkedunk i rustfrit stål",
+      "outcome": "Mandatory decoration selected and checked"
+    },
+    {
+      "id": "pf-120541",
+      "sku": "12054101",
+      "name": "Sabia RPET foldbar mulepose 7L",
+      "outcome": "Blank purchase passed; decoration remains unavailable pending PF"
+    },
+    {
+      "id": "pf-120541",
+      "sku": "12054101",
+      "name": "Sabia RPET foldbar mulepose 7L",
+      "outcome": "Blank purchase passed; decoration remains unavailable pending PF"
+    },
+    {
+      "id": "pf-107811",
+      "sku": "10781101",
+      "name": "Dairy Dream notesbog og kuglepensæt af genbrugte mælkekartoner i A5 størrelse",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-107811",
+      "sku": "10781101",
+      "name": "Dairy Dream notesbog og kuglepensæt af genbrugte mælkekartoner i A5 størrelse",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-120783",
+      "sku": "12078301",
+      "name": "Odisha 180 g/m² økologisk OCS mulepose med bund 14 L ",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-120783",
+      "sku": "12078301",
+      "name": "Odisha 180 g/m² økologisk OCS mulepose med bund 14 L ",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-106904",
+      "sku": "10690400",
+      "name": "Spectrum A5 hardcover notesbog",
+      "outcome": "Gold and silver selected and checked"
+    },
+    {
+      "id": "pf-107925",
+      "sku": "10792571",
+      "name": "Legato A5 notesbog med rollerballpen (blå refill)",
+      "outcome": "Gold and silver selected and checked"
+    },
+    {
+      "id": "pf-120789",
+      "sku": "12078901",
+      "name": "Peru Blend 180 g/m² mulepose af GRS genvundet bomuld 7 L",
+      "outcome": "Invalid placement excluded; valid alternative passed"
+    },
+    {
+      "id": "pf-210215",
+      "sku": "21021500",
+      "name": "Polar A5 notesbog med linieret sider",
+      "outcome": "Gold and silver selected and checked"
+    },
+    {
+      "id": "pf-220520",
+      "sku": "22052001",
+      "name": "Cirrus POP 350 ml krus med 360° låg",
+      "outcome": "Mandatory decoration selected and checked"
+    }
+  ]
+}

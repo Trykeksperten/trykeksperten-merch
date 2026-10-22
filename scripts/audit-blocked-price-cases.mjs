@@ -45,6 +45,7 @@ for(const c of input.blockedCases){
   row.outcome='Blank purchase passed; decoration remains unavailable pending PF';
   row.attempts=[{blank:true,ok:true,totalIncVat:order.totalIncVat}];result.cases.push(row);continue;
  }
+ if(c.reason.includes('guld eller sølv'))passed=['gold','silver'].every(finish=>attempts.some(a=>a.foil===finish&&a.ok));
  row.attempts=attempts;
  if(c.reason.includes('guld eller sølv'))row.supplierAction='Confirm PF gold/silver order codes before supplier submission';
  row.outcome=passed?(c.reason.includes('gyldigt mockup')?'Invalid placement excluded; valid alternative passed':c.reason.includes('guld eller sølv')?'Gold and silver selected and checked':'Mandatory decoration selected and checked'):'Needs supplier data or routing review';
@@ -52,5 +53,8 @@ for(const c of input.blockedCases){
  result.cases.push(row);
 }
 result.priceRulesUnchanged=before===hash((await loadPricing()).rules);
+result.summary={total:result.cases.length,outcomes:result.cases.reduce((counts,row)=>{counts[row.outcome]=(counts[row.outcome]||0)+1;return counts;},{}),unresolved:result.unresolved.length};
+// A successful alternative does not make the original supplier placement usable.
+result.supplierDependencies=result.cases.filter(row=>row.supplierAction||row.outcome==='Unpriced variant excluded from storefront').map(({productId,sku,name,supplierAction,outcome})=>({productId,sku,name,action:supplierAction||'PF must supply a current variant price; keep existing customer prices unchanged',outcome}));
 console.log(JSON.stringify(result,null,2));
 if(!result.priceRulesUnchanged||result.unresolved.length)process.exitCode=1;
