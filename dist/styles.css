@@ -839,12 +839,9 @@ header{border-bottom-color:#d2ccc2}
  inset:0;
  z-index:-1;
  background:#cf4d22;
- border-radius:38% 62% 57% 43% / 58% 39% 61% 42%;
- transform:rotate(-12deg);
+ border-radius:50%;
+ transform:none;
 }
-.home-value-strip>span:nth-child(2) b::before{border-radius:59% 41% 39% 61% / 43% 61% 39% 57%;transform:rotate(9deg)}
-.home-value-strip>span:nth-child(3) b::before{border-radius:43% 57% 62% 38% / 61% 42% 58% 39%;transform:rotate(-7deg)}
-.home-value-strip>span:nth-child(4) b::before{border-radius:61% 39% 44% 56% / 41% 58% 42% 59%;transform:rotate(14deg)}
 .home-value-strip strong{
  color:#171b19;
  font-size:clamp(1rem,1.2vw,1.16rem);
