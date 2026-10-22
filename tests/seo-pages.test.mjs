@@ -56,3 +56,13 @@ test('sitemap follows shop prices and uses canonical category encoding',()=>{
  assert.match(xml,/underkategori=Isoleret\+krus/);
  assert.doesNotMatch(sitemapXML(data,{available:false}),/\/design\//);
 });
+
+
+test('brand initial HTML shows the vector logo before hydration, with products reserved for no-script fallback',()=>{
+ const data={...catalog,brands:[{id:'testbrand',name:'Testbrand',logo:'/assets/brands/parker.png'}]};
+ const html=seoMain(seoPage('/produkter','?brand=testbrand',data),data);
+ assert.match(html,/<div class="wrap catalog-brand-heading"><h1><img class="catalog-brand-logo" src="\/assets\/brands\/parker.svg\?v=2" alt="Testbrand"/);
+ assert.doesNotMatch(html,/<h1>Testbrand merchandise/);
+ assert.doesNotMatch(html.split('<noscript>')[0],/class="product-grid"|aria-label="Produktgrupper"/);
+ assert.match(html,/<noscript>[\s\S]*href="\/design\/pf-123"/);
+});
