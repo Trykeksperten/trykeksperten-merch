@@ -735,6 +735,7 @@ Opdatér kurv|Update cart
 Tilføj tekst|Add text
 Kuglepenne|Pens
 Kasketter|Caps
+© 2026 Smerch. Alle rettigheder forbeholdes.|© 2026 Smerch. All rights reserved.
 Sætter brandanimation på pause|Pause brand animation
 Se produkter fra|Browse products from
 Med på hele dagen.|With you all day.

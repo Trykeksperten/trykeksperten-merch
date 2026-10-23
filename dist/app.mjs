@@ -1,3 +1,4 @@
+import {premiumBrands} from './product-collections.mjs';
 import {productLoading} from './product-loading.mjs?v=2';
 import {bindProductSearch} from './product-search.mjs';
 import {bindContactAvailability} from './contact-availability.mjs';
@@ -14,7 +15,7 @@ import {shouldHandleNavigation} from './navigation.mjs?v=2';
 import {editorialProductCard,editorialStory,bindProductColorSwatches} from './product-editorial.mjs?v=6';
 import {pfCartPage,bindCart,updateCartHeader,readCart as readLiveCart,writeCart as writeLiveCart} from './pf-cart.mjs?v=25';
 import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs?v=20';
-import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=88';
+import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=89';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from './pf-visibility.mjs?v=24';
 import {productGroups,groupSections,productGroupURL,navigationProductGroups} from './product-groups.mjs?v=24';
 import { specialPage, bindSpecial } from './special.mjs?v=22';
@@ -48,9 +49,8 @@ function visibleBrands(){if(!pfCatalog)return catalog.brands||[];const ids=new S
 function liveProductImage(product){return pricedVariants(product,pfPrices).find(variant=>variant.images?.[0])?.images[0];}
 function homeCategoryTiles(){
  const products=shopProducts(pfCatalog,pfPrices).filter(product=>pfPrices?.products?.[product.id]&&liveProductImage(product));
- const premiumBrands=['stanley-1913','thule','hydro-flask','moleskine','ocean-bottle','larq','herschel','miir','waterman'];
  const categories=[
-  {name:'High-end produkter',href:'/produkter?niveau=premium',modelCode:'100834',matches:product=>premiumBrands.includes(product.brandId)},
+  {name:'High-end produkter',href:'/produkter?udvalg=high-end',modelCode:'100834',matches:product=>premiumBrands.includes(product.brandId)},
   {name:'Kuglepenne',href:productGroupURL('kontor','Kuglepenne')+'&sortering=price-asc',matches:product=>product.category==='Kuglepenne',cheapest:true},
   {name:'Kasketter',href:productGroupURL('toj','Caps & hatte'),modelCode:'38678',sku:'38678990',matches:product=>product.shopCategory==='toj'&&product.category==='Caps & hatte'&&/kasket|cap/i.test(product.name)}
  ];
@@ -86,11 +86,11 @@ function openProductMenu(groupId){
  const priced=shopProducts(pfCatalog,pfPrices),products=priced.length?priced:(pfCatalog?.products||[]),groups=navigationProductGroups(products);
  if(matchMedia('(max-width:1024px)').matches){
   const menu=$('#product-menu');menu.classList.remove('has-active-group');
-  menu.innerHTML=`<div class="mobile-category-accordion">${groups.map(group=>`<div class="mobile-category-group"><button type="button" data-mobile-group="${group.id}" aria-expanded="false" aria-controls="mobile-category-${group.id}">${esc(group.name)}<span aria-hidden="true">⌄</span></button><div id="mobile-category-${group.id}" class="mobile-subcategories" hidden><a class="mobile-category-all" href="${productGroupURL(group.id)}">${getLanguage()==='en'?'View all in this group':'Se alle i gruppen'}</a>${groupSections(group,products).flatMap(section=>section.items).map(item=>`<a href="${productGroupURL(group.id,item.name)}">${esc(item.name)} <small>${item.count}</small></a>`).join('')}</div></div>`).join('')}<a class="mobile-category-all" href="/produkter">${getLanguage()==='en'?'View all products':'Se alle produkter'} ↗</a></div>`;
+  menu.innerHTML=`<div class="mobile-category-accordion">${groups.map(group=>`<div class="mobile-category-group"><button type="button" data-mobile-group="${group.id}" aria-expanded="false" aria-controls="mobile-category-${group.id}">${esc(group.name)}<span aria-hidden="true">⌄</span></button><div id="mobile-category-${group.id}" class="mobile-subcategories" hidden><a class="mobile-category-all group-all-button" href="${productGroupURL(group.id)}">${getLanguage()==='en'?'View all in this group':'Se alle i gruppen'}</a>${groupSections(group,products).flatMap(section=>section.items).map(item=>`<a href="${productGroupURL(group.id,item.name)}">${esc(item.name)} <small>${item.count}</small></a>`).join('')}</div></div>`).join('')}<a class="mobile-category-all" href="/produkter">${getLanguage()==='en'?'View all products':'Se alle produkter'} ↗</a></div>`;
   menu.hidden=false;$('#product-menu-toggle').setAttribute('aria-expanded','true');return;
  }
  const active=groups.find(group=>group.id===groupId),sections=active?groupSections(active,products):[];
- $('#product-menu').innerHTML=`${active?'<button class="mobile-group-back" data-menu-group="" type="button">← Produktgrupper</button>':''}<div class="wrap product-mega-layout"><div class="product-mega-groups"><p class="eyebrow">Produktgrupper</p>${groups.map(group=>`<button type="button" data-menu-group="${group.id}" class="${group.id===active?.id?'active':''}" aria-pressed="${group.id===active?.id}">${esc(group.name)} <span aria-hidden="true">→</span></button>`).join('')}<a href="/produkter">Se alle produkter ↗</a></div><div class="product-mega-content">${active?`<div class="product-mega-heading"><div><p class="eyebrow">Find det rigtige</p><h2>${esc(active.name)}</h2></div><a href="${productGroupURL(active.id)}">Se alle i gruppen ↗</a></div><div class="product-mega-sections">${sections.map(section=>`<section><h3>${esc(section.name)}</h3>${section.items.map(item=>`<a href="${productGroupURL(active.id,item.name)}">${esc(item.name)} <small>${item.count}</small></a>`).join('')}</section>`).join('')}</div>`:'<div class="product-mega-heading"><div><p class="eyebrow">Find det rigtige</p><h2>Vælg en produktgruppe</h2><p>Vælg en gruppe for at se underkategorierne.</p></div></div>'}</div></div>`;
+ $('#product-menu').innerHTML=`${active?'<button class="mobile-group-back" data-menu-group="" type="button">← Produktgrupper</button>':''}<div class="wrap product-mega-layout"><div class="product-mega-groups"><p class="eyebrow">Produktgrupper</p>${groups.map(group=>`<button type="button" data-menu-group="${group.id}" class="${group.id===active?.id?'active':''}" aria-pressed="${group.id===active?.id}">${esc(group.name)} <span aria-hidden="true">→</span></button>`).join('')}<a href="/produkter">Se alle produkter ↗</a></div><div class="product-mega-content">${active?`<div class="product-mega-heading"><div><p class="eyebrow">Find det rigtige</p><h2>${esc(active.name)}</h2></div><a class="group-all-button" href="${productGroupURL(active.id)}">Se alle i gruppen</a></div><div class="product-mega-sections">${sections.map(section=>`<section><h3>${esc(section.name)}</h3>${section.items.map(item=>`<a href="${productGroupURL(active.id,item.name)}">${esc(item.name)} <small>${item.count}</small></a>`).join('')}</section>`).join('')}</div>`:'<div class="product-mega-heading"><div><p class="eyebrow">Find det rigtige</p><h2>Vælg en produktgruppe</h2><p>Vælg en gruppe for at se underkategorierne.</p></div></div>'}</div></div>`;
  $('#product-menu').classList.toggle('has-active-group',Boolean(active));
  $('#product-menu').hidden=false;$('#product-menu-toggle').setAttribute('aria-expanded','true');
  if(active&&!matchMedia('(max-width:1024px)').matches)$('#product-menu').querySelector(`[data-menu-group="${active.id}"]`)?.focus({preventScroll:true});

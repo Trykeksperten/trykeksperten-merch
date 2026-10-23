@@ -1,3 +1,4 @@
+import {isHighEndProduct,isHighEndSelection} from './product-collections.mjs';
 import {matchesProductSearch} from './product-search.mjs';
 import {fromInc} from './customer-pricing.mjs';
 import {translate,getLanguage} from './i18n-core.mjs';
@@ -67,7 +68,8 @@ export function filterPFProducts(products,params,priceData,qualityTier){
   if(category==='caps'){if(!['Caps & hatte','Huer'].includes(product.category))return false;}else if(category==='bomuldstasker'){if(product.shopCategory!=='tasker'||!(/bomuld|cotton/i.test(product.name+' '+(product.material||''))||product.category==='Bomuldstasker'))return false;}else if(category&&product.shopCategory!==category)return false;
   if(subcategory&&product.category!==subcategory)return false;
   if(brand&&product.brandId!==brand)return false;
-  if(level&&qualityTier(product)!==level)return false;
+  if(isHighEndSelection(params)&&!isHighEndProduct(product))return false;
+  if(level&&level!=='premium'&&qualityTier(product)!==level)return false;
   if(q&&!matchesProductSearch(product,q))return false;
   if(color&&!productColors(product,priceData).includes(color))return false;
   if(insulation&&product.insulation!==insulation)return false;

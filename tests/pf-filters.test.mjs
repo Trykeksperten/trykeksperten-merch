@@ -36,3 +36,11 @@ test('catalogue sorting supports price, name and brand while keeping unknown pri
  assert.deepEqual(sortPFProducts(products,'name-desc',prices).map(p=>p.id),['u','b','a']);
  assert.deepEqual(sortPFProducts(products,'brand',prices).map(p=>p.id),['a','u','b']);
 });
+
+test('high-end selection and old premium links exclude budget products even with price sorting',()=>{
+ const products=[{id:'budget',name:'Blyant',brandId:'unbranded',variants:[]},{id:'premium',name:'Stanley',brandId:'stanley-1913',variants:[]}];
+ for(const query of ['udvalg=high-end','niveau=premium','udvalg=high-end&sortering=price-asc']){
+  assert.deepEqual(filterPFProducts(products,new URLSearchParams(query),{},()=> 'recommended').map(p=>p.id),['premium']);
+ }
+ assert.equal(filterPFProducts(products,new URLSearchParams(),{},()=> 'recommended').length,2);
+});
