@@ -1,0 +1,4 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {isUnfinishedPayment} from '../dist/admin-order-list.mjs';
+test('unfinished and cancelled unlinked attempts are separate; real reservations, paid and PF-linked orders stay visible',()=>{for(const status of ['awaiting_payment','expired','payment_failed','cancelled'])assert.equal(isUnfinishedPayment({status,pfOrderIds:[]}),true);for(const status of ['authorized','paid','capture_reconciliation','needs_attention','authorization_expired'])assert.equal(isUnfinishedPayment({status,pfOrderIds:[]}),false);assert.equal(isUnfinishedPayment({status:'cancelled',pfOrderIds:['ord-real']}),false);assert.equal(isUnfinishedPayment({status:'awaiting_payment'},[{id:'ord-real'}]),false);assert.equal(isUnfinishedPayment({status:'cancelled',paidAt:'2026-10-23'}),false);});

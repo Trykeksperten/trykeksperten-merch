@@ -38,7 +38,7 @@ test('5 kr live reservation verifies callbacks, blocks all commerce, cancels aft
  const economic={ECONOMIC_ENABLED:'1',ECONOMIC_APP_SECRET_TOKEN:'fixture',ECONOMIC_AGREEMENT_GRANT_TOKEN:'fixture',ECONOMIC_CUSTOMER_GROUP_NUMBER:'1',ECONOMIC_PAYMENT_TERMS_NUMBER:'2',ECONOMIC_LAYOUT_NUMBER:'3',ECONOMIC_VAT_ZONE_NUMBER:'1',ECONOMIC_PRODUCT_NUMBER:'MERCH',ECONOMIC_FREIGHT_PRODUCT_NUMBER:'FRAGT'};
  await assert.rejects(syncEconomicInvoice(order.id,{env:economic,fetchImpl:()=>{throw Error('Must never call accounting');}}),/Kun bekræftede liveordrer/);
  await queueOrderConfirmation({...authorized,legal:{documents:{}}});await assert.rejects(access(join(root,'order-mail',order.id+'.json')));
- await cancelQuickpay(order.id,{env:{...env,QUICKPAY_MODE:'live'},fetchImpl:async(url,options)=>({ok:true,json:async()=>options.method==='POST'?{...payment,operations:[...payment.operations,{id:2,type:'cancel',pending:false,qp_status_code:'20000'}]}:payment})});
+ await cancelQuickpay(order.id,{env:{...env,QUICKPAY_MODE:'live'},fetchImpl:async(url,options)=>{if(options.method==='DELETE'){payment.link=null;return {ok:true,status:204};}if(options.method==='POST')payment.operations.push({id:2,type:'cancel',pending:false,qp_status_code:'20000'});return {ok:true,json:async()=>payment};}});
  assert.equal((await readCheckout(order.id)).status,'cancelled');
  await applyQuickpayCallback(payment,{env});assert.equal((await readCheckout(order.id)).status,'cancelled');
 });
