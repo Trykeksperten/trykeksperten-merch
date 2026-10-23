@@ -14,3 +14,8 @@
 
 .invoice-setup{margin-bottom:20px}.invoice-setup .action,.invoice-panel button.action{display:inline-flex;align-items:center;justify-content:center;width:fit-content;min-height:44px;padding:10px 16px;border:1px solid #c9d2ce;border-radius:8px;background:#fff;color:#1a2928;font:500 14px/1.4 "Roboto",sans-serif;text-decoration:none}
 .invoice-panel{display:grid;gap:8px;margin-top:16px;padding:18px;border:1px solid #dce0dc;border-radius:10px;background:#f7f8f5;min-width:0;overflow-wrap:anywhere}.invoice-panel strong,.invoice-panel small{display:block}.invoice-panel small{font-size:14px;line-height:1.5;color:#52615a}.invoice-panel button.action{margin:6px 0}.invoice-panel button:disabled{opacity:.5;cursor:wait}
+.admin-mockup{display:inline-grid;gap:5px;width:min(200px,100%);margin:12px 12px 10px 0;padding:8px;border:1px solid #e2e6e1;border-radius:12px;background:#f6f7f6;color:#59645e;font-size:12px;text-align:center}
+.admin-mockup img{display:block;width:100%;height:150px;object-fit:contain;border-radius:8px;background:#fff}
+.admin-mockup.compact{width:68px;margin:0 10px 0 0;padding:4px;gap:2px;font-size:10px;flex:none}
+.admin-mockup.compact img{height:52px}
+.admin-mockup.compact figcaption{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
