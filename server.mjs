@@ -1,3 +1,4 @@
+import {pfTestEnvironment} from './lib/pf-test-env.mjs';
 import {orderMockups,requiredOrderMockup} from './lib/order-mockups.mjs';
 import {applyPilotColour} from './lib/pilot-colour.mjs';
 import {pilotFreightExVat} from './lib/pilot-freight.mjs';
@@ -267,16 +268,17 @@ const handleRequest=async(req,res)=>{
    if(pathname==='/api/pf-orders/status'&&req.method==='GET'){json(res,200,{...gatewayRequirements(),automaticHandoff:handoffConfiguration(),captureEnabled:process.env.PAYMENT_PROVIDER==='quickpay'?process.env.QUICKPAY_CAPTURE_ENABLED==='1':process.env.STRIPE_CAPTURE_ENABLED==='1'});return;}
    if(pathname==='/api/pf-orders/test-cart'&&req.method==='POST'){
     if(!adminSessionAuthorized(req))throw Error('Medarbejderlogin kræves.');
-    const input=await readJSON(req,30*1024*1024);validateCartTest(input);
+    const env=pfTestEnvironment(),input=await readJSON(req,30*1024*1024);validateCartTest(input,env);
     const catalog=await loadProductCatalog(input.lines.map(line=>line.productId)),{prices,rules}=await loadPricing(),stock=await loadStock();
-    const sent=await sendCartTest(input,{catalog,prices,rules,stock});
+    const sent=await sendCartTest(input,{catalog,prices,rules,stock,env});
     json(res,201,{id:sent.id,purchaseOrderNumber:sent.purchaseOrderNumber,status:sent.status,test:true,paymentCreated:false});return;
    }
    if(pathname==='/api/pf-orders/test'&&req.method==='POST'){
     const input=await readJSON(req);
     const catalog=await loadProductCatalog(['pf-38687']),{prices,rules}=await loadPricing(),stock=await loadStock();
-    const order=await prepareOrder(gatewayTestOrderInput(input),{catalog,prices,rules,stock});
-    const sent=await dispatchOrder(order.id);
+    const env=pfTestEnvironment();
+    const order=await prepareOrder(gatewayTestOrderInput(input,{env}),{catalog,prices,rules,stock,env});
+    const sent=await dispatchOrder(order.id,{env});
     json(res,201,{id:sent.id,purchaseOrderNumber:sent.purchaseOrderNumber,status:sent.status,gatewayResponse:sent.gatewayResponse,test:true,paymentCreated:false});return;
    }
    if(pathname==='/api/pf-orders'&&req.method==='GET'){json(res,200,(await listOrders()).map(({gatewayPayload,lines,supplierTotal,...order})=>({...order,lines:lines.map(({supplierUnitPrice,...line})=>line)})));return;}
