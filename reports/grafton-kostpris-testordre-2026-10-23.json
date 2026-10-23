@@ -1,0 +1,38 @@
+{
+  "status": "draft_not_submitted",
+  "product": "Grafton 270 g/m² vasket kasket med 6 paneler",
+  "sku": "38687070",
+  "color": "Havregryn",
+  "quantity": 10,
+  "method": "Broderi fixed",
+  "printCode": "EMBF02",
+  "position": "Forside",
+  "widthMm": 85,
+  "heightMm": 25,
+  "colours": 1,
+  "logoFile": "smerch logo cap.ai",
+  "cartReference": "e08dcba0-b4a8-4d49-8339-52817e653fa7",
+  "source": "Existing browser cart on smerch.dk, dimensions visually verified",
+  "priceSources": {
+    "productDate": "2026-10-17T05:15:01.373",
+    "printDate": "2026-10-18T12:00:00Z",
+    "freight": "PF Store screenshot supplied by Joakim 2026-10-23 13:33; 65 DKK ex VAT"
+  },
+  "costOre": {
+    "goods": 26000,
+    "embroidery": 35190,
+    "setup": 32000,
+    "smallOrder": 0,
+    "freight": 6500,
+    "net": 99690,
+    "vat": 24923,
+    "total": 124613
+  },
+  "pending": [
+    "Deploy internal cost-price checkout",
+    "PF embroidery thread colour code confirmation",
+    "Payment approval and explicit pilot activation"
+  ],
+  "paymentCreated": false,
+  "pfOrderCreated": false
+}

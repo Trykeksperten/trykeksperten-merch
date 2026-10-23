@@ -1,0 +1,48 @@
+Rigtig testordre med kort og logo – klargøring 23. oktober 2026
+
+STATUS
+Koden indeholder en særskilt administratoradgang: /betaling?test=pilot.
+Den er slået fra som standard. Kundebetaling forbliver lukket via
+launchConfig.ordersEnabled=false, både i brugerfladen og på serveren.
+PF_COMMUNICATION_EMAIL_ACTIVE=1 er gemt i Render med Save only efter
+Thomas' bekræftelse. Det træder i kraft ved næste deployment.
+Ingen livebetaling, hævning eller PF-afsendelse er aktiveret nu.
+
+FØR AKTIVERING (må først ske efter PF- og betalingsgodkendelse)
+- Push/deploy den gennemgåede kode med ordersEnabled=false.
+- PF skal bekræfte produktionsadgang, produktionscallbacks, ASN og
+  Smerch som afsender. Kontrollér produktionsadgangskoden uden at logge den.
+- Betalingsudbyderen skal godkende rigtige kortbetalinger. Afklar den
+  faktiske reservationsfrist og angiv QUICKPAY_AUTH_HOLD_HOURS (1–168).
+  Der er ikke gættet på en frist i liveopsætningen.
+- Aftal produkt, antal, logofil og maksimumsbeløb med Joakim.
+  SMERCH_ADMIN_PILOT_MAX_DKK angives ud fra det godkendte beløb.
+- Først derefter: Quickpay/PF live, eksisterende godkendelsesflag og
+  SMERCH_ADMIN_PILOT_ENABLED=1. Kundernes ordersEnabled skal stadig være false.
+- Statuskontrollen kræver både login, særskilt aktivering, godkendte
+  liveindstillinger, korrekturadresse og beløbsgrænse. Den almindelige
+  checkout kan ikke benytte administratoradgangen.
+
+GENNEMFØRELSE
+1. Log ind i administrationen. Læg en lille ordre med logo i kurven.
+2. Åbn Rigtig testordre med kort og logo under Ordrer.
+3. Kontrollér den fulde pris inkl. fragt, logo, trykmetode og placering.
+4. Joakim accepterer vilkår og gennemfører selv kortbetalingen.
+5. Kontrollér reservation, kundemail, logofil-links og PF-ordrenummer.
+6. PF sender e-proof til korrektur@smerch.dk. Importér den aktuelle
+   korrektur i Smerchs korrekturindbakke med PF-reference og send kunden
+   det personlige godkendelseslink. PF-email importeres ikke automatisk.
+7. Kontrollér kundens godkendelse af seneste version og gyldig reservation.
+   Følg administrationens hævningsflow før godkendelsen sendes til PF.
+8. Godkend hos PF via deres e-proof-link. Registrér kanal og reference
+   samt PF's bekræftelse i Smerch. Smerchs knap godkender ikke automatisk hos PF.
+9. Kontrollér ASN, tracking, faktisk levering og fakturaopsætning.
+10. Slå SMERCH_ADMIN_PILOT_ENABLED fra efter testen. Åbn først offentligt
+    efter særskilt beslutning.
+
+BEGRÆNSNINGER
+Den nye adgang er en rigtig ordre med økonomiske og produktionsmæssige
+konsekvenser, ikke 5-kroners MobilePay-testen. Kortet reserveres med den
+fulde ordrepris og auto_capture=false. Kundemail, PF-overførsel og det
+almindelige efterfølgende ordreflow anvendes. Ingen virkelig betaling
+eller produktionsordre er udført som del af klargøringen.

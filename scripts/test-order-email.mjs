@@ -29,7 +29,7 @@ try{
   order.lines=order.lines.map(line=>({...line,productName:line.productName||catalog.products.find(p=>p.id===line.productId)?.name}));
   root=await mkdtemp(join(tmpdir(),'smerch-mail-test-'));
   process.env.SMERCH_DATA_DIR=root;
-  await queueOrderConfirmation({...order,shipping:{...order.shipping,email:to}});
+  await queueOrderConfirmation({...order,adminTest:false,adminLiveTest:false,shipping:{...order.shipping,email:to}});
   let delivered=false;
   await retryOrderConfirmations({transport:{sendMail:async message=>{
    const result=await sender.sendMail({...message,subject:'[TEST] '+message.subject,html:'<p><strong>TEST – Dette er en testmail, ikke en bestilling. Ingen produktion eller betaling sættes i gang.</strong></p>'+message.html,text:'TEST – Dette er en testmail, ikke en bestilling. Ingen produktion eller betaling sættes i gang.\n\n'+message.text});

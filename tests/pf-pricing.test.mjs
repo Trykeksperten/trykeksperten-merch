@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {listPFPrintPrices,listPFProductPrices,listPFProductTiers,listPFStock,normalizePrices,normalizeStock,estimatePFLine,quotePFLine,quotePFCart,supplierPFOrderAmounts,validateCartLine} from '../lib/pf-pricing.mjs';
+import {supplierCostRules,listPFPrintPrices,listPFProductPrices,listPFProductTiers,listPFStock,normalizePrices,normalizeStock,estimatePFLine,quotePFLine,quotePFCart,supplierPFOrderAmounts,validateCartLine} from '../lib/pf-pricing.mjs';
 import {designGroupSize} from '../dist/design-layers.mjs';
 import {loadCatalogIndex,loadPFProduct} from '../lib/pf-catalog-store.mjs';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from '../dist/pf-visibility.mjs';
@@ -322,4 +322,14 @@ test('a variant override takes precedence while other colours retain the product
  const second={...v,sku:'OTHER-COLOR'},cat={...catalog,products:[{...p,variants:[v,second]}]},source={...prices,products:{...prices.products,[second.sku]:prices.products[v.sku]}},custom={...rules,salePrices:{[p.id]:[{min:1,unitExVat:15000}],[v.sku]:[{min:1,unitExVat:12000}]}};
  assert.equal(quotePFLine(cat,blank,source,custom,now).goodsUnit,12000);
  assert.equal(quotePFLine(cat,{...blank,sku:second.sku},source,custom,now).goodsUnit,15000);
+});
+
+test('internal cost quote matches PF and ignores retail overrides and setup rounding',()=>{
+ const source=structuredClone(prices);source.prints[o.printCode].combinations[0].setup=123.45;
+ const retailRules={...rules,setupMarkup:80,salePrices:{[blank.sku]:[{min:1,unitExVat:99000}]}};
+ const cost=quotePFCart(catalog,[decorated],source,supplierCostRules(retailRules),now);
+ assert.equal(cost.net,Math.round(supplierPFOrderAmounts(catalog,[decorated],source,now).total*100));
+ assert.equal(cost.goods,100000);assert.equal(cost.print,10000);assert.equal(cost.setupBase,12345);assert.equal(cost.smallOrder,3000);
+ assert.equal(cost.totalIncVat,cost.net+Math.round(cost.net*.25));
+ assert.ok(quotePFCart(catalog,[decorated],source,retailRules,now).net>cost.net);
 });
