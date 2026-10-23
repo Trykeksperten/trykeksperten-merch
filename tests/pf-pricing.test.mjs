@@ -305,3 +305,16 @@ test('approved fixed premium prices survive promotion expiry and preserve other 
  }
  }
  });
+test('product-wide prices apply to every variant and future variants across tiers and checkout',()=>{
+ const second={...v,sku:'NEW-COLOR'},product={...p,variants:[v,second]},cat={...catalog,products:[product]},source={...prices,products:{...prices.products,[second.sku]:prices.products[v.sku]}},custom={...rules,salePrices:{[p.id]:[{min:1,unitExVat:12345},{min:40,unitExVat:11000}],[v.sku]:[{min:1,unitExVat:20000}]}};
+ for(const variant of product.variants){
+ assert.equal(listPFProductTiers(cat,p.id,variant.sku,source,custom,now).tiers[0].unitExVat,12345);
+ for(const quantity of [1,40]){const line={...blank,sku:variant.sku,quantity},expected=quantity===1?12345:11000;assert.equal(quotePFLine(cat,line,source,custom,now).goodsUnit,expected);assert.equal(estimatePFLine(cat,line,source,custom,now).goodsUnit,expected);}
+ }
+ assert.equal(listPFProductPrices(cat,source,custom,now).products[p.id].fromExVat,12345);
+});
+
+test('product price respects a variant with a higher supplier minimum',()=>{
+ const source={...prices,products:{...prices.products,[v.sku]:{...prices.products[v.sku],tiers:[{min:10,net:100}]}}},custom={...rules,salePrices:{[p.id]:[{min:1,unitExVat:12345},{min:40,unitExVat:11000}]}};
+ const result=listPFProductTiers(catalog,p.id,v.sku,source,custom,now);assert.equal(result.available,true);assert.equal(result.minimumQuantity,10);assert.equal(result.tiers[0].min,10);assert.equal(result.tiers[0].unitExVat,12345);
+});

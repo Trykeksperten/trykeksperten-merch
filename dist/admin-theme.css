@@ -63,3 +63,14 @@ body.admin-dashboard,body.admin-proofs{font-family:system-ui,-apple-system,Blink
 body.admin-dashboard *,body.admin-proofs *{font-weight:400!important}
 body.admin-dashboard button,body.admin-dashboard input,body.admin-dashboard select,body.admin-dashboard textarea,body.admin-dashboard a.action,body.admin-proofs button,body.admin-proofs input,body.admin-proofs select,body.admin-proofs textarea,body.admin-proofs a.action{font-family:inherit!important}
 .checkout-search{margin:16px 24px;width:min(440px,calc(100% - 48px))}.checkout-columns,.checkout-row>summary{display:grid;grid-template-columns:95px minmax(140px,1fr) 120px minmax(140px,1.3fr) 110px 130px;gap:16px}.checkout-columns{padding:14px 24px;border-top:1px solid var(--admin-line);border-bottom:1px solid var(--admin-line);font-size:12px;color:var(--admin-muted);background:#f8f9f6}.checkout-reference{font-size:12px;overflow-wrap:anywhere}.checkout-date,.checkout-pf{font-size:12px}.checkout-row>summary{list-style:none}.checkout-row>summary .checkout-customer small{font-size:11px}@media(max-width:1100px){.checkout-columns{display:none}.checkout-row>summary{grid-template-columns:1fr 1fr}.checkout-row>summary>.status{grid-column:auto;justify-self:end}.checkout-reference:before{content:'Smerch: ';color:var(--admin-muted)}.checkout-pf:before{content:'PF: ';color:var(--admin-muted)}}
+
+/* Login follows the storefront's white and soft-grey controls. */
+.admin-dashboard .login-view{background:#fff;font-family:"Roboto",sans-serif}
+.admin-dashboard .login-card{border-color:#dce1dc;border-radius:20px;padding:28px;background:#fff}
+.admin-dashboard .login-card input{background:#f5f5f5;border:1px solid #dce1dc;border-radius:12px;min-height:42px}
+.admin-dashboard .login-card input:focus-visible{outline:2px solid #899b8d;outline-offset:2px}
+.admin-dashboard .login-card form button{min-height:42px;border:1px solid #d3d9d5;border-radius:999px;background:#edf1ed;color:#17201f;padding:10px 22px}
+.admin-dashboard .login-card form button:hover{background:#e2e8e2;border-color:#899b8d}
+.admin-dashboard .login-card form button:focus-visible{outline:2px solid #899b8d;outline-offset:3px}
+.admin-dashboard .login-card>a:not(.login-brand){color:#646a6c}
+.admin-dashboard .login-card>a:not(.login-brand):hover{text-decoration:underline;text-underline-offset:3px}

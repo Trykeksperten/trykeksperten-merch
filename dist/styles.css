@@ -1380,12 +1380,12 @@ header nav a:focus-visible,
 .pf-product-gallery .pf-gallery img{width:100%;height:100%;object-fit:contain}
 .pf-documents{border-top:1px solid var(--line);padding-top:22px;margin-bottom:28px}
 .pf-documents h3{font-size:1.1rem;margin-bottom:14px}
-.pf-documents>div{display:grid;gap:10px}
-.pf-documents a{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:14px}
+.pf-documents>div{display:flex;flex-wrap:wrap;gap:8px}
+.pf-documents a{display:flex;align-items:center;justify-content:center;gap:8px;max-width:100%;background:#fff;border:1px solid var(--line);border-radius:22px;padding:8px 14px;font-size:13px}
 .pf-documents a:hover{border-color:var(--blue)}
-.pf-documents a strong,.pf-documents a small{display:block}
-.pf-documents a small{margin-top:2px;color:var(--muted);font-size:12px}
-.pf-documents a>span:last-child{font-size:1.2rem;color:var(--blue)}
+.pf-documents a>span{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px}
+.pf-documents a strong,.pf-documents a small{display:inline}
+.pf-documents a small{margin-top:0;color:var(--muted);font-size:12px}
 .pf-documents>p{margin:12px 0 0}
 @media(max-width:600px){.pf-product-gallery{grid-template-columns:54px minmax(0,1fr);gap:10px}.pf-product-gallery .pf-gallery{max-height:390px;gap:7px}}
 
@@ -2057,7 +2057,7 @@ body.storefront #main .pf-pagination .pf-page-status{font-size:12px;font-weight:
 /* Print technique help is separate from the method selection button. */
 .pf-method-choice{position:relative;min-width:0;display:flex;flex-direction:column;align-self:start}
 .pf-studio .pf-method-choice .pf-method-card{width:100%;padding-right:48px}
-.pf-studio .pf-method-choice .pf-method-card em{position:static;order:5;margin-top:4px}
+.pf-studio .pf-method-choice .pf-method-card em{position:absolute;top:-10px;left:16px;right:auto;margin:0;padding:3px 8px;background:#edf1ed;color:#526458;font-size:11px;line-height:1.3}
 .pf-method-info summary{position:absolute;right:10px;top:10px;display:grid;place-items:center;width:32px;height:32px;border:1px solid #d9ddda;border-radius:50%;color:#646a6c;background:white;cursor:pointer;list-style:none;font-size:15px}
 .pf-method-info summary::-webkit-details-marker{display:none}
 .pf-method-info summary:hover,.pf-method-info[open] summary{color:#cf4d22;border-color:#cf4d22}
@@ -2070,3 +2070,12 @@ body.storefront #main .pf-pagination .pf-page-status{font-size:12px;font-weight:
 .pf-method-info>div{position:relative;padding-right:44px}
 .pf-studio .pf-method-info-close{position:absolute;top:7px;right:7px;display:grid;place-items:center;width:28px;height:28px;min-height:0;padding:0;border:0;border-radius:50%;background:transparent;color:#646a6c;font-size:21px;line-height:1;cursor:pointer}
 .pf-studio .pf-method-info-close:hover{background:#eceeed;color:#17201f}
+
+/* Keep printing choices consistent with quantity choices. */
+body.storefront #main .pf-studio .pf-method-cards{row-gap:18px}
+body.storefront #main .pf-studio .pf-method-card{min-height:148px;border:1px solid #dce1dc;padding:18px 48px 18px 16px;background:#fff}
+body.storefront #main .pf-studio .pf-method-card.selected{border-color:#899b8d;background:#edf1ed;box-shadow:inset 0 0 0 1px #899b8d}
+body.storefront #main .pf-studio .pf-method-card:hover{border-color:#899b8d;transform:none}
+body.storefront #main .pf-studio .pf-method-card small,body.storefront #main .pf-studio .pf-method-card p{color:#626c67}
+body.storefront #main .pf-studio .pf-placement-choice:has(input:checked){border-color:#899b8d;background:#edf1ed;box-shadow:inset 0 0 0 1px #899b8d}
+body.storefront #main .pf-studio .pf-placement-choice:has(input:checked) .pf-placement-check{border-color:#899b8d;background:#899b8d}

@@ -2,7 +2,7 @@ import {invoiceSetupPanel,invoiceOrderPanel} from './admin-invoices.mjs';
 import {renderCompanies} from './admin-companies.mjs';
 import {proofQueue,proofQueueLabel} from './proof-status.mjs';
 import {renderStatistics} from './admin-statistics.mjs';
-import {renderProducts} from './admin-products.mjs?v=2';
+import {renderProducts} from './admin-products.mjs?v=3';
 const $=id=>document.getElementById(id),content=$('content');let orders=[],checkouts=[],marketing=[],withdrawals=[],view='overview';
 const statusText={prepared:'Klar til PF',confirmed:'PF har bekræftet ordren',gateway_accepted:'PF har modtaget',awaiting_proof:'Afventer korrektur',proof_received:'Til gennemgang',approval_pending_pf:'Afventer PF-kvittering',revision_requested:'Ændring ønsket',approval_recorded:'PF-godkendelse registreret',processing:'Under behandling',shipped:'Afsendt',needs_attention:'Kræver opmærksomhed',needs_reconciliation:'Kræver afstemning',cancelled:'Annulleret'};
 function el(tag,text,className){const node=document.createElement(tag);if(text!==undefined)node.textContent=String(text);if(className)node.className=className;return node;}
