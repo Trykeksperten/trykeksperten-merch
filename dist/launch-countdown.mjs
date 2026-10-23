@@ -1,4 +1,4 @@
-import {launchConfig,countdown} from './launch-config.mjs?v=3';
+import {launchConfig,countdown} from './launch-config.mjs?v=4';
 const showCountdown = true;
 if(showCountdown && !launchConfig.ordersEnabled){
  const banner=document.createElement('aside');
