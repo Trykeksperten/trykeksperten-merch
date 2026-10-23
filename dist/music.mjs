@@ -23,7 +23,11 @@ if (nav) {
   document.body.append(panel);
   const close = panel.querySelector('.music-close');
   const english = () => document.documentElement.lang === 'en';
+  let renderedLabels;
   function labels() {
+    const state = `${english()}:${panel.hidden}`;
+    if (state === renderedLabels) return;
+    renderedLabels = state;
     button.textContent = panel.hidden ? (english()?'♫ Play music':'♫ Afspil musik') : (english()?'♫ Stop music':'♫ Stop musik');
     panel.querySelector('h2').textContent = english()?'Easy listening':'Rolige toner';
     close.textContent = english()?'Stop and close':'Stop og luk';

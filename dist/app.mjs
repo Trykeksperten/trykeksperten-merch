@@ -9,7 +9,7 @@ import {trackShopPage} from './shop-statistics.mjs';
 import {seoPage,seoHead} from './seo-pages.mjs';
 import {getLanguage} from './i18n-core.mjs';
 import {aboutPage} from './about.mjs?v=3';
-import {initLanguage} from './i18n.mjs';
+import {initLanguage} from './i18n.mjs?v=2';
 import {bindProductImageHover} from './product-hover.mjs?v=2';
 import {shouldHandleNavigation} from './navigation.mjs?v=2';
 import {editorialProductCard,editorialStory,bindProductColorSwatches} from './product-editorial.mjs?v=6';

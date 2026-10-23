@@ -33,7 +33,7 @@ function apply(){
   }
   const title=document.querySelector('title');
   if(title){const value=title.textContent,translated=storedValue(originals,title,value);if(translated!==value)title.textContent=translated;}
-  document.documentElement.lang=getLanguage();
+  if(document.documentElement.lang!==getLanguage())document.documentElement.lang=getLanguage();
   document.querySelectorAll('[data-language]').forEach(button=>{button.setAttribute('aria-pressed',String(button.dataset.language===getLanguage()));});
  }finally{applying=false;observer?.observe(document.body,watches);if(observer)observer.observe(document.querySelector('title'),{childList:true,characterData:true,subtree:true});}
 }
