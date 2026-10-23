@@ -1,5 +1,6 @@
 // Metadata only: the PNG bytes remain behind the authenticated image endpoint.
 export function mockupsForPfOrder(checkout,order){
+ if(!order?.checkoutId&&order?.gatewayPayload?.Header?.isTest===true)return (order.lines||[]).flatMap((line,lineIndex)=>(line.decorations||[]).flatMap((design,decorationIndex)=>design.files?.proof?[{lineIndex,decorationIndex,label:[line.productId,design.position].filter(Boolean).join(' · '),url:`/api/pf-orders/${encodeURIComponent(order.id)}/mockup/${lineIndex}/${decorationIndex}`}]:[]));
  if(!checkout||!order?.checkoutId||checkout.id!==order.checkoutId)return [];
  const index=Number.isInteger(order.checkoutGroupIndex)?order.checkoutGroupIndex:(checkout.pfOrderIds||[]).indexOf(order.id);
  const lineIndexes=checkout.fulfillmentGroups?.[index]??(checkout.pfOrderIds?.length===1?checkout.lines.map((_,i)=>i):[]);

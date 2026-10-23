@@ -1,4 +1,4 @@
-import {mockupsForPfOrder,appendMockup} from './admin-mockups.mjs';
+import {mockupsForPfOrder,appendMockup} from './admin-mockups.mjs?v=2';
 import {invoiceSetupPanel,invoiceOrderPanel} from './admin-invoices.mjs';
 import {renderCompanies} from './admin-companies.mjs';
 import {proofQueue,proofQueueLabel} from './proof-status.mjs';

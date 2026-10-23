@@ -1,3 +1,4 @@
+import {readTestOrderMockup} from '../lib/pf-test-artwork.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
@@ -29,6 +30,9 @@ test('cart test sends signed original bytes, accurate contact and decoration wit
   assert.equal(payload.Header.isTest,true);assert.equal(payload.OrderType,'DECORATED');assert.equal(payload.SKUs[0].Eproof,'EPROOF');assert.equal(payload.SKUs[0].Quantity,25);assert.deepEqual(payload.Decorations[0].PMSColors,['Black C']);
   const contact=payload.Shipments[0].shipContact;assert.equal(contact.Attention,'Testkunde');assert.equal(contact.Email,'test@example.dk');assert.equal(contact.shipAddress.Address1,'Testvej 1, 2. th.');assert.equal(contact.shipAddress.PostalCode,'1000');
   assert.equal(first.checkoutId,null);assert.equal((await readOrder(first.id)).status,'gateway_accepted');assert.ok(!(await readdir(join(root,'checkouts'))).some(name=>name.endsWith('.json')));
+  assert.deepEqual(await readTestOrderMockup(first,0,0),Buffer.from(png,'base64'));
+  await assert.rejects(readTestOrderMockup({...first,id:'ord-wrong'},0,0),/matcher ikke ordren/);
+  await assert.rejects(readTestOrderMockup(first,2,0),/findes ikke/);
   const query=new URL(payload.Artworks[0].UrlArtFile).searchParams;query.set('artwork','other');await assert.rejects(readSignedArtwork(query,{env}),/ugyldigt/);
  }finally{delete process.env.SMERCH_DATA_DIR;await rm(root,{recursive:true,force:true});}
 });

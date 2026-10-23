@@ -1,5 +1,5 @@
 import {bindTestSubmission} from './pf-test-submit.mjs?v=2';
-import {mockupsForPfOrder,appendMockup} from './admin-mockups.mjs';
+import {mockupsForPfOrder,appendMockup} from './admin-mockups.mjs?v=2';
 import {productionPaymentActive} from './production-payment.mjs';
 import {orderOverview} from './pf-order-layout.mjs?v=2';
 import {bindCartTest} from './pf-cart-test.mjs?v=4';

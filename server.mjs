@@ -1,3 +1,4 @@
+import {readTestOrderMockup} from './lib/pf-test-artwork.mjs';
 import {pfTestEnvironment} from './lib/pf-test-env.mjs';
 import {orderMockups,requiredOrderMockup} from './lib/order-mockups.mjs';
 import {applyPilotColour} from './lib/pilot-colour.mjs';
@@ -265,6 +266,8 @@ const handleRequest=async(req,res)=>{
   if(!authorized(req,process.env.PF_ORDER_ADMIN_TOKEN)&&!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}
   try{
    const pathname=new URL(req.url,'http://localhost').pathname;
+   const testMockup=pathname.match(/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})\/mockup\/(\d+)\/(\d+)$/);
+   if(testMockup&&req.method==='GET'){const [,id,line,decoration]=testMockup;const bytes=await readTestOrderMockup(await readOrder(id),Number(line),Number(decoration));res.writeHead(200,{'Content-Type':'image/png','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}).end(bytes);return;}
    if(pathname==='/api/pf-orders/status'&&req.method==='GET'){json(res,200,{...gatewayRequirements(),automaticHandoff:handoffConfiguration(),captureEnabled:process.env.PAYMENT_PROVIDER==='quickpay'?process.env.QUICKPAY_CAPTURE_ENABLED==='1':process.env.STRIPE_CAPTURE_ENABLED==='1'});return;}
    if(pathname==='/api/pf-orders/test-cart'&&req.method==='POST'){
     if(!adminSessionAuthorized(req))throw Error('Medarbejderlogin kræves.');
