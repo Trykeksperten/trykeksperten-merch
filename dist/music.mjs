@@ -37,7 +37,7 @@ if (nav) {
   function play(index) {
     const queue = [...tracks.slice(index), ...tracks.slice(0,index)];
     const frame = document.createElement('iframe');
-    const params = new URLSearchParams({autoplay:'1', playsinline:'1',rel:'0',playlist:queue.slice(1).map(t=>t.id).join(',')});
+    const params = new URLSearchParams({autoplay:'1', playsinline:'1',rel:'0',playlist:queue.map(t=>t.id).join(',')});
     frame.src = `https://www.youtube-nocookie.com/embed/${queue[0].id}?${params}`;
     frame.title = `${queue[0].artist} – ${queue[0].title}`;
     frame.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
