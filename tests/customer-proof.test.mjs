@@ -42,7 +42,7 @@ test('customer decisions queue receipts, retry delivery and survive a new proof 
   await recordProof(id,{proofReference:'NEXT',mimeType:'application/pdf',contentBase64:Buffer.from('%PDF-1.4\nNext').toString('base64')});
   await retryProofMail({orderIds:[id],now:now+16*60000,transport:{sendMail:async mail=>sent.push(mail)}});
   await retryProofMail({orderIds:[id],now:now+32*60000,transport:{sendMail:async mail=>sent.push(mail)}});
-  assert.equal(sent.length,1);assert.equal(sent[0].from.address,'korrektur@smerch.dk');
+  assert.equal(sent.length,2);const internal=sent.find(mail=>mail.to==='korrektur@smerch.dk');assert.ok(internal);assert.match(internal.text,new RegExp('/admin/pf-orders#order='+id));assert.match(internal.subject,decision==='approve'?/Kunden har godkendt/:/Kunden ønsker ændringer/);assert.match(internal.text,/Flyt logoet op/);assert.ok(!internal.text.includes(token));assert.match(internal.text,/ingen hævning/);sent.sort((a,b)=>Number(a.to==='korrektur@smerch.dk')-Number(b.to==='korrektur@smerch.dk'));assert.equal(sent[0].from.address,'korrektur@smerch.dk');
   assert.match(sent[0].subject,decision==='approve'?/modtaget din godkendelse/:/registreret dine ændringsønsker/);
   if(decision==='reject'){assert.match(sent[0].text,/Flyt logoet op/);assert.match(sent[0].text,/snart en ny korrektur/);}
  }
