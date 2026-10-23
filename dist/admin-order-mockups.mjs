@@ -6,7 +6,7 @@ async function api(path,options){const r=await fetch(path,options);if(!r.ok){con
 try{
  if(!/^pay-[a-f0-9-]{36}$/.test(id||''))throw Error('Ugyldigt ordrenummer.');
  const source=await (await api(`/api/admin/checkouts/${id}/mockups`)).json(),mockups=[];
- const loadPreview=async logo=>{const r=await api(`/api/admin/checkouts/${id}/artwork/${encodeURIComponent(logo.id)}`),blob=await r.blob();return await createVectorPreview(blob);};
+ const loadPreview=async logo=>{const r=await api(`/api/admin/checkouts/${id}/artwork/${encodeURIComponent(logo.id)}`),blob=await r.blob();return await createVectorPreview(new File([blob],logo.name||logo.filename||"artwork.ai",{type:blob.type}));};
  for(const [lineIndex,line] of source.lines.entries()){
   const product=source.catalog.products.find(p=>p.id===line.productId),variant=product.variants.find(v=>v.sku===line.sku);
   for(const [decorationIndex,design] of line.decorations.entries()){
