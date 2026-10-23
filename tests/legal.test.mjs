@@ -7,9 +7,9 @@ import {LEGAL_VERSION,MARKETING_VERSION,validateCheckoutConsent,marketingConsent
 import {validateMarketing,subscribeMarketing,unsubscribeMarketing,listMarketing,recordWithdrawal,listWithdrawals,deliverWithdrawalReceipt} from '../lib/legal-services.mjs';
 import {legalPage} from '../lib/legal-pages.mjs';
 const consent={version:LEGAL_VERSION,accepted:true,customerType:'consumer',locale:'da',prepayment:true,personalised:true};
-test('checkout requires current terms, actual boolean choices and separate prepayment acceptance',()=>{
+test('checkout requires current terms, actual boolean choices and personalisation acceptance',()=>{
  assert.equal(validateCheckoutConsent(consent,0).acceptedAt,'1970-01-01T00:00:00.000Z');
- for(const patch of [{accepted:'true'},{version:'old'},{prepayment:false},{personalised:false},{customerType:'other'},{locale:'xx'}])assert.throws(()=>validateCheckoutConsent({...consent,...patch}));
+ for(const patch of [{accepted:'true'},{version:'old'},{personalised:false},{customerType:'other'},{locale:'xx'}])assert.throws(()=>validateCheckoutConsent({...consent,...patch}));
  assert.equal(validateCheckoutConsent({...consent,customerType:'business',locale:'en'}).customerType,'business');
 });
 test('marketing cannot be inferred from contact fields, truthy strings, or terms acceptance',()=>{

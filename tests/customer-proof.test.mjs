@@ -47,3 +47,24 @@ test('customer decisions queue receipts, retry delivery and survive a new proof 
   if(decision==='reject'){assert.match(sent[0].text,/Flyt logoet op/);assert.match(sent[0].text,/snart en ny korrektur/);}
  }
 });
+
+test('production approval uses an unexpired reservation; capture waits for full shipment',async()=>{
+ const {checkoutReadyForCapture}=await import('../lib/order-flow.mjs');
+ const {id,checkoutId}=await fixture(),token=await invite(id);
+ await decideProof(id,{version:1,decision:'approve',customerToken:token});
+ const path=join(directory,'checkouts',checkoutId+'.json'),checkout=JSON.parse(await readFile(path));
+ checkout.authorizationExpiresAt=new Date(Date.now()+86400000).toISOString();checkout.pfOrderIds=[id];checkout.fulfillment={groups:[{}]};checkout.lines=[{decorations:[{method:'Broderi fixed'}]}];await writeFile(path,JSON.stringify(checkout));
+ assert.equal(await checkoutReadyForCapture(checkout),false);
+ await recordApprovalDelivery(id,{channel:'E-mail',reference:'proof-approved'});
+ await recordExternalApproval(id,{pfApprovalReference:'PF-accepted'});
+ assert.equal(JSON.parse(await readFile(path)).status,'authorized');
+ const pf=await readOrder(id);pf.pfOrderNumber='123';pf.status='partially_shipped';pf.shipment={shipDate:new Date().toISOString(),isOrderComplete:false};await writeFile(join(directory,'orders',id+'.json'),JSON.stringify(pf));
+ assert.equal(await checkoutReadyForCapture(checkout),false);
+ pf.status='shipped';pf.shipment.isOrderComplete=true;await writeFile(join(directory,'orders',id+'.json'),JSON.stringify(pf));assert.equal(await checkoutReadyForCapture(checkout),true);
+});
+test('expired reservation cannot release a proof to production',async()=>{
+ const {id,checkoutId}=await fixture(),token=await invite(id);await decideProof(id,{version:1,decision:'approve',customerToken:token});
+ const path=join(directory,'checkouts',checkoutId+'.json'),checkout=JSON.parse(await readFile(path));checkout.authorizationExpiresAt='2000-01-01';await writeFile(path,JSON.stringify(checkout));
+ await assert.rejects(recordApprovalDelivery(id,{channel:'E-mail',reference:'x'}),/reservation/);
+ await assert.rejects(recordExternalApproval(id,{pfApprovalReference:'x'}),/reservation/);
+});

@@ -29,10 +29,16 @@
     "total": 124613
   },
   "pending": [
-    "Deploy internal cost-price checkout",
-    "PF embroidery thread colour code confirmation",
-    "Payment approval and explicit pilot activation"
+    "PF must confirm Smerch as sender; Joakim explicitly declined PF sender for this test",
+    "Activate restricted pilot after sender confirmation and verify checkout with existing cart"
   ],
   "paymentCreated": false,
-  "pfOrderCreated": false
+  "pfOrderCreated": false,
+  "threadColourInstruction": {
+    "approvedBy": "Joakim",
+    "code": "717 C",
+    "instruction": "717 C til broderiet; godkendes i PF-korrekturen før produktion.",
+    "originalSha256": "bf9c98608c8b1d06f101dba29ccd947581a38f7cda431460141c89e6cc727b88"
+  },
+  "capturePolicy": "Reserve at checkout; manual capture only after PF confirms all shipments complete."
 }

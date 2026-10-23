@@ -33,10 +33,10 @@ GENNEMFØRELSE
    korrektur i Smerchs korrekturindbakke med PF-reference og send kunden
    det personlige godkendelseslink. PF-email importeres ikke automatisk.
 7. Kontrollér kundens godkendelse af seneste version og gyldig reservation.
-   Følg administrationens hævningsflow før godkendelsen sendes til PF.
+   Send godkendelsen til PF med aktiv reservation; ingen hævning før afsendelse.
 8. Godkend hos PF via deres e-proof-link. Registrér kanal og reference
    samt PF's bekræftelse i Smerch. Smerchs knap godkender ikke automatisk hos PF.
-9. Kontrollér ASN, tracking, faktisk levering og fakturaopsætning.
+9. Kontrollér ASN og fuld afsendelse; hæv først derefter betalingen i administrationen. Kontrollér tracking, levering og faktura.
 10. Slå SMERCH_ADMIN_PILOT_ENABLED fra efter testen. Åbn først offentligt
     efter særskilt beslutning.
 
@@ -46,3 +46,7 @@ konsekvenser, ikke 5-kroners MobilePay-testen. Kortet reserveres med den
 fulde ordrepris og auto_capture=false. Kundemail, PF-overførsel og det
 almindelige efterfølgende ordreflow anvendes. Ingen virkelig betaling
 eller produktionsordre er udført som del af klargøringen.
+
+OPDATERET: 717 C er godkendt af Joakim til den præcise logofil.
+297 tests bestået. Ingen automatisk hævning; kun fuld bekræftet PF-afsendelse tillader manuel hævning.
+Joakim kræver Smerch som afsender også på egen testordre; PF skal bekræfte dette før aktivering.

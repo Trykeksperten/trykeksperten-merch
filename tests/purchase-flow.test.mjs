@@ -9,13 +9,13 @@ test('blank purchases do not require or record personalisation or prepayment con
  const legal=validateCheckoutConsent({...consent,personalised:true,prepayment:true},Date.now(),{personalised:false});
  assert.equal(legal.personalised,false);assert.equal(legal.prepayment,false);assert.equal(legal.prepaymentText,'');
  assert.doesNotThrow(()=>validateCheckoutConsent(consent,Date.now(),{personalised:false}));
- assert.throws(()=>validateCheckoutConsent(consent),/forudbetaling/);
+ assert.throws(()=>validateCheckoutConsent(consent),/personligt tilpassede/);
  assert.throws(()=>validateCheckoutConsent({...consent,accepted:false},Date.now(),{personalised:false}),/handelsbetingelser/);
 });
 test('payment copy reflects the actual contents of the basket in both languages',()=>{
  assert.equal(hasPersonalisation(blank),false);assert.equal(isMixedPurchase([...blank,...decorated]),true);
  assert.match(paymentDescription(blank),/tidligst ved afsendelse/);assert.doesNotMatch(paymentDescription(blank),/korrektur/);
- assert.match(paymentDescription(decorated),/godkendelse/);assert.match(paymentDescription(blank,'en'),/no earlier than dispatch/);
+ assert.match(paymentDescription(decorated),/tidligst ved afsendelse/);assert.match(paymentDescription(blank,'en'),/no earlier than dispatch/);
 });
 test('interface translations take priority over generic supplier product categories',()=>{
  installProductTranslations({Andet:'Other Pens & Writing Accessories'});
