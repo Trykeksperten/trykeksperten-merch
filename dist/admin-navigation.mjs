@@ -3,10 +3,10 @@ const secondary=[['automation','Automatik og beskeder'],['products','Produkter']
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
 export function mountAdminNavigation(root,{active='overview',navigate,onLogout}={}){
  root.replaceChildren();root.setAttribute('aria-label','Administration');const brand=el('div',null,'brand'),logo=el('img');logo.src='/assets/smerch.svg';logo.alt='Smerch';logo.width=120;logo.height=50;brand.append(logo,el('span','Administration'));
- const nav=el('nav');nav.setAttribute('aria-label','Hovednavigation');const more=el('details',null,'admin-nav-secondary');more.append(el('summary','Øvrige funktioner'));const links=new Map(),badges=new Map();
+ const nav=el('nav');nav.setAttribute('aria-label','Hovednavigation');const more=el('section',null,'admin-nav-secondary');more.append(el('h2','Øvrige funktioner'));const links=new Map(),badges=new Map();
  for(const [key,title] of [...primary,...secondary]){const a=el('a',null,'admin-nav-link');a.href=key==='overview'?'/admin':'/admin#'+key;a.dataset.view=key;const name=el('span',title),count=el('span',null,'admin-nav-count');count.hidden=true;a.append(name,count);if(navigate)a.onclick=event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();navigate(key);};links.set(key,a);badges.set(key,count);(primary.some(([k])=>k===key)?nav:more).append(a);}
  nav.append(more);const bottom=el('div',null,'sidebar-bottom'),shop=el('a','Til webshoppen'),logout=el('button','Log ud');shop.href='/';logout.type='button';logout.onclick=onLogout;bottom.append(shop,logout);root.append(brand,nav,bottom);
- function update(view,counts={}){const key=view==='actions'?'overview':view;for(const [k,a] of links){const current=k===key;a.classList.toggle('active',current);if(current)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');const n=counts[k]||0;badges.get(k).hidden=n===0;badges.get(k).textContent=n?String(n):'';}if(secondary.some(([k])=>k===key))more.open=true;}
+ function update(view,counts={}){const key=view==='actions'?'overview':view;for(const [k,a] of links){const current=k===key;a.classList.toggle('active',current);if(current)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');const n=counts[k]||0;badges.get(k).hidden=n===0;badges.get(k).textContent=n?String(n):'';}}
  update(active);return {update};
 }
 export function bindAdminMenu({shell,button,sidebar}){
