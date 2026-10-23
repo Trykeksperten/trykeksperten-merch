@@ -19,7 +19,7 @@ import {launchConfig,launchMessage,blocksLaunchOrder} from './dist/launch-config
 import {sanitizeSpecial,sendSpecial} from './lib/special-inquiry.mjs';
 import {recordStatistics,statisticsReport} from './lib/shop-statistics.mjs';
 import {isPolandProduct} from './lib/pf-shipping-origin.mjs';
-import {saveSalePrices} from './lib/sale-prices.mjs';
+import {saveSalePrices,readSalePriceState} from './lib/sale-prices.mjs';
 import {readAssortment,publicAssortment,setVisibility,adminProduct,isVisibleProduct} from './lib/assortment.mjs';
 import {validateBilling} from './lib/billing.mjs';
 import {queueOrderConfirmation,retryOrderConfirmations} from './lib/order-mail.mjs';
@@ -205,7 +205,7 @@ const handleRequest=async(req,res)=>{
  if(adminPricePath&&['GET','POST'].includes(req.method)){
   if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}
   res.setHeader('Cache-Control','no-store');
-  try{const catalog=await loadCatalogIndex(),{prices,rules}=await loadPricing(),id=adminPricePath[1];if(req.method==='POST'){const input=await readJSON(req,32768),product=catalog.products.find(p=>p.id===id),variant=product?.variants.find(v=>v.sku===input.sku);if(!variant)throw Error('Produktvarianten findes ikke.');const automatic=listPFProductTiers(catalog,id,input.sku,prices,{...rules,salePrices:{}});if(input.tiers!==null&&!automatic.available)throw Error(automatic.message);rules.salePrices=await saveSalePrices(id,input.tiers,{minimum:automatic.minimumQuantity||1,productWide:true,clearSkus:product.variants.map(v=>v.sku)});}json(res,200,{...adminProductPricing(catalog,id,prices,rules),summary:adminPriceSummary(catalog.products.find(p=>p.id===id),prices,rules)});}catch(error){json(res,400,{error:error.message});}return;
+  try{const catalog=await loadCatalogIndex(),{prices,rules}=await loadPricing(),id=adminPricePath[1];if(req.method==='POST'){const input=await readJSON(req,32768),product=catalog.products.find(p=>p.id===id),variant=product?.variants.find(v=>v.sku===input.sku);if(!variant)throw Error('Produktvarianten findes ikke.');const automatic=listPFProductTiers(catalog,id,input.sku,prices,{...rules,salePrices:{}});if(input.tiers!==null&&!automatic.available)throw Error(automatic.message);if(input.scope!==undefined&&!['product','variant'].includes(input.scope))throw Error('Vælg produkt eller variant.');const productWide=input.scope!=='variant';rules.salePrices=await saveSalePrices(productWide?id:input.sku,input.tiers,{minimum:automatic.minimumQuantity||1,productWide,clearSkus:productWide?product.variants.map(v=>v.sku):[],durationMinutes:input.tiers===null?0:(input.durationMinutes??0)});rules.salePriceExpirations=(await readSalePriceState()).expirations;}json(res,200,{...adminProductPricing(catalog,id,prices,rules),summary:adminPriceSummary(catalog.products.find(p=>p.id===id),prices,rules)});}catch(error){json(res,400,{error:error.message});}return;
  }
  if(req.url==='/api/admin/products'&&['GET','POST'].includes(req.method)){
   if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}

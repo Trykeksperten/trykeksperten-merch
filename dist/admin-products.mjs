@@ -1,4 +1,4 @@
-import {editProductPrices} from './admin-product-prices.mjs?v=2';
+import {editProductPrices} from './admin-product-prices.mjs?v=3';
 const money=value=>new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK'}).format(value/100);
 const node=(tag,text)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;return el;};
 export async function renderProducts(parent,api){

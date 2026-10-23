@@ -22,3 +22,27 @@ test('product-wide prices replace variant overrides atomically and reset togethe
  await saveSalePrices('pf-product',null,options);assert.deepEqual(await readSalePrices(path),{OTHER:old});
  }finally{await rm(dir,{recursive:true,force:true});}
 });
+test('temporary variant price restores previous price at expiry without a running browser',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'sale-timer-')),path=join(dir,'prices.json'),now=1000000;
+ const original=[{min:1,unitExVat:900}],offer=[{min:1,unitExVat:700}];
+ try{
+ await saveSalePrices('A',original,{path});await saveSalePrices('B',original,{path});
+ await saveSalePrices('A',offer,{path,durationMinutes:30,now});
+ assert.deepEqual(await readSalePrices(path,now+1799999),{A:offer,B:original});
+ assert.deepEqual(await readSalePrices(path,now+1800000),{A:original,B:original});
+ await saveSalePrices('NEW',offer,{path,durationMinutes:60,now});assert.equal((await readSalePrices(path,now+3600000)).NEW,undefined);
+ assert.throws(()=>saveSalePrices('A',offer,{path,durationMinutes:31}));
+ }finally{await rm(dir,{recursive:true,force:true});}
+});
+test('temporary product price restores variant overrides and respects newer edits',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'sale-timer-all-')),path=join(dir,'prices.json'),now=1000000;
+ const original=[{min:1,unitExVat:900}],offer=[{min:1,unitExVat:700}],newer=[{min:1,unitExVat:800}];
+ try{
+ await saveSalePrices('A',original,{path});await saveSalePrices('pf-product',original,{path});
+ await saveSalePrices('pf-product',offer,{path,productWide:true,clearSkus:['A','B'],durationMinutes:30,now});
+ assert.deepEqual(await readSalePrices(path,now),{'pf-product':offer});
+ assert.deepEqual(await readSalePrices(path,now+1800000),{A:original,'pf-product':original});
+ await saveSalePrices('A',newer,{path,now:now+1000});
+ assert.deepEqual(await readSalePrices(path,now+1800000),{A:newer,'pf-product':original});
+ }finally{await rm(dir,{recursive:true,force:true});}
+});
