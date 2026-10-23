@@ -7,7 +7,7 @@ export function compactOrderWorkspace(box,{order,products,overview,supplierDocs,
  const summary=el('div',null,'order-summary-layout');summary.append(products,overview);
  documents.open=contact.open=true;
  const proof=el('div',null,'order-proof-layout'),visual=el('section',null,'order-proof-visual'),controls=el('section',null,'order-proof-controls');
- visual.append(...proofNodes);if(!proofNodes.length)visual.append(el('p','Ingen korrektur modtaget endnu.','muted'));
+ const proofHeader=el('div',null,'order-proof-heading'),previewNodes=proofNodes.filter(node=>(node.className||'').split(' ').includes('preview'));if(previewNodes.length){proofHeader.append(...proofNodes.filter(node=>!previewNodes.includes(node)));proof.append(proofHeader);visual.append(...previewNodes);proof.className+=' has-proof-heading';}else visual.append(...proofNodes);if(!proofNodes.length)visual.append(el('p','Ingen korrektur modtaget endnu.','muted'));
  if(decision)controls.append(decision);if(actions){actions.open=true;const primary=actions.querySelector('.order-primary-task');if(primary)actions.insertBefore(primary,actions.children[1]||null);controls.append(actions);}if(!controls.childElementCount)controls.append(el('p','Ingen korrekturhandling afventer.','muted'));proof.append(visual,controls);
  const groups=[['summary','Bestilling',[summary]],['proof','Korrektur',[proof]],['documents','Dokumenter',[documents,supplierDocs]],['contact','Kundekontakt',[contact]],['history','Historik',[automation,history,events].filter(Boolean)]];
  const prefix='order-'+order.id;

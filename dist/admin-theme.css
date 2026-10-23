@@ -144,3 +144,10 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 @media(max-width:760px){body.admin-pf-shell:has(#pf-nav:not([hidden])){display:block}}
 
 .admin-proofs #login .login-brand img{margin-inline:auto}
+
+.order-proof-heading{grid-column:1/-1;min-width:0}
+.order-proof-heading h2{font-size:18px;margin:0 0 8px}
+.order-proof-heading p{font-size:12px}
+.admin-proofs #detail .order-proof-visual .preview{margin:0}
+@media(min-width:1051px){.has-proof-heading>.order-proof-visual{grid-column:1;grid-row:2}.has-proof-heading>.order-proof-controls{grid-column:2;grid-row:2}}
+@media(max-width:1050px){.has-proof-heading>.order-proof-heading{grid-row:1}.has-proof-heading>.order-proof-controls{grid-row:2}.has-proof-heading>.order-proof-visual{grid-row:3}}
