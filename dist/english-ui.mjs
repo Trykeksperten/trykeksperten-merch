@@ -734,7 +734,7 @@ logoer|logos
 Opdatér kurv|Update cart
 Tilføj tekst|Add text
 Kuglepenne|Pens
-Fede caps|Great caps
+Kasketter|Caps
 Sætter brandanimation på pause|Pause brand animation
 Se produkter fra|Browse products from
 Med på hele dagen.|With you all day.

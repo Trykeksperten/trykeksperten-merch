@@ -14,7 +14,7 @@ import {shouldHandleNavigation} from './navigation.mjs?v=2';
 import {editorialProductCard,editorialStory,bindProductColorSwatches} from './product-editorial.mjs?v=6';
 import {pfCartPage,bindCart,updateCartHeader,readCart as readLiveCart,writeCart as writeLiveCart} from './pf-cart.mjs?v=25';
 import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs?v=20';
-import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=87';
+import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=88';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from './pf-visibility.mjs?v=24';
 import {productGroups,groupSections,productGroupURL,navigationProductGroups} from './product-groups.mjs?v=24';
 import { specialPage, bindSpecial } from './special.mjs?v=22';
@@ -43,7 +43,7 @@ function notify(message){$('#toast').textContent=message;$('#toast').classList.a
 function persist(){try{localStorage.setItem('merch-cart-v1',JSON.stringify(cart));updateCartHeader();return true;}catch{notify('Browseren kunne ikke gemme kurven. Frigør lagerplads og prøv igen.');return false;}}
 function nav(url,{scrollTop=false,replace=false}={}){let next=new URL(url,location.href);if(location.pathname==='/produkter'&&next.pathname.startsWith('/design/')&&!next.searchParams.has('from'))next.searchParams.set('from','/produkter'+location.search);const categoryChanged=next.pathname==='/produkter'&&['kategori','underkategori'].some(key=>next.searchParams.get(key)!==new URLSearchParams(location.search).get(key)),keepPosition=!scrollTop&&!categoryChanged&&next.pathname===location.pathname,scrollY=window.scrollY;closeProductMenu();closeBrandsMenu();$('#navigation').classList.remove('open');$('.menu-toggle').setAttribute('aria-expanded','false');history[replace?'replaceState':'pushState']({},'',next.pathname+next.search+next.hash);render();window.scrollTo(0,keepPosition?scrollY:0);$('#main').focus({preventScroll:true});}
 function picture(p,cls='',lazy=true){return `<img class="${cls}" src="${esc(p.colors[0].images[0])}" alt="${esc(p.name)} — demobillede" ${lazy?'loading="lazy"':''} width="700" height="700">`;}
-function card(p){const tier=p.tiers.at(-1);return `<article class="product-card"><a class="product-image" href="/produkt/${p.id}"><span class="image-tag">DEMO</span>${picture(p)}<span class="round-link" aria-hidden="true">↗</span></a><div class="card-meta"><span>${p.minimum} stk. min.</span></div><a href="/produkt/${p.id}" class="product-title">${esc(p.name)}</a><div class="card-bottom"><span>${tier?`Fra ${money(tier.unit)}`:'Få tilbud'}</span><div class="dots" aria-label="${esc(p.colors.map(c=>c.name).join(', '))}">${p.colors.map(c=>`<i style="background:${c.hex}"></i>`).join('')}</div></div><p class="price-note">${tier?`Demopris ved ${tier.min} stk. · ekskl. moms og tryk`:'Pris og specifikationer efter aftale'}</p></article>`;}
+function card(p){const tier=p.tiers.at(-1);return `<article class="product-card"><a class="product-image" href="/produkt/${p.id}"><span class="image-tag">DEMO</span>${picture(p)}</a><div class="card-meta"><span>${p.minimum} stk. min.</span></div><a href="/produkt/${p.id}" class="product-title">${esc(p.name)}</a><div class="card-bottom"><span>${tier?`Fra ${money(tier.unit)}`:'Få tilbud'}</span><div class="dots" aria-label="${esc(p.colors.map(c=>c.name).join(', '))}">${p.colors.map(c=>`<i style="background:${c.hex}"></i>`).join('')}</div></div><p class="price-note">${tier?`Demopris ved ${tier.min} stk. · ekskl. moms og tryk`:'Pris og specifikationer efter aftale'}</p></article>`;}
 function visibleBrands(){if(!pfCatalog)return catalog.brands||[];const ids=new Set(shopProducts(pfCatalog,pfPrices).map(p=>p.brandId));return (catalog.brands||[]).filter(brand=>ids.has(brand.id));}
 function liveProductImage(product){return pricedVariants(product,pfPrices).find(variant=>variant.images?.[0])?.images[0];}
 function homeCategoryTiles(){
@@ -52,14 +52,17 @@ function homeCategoryTiles(){
  const categories=[
   {name:'High-end produkter',href:'/produkter?niveau=premium',modelCode:'100834',matches:product=>premiumBrands.includes(product.brandId)},
   {name:'Kuglepenne',href:productGroupURL('kontor','Kuglepenne')+'&sortering=price-asc',matches:product=>product.category==='Kuglepenne',cheapest:true},
-  {name:'Fede caps',href:productGroupURL('toj','Caps & hatte'),modelCode:'111073',matches:product=>product.shopCategory==='toj'&&product.category==='Caps & hatte'&&/kasket|cap/i.test(product.name)}
+  {name:'Kasketter',href:productGroupURL('toj','Caps & hatte'),modelCode:'38678',sku:'38678990',matches:product=>product.shopCategory==='toj'&&product.category==='Caps & hatte'&&/kasket|cap/i.test(product.name)}
  ];
  const tiles=categories.map(item=>{
   const matches=products.filter(item.matches);
   if(item.cheapest)matches.sort((a,b)=>(pfPrices.products[a.id].fromIncVat??Infinity)-(pfPrices.products[b.id].fromIncVat??Infinity));
   const product=matches.find(candidate=>candidate.modelCode===item.modelCode)||matches[0];
   if(!product)return '';
-  return `<a class="category-tile" href="${esc(item.href)}"><div><img src="${esc(liveProductImage(product))}" alt="${esc(product.name)}" loading="lazy" decoding="async" width="700" height="700"></div><h3>${item.name}</h3></a>`;
+  const selectedVariant=item.sku?product.variants.find(variant=>variant.sku===item.sku&&variant.images?.[0]):null;
+  const image=selectedVariant?.images[0]||liveProductImage(product);
+  const imageAlt=selectedVariant?`${product.name} – ${selectedVariant.color}`:product.name;
+  return `<a class="category-tile" href="${esc(item.href)}"><div><img src="${esc(image)}" alt="${esc(imageAlt)}" loading="lazy" decoding="async" width="700" height="700"></div><h3>${item.name}</h3></a>`;
  }).join('');
  return tiles;
 }
