@@ -1,4 +1,4 @@
-import {bindTestSubmission} from './pf-test-submit.mjs';
+import {bindTestSubmission} from './pf-test-submit.mjs?v=2';
 import {mockupsForPfOrder,appendMockup} from './admin-mockups.mjs';
 import {productionPaymentActive} from './production-payment.mjs';
 import {orderOverview} from './pf-order-layout.mjs';
