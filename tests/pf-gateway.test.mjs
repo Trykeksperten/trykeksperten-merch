@@ -13,3 +13,25 @@ test('Gateway status explains missing PF access without exposing credentials',()
 test('gateway accepts only a matching PF success response',async()=>{const env={PF_GATEWAY_MODE:'test',PF_GATEWAY_USERNAME:'u',PF_GATEWAY_PASSWORD:'p',PF_GATEWAY_SENDER_ID:'s',PF_COMMUNICATION_EMAIL:'x@y.dk'},payload=buildPFOrder(base,{...settings,isTest:true});const fetchImpl=async(url,options)=>{assert.match(url,/\/test\//);assert.match(options.headers.Authorization,/^Basic /);return {ok:true,status:202,json:async()=>({status:'success',yourMessageId:'message-1',message:'Order accepted.'})};};assert.equal((await submitPFOrder(payload,{env,fetchImpl})).httpStatus,202);await assert.rejects(submitPFOrder(payload,{env,fetchImpl:async()=>({ok:true,status:202,json:async()=>({status:'success',yourMessageId:'wrong'})})}),/afviste/);});
 test('Gateway selects the password for the active environment',async()=>{const env={PF_GATEWAY_MODE:'test',PF_GATEWAY_USERNAME:'u',PF_GATEWAY_TEST_PASSWORD:'test-secret',PF_GATEWAY_PROD_PASSWORD:'prod-secret',PF_GATEWAY_SENDER_ID:'s',PF_COMMUNICATION_EMAIL:'x@y.dk'},payload=buildPFOrder(base,{...settings,isTest:true});const fetchImpl=async(url,options)=>{assert.equal(options.headers.Authorization,`Basic ${Buffer.from('u:test-secret').toString('base64')}`);return {ok:true,status:202,json:async()=>({status:'success',yourMessageId:'message-1'})};};await submitPFOrder(payload,{env,fetchImpl});});
 test('protected Gateway test order is blank, fixed and unavailable outside test mode',()=>{const request={confirmation:'TEST',name:'Joakim',email:'joakim@example.dk',phone:'12345678',street:'Testvej 1',postalCode:'1000',city:'København'},input=gatewayTestOrderInput(request,{env:{PF_GATEWAY_MODE:'test'}});assert.deepEqual(input.lines,[{productId:'pf-38687',sku:'38687550',quantity:50,decorations:[]}]);assert.equal(input.shipping.address.street2,'PF TEST – MÅ IKKE PRODUCERES');assert.throws(()=>gatewayTestOrderInput({...request,confirmation:'test'},{env:{PF_GATEWAY_MODE:'test'}}),/Skriv TEST/);assert.throws(()=>gatewayTestOrderInput(request,{env:{PF_GATEWAY_MODE:'live'}}),/kun sendes/);});
+
+test('delivery comment survives checkout validation and PF shipment mapping without changing street',async()=>{
+ const {validateDelivery}=await import('../lib/checkout.mjs');
+ const shipping=validateDelivery({...base.shipping,...base.shipping.address,deliveryComment:'  Bygning E\nAflever i receptionen  '});
+ const order={...base,shipping:{...shipping,address:{street:shipping.street,city:shipping.city,postalCode:shipping.postalCode,country:shipping.country}}};
+ const payload=buildPFOrder(order,settings);
+ assert.equal(payload.Shipments[0].shipContact.shipAddress.Address1,'Testvej 1');
+ assert.equal(payload.Shipments[0].shipContact.shipAddress.Address2,'Bygning E Aflever i receptionen');
+ order.shipping.address.street2='Etage 2';
+ const second=buildPFOrder(order,settings).Shipments[0].shipContact.shipAddress;
+ assert.equal(second.Address2,'Etage 2');assert.equal(second.Address3,shipping.deliveryComment);
+ assert.throws(()=>validateDelivery({...shipping,deliveryComment:'x'.repeat(101)}),/100 tegn/);
+ assert.throws(()=>buildPFOrder({...order,shipping:{...order.shipping,deliveryComment:'x'.repeat(101)}},settings),/100 tegn/);
+ const empty=buildPFOrder(base,settings).Shipments[0].shipContact.shipAddress;
+ assert.equal(empty.Address2,undefined);assert.equal(empty.Address3,undefined);
+});
+test('delivery comments appear safely escaped in customer confirmation',async()=>{
+ const {customerSummary,orderOverviewHTML}=await import('../lib/order-confirmation-view.mjs');
+ const summary=customerSummary({...base,shipping:{...base.shipping,deliveryComment:'Reception <E> & port 2'}});
+ assert.equal(summary.shipping.deliveryComment,'Reception <E> & port 2');
+ const html=orderOverviewHTML(summary);assert.ok(html.includes('Reception &lt;E&gt; &amp; port 2'));assert.ok(!html.includes('Reception <E>'));
+});
