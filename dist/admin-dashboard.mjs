@@ -1,5 +1,5 @@
 import {orderList} from './admin-order-list.mjs';
-import {orderKind} from './admin-order-state.mjs';
+import {isTestOrder} from './admin-order-state.mjs';
 import {mockupsForPfOrder,mockupsForCheckout,appendMockupOverview,appendMockup} from './admin-mockups.mjs?v=4';
 import {invoiceSetupPanel,invoiceOrderPanel} from './admin-invoices.mjs';
 import {renderCompanies} from './admin-companies.mjs';
@@ -15,7 +15,7 @@ function row(order){const item=el('div',undefined,'row'),info=el('div');info.app
 async function api(path,method='GET',body){const response=await fetch(path,{method,credentials:'same-origin',headers:{...(method==='POST'?{'X-Smerch-Admin':'1'}:{}),...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,cache:'no-store'});if(!response.ok){let data;try{data=await response.json();}catch{}throw Error(data?.error||`HTTP ${response.status}`);}return response;}
 function showLogin(){document.getElementById('login-view').hidden=false;document.getElementById('admin-app').hidden=true;}
 function showApp(){document.getElementById('login-view').hidden=true;document.getElementById('admin-app').hidden=false;}
-function render(){const title={companies:'Virksomheder',statistics:'Statistik',products:'Produkter',overview:'Overblik',proofs:'Korrekturer',orders:'Ordrer',integration:'PF-integration',marketing:'Marketingvalg',withdrawals:'Fortrydelser'}[view];$('page-title').textContent=title;document.querySelectorAll('[data-view]').forEach(button=>button.classList.toggle('active',button.dataset.view===view));content.replaceChildren();const customerOrders=orders.filter(o=>orderKind(o,checkouts.find(c=>c.id===o.checkoutId))==='Kundeordre'),pending=customerOrders.filter(order=>proofQueue(order)==='smerch'),pfWaiting=customerOrders.filter(order=>proofQueue(order)==='pf');$('proof-count').textContent=pending.length||'';
+function render(){const title={companies:'Virksomheder',statistics:'Statistik',products:'Produkter',overview:'Overblik',proofs:'Korrekturer',orders:'Ordrer',integration:'PF-integration',marketing:'Marketingvalg',withdrawals:'Fortrydelser'}[view];$('page-title').textContent=title;document.querySelectorAll('[data-view]').forEach(button=>button.classList.toggle('active',button.dataset.view===view));content.replaceChildren();const customerOrders=orders.filter(o=>!isTestOrder(o,checkouts.find(c=>c.id===o.checkoutId))),pending=customerOrders.filter(order=>proofQueue(order)==='smerch'),pfWaiting=customerOrders.filter(order=>proofQueue(order)==='pf');$('proof-count').textContent=pending.length||'';
  if(view==='statistics'){renderStatistics(content,api);return;}
  if(view==='companies'){renderCompanies(content,api);return;}
  if(view==='products'){renderProducts(content,api);return;}
