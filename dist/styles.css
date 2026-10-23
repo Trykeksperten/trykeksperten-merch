@@ -1618,7 +1618,7 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 .pf-studio .pf-method-card{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;min-height:128px;padding:16px;border-radius:12px;gap:6px;border-width:1px;box-shadow:none}
 .pf-studio .pf-method-card.selected{border:2px solid var(--orange,#cd491d);padding:15px}
 .pf-studio .pf-method-card strong{font-size:16px;font-weight:500;margin:0}
-.pf-studio .pf-method-recommended strong{padding-right:80px}
+.pf-studio .pf-method-recommended strong{padding-right:0}
 .pf-studio .pf-method-card small{font-size:13px;font-weight:400;margin:0}
 .pf-studio .pf-method-card p{font-size:13px;font-weight:400;line-height:1.4;margin:4px 0 0;color:#66615d}
 .pf-studio .pf-method-card em{right:12px;top:12px;font-size:11px}
@@ -2057,7 +2057,7 @@ body.storefront #main .pf-pagination .pf-page-status{font-size:12px;font-weight:
 /* Print technique help is separate from the method selection button. */
 .pf-method-choice{position:relative;min-width:0;display:flex;flex-direction:column;align-self:start}
 .pf-studio .pf-method-choice .pf-method-card{width:100%;padding-right:48px}
-.pf-studio .pf-method-choice .pf-method-card em{position:absolute;top:-10px;left:16px;right:auto;margin:0;padding:3px 8px;background:#edf1ed;color:#526458;font-size:11px;line-height:1.3}
+.pf-studio .pf-method-choice .pf-method-card em{position:absolute;top:12px;left:auto;right:50px;margin:0;padding:3px 8px;background:#edf1ed;color:#526458;font-size:11px;line-height:1.3}
 .pf-method-info summary{position:absolute;right:10px;top:10px;display:grid;place-items:center;width:32px;height:32px;border:1px solid #d9ddda;border-radius:50%;color:#646a6c;background:white;cursor:pointer;list-style:none;font-size:15px}
 .pf-method-info summary::-webkit-details-marker{display:none}
 .pf-method-info summary:hover,.pf-method-info[open] summary{color:#cf4d22;border-color:#cf4d22}
