@@ -1,6 +1,6 @@
 // Metadata only: the PNG bytes remain behind the authenticated image endpoint.
 export function mockupsForPfOrder(checkout,order){
- if(!order?.checkoutId&&order?.gatewayPayload?.Header?.isTest===true)return (order.lines||[]).flatMap((line,lineIndex)=>(line.decorations||[]).flatMap((design,decorationIndex)=>design.files?.proof?[{lineIndex,decorationIndex,label:[line.productId,design.position].filter(Boolean).join(' · '),url:`/api/pf-orders/${encodeURIComponent(order.id)}/mockup/${lineIndex}/${decorationIndex}`}]:[]));
+ if(!order?.checkoutId&&(order?.isTest===true||order?.gatewayPayload?.Header?.isTest===true))return (order.lines||[]).flatMap((line,lineIndex)=>(line.decorations||[]).flatMap((design,decorationIndex)=>design.files?.proof?[{lineIndex,decorationIndex,label:[line.productId,design.position].filter(Boolean).join(' · '),url:`/api/pf-orders/${encodeURIComponent(order.id)}/mockup/${lineIndex}/${decorationIndex}`}]:[]));
  if(!checkout||!order?.checkoutId||checkout.id!==order.checkoutId)return [];
  const index=Number.isInteger(order.checkoutGroupIndex)?order.checkoutGroupIndex:(checkout.pfOrderIds||[]).indexOf(order.id);
  const lineIndexes=checkout.fulfillmentGroups?.[index]??(checkout.pfOrderIds?.length===1?checkout.lines.map((_,i)=>i):[]);
@@ -13,7 +13,7 @@ export function appendMockup(parent,ref,{compact=false}={}){
  const figure=document.createElement('figure');figure.className=compact?'admin-mockup compact':'admin-mockup';
  const img=document.createElement('img');img.src=ref.url;img.alt=`Designmockup · ${ref.label||'trykplacering'}`;img.loading='lazy';
  const caption=document.createElement('figcaption');caption.textContent=ref.label||'Designmockup';
- figure.append(img,caption);parent.append(figure);return figure;
+ const link=document.createElement('a');link.href=ref.url;link.target='_blank';link.rel='noopener';link.append(img);img.onerror=()=>{caption.textContent='Mockup kunne ikke indlæses · prøv at åbne billedet';};figure.append(link,caption);parent.append(figure);return figure;
 }
 
 export function mockupsForCheckout(checkout){
