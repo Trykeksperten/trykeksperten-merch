@@ -222,10 +222,10 @@ header{position:relative;z-index:20}
 :root{
  --ink:#111513;
  --blue:#cf4d22;
- --paper:#f7f7f6;
- --home-cream:#eceeea;
+ --paper:#ffffff;
+ --home-cream:#ffffff;
  --soft:#e9ebea;
- --frame:#eff0ee;
+ --frame:#ffffff;
  --line:#d9ddda;
  --muted:#686a65;
 }
@@ -1648,8 +1648,8 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 .customer-pricing-bar{display:flex;justify-content:flex-end;padding:8px max(20px,calc((100vw - 1440px)/2));background:#eef0ed;border-bottom:1px solid #d8ddda}
 .customer-pricing-options{display:flex;align-items:center;gap:14px;max-width:100%}
 .customer-pricing-bar button{font:inherit;font-size:14px;background:transparent;border:1px solid transparent;border-radius:999px;padding:10px 18px;text-decoration:none;cursor:pointer;min-height:44px;color:#17201f}
-.customer-pricing-bar button[aria-pressed="true"]{background:#e0e5df;color:#17201f}
-.customer-pricing-bar button:hover{background:#d9e0d8;box-shadow:none}
+.customer-pricing-bar button[aria-pressed="true"]{background:#f0f0f0;color:#17201f}
+.customer-pricing-bar button:hover{background:#e6e6e6;box-shadow:none}
 .customer-pricing-bar button:focus{outline:none;box-shadow:none}
 .customer-pricing-bar button:focus-visible{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
  .customer-choice{width:min(380px,calc(100% - 32px));max-height:calc(100dvh - 32px);overflow:auto;padding:28px 24px 22px;border:1px solid #dfe3df;border-radius:14px;color:#17201f;background:#fafbf9;box-sizing:border-box;font-family:var(--font-sans)}
@@ -1774,8 +1774,8 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 .masthead .header-preferences{display:flex;align-items:center;gap:18px}
 .masthead .header-preferences .language-switch{margin:0;gap:4px}
 .masthead .header-preferences .language-switch button{font-size:13px;font-weight:400;line-height:1.4;min-width:36px;min-height:36px;padding:6px 10px;border:1px solid transparent;border-radius:999px;background:transparent;color:#59625d}
-.masthead .header-preferences .language-switch button[aria-pressed="true"]{background:#e0e5df;color:#17201f;font-weight:500}
-.masthead .header-preferences .language-switch button:hover{background:#d9e0d8;box-shadow:none}
+.masthead .header-preferences .language-switch button[aria-pressed="true"]{background:#f0f0f0;color:#17201f;font-weight:500}
+.masthead .header-preferences .language-switch button:hover{background:#e6e6e6;box-shadow:none}
 .masthead .header-preferences .language-switch button:focus{outline:none;box-shadow:none}
 .masthead .header-preferences .language-switch button:focus-visible{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
 @media(max-width:1024px){
@@ -1796,13 +1796,13 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 
 
 /* Search shares the header's soft surfaces and regular type. */
-.masthead #search{background:#e8ece7;border:1px solid #d8dfd7;border-radius:999px;padding:5px 6px 5px 18px;box-shadow:none;gap:12px}
-.masthead #search:focus-within{border-color:#8c9b8f}
+.masthead #search{background:#f5f5f5;border:1px solid #e2e2e2;border-radius:999px;padding:5px 6px 5px 18px;box-shadow:none;gap:12px}
+.masthead #search:focus-within{border-color:#999999}
 .masthead #search>span{display:flex;align-items:center;color:#59625d;font-size:20px}
 .masthead #search input{background:transparent;color:#17201f;font-weight:400}
 .masthead #search input::placeholder{color:#68716b;font-weight:400}
-.masthead #search button{background:#dbe2d9;color:#17201f;border:0;border-radius:999px;font-weight:400;padding:10px 18px;min-height:40px}
-.masthead #search button:hover{background:#cfd9cd}
+.masthead #search button{background:#eeeeee;color:#17201f;border:0;border-radius:999px;font-weight:400;padding:10px 18px;min-height:40px}
+.masthead #search button:hover{background:#e2e2e2}
 .masthead #search button:focus-visible{outline:2px solid #64766a;outline-offset:2px}
 @media(max-width:1024px){.masthead #search{gap:8px;padding-left:14px}.masthead #search button{padding:8px 12px}}
 
