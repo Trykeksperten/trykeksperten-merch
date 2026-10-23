@@ -113,3 +113,13 @@ export function bindCartMockups(root,lines){
   }
  }
 }
+
+// Mail previews are bounded independently of the full-size cart canvas.
+export function mailMockupBase64(canvas){
+ const preview=document.createElement('canvas');
+ const scale=Math.min(1,512/Math.max(canvas.width,canvas.height));
+ preview.width=Math.max(1,Math.round(canvas.width*scale));
+ preview.height=Math.max(1,Math.round(canvas.height*scale));
+ preview.getContext('2d').drawImage(canvas,0,0,preview.width,preview.height);
+ return preview.toDataURL('image/png').split(',')[1];
+}

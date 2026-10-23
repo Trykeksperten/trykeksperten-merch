@@ -1,5 +1,5 @@
 import {renderShipmentTracking} from './shipment-tracking.mjs';
-import {renderCartMockup} from './cart-mockup.mjs';
+import {renderCartMockup,mailMockupBase64} from './cart-mockup.mjs?v=2';
 import {addressPickerHTML,bindAddressPicker} from './address-picker.mjs?v=2';
 import {hasPersonalisation,paymentDescription,freightEstimate} from './purchase-flow.mjs';
 import {paymentMethodsHTML} from './payment-methods.mjs';
@@ -47,7 +47,7 @@ export async function bindCheckout(notify){
        try{
         let base64;
         if(line.companyTemplate){const r=await fetch(`/api/company/previews/${encodeURIComponent(line.companyTemplate.id)}/${decorationIndex}`);if(!r.ok)throw Error('Det gemte mockup kunne ikke hentes.');const bytes=new Uint8Array(await r.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));base64=btoa(binary);}
-        else{const canvas=await renderCartMockup(product,variant.options.find(o=>o.id===design.optionId),design);base64=canvas.toDataURL('image/png').split(',')[1];}
+        else{const canvas=await renderCartMockup(product,variant.options.find(o=>o.id===design.optionId),design);base64=mailMockupBase64(canvas);}
         if(base64.length>2*1024*1024||mockups.reduce((n,m)=>n+m.base64.length,0)+base64.length>8*1024*1024)throw Error('Mockuppet er for stort til ordrebekræftelsen.');
         mockups.push({lineIndex,decorationIndex,base64});
        }catch(error){throw Error('Mockup kunne ikke gemmes: '+error.message+' Prøv igen, før du går til betaling.');}
