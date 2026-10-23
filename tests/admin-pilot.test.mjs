@@ -23,7 +23,7 @@ test('pilot uses full-price credit card reservation, rejects sandbox callbacks a
  const order=prepareAdminPilot(fixture(),env);assert.equal(order.adminPilot,true);assert.equal(order.adminTest,false);assert.equal(order.totalIncVat,25000);
  await persistCheckout(order);let link;
  await createQuickpayLink(order.id,{env,fetchImpl:async(url,options)=>{const body=JSON.parse(options.body);if(options.method==='POST')return {ok:true,json:async()=>({id:1234,order_id:body.order_id})};link=body;return {ok:true,json:async()=>({url:'https://payment.quickpay.net/payments/fixture'})};}});
- assert.equal(link.amount,25000);assert.equal(link.payment_methods,'creditcard');assert.equal(link.auto_capture,false);
+ assert.equal(link.amount,25000);assert.equal(link.payment_methods,'mobilepay,apple-pay,google-pay,creditcard');assert.equal(link.auto_capture,false);
  const saved=await readCheckout(order.id),payment={id:1234,order_id:saved.quickpayOrderId,type:'Payment',currency:'DKK',test_mode:false,accepted:true,link:{amount:25000},operations:[{id:1,type:'authorize',amount:25000,pending:false,qp_status_code:'20000'}]};
  await assert.rejects(applyQuickpayCallback({...payment,test_mode:true},{env}),/test\/live/);
  await applyQuickpayCallback(payment,{env});const authorized=await readCheckout(order.id);assert.equal(authorized.status,'authorized');assert.equal(authorized.paymentMode,'live');assert.equal(authorized.adminTest,false);
