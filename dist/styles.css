@@ -2066,3 +2066,7 @@ body.storefront #main .pf-pagination .pf-page-status{font-size:12px;font-weight:
 .pf-method-info .small{font-size:12px;color:#686a65}
 
 .pf-engraving-info{margin:12px 0 0;padding:12px 14px;border:1px solid #e2e5e3;border-radius:12px;background:#f5f6f5;color:#5f6462;font-size:12px;line-height:1.5}
+
+.pf-method-info>div{position:relative;padding-right:44px}
+.pf-studio .pf-method-info-close{position:absolute;top:7px;right:7px;display:grid;place-items:center;width:28px;height:28px;min-height:0;padding:0;border:0;border-radius:50%;background:transparent;color:#646a6c;font-size:21px;line-height:1;cursor:pointer}
+.pf-studio .pf-method-info-close:hover{background:#eceeed;color:#17201f}
