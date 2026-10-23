@@ -46,6 +46,7 @@ export function sortPFProducts(products,mode,priceData,tierFor=()=> 'recommended
   const value=Number(priceData?.products?.[product.id]?.fromIncVat);
   return Number.isFinite(value)?value:null;
  };
+ if(mode==='popular')return list.sort((a,b)=>{const ap=Number.isFinite(a.popularity)?a.popularity:-Infinity,bp=Number.isFinite(b.popularity)?b.popularity:-Infinity;return (ap===bp?0:ap>bp?-1:1)||byName(a,b);});
  if(mode==='price-asc'||mode==='price-desc')return list.sort((a,b)=>{
   const aPrice=priceFor(a),bPrice=priceFor(b);
   if(aPrice===null&&bPrice===null)return byName(a,b);

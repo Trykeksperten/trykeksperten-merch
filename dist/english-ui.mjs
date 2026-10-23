@@ -160,6 +160,8 @@ Nulstil|Reset
 Nulstil zoom til 100%|Reset zoom to 100%
 Nulstil filtre|Reset filters
 Sortér efter|Sort by
+Populære først|Most popular first
+Sortér produkter|Sort products
 Pris: laveste først|Price: low to high
 Pris: højeste først|Price: high to low
 Navn: A–Å|Name: A–Z

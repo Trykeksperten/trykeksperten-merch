@@ -1,3 +1,4 @@
+import {startPopularitySync} from './lib/pf-popularity.mjs';
 import {inspectArtworkPantone,decorationPantone} from './lib/artwork-pantone.mjs';
 const pantoneAllowed=createAddressLimiter();
 import {readPFCallback} from './lib/pf-callback.mjs';
@@ -377,3 +378,5 @@ if(hasPriceFeeds&&Number.isFinite(syncMinutes)&&syncMinutes>=15){
  setTimeout(sync,5_000).unref();
  setInterval(sync,syncMinutes*60_000).unref();
 }
+
+startPopularitySync();
