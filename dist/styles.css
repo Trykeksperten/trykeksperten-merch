@@ -2107,3 +2107,9 @@ body.storefront #main .about-content{align-items:start;gap:48px;margin-top:32px}
 body.storefront #main .about-story{font-size:16px;line-height:1.75;color:#646a6c}
 body.storefront #main .about-portrait{border-radius:16px}
 @media(max-width:800px){body.storefront #main :is(.contact-layout,.special-page .cart-layout){grid-template-columns:1fr}body.storefront #main :is(.contact-form,.special-page #special-form,.contact-details,.special-page .cart-summary){padding:20px}body.storefront #main .about-content{gap:24px}}
+
+.pf-pantone-panel{display:grid;gap:8px;padding:14px;margin:12px 0;background:#edf1ed;border:1px solid #d5ddd7;border-radius:14px;font-size:14px;color:#17201f}
+.pf-pantone-panel[hidden]{display:none}
+.pf-pantone-panel>div{display:flex;align-items:center;gap:10px}
+.pf-pantone-panel>small{color:#626c67;overflow-wrap:anywhere;line-height:1.45}
+.pf-pantone-swatch{display:inline-block;width:24px;height:24px;border:1px solid #0002;border-radius:6px;flex-shrink:0}
