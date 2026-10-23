@@ -49,7 +49,7 @@ import { publicCatalog } from './lib/catalog.mjs';
 import {sanitizeDesignLine} from './lib/design-validation.mjs';
 import {loadCatalogIndex,loadPFProduct,loadProductCatalog} from './lib/pf-catalog-store.mjs';
 import {seoPage,seoHead,seoMain,sitemapXML,robotsTXT} from './dist/seo-pages.mjs';
-import {parsePFPlacementSVG,stripPFPlacementGuide} from './lib/pf-placement.mjs';
+import {parsePFPlacementSVG,stripPFPlacementGuide,highlightPFPlacementGuide} from './lib/pf-placement.mjs';
 const root=resolve(fileURLToPath(new URL('./dist/',import.meta.url)));
 const pdfRoot=resolve(fileURLToPath(new URL('./node_modules/pdfjs-dist/build/',import.meta.url)));
 const port=Number(process.env.PORT||5173);
@@ -305,8 +305,9 @@ const handleRequest=async(req,res)=>{
   try{
    const source=new URL(req.url,'http://localhost').searchParams.get('src'),url=new URL(source);
    if(url.protocol!=='https:'||url.hostname!=='imagedata.pfconcept.com'||!url.pathname.startsWith('/2d/models/')||!url.pathname.endsWith('.svg'))throw Error();
-   let svg=placementArtCache.get(url.href);
-   if(!svg){const response=await fetch(url,{redirect:'error',signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error();svg=await response.text();if(svg.length>8*1024*1024)throw Error();svg=stripPFPlacementGuide(svg);placementArtCache.set(url.href,svg);while(placementArtCache.size>200)placementArtCache.delete(placementArtCache.keys().next().value);}
+   const guide=new URL(req.url,'http://localhost').searchParams.get('guide')==='1',cacheKey=url.href+(guide?'#guide':'');
+   let svg=placementArtCache.get(cacheKey);
+   if(!svg){const response=await fetch(url,{redirect:'error',signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error();svg=await response.text();if(svg.length>8*1024*1024)throw Error();svg=guide?highlightPFPlacementGuide(svg):stripPFPlacementGuide(svg);placementArtCache.set(cacheKey,svg);while(placementArtCache.size>200)placementArtCache.delete(placementArtCache.keys().next().value);}
    res.writeHead(200,{'Content-Type':'image/svg+xml; charset=utf-8'}).end(svg);
   }catch{res.writeHead(404,{'Content-Type':'text/plain; charset=utf-8'}).end('Placeringsbilledet kunne ikke indlæses.');}return;
  }
