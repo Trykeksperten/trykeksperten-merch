@@ -4,3 +4,10 @@ header{max-width:1160px;margin:auto;padding:18px 28px;border:0}header img{displa
 @media(max-width:760px){.proof-layout{grid-template-columns:1fr;gap:20px}header{padding:16px 20px}header img{width:118px}main{padding:20px}.preview{padding:18px}#preview img{height:280px;max-height:42vh}#preview iframe{height:360px}.preview-heading .eyebrow{display:none}form{padding:18px}}
 /* Keep PF's document intact within a quiet Smerch review page. */
 .proof-main>h1{font-size:clamp(26px,3vw,38px);font-weight:400}.proof-layout{grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr)}#preview iframe{height:560px;max-height:none}.preview-heading h2{font-weight:400}@media(max-width:760px){.proof-layout{grid-template-columns:1fr}#preview iframe{height:420px}}
+
+/* Render every PDF page on canvas, including on browsers without a PDF plugin. */
+#preview{flex-direction:column;align-items:stretch;gap:16px;min-width:0}
+.proof-pdf-page{width:100%;min-width:0;background:white;border:1px solid #e2e5e0;border-radius:8px;overflow:hidden}
+.proof-pdf-page p{margin:0;padding:6px 10px;background:#f5f7f3;color:#64706a;font-size:12px}
+.proof-pdf-page canvas{display:block;width:100%;height:auto}
+#preview[aria-busy=true]{min-height:280px;justify-content:center;text-align:center}
