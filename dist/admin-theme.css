@@ -74,3 +74,9 @@ body.admin-dashboard button,body.admin-dashboard input,body.admin-dashboard sele
 .admin-dashboard .login-card form button:focus-visible{outline:2px solid #899b8d;outline-offset:3px}
 .admin-dashboard .login-card>a:not(.login-brand){color:#646a6c}
 .admin-dashboard .login-card>a:not(.login-brand):hover{text-decoration:underline;text-underline-offset:3px}
+
+.mockup-overview{display:flex;flex-wrap:wrap;gap:6px;align-items:center;max-width:220px}
+.mockup-overview .admin-mockup.compact{margin:0;flex:none;width:68px}
+.mockup-overview>.muted{font-size:12px;color:#68716c}
+.checkout-columns,.checkout-row>summary{grid-template-columns:95px minmax(120px,1fr) 110px minmax(130px,1.3fr) 150px 110px 130px}
+@media(max-width:1100px){.checkout-row>summary{grid-template-columns:1fr 1fr}.checkout-row>summary>.mockup-overview{grid-column:1/-1;max-width:none}}

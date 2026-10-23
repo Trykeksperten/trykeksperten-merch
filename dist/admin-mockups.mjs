@@ -15,3 +15,13 @@ export function appendMockup(parent,ref,{compact=false}={}){
  const caption=document.createElement('figcaption');caption.textContent=ref.label||'Designmockup';
  figure.append(img,caption);parent.append(figure);return figure;
 }
+
+export function mockupsForCheckout(checkout){
+ return (checkout.mockups||[]).filter(ref=>checkout.lines?.[ref.lineIndex]?.decorations?.[ref.decorationIndex]).map(ref=>({...ref,label:[checkout.productNames?.[checkout.lines[ref.lineIndex].productId]||checkout.lines[ref.lineIndex].productId,checkout.lines[ref.lineIndex].decorations[ref.decorationIndex].position].filter(Boolean).join(' · '),url:`/api/admin/checkouts/${encodeURIComponent(checkout.id)}/mockup/${ref.lineIndex}/${ref.decorationIndex}`}));
+}
+export function appendMockupOverview(parent,refs,{decorated=false}={}){
+ const gallery=document.createElement('div');gallery.className='mockup-overview';
+ for(const ref of refs)appendMockup(gallery,ref,{compact:true});
+ if(!refs.length){const note=document.createElement('span');note.className='muted';note.textContent=decorated?'Mockup mangler':'Uden tryk';gallery.append(note);}
+ parent.append(gallery);return gallery;
+}
