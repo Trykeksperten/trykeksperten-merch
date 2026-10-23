@@ -33,7 +33,7 @@ test('PostScript spot declarations are candidates only; arbitrary text cannot pr
 });
 test('only server original analysis supplies PF codes; added text, missing files and colour count fail closed',async()=>{
  const logo={id:randomUUID(),name:'art.ai',type:'application/illustrator'},bytes=await pdf();logo.size=bytes.length;
- const deco={method:'Screenprint',colors:1,artworks:[{logo}]},order={id:`pay-${randomUUID()}`,lines:[{decorations:[deco]}]},group={lineIndexes:[0]},env={SMERCH_PUBLIC_BASE_URL:'https://smerch.dk',SMERCH_ARTWORK_SIGNING_SECRET:'x'.repeat(40)};
+ const deco={method:'Screenprint',colors:1,artworks:[{logo}]},order={mockups:[{filename:'mockup-1-1.png',base64:'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='}],id:`pay-${randomUUID()}`,lines:[{decorations:[deco]}]},group={lineIndexes:[0]},env={SMERCH_PUBLIC_BASE_URL:'https://smerch.dk',SMERCH_ARTWORK_SIGNING_SECRET:'x'.repeat(40)};
  try{
   logo.pantone={status:'verified',codes:['123 C']};assert.throws(()=>pfAssetsForGroup(order,group,{env}),/Pantone/);
   await persistCheckoutArtwork(order,[{id:logo.id,base64:bytes.toString('base64')}]);

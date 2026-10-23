@@ -6,7 +6,7 @@ import {sanitizeDesignLine} from '../lib/design-validation.mjs';
 import {normalizeArtworkForOption,designGroupSize} from '../dist/design-layers.mjs';
 import {pfAssetsForGroup} from '../lib/order-flow.mjs';
 test('foil requires confirmed supplier codes rather than an ink Pantone mapping',()=>{
- const checkout={id:'pay-11111111-1111-4111-8111-111111111111',lines:[{decorations:[{methodCode:9,foilFinish:'gold',colors:1,text:'TEST',ink:'#17201f',artworks:[]}]}]},group={lineIndexes:[0]},env={SMERCH_PUBLIC_BASE_URL:'https://smerch.dk',SMERCH_ARTWORK_SIGNING_SECRET:'x'.repeat(40),SMERCH_PMS_COLOR_MAP:'{"#17201f":"Black C"}'};
+ const checkout={mockups:[{filename:'mockup-1-1.png',base64:'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='}],id:'pay-11111111-1111-4111-8111-111111111111',lines:[{decorations:[{methodCode:9,foilFinish:'gold',colors:1,text:'TEST',ink:'#17201f',artworks:[]}]}]},group={lineIndexes:[0]},env={SMERCH_PUBLIC_BASE_URL:'https://smerch.dk',SMERCH_ARTWORK_SIGNING_SECRET:'x'.repeat(40),SMERCH_PMS_COLOR_MAP:'{"#17201f":"Black C"}'};
  assert.throws(()=>pfAssetsForGroup(checkout,group,{env}),/PF-foliekoden for Guld/);
  checkout.pfColourOverrides={'0:0':['ConfirmedGold']};
  assert.deepEqual(pfAssetsForGroup(checkout,group,{env})['0:0'].pmsColors,['ConfirmedGold']);

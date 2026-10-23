@@ -7,7 +7,7 @@ import {pfAssetsForGroup} from '../lib/order-flow.mjs';
 test('Thomas: digital and colourless methods use canonical PMS values without a palette map',()=>{
  for(const [method,expected] of [['Digitaltryk','Full Color'],['Digital','Full Color'],['Gravering','Laser Engraving'],['Laser Engraving','Laser Engraving'],['Prægning','Debossing']]){
   assert.deepEqual(pfColourCodes({method,colors:4}),[expected]);
-  const checkout={id:'pay-123',lines:[{decorations:[{method,colors:4,artworks:[{logo:{id:'logo'}}]}]}]};
+  const checkout={mockups:[{filename:'mockup-1-1.png',base64:'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='}],id:'pay-123',lines:[{decorations:[{method,colors:4,artworks:[{logo:{id:'logo'}}]}]}]};
   const assets=pfAssetsForGroup(checkout,{lineIndexes:[0]},{env:{SMERCH_PUBLIC_BASE_URL:'https://smerch.example',SMERCH_ARTWORK_SIGNING_SECRET:'x'.repeat(32)}});
   assert.deepEqual(assets['0:0'].pmsColors,[expected]);
  }
@@ -45,7 +45,7 @@ test('decorated live dispatch requires confirmed PF Store user before any networ
  await submitPFOrder(payload,{env:{...env,PF_COMMUNICATION_EMAIL_ACTIVE:'1'},fetchImpl});assert.equal(sent,true);
 });
 test('unconfirmed techniques do not inherit automatic RGB-to-Pantone mappings',()=>{
- const checkout={id:'pay-123',lines:[{decorations:[{method:'Digital transfer',colors:1,text:'Test',ink:'#000000',artworks:[]}]}]};
+ const checkout={mockups:[{filename:'mockup-1-1.png',base64:'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='}],id:'pay-123',lines:[{decorations:[{method:'Digital transfer',colors:1,text:'Test',ink:'#000000',artworks:[]}]}]};
  const env={SMERCH_PUBLIC_BASE_URL:'https://smerch.example',SMERCH_ARTWORK_SIGNING_SECRET:'x'.repeat(32),SMERCH_PMS_COLOR_MAP:'{"#000000":"Black C"}'};
  assert.throws(()=>pfAssetsForGroup(checkout,{lineIndexes:[0]},{env}),/bekræftes manuelt/);
 });
