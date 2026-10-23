@@ -1,3 +1,4 @@
+import {companySettings,saveCompanySettings,documentSeed,documentEligibility,reviewDocument,createOrderDocument,readOrderDocument,listOrderDocuments} from './lib/order-documents.mjs';
 import {resendOptions,prepareResend,sendResend,readResendDraft} from './lib/order-resend.mjs';
 import {readCorrespondence,addCorrespondence} from './lib/order-correspondence.mjs';
 import {readTestOrderMockup} from './lib/pf-test-artwork.mjs';
@@ -269,6 +270,16 @@ const handleRequest=async(req,res)=>{
   if(!authorized(req,process.env.PF_ORDER_ADMIN_TOKEN)&&!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}
   try{
    const pathname=new URL(req.url,'http://localhost').pathname;
+   const documents=pathname.match(/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})\/documents(?:\/([a-f0-9-]{36}))?$/);
+   if(documents){
+    if(!adminSessionAuthorized(req)){json(res,401,{error:'Medarbejderlogin kræves.'});return;}
+    res.setHeader('Cache-Control','private, no-store');
+    const order=await presentPFOrder(await readOrder(documents[1])),checkout=order.checkoutId?await readCheckout(order.checkoutId):null,company=await companySettings();
+    if(req.method==='GET'&&documents[2]){const record=await readOrderDocument(order.id,documents[2]);res.writeHead(200,{'Content-Type':'application/pdf','Content-Disposition':`inline; filename="Smerch-${record.document.type}-${record.id}.pdf"`,'X-Content-Type-Options':'nosniff','Content-Security-Policy':'sandbox'}).end(Buffer.from(record.pdf,'base64'));return;}
+    if(req.method==='GET'){const type=legalURL.searchParams.get('type');json(res,200,type?documentSeed(order,checkout,company,type):{company,documents:await listOrderDocuments(order.id),options:['basis','shipment','receipt'].map(type=>({type,reason:documentEligibility(order,checkout,type)}))});return;}
+    if(req.method==='POST'&&!documents[2]){if(!checkoutRequestAuthorized(req)){json(res,403,{error:'Ugyldig oprindelse.'});return;}const input=await readJSON(req,128*1024);if(input.action==='settings'){json(res,200,await saveCompanySettings(input.company));return;}if(input.action==='review'){json(res,200,reviewDocument(order,checkout,company,input.document));return;}if(input.action==='generate'){json(res,201,await createOrderDocument(order,checkout,company,input.document));return;}throw Error('Ukendt dokumenthandling.');}
+    json(res,405,{error:'Handlingen er ikke tilladt.'});return;
+   }
    const resend=pathname.match(/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})\/resend(?:\/([a-f0-9-]{36})\/attachment\/(\d+))?$/);
    if(resend){if(!adminSessionAuthorized(req)){json(res,401,{error:'Medarbejderlogin kræves.'});return;}res.setHeader('Cache-Control','no-store');const order=await readOrder(resend[1]),checkout=order.checkoutId?await readCheckout(order.checkoutId):null;
     if(req.method==='GET'&&resend[2]){const draft=await readResendDraft(order.id,resend[2]),a=draft.attachments[Number(resend[3])];if(!a)throw Error('Bilaget findes ikke.');res.writeHead(200,{'Content-Type':a.contentType,'Content-Disposition':`attachment; filename="${a.filename.replace(/[^a-zA-Z0-9._-]/g,'_')}"`,'Content-Security-Policy':'sandbox','X-Content-Type-Options':'nosniff'}).end(a.base64?Buffer.from(a.base64,'base64'):a.content);return;}
