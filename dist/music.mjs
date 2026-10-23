@@ -18,7 +18,7 @@ if (nav) {
   panel.hidden = true;
   panel.setAttribute('aria-labelledby','music-heading');
   panel.setAttribute('translate','no');
-  panel.innerHTML = `<div class="music-heading"><h2 id="music-heading">Rolige toner</h2><button type="button" class="music-close">Stop og luk</button></div><p class="music-intro"></p><div class="music-player"></div><ol class="music-tracks">${tracks.map((t,i)=>`<li><button type="button" data-track="${i}"><span>${t.title}</span><small>${t.artist}</small></button></li>`).join('')}</ol><a class="music-external" target="_blank" rel="noopener">Åbn på YouTube</a>`;
+  panel.innerHTML = `<div class="music-heading"><h2 id="music-heading">Rolige toner</h2><button type="button" class="music-close">Stop og luk</button></div><div class="music-player"></div><details class="music-selection"><summary>Vælg musik</summary><ol class="music-tracks">${tracks.map((t,i)=>`<li><button type="button" data-track="${i}"><span>${t.title}</span><small>${t.artist}</small></button></li>`).join('')}</ol><a class="music-external" target="_blank" rel="noopener">Åbn på YouTube</a></details>`;
   nav.append(button);
   document.body.append(panel);
   const close = panel.querySelector('.music-close');
@@ -31,7 +31,7 @@ if (nav) {
     button.textContent = panel.hidden ? (english()?'♫ Play music':'♫ Afspil musik') : (english()?'♫ Stop music':'♫ Stop musik');
     panel.querySelector('h2').textContent = english()?'Easy listening':'Rolige toner';
     close.textContent = english()?'Stop and close':'Stop og luk';
-    panel.querySelector('.music-intro').textContent = english()?'A little music while you browse. Plays via YouTube.':'Lidt musik, mens du går på opdagelse. Afspilles via YouTube.';
+    panel.querySelector('.music-selection summary').textContent = english()?'Choose music':'Vælg musik';
     panel.querySelector('.music-external').textContent = english()?'Open playlist on YouTube':'Åbn listen på YouTube';
   }
   function play(index) {
@@ -64,7 +64,11 @@ if (nav) {
   close.addEventListener('click',stop);
   panel.addEventListener('click',event=>{
     const track = event.target.closest('[data-track]');
-    if(track) play(Number(track.dataset.track));
+    if(track) {
+      play(Number(track.dataset.track));
+      panel.querySelector('.music-selection').open = false;
+      panel.querySelector('.music-selection summary').focus();
+    }
   });
   document.addEventListener('keydown',event=>{
     if(event.key==='Escape' && !panel.hidden) stop();
