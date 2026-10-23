@@ -19,3 +19,12 @@ test('suggestions cannot become verified supplier colour codes',()=>{
  assert.equal(decorationPantone({colors:1,artworks:[art]},[]).status,'manual');
  assert.deepEqual(artworkPantoneRows({logo:{}}),[]);
 });
+test('automatic Pantone suggestion never recolours the original or blocks production',async()=>{
+ const {assertProductionColors}=await import('../dist/artwork-production-colors.mjs');
+ const art={logo:{id:'orange',detectedPalette:[{hex:'#ff5000',share:1}]}};
+ const before=structuredClone(art);
+ const rows=artworkPantoneRows(art);
+ assert.equal(rows[0].status,'suggested');
+ assert.deepEqual(art,before);
+ assert.doesNotThrow(()=>assertProductionColors({artworks:[art]}));
+});
