@@ -15,10 +15,5 @@ export function compactOrderWorkspace(box,{order,products,overview,supplierDocs,
  for(const [key,title,nodes] of groups){const button=el('button',title),panel=el('section',null,'order-tab-panel');button.type='button';button.id=prefix+'-tab-'+key;button.setAttribute('role','tab');button.setAttribute('aria-controls',prefix+'-panel-'+key);panel.id=prefix+'-panel-'+key;panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby',button.id);button.onclick=()=>select(key);panel.append(...nodes);panels.set(key,panel);buttons.set(key,button);tabs.append(button);}
  tabs.onkeydown=e=>{const keys=[...buttons.keys()],i=keys.indexOf([...buttons].find(([,b])=>b===document.activeElement)?.[0]);if(i<0)return;const target=e.key==='Home'?0:e.key==='End'?keys.length-1:e.key==='ArrowRight'?(i+1)%keys.length:e.key==='ArrowLeft'?(i+keys.length-1)%keys.length:null;if(target!==null){e.preventDefault();select(keys[target],true);}};
  workspace.append(tabs,...panels.values());box.append(workspace);
- const shortcuts=el('div',null,'order-quick-actions');
- const primary=el('button',order.status==='approval_pending_pf'?'Registrér PF-godkendelse':order.status==='proof_received'?'Gennemgå korrektur':order.status==='revision_requested'?'Se ændringsønske':'Se korrektur og PF-status','primary');primary.type='button';primary.onclick=()=>{select('proof',true);};
- const note=el('button','Skriv intern note');note.type='button';note.onclick=()=>{select('contact');contact.querySelector('textarea')?.focus();};
- const docs=el('button','Generér dokument');docs.type='button';docs.onclick=()=>select('documents',true);
- shortcuts.append(primary,note,docs);box.querySelector('.order-next')?.append(shortcuts);
  select(selections.get(order.id)||'summary');return {select,panels};
 }
