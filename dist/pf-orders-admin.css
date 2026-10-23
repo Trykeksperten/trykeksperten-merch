@@ -24,3 +24,23 @@ body.admin-proofs{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe 
 .admin-mockup.compact{width:82px;margin:6px 0 0;padding:4px;gap:2px;font-size:10px}
 .admin-mockup.compact img{height:64px}
 .admin-mockup.compact figcaption{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* A compact sign-in page, consistent with the main administration login. */
+body.admin-proofs:has(#login:not([hidden])){background:#fff;font-family:"Roboto",sans-serif}
+body.admin-proofs:has(#login:not([hidden]))>header{display:none}
+body.admin-proofs:has(#login:not([hidden]))>main{min-height:100svh;display:grid;place-content:center;padding:24px}
+body.admin-proofs #login{width:min(420px,calc(100vw - 48px));margin:0;padding:28px;border:1px solid #dce1dc;border-radius:20px;box-shadow:none}
+body.admin-proofs #login .login-brand{display:block;margin-bottom:24px}
+body.admin-proofs #login h2{font-size:28px;margin-bottom:8px}
+body.admin-proofs #login label{font-weight:400;margin-top:20px}
+body.admin-proofs #login input{min-height:44px;background:#f5f5f5;border:1px solid #dce1dc;border-radius:12px}
+body.admin-proofs #login input:focus-visible{outline:2px solid #899b8d;outline-offset:3px}
+body.admin-proofs #login .primary{min-height:44px;background:#edf1ed;color:#17201f;border-color:#d3d9d5;border-radius:999px;margin-top:24px}
+body.admin-proofs #login .primary:hover{background:#e2e8e2}
+body.admin-proofs #login .login-back{display:inline-block;margin-top:18px;color:#68716c}
+#login-feedback:empty,#test-feedback:empty{display:none}
+#login-feedback,.test-error{color:#a13530}
+#test-feedback{margin:14px 0 0;padding:12px 14px;border-radius:10px;line-height:1.5;scroll-margin:24px}
+#test-feedback.test-error{background:#fceceb;border:1px solid #efc9c6}
+#test-feedback.test-progress{background:#edf1ed;color:#243b2e;border:1px solid #dce2dc}
+.pf-order-table .mockup-cell{width:112px;min-width:112px;vertical-align:middle}
+.pf-order-table .mockup-cell .admin-mockup{margin:0}
