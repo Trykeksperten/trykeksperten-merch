@@ -1,5 +1,5 @@
 const primary=[['overview','I dag'],['orders','Alle ordrer'],['proofs','Korrekturer'],['production','Produktion'],['deliveries','Leveringer'],['blocked','Fejl og mangler']];
-const secondary=[['automation','Automatik og beskeder'],['products','Produkter'],['companies','Virksomheder'],['statistics','Statistik'],['integration','PF-integration'],['marketing','Marketingvalg'],['withdrawals','Fortrydelser']];
+const secondary=[['products','Produkter'],['companies','Virksomheder'],['statistics','Statistik'],['withdrawals','Fortrydelser'],['marketing','Marketingvalg'],['automation','Automatik og beskeder'],['integration','PF-integration']];
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
 export function mountAdminNavigation(root,{active='overview',navigate,onLogout}={}){
  root.replaceChildren();root.setAttribute('aria-label','Administration');const brand=el('div',null,'brand'),logo=el('img');logo.src='/assets/smerch.svg';logo.alt='Smerch';logo.width=120;logo.height=50;brand.append(logo);
