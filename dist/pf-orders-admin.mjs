@@ -1,5 +1,5 @@
 import {orderActionCard,orderProductCards} from './admin-order-cards.mjs';
-import {correspondencePanel} from './admin-correspondence.mjs';
+import {correspondencePanel} from './admin-correspondence.mjs?v=2';
 import {orderLabels,eventLabels,isTestOrder,dateTime} from './admin-order-state.mjs';
 import {bindTestSubmission} from './pf-test-submit.mjs?v=2';
 import {mockupsForPfOrder,appendMockupOverview,appendMockup} from './admin-mockups.mjs?v=4';

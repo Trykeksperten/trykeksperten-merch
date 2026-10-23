@@ -1,3 +1,4 @@
+import {resendOptions,prepareResend,sendResend,readResendDraft} from './lib/order-resend.mjs';
 import {readCorrespondence,addCorrespondence} from './lib/order-correspondence.mjs';
 import {readTestOrderMockup} from './lib/pf-test-artwork.mjs';
 import {pfTestEnvironment} from './lib/pf-test-env.mjs';
@@ -268,6 +269,11 @@ const handleRequest=async(req,res)=>{
   if(!authorized(req,process.env.PF_ORDER_ADMIN_TOKEN)&&!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}
   try{
    const pathname=new URL(req.url,'http://localhost').pathname;
+   const resend=pathname.match(/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})\/resend(?:\/([a-f0-9-]{36})\/attachment\/(\d+))?$/);
+   if(resend){if(!adminSessionAuthorized(req)){json(res,401,{error:'Medarbejderlogin kræves.'});return;}res.setHeader('Cache-Control','no-store');const order=await readOrder(resend[1]),checkout=order.checkoutId?await readCheckout(order.checkoutId):null;
+    if(req.method==='GET'&&resend[2]){const draft=await readResendDraft(order.id,resend[2]),a=draft.attachments[Number(resend[3])];if(!a)throw Error('Bilaget findes ikke.');res.writeHead(200,{'Content-Type':a.contentType,'Content-Disposition':`attachment; filename="${a.filename.replace(/[^a-zA-Z0-9._-]/g,'_')}"`,'Content-Security-Policy':'sandbox','X-Content-Type-Options':'nosniff'}).end(a.base64?Buffer.from(a.base64,'base64'):a.content);return;}
+    if(req.method==='GET'){json(res,200,await resendOptions(order,checkout));return;}
+    if(req.method==='POST'&&!resend[2]){if(!checkoutRequestAuthorized(req)){json(res,403,{error:'Ugyldig oprindelse.'});return;}const input=await readJSON(req,4096);json(res,200,input.draftId?await sendResend(order,checkout,input.draftId):await prepareResend(order,checkout,input.action));return;}json(res,405,{error:'Handlingen er ikke tilladt.'});return;}
    const correspondence=pathname.match(/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})\/correspondence$/);
    if(correspondence){if(!adminSessionAuthorized(req)){json(res,401,{error:'Medarbejderlogin kræves.'});return;}const order=await readOrder(correspondence[1]);if(req.method==='GET'){json(res,200,await readCorrespondence(order.id));return;}if(req.method==='POST'){if(!checkoutRequestAuthorized(req)){json(res,403,{error:'Ugyldig oprindelse.'});return;}json(res,200,await addCorrespondence(order,await readJSON(req,16384)));return;}json(res,405,{error:'Handlingen er ikke tilladt.'});return;}
    const testMockup=pathname.match(/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})\/mockup\/(\d+)\/(\d+)$/);
