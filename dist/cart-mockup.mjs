@@ -17,7 +17,7 @@ async function productDetail(id){
  if(!products.has(id))products.set(id,fetch('/api/pf-product/'+encodeURIComponent(id)).then(r=>{if(!r.ok)throw Error();return r.json();}).catch(error=>{products.delete(id);throw error;}));
  return products.get(id);
 }
-export async function renderCartMockup(product,option,design){
+export async function renderCartMockup(product,option,design,{loadPreview=loadArtworkPreview}={}){
  const assets=placementOptionAssets(product,option);
  if(!assets.ready)throw Error('Der mangler et placeringsbillede.');
  const image=await loadImage(assets.svg?'/api/pf-placement-art?src='+encodeURIComponent(assets.svg):'/api/pf-imprint-image?src='+encodeURIComponent(assets.image));
@@ -41,7 +41,7 @@ export async function renderCartMockup(product,option,design){
  const foil=isFoilOption(option)?foilFinish(design.foilFinish)?.hex:null;
  const artworks=design.artworks?.length?design.artworks:design.logo?[{logo:design.logo,x:.5,y:.5,scale:.34}]:[];
  for(const art of artworks){
-  const file=await loadArtworkPreview(art.logo);
+  const file=await loadPreview(art.logo);
   if(!file)throw Error('Logofilen kan ikke vises som skitse.');
   let url;
   try{

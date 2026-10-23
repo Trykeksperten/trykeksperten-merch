@@ -46,12 +46,13 @@ export async function bindCheckout(notify){
       for(const [decorationIndex,design] of line.decorations.entries()){
        try{
         let base64;
-        if(line.companyTemplate){const r=await fetch(`/api/company/previews/${encodeURIComponent(line.companyTemplate.id)}/${decorationIndex}`);if(!r.ok)continue;const bytes=new Uint8Array(await r.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));base64=btoa(binary);}
+        if(line.companyTemplate){const r=await fetch(`/api/company/previews/${encodeURIComponent(line.companyTemplate.id)}/${decorationIndex}`);if(!r.ok)throw Error('Det gemte mockup kunne ikke hentes.');const bytes=new Uint8Array(await r.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));base64=btoa(binary);}
         else{const canvas=await renderCartMockup(product,variant.options.find(o=>o.id===design.optionId),design);base64=canvas.toDataURL('image/png').split(',')[1];}
-        if(base64.length<=2*1024*1024&&mockups.reduce((n,m)=>n+m.base64.length,0)+base64.length<=8*1024*1024)mockups.push({lineIndex,decorationIndex,base64});
-       }catch{/* An unavailable preview must not prevent checkout. */}
+        if(base64.length>2*1024*1024||mockups.reduce((n,m)=>n+m.base64.length,0)+base64.length>8*1024*1024)throw Error('Mockuppet er for stort til ordrebekræftelsen.');
+        mockups.push({lineIndex,decorationIndex,base64});
+       }catch(error){throw Error('Mockup kunne ikke gemmes: '+error.message+' Prøv igen, før du går til betaling.');}
       }
-     }catch{}
+     }catch(error){throw error;}
     }
     const shipping=Object.fromEntries(new FormData(form)),response=await fetch(adminTest?adminTestEndpoint()+'/session':'/api/checkout/session',{method:'POST',headers:{'Content-Type':'application/json',...(adminTest?{'X-Smerch-Admin':'1'}:{})},body:JSON.stringify({lines,shipping,artworks,mockups,billing:{company:form.elements.billingCompany.value,cvr:form.elements.billingCvr.value,email:form.elements.billingEmail.value,reference:form.elements.billingReference.value},legal:{version:LEGAL_VERSION,locale:getLanguage(),customerType:form.elements.customerType.value,accepted:form.elements.termsAccepted.checked,personalised:form.elements.personalised.checked,prepayment:false}})}),result=await response.json();if(!response.ok)throw Error(result.error||'Betalingen kunne ikke startes.');sessionStorage.setItem('pf-checkout-id',result.id);sessionStorage.setItem('pf-checkout-cart',JSON.stringify(lines));location.assign(result.url);
    }catch(e){error.textContent=e.message;button.disabled=false;button.textContent=adminTest?(pilotRequested()?'Bestil rigtig testordre med betalingspligt':liveTestRequested()?'Reservér 5 kr. med MobilePay →':'Åbn testbetaling →'):'Bestil med betalingspligt →';notify?.(e.message);}

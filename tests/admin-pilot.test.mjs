@@ -39,6 +39,7 @@ test('HTTP keeps public checkout closed and refuses unauthenticated pilot even w
   assert.equal((await post('/api/checkout/session')).status,503);
   assert.equal((await post('/api/admin/checkout-pilot/session')).status,403);
   assert.equal((await fetch(base+'/api/admin/checkout-pilot/status')).status,403);
+  const preview='/api/admin/checkouts/pay-'+randomUUID()+'/mockups';assert.equal((await fetch(base+preview)).status,403);assert.equal((await post(preview)).status,403);
   assert.equal((await post('/api/admin/checkout-pilot/pay-'+randomUUID()+'/reauthorize')).status,403);
  }finally{if(child.exitCode===null){child.kill('SIGTERM');await once(child,'exit');}}
 });
