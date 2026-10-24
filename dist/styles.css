@@ -2204,3 +2204,10 @@ body.storefront #main .about-page .about-content{display:block;margin-top:0}
 /* The enhanced ribbon wraps at the measured group width, including after resize/back navigation. */
 .home-brand-preview .brand-marquee .brand-wordmarks[data-ribbon-motion="continuous"]{animation:none!important;display:flex;gap:0;will-change:transform}
 .home-brand-preview .brand-wordmarks[data-ribbon-motion="continuous"]>.brand-marquee-group{display:flex;flex:none;gap:0}
+
+/* Keep the moving surface viewport-sized; recycle individual cards before they leave it. */
+.home-brand-preview .brand-marquee:has([data-ribbon-motion="cards"]){overflow:hidden;overflow:clip}
+.home-brand-preview .brand-marquee .brand-wordmarks[data-ribbon-motion="cards"]{animation:none!important;transform:none!important;will-change:auto;display:block;position:relative;width:100%}
+.home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"]>.brand-marquee-group:first-child{display:contents}
+.home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"]>.brand-marquee-group[aria-hidden="true"]{display:none}
+.home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"]>.brand-marquee-group>a{position:absolute;top:0;left:0;will-change:auto}
