@@ -151,3 +151,8 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 .admin-proofs #detail .order-proof-visual .preview{margin:0}
 @media(min-width:1051px){.has-proof-heading>.order-proof-visual{grid-column:1;grid-row:2}.has-proof-heading>.order-proof-controls{grid-column:2;grid-row:2}}
 @media(max-width:1050px){.has-proof-heading>.order-proof-heading{grid-row:1}.has-proof-heading>.order-proof-controls{grid-row:2}.has-proof-heading>.order-proof-visual{grid-row:3}}
+
+.order-customer-contact{grid-column:1/-1;min-width:0;padding:0 0 18px;margin:0 0 8px;border-bottom:1px solid var(--admin-line)}
+.order-customer-contact h2{font-size:18px;margin:0 0 14px}.customer-contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px 28px}.customer-contact-grid>div{min-width:0}.customer-contact-grid h3{font-size:14px;color:var(--admin-muted);font-weight:500;margin:0 0 6px}.customer-contact-grid p{margin:3px 0;overflow-wrap:anywhere}.customer-contact-grid strong{display:block;margin-bottom:5px}.customer-contact-grid a{color:inherit;text-underline-offset:3px}
+@media(min-width:1450px){.order-contact>.order-customer-contact{grid-row:1}.order-contact>.order-contact-notes{grid-column:1;grid-row:2/4}.order-contact>.order-contact-compose{grid-column:2;grid-row:2}.order-contact>p[role=status]{grid-row:3}}
+@media(max-width:520px){.customer-contact-grid{grid-template-columns:1fr;gap:16px}}
