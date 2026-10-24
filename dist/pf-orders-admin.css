@@ -44,3 +44,4 @@ body.admin-proofs #login .login-back{display:inline-block;margin-top:18px;color:
 #test-feedback.test-progress{background:#edf1ed;color:#243b2e;border:1px solid #dce2dc}
 .pf-order-table .mockup-cell{width:112px;min-width:112px;vertical-align:middle}
 .pf-order-table .mockup-cell .admin-mockup{margin:0}
+.finance-totals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr) minmax(0,1fr));gap:8px;margin:16px 0}.finance-totals dd{margin:0;font-weight:600}.finance-table{width:100%;border-collapse:collapse;margin:16px 0}.finance-table td,.finance-table th{padding:8px;text-align:left;border-bottom:1px solid #dce3dd}.finance-table td:last-child{display:flex;gap:12px;align-items:center;flex-wrap:wrap}@media(max-width:800px){.finance-totals{grid-template-columns:1fr 1fr}.finance-table{display:block;overflow-x:auto}}

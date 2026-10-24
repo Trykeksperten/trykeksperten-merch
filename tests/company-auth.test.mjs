@@ -30,10 +30,11 @@ test('invalid company credentials are rate limited and do not create a session',
 });
 
 test('staff-managed credentials are hashed in private storage and changing them revokes earlier company sessions',async()=>{
- const {mkdtemp,readFile,rm}=await import('node:fs/promises'),{tmpdir}=await import('node:os'),{join}=await import('node:path');
+ const {mkdtemp,readFile,writeFile,rm}=await import('node:fs/promises'),{tmpdir}=await import('node:os'),{join}=await import('node:path');
  const {configureCompanyAccount,companyAccounts}=await import('../lib/company-auth.mjs');
  const directory=await mkdtemp(join(tmpdir(),'smerch-company-account-')),previous=process.env.SMERCH_DATA_DIR;process.env.SMERCH_DATA_DIR=directory;
  try{
+  await writeFile(join(directory,'companies.json'),JSON.stringify({accounts:[{id:'racketclub',name:'Test fixture'}]}));
   await configureCompanyAccount('racketclub',{username:'test-company',password:'private-test-password'});
   const text=await readFile(join(directory,'companies.json'),'utf8');assert.ok(!text.includes('private-test-password'));assert.match(JSON.parse(text).accounts[0].passwordHash,/^[a-f0-9]{32}:[a-f0-9]{128}$/);
   const headers={},res={setHeader:(k,v)=>headers[k]=v},req=request('private-config-test');

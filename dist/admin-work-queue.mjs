@@ -1,6 +1,6 @@
 import {mockupsForPfOrder,appendMockupOverview} from './admin-mockups.mjs';
 import {nextStep,isTestOrder,dateTime,paymentLabel} from './admin-order-state.mjs';
-export function workQueue(orders,checkouts,mailRows=[]){return orders.filter(o=>!isTestOrder(o,checkouts.find(c=>c.id===o.checkoutId))).map(order=>{const checkout=checkouts.find(c=>c.id===order.checkoutId),[owner,next]=nextStep(order,checkout,mailRows),blockers=[];
+export function workQueue(orders,checkouts,mailRows=[]){return orders.filter(o=>!isTestOrder(o,checkouts.find(c=>c.id===o.checkoutId))).map(order=>{const checkout=checkouts.find(c=>c.id===order.checkoutId),[owner,next]=nextStep(order,checkout,mailRows),blockers=[...(checkout?.finance?.problems||[])];
  if(['needs_attention','needs_reconciliation'].includes(order.status))blockers.push(order.pfStatusInformation||'Afklar PF-status og hændelseslog.');
  if(checkout&&['authorization_expired','capture_reconciliation','payment_failed'].includes(checkout.status))blockers.push(paymentLabel(checkout));
  if(order.lines?.some(l=>l.decorations?.length)&&!mockupsForPfOrder(checkout,order).length)blockers.push('Kontrollér designvisning og mockups på ordren.');
