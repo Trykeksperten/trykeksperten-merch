@@ -79,3 +79,16 @@
  .pf-visual-designer .pf-editor-leave{font-size:12px}
  .pf-visual-designer .pf-designer-actions .button{flex:1;min-width:0;min-height:46px}
 }
+
+/* Fixed mobile preview and an independently scrolling tools pane. */
+@media(max-width:1024px){
+ .pf-visual-designer .pf-designer-workspace{overflow:hidden;overflow:clip}
+ .pf-visual-designer .pf-canvas-area{flex:0 0 auto;position:relative;z-index:2;overflow:hidden}
+ .pf-visual-designer .pf-canvas-area>.pf-canvas-shell{height:calc(var(--mobile-stage-size,180px) + 20px);flex:none;max-height:none;padding:10px;justify-content:center;overflow:hidden}
+ .pf-visual-designer .pf-canvas-area>.pf-canvas-shell.is-zoomed{height:calc(var(--mobile-stage-size,180px) + 20px);max-height:none;overflow:auto;justify-content:flex-start}
+ .pf-visual-designer .pf-designer-stage{width:calc((100vw - 22px)/2);max-width:280px}
+ .pf-visual-designer .pf-canvas-help{display:none}
+ .pf-visual-designer .pf-designer-sidebar{flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:24px}
+ .pf-visual-designer .pf-designer-stage,.pf-visual-designer .pf-designer-stage *{touch-action:none}
+ .pf-visual-designer .pf-layer-nudge button,.pf-visual-designer .pf-layer-actions button{min-height:44px}
+}
