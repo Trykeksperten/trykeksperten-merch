@@ -4,7 +4,7 @@ Release 24. oktober 2026. Den nye fakturerings- og betalingsautomatik er deaktiv
 
 ## Ansvar og afgrænsning
 
-Smerch er brand. Juridisk sælger: Trykeksperten ApS, CVR 44015773, Raffinaderivej 10 E, 2300 København S.
+Smerch er brand. Juridisk sælger: Trykeksperten ApS, CVR 44015773, Raffinaderivej 20, 2300 København S.
 
 Financial Outsourcing/e-conomic er den eneste fakturanummeransvarlige. Smerch opfinder eller tildeler ikke fakturanumre. Uden API eller en udtrykkeligt aftalt anden nummeransvarlig kan endelige fakturaer ikke udstedes automatisk. Systemet klargør leverancegrundlag, viser ventende fakturering og kan sende grundlag til bogholderen. Det gælder også forenklede fakturaer til danske privatkunder. Den gamle e-conomic-kladdeintegration er blokeret, når det nye flow aktiveres, så begge flows ikke opretter bilag for samme salg.
 
