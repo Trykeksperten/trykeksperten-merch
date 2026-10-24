@@ -5,6 +5,7 @@ export function paymentDescription(lines,locale='da'){
  return locale==='en'?'Payment is authorised when ordering and captured no earlier than dispatch.':'Beløbet reserveres ved bestilling og hæves tidligst ved afsendelse.';
 }
 export function freightEstimate(fulfillment,config){
+ if(config?.freightQuoteRequired)return null;
  if(!fulfillment?.ready||!fulfillment.groups?.length)return null;
  const amounts=fulfillment.groups.map(group=>group.kind==='blank'?config.blankShipping?.freightExVat:(config.freightByLocation?.[group.location]??(fulfillment.groups.length===1?config.freightExVat:null)));
  if(amounts.some(value=>!Number.isFinite(value)||value<=0))return null;

@@ -58,5 +58,5 @@ test('approved cap pilot totals 1246.13 including PF freight and VAT without cha
  const line={productId:p.id,sku:'38687070',quantity:10,decorations:[{optionId:'printdata_cse1_dk_label_v3:8182',width:85,height:25,colors:1,text:'',textPlacement:{x:.5,y:.5,scale:.24},artworks:[{id:'layer',x:.5,y:.5,scale:.85,rotation:0,logo:{id:'logo',name:'fixture.ai',type:'application/illustrator',size:100,pixelWidth:340,pixelHeight:100,detectedColors:1}}]}]};
  const input={lines:[line],shipping:{name:'Test',email:'test@example.invalid',phone:'12345678',street:'Testvej 1',postalCode:'1000',city:'København',country:'DK'}},options={catalog:{products:[p]},prices,rules:{goodsMarkup:100,printMarkup:100},stock:{updatedAt:stamp,items:{'38687070':{available:100}}},env};
  const pilot=prepareCheckout(input,{...options,atSupplierCost:true});assert.equal(pilot.freightExVat,6500);assert.equal(pilot.totalIncVat,124613);
- const publicOrder=prepareCheckout({...input,atSupplierCost:true},options);assert.equal(publicOrder.freightExVat,15000);assert.notEqual(publicOrder.totalIncVat,124613);
+ assert.throws(()=>prepareCheckout({...input,atSupplierCost:true},options),/Fragtprisen skal bekræftes/); // Public live checkout must use a separate accepted quote.
 });

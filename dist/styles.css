@@ -2113,3 +2113,4 @@ body.storefront #main .about-portrait{border-radius:16px}
 .pf-pantone-panel>div{display:flex;align-items:center;gap:10px}
 .pf-pantone-panel>small{color:#626c67;overflow-wrap:anywhere;line-height:1.45}
 .pf-pantone-swatch{display:inline-block;width:24px;height:24px;border:1px solid #0002;border-radius:6px;flex-shrink:0}
+.checkout-freight{margin:14px 0}.checkout-freight p{line-height:1.5}.checkout-freight button{margin:8px 0}.checkout-freight .legal-check{margin-top:12px}

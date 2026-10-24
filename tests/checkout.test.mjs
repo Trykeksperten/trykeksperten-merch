@@ -35,3 +35,18 @@ test('supplier cost is server-selected and remains consistent for renewal',async
  const {validateRenewal}=await import('../lib/order-flow.mjs');assert.equal(validateRenewal(cost,{catalog,prices,rules,stock,env}),true);
  assert.throws(()=>validateRenewal({...cost,adminPilot:false},{catalog,prices,rules,stock,env}),/Pris/);
 });
+
+test('live checkout requires an exact freight offer and keeps it during payment renewal',async()=>{
+ const {freightContextKey}=await import('../lib/freight-quotes.mjs'),{validateRenewal}=await import('../lib/order-flow.mjs');
+ const liveEnv={...env,STRIPE_SECRET_KEY:'sk_live_example',STRIPE_LIVE_ENABLED:'1',STRIPE_CAPTURE_ENABLED:'1',SMERCH_PUBLIC_BASE_URL:'https://smerch.dk',PF_GATEWAY_MODE:'live',PF_GATEWAY_LIVE_ENABLED:'1',PF_AUTO_SUBMIT_ENABLED:'1',PF_WHITE_LABEL_CONFIRMED:'1',PF_PROOF_DELIVERY_CONFIRMED:'1'};
+ const base=prepareCheckout(input,{catalog,prices,rules,stock,env,now});
+ assert.equal(checkoutConfiguration(liveEnv).freightQuoteRequired,true);
+ assert.throws(()=>prepareCheckout(input,{catalog,prices,rules,stock,env:liveEnv,now}),/Fragtprisen skal bekræftes/);
+ const context={lines:base.lines,shipping:base.shipping,goodsTotalIncVat:base.quote.totalIncVat,deliveryMethod:'STD',groups:base.fulfillment.groups};
+ const approved={id:'freight-test',revision:1,contextKey:freightContextKey(context),source:'manual_pf',currency:'DKK',validUntil:new Date(now+60000).toISOString(),supplierExVat:8000,markupExVat:1000,customerExVat:9000,customerIncVat:11250,groups:base.fulfillment.groups.map(g=>({...g,supplierExVat:8000,pfPriceReference:'PF-quote-test'}))};
+ const order=prepareCheckout(input,{catalog,prices,rules,stock,env:liveEnv,now,freightApproval:approved});assert.equal(order.totalIncVat,base.quote.totalIncVat+11250);assert.equal(order.freightQuote.supplierExVat,8000);assert.equal(order.freightGroups[0].pfPriceReference,'PF-quote-test');assert.equal(order.freightQuote.acceptedAt,new Date(now).toISOString());
+ assert.equal(validateRenewal(order,{catalog,prices,rules,stock,env:{...liveEnv,SMERCH_FREIGHT_EX_VAT_DKK:'999'}}),true);
+ assert.throws(()=>validateRenewal({...order,shipping:{...order.shipping,street:'Anden vej 2'}},{catalog,prices,rules,stock,env:liveEnv}),/accepterede fragt/);
+ assert.throws(()=>prepareCheckout({...input,shipping:{...input.shipping,city:'Aarhus'}},{catalog,prices,rules,stock,env:liveEnv,now,freightApproval:approved}),/Fragtprisen skal bekræftes/);
+ const noRates={...liveEnv,SMERCH_FREIGHT_EX_VAT_DKK:''};assert.equal(checkoutConfiguration(noRates).ready,true);assert.throws(()=>prepareCheckout(input,{catalog,prices,rules,stock,env:noRates,now}),/Fragtprisen skal bekræftes/);
+});
