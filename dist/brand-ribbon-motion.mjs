@@ -1,0 +1,15 @@
+// Pixel-based wrapping avoids relying on a very wide percentage-transformed CSS layer.
+const running=new WeakMap();
+export function bindContinuousRibbon(track,{win=window,doc=document}={}){
+ if(running.has(track))return running.get(track);
+ const group=track.querySelector('.brand-marquee-group');if(!group)return;
+ let width=0,offset=0,last=null,frame=null,disposed=false;
+ const paint=()=>{track.style.transform=`translate3d(${-offset}px,0,0)`;};
+ const measure=()=>{const next=group.getBoundingClientRect().width;if(next>0){offset=width?offset/width*next:0;width=next;paint();}};
+ const stop=()=>{if(frame!==null)win.cancelAnimationFrame(frame);frame=null;last=null;};
+ const tick=now=>{frame=null;if(!track.isConnected){dispose();return;}if(doc.hidden){last=null;return;}if(last!==null&&width>0){const elapsed=Math.min(Math.max(now-last,0),100);offset=(offset+elapsed*width/32000)%width;paint();}last=now;frame=win.requestAnimationFrame(tick);};
+ const resume=()=>{if(disposed)return;stop();measure();if(!doc.hidden)frame=win.requestAnimationFrame(tick);};
+ const observer=win.ResizeObserver?new win.ResizeObserver(measure):null;
+ function dispose(){if(disposed)return;disposed=true;stop();observer?.disconnect();win.removeEventListener('resize',measure);win.removeEventListener('pageshow',resume);doc.removeEventListener('visibilitychange',resume);running.delete(track);delete track.dataset.ribbonMotion;track.style.transform='';}
+ running.set(track,dispose);track.dataset.ribbonMotion='continuous';track.style.animationPlayState='running';observer?.observe(group);win.addEventListener('resize',measure);win.addEventListener('pageshow',resume);doc.addEventListener('visibilitychange',resume);resume();return dispose;
+}

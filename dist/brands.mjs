@@ -1,3 +1,4 @@
+import {bindContinuousRibbon} from './brand-ribbon-motion.mjs';
 import {brandLogoURL} from './brand-logos.mjs';
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 import {pricedVariants} from './pf-visibility.mjs';
@@ -14,7 +15,7 @@ export function brandPreview(brands,products=[],prices){
   const product=matches.find(item=>item.id===previewProducts[brand.id]&&productImage(item))||matches.find(productImage);
   return {...brand,productName:product?.name,productImage:product&&productImage(product)};
  });
- const group=duplicate=>`<div class="brand-marquee-group" ${duplicate?'aria-hidden="true"':''}>${featured.map(b=>`<a href="/produkter?brand=${escape(b.id)}" aria-label="Se produkter fra ${escape(b.name)}" ${duplicate?'tabindex="-1"':''}>${b.productImage?`<img class="brand-product-image" src="${escape(b.productImage)}" alt="${escape(b.productName)}" loading="lazy" decoding="async" width="500" height="500">`:''}${logo(b)}</a>`).join('')}</div>`;
+ const group=duplicate=>`<div class="brand-marquee-group" ${duplicate?'aria-hidden="true"':''}>${featured.map(b=>`<a href="/produkter?brand=${escape(b.id)}" aria-label="Se produkter fra ${escape(b.name)}" ${duplicate?'tabindex="-1"':''}>${b.productImage?`<img class="brand-product-image" src="${escape(b.productImage)}" alt="${escape(b.productName)}" loading="eager" decoding="async" width="500" height="500">`:''}${logo(b)}</a>`).join('')}</div>`;
  return `<section class="brand-preview home-brand-preview" aria-label="Udvalgte brands"><h2 class="sr-only">Udvalgte brands</h2><div class="brand-marquee"><div class="brand-wordmarks">${group(false)}${group(true)}</div></div></section>`;
 }
 
@@ -23,6 +24,6 @@ export function brandsPage(brands,search){const params=new URLSearchParams(searc
 // Native links remain clickable while the owner-requested ribbon runs continuously.
 export function bindBrandPreview(root=document){
  for(const track of root.querySelectorAll('.home-brand-preview .brand-wordmarks')){
-  track.style.animationPlayState='running';
+  bindContinuousRibbon(track);
  }
 }

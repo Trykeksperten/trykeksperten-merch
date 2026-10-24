@@ -2200,3 +2200,7 @@ body.storefront #main .home-value-strip strong{font-size:13px;line-height:1.25;f
 /* Portrait follows the about-page heading, before the story. */
 body.storefront #main .about-page>.about-portrait{width:230px;max-width:100%;margin:20px 0 24px;border-radius:16px}
 body.storefront #main .about-page .about-content{display:block;margin-top:0}
+
+/* The enhanced ribbon wraps at the measured group width, including after resize/back navigation. */
+.home-brand-preview .brand-marquee .brand-wordmarks[data-ribbon-motion="continuous"]{animation:none!important;display:flex;gap:0;will-change:transform}
+.home-brand-preview .brand-wordmarks[data-ribbon-motion="continuous"]>.brand-marquee-group{display:flex;flex:none;gap:0}
