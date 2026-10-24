@@ -2155,8 +2155,8 @@ body.storefront #main .about-portrait{border-radius:16px}
 
 /* A compact, connected four-step guide. */
 .home-value-strip{padding-top:12px;padding-bottom:12px;border-top:0;border-bottom:0}
-.home-value-strip>span{position:relative;min-height:66px;padding:0 4px;gap:7px;border:0!important}
-.home-value-strip>span:not(:last-child)::after{content:"";position:absolute;top:13px;left:calc(50% + 19px);width:calc(100% - 38px);height:1px;background:#b9c5bc}
+.home-value-strip>span{position:relative;display:grid;grid-template-rows:26px auto;justify-items:center;align-content:start;align-items:start;min-height:66px;padding:0 4px;gap:7px;border:0!important}
+.home-value-strip>span:not(:last-child)::after{content:"";position:absolute;top:12.5px;left:calc(50% + 19px);width:calc(100% - 38px);height:1px;background:#b9c5bc}
 .home-value-strip b{width:26px;height:26px;color:#40554a}
 .home-value-strip b::before{background:#e1e8e2}
 body.storefront #main .home-value-strip strong{font-size:13px;line-height:1.25;font-weight:500;min-height:0}
