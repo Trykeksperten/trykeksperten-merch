@@ -19,7 +19,7 @@ import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=96';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from './pf-visibility.mjs?v=24';
 import {productGroups,groupSections,productGroupURL,navigationProductGroups} from './product-groups.mjs?v=24';
 import { specialPage, bindSpecial } from './special.mjs?v=23';
-import { brandPreview, brandsPage } from './brands.mjs?v=27';
+import { brandPreview, brandsPage, bindBrandPreview } from './brands.mjs?v=27';
 import {filterProducts,totalQuantity,validateLine,quoteLine} from './rules.mjs?v=21';
 import {saveFile,loadFile,deleteFile} from './storage.mjs?v=22';
 await initLanguage();
@@ -133,6 +133,7 @@ function bind(){
  scrubCustomerCopy(document);
  if(!supplierCopyObserver){supplierCopyObserver=new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===Node.TEXT_NODE){const clean=customerCopy(node.nodeValue);if(clean!==node.nodeValue)node.nodeValue=clean;}else if(node.nodeType===Node.ELEMENT_NODE)scrubCustomerCopy(node);})));supplierCopyObserver.observe(document.body,{childList:true,subtree:true});}
  if(pfCatalog){bindPF(pfCatalog,nav,notify,pfPrices);bindCart(pfCatalog,nav,notify);}
+ bindBrandPreview($('#main'));
  bindCheckout(notify);
  bindSpecial();
  bindContactAvailability($('#contact-form'));

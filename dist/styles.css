@@ -2114,3 +2114,25 @@ body.storefront #main .about-portrait{border-radius:16px}
 .pf-pantone-panel>small{color:#626c67;overflow-wrap:anywhere;line-height:1.45}
 .pf-pantone-swatch{display:inline-block;width:24px;height:24px;border:1px solid #0002;border-radius:6px;flex-shrink:0}
 .checkout-freight{margin:14px 0}.checkout-freight p{line-height:1.5}.checkout-freight button{margin:8px 0}.checkout-freight .legal-check{margin-top:12px}
+
+/* Compact mobile homepage: keep the process and product entry points in view. */
+@media(max-width:700px){
+ .home-value-strip{grid-template-columns:repeat(4,minmax(0,1fr));padding:0 10px}
+ .home-value-strip>span{min-height:76px;padding:10px 3px;gap:5px;border-bottom:0;border-right:1px solid #dce0dc}
+ .home-value-strip>span:nth-child(2n){border-right:1px solid #dce0dc}
+ .home-value-strip>span:last-child{border-right:0}
+ .home-value-strip b{width:24px;height:24px;font-size:10px}
+ .home-value-strip strong{font-size:11px;line-height:1.25;letter-spacing:0;max-width:90px;min-height:28px;display:flex;align-items:center}
+ .home-proof-note.home-delivery-note{padding:10px 12px;gap:3px;font-size:11px;line-height:1.4;letter-spacing:0}
+ .home-brand-preview{padding:12px 0 18px}
+ .home-brand-preview .brand-marquee-group a{flex:0 0 148px;width:148px;min-height:152px;padding:8px 10px;gap:4px;touch-action:manipulation;-webkit-tap-highlight-color:rgba(207,77,34,.12)}
+ .home-brand-preview .brand-product-image{width:104px;height:104px}
+ .home-brand-preview .brand-marquee-group .brand-logo{width:72px;height:26px}
+ .home-categories{padding-top:20px;padding-bottom:20px}
+ .home-categories .section-heading{margin-bottom:14px}
+ .home-categories .section-heading h2{font-size:26px;line-height:1.15}
+ .home-categories .category-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+ .home-categories .category-tile>div{aspect-ratio:1;border-radius:10px}
+ .home-categories .category-tile img{padding:9%}
+ .home-categories .category-tile h3{padding-top:8px;font-size:12px;line-height:1.3}
+}
