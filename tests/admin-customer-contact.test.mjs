@@ -4,10 +4,10 @@ import {customerContactData,customerContactPanel} from '../dist/admin-customer-c
 import {checkoutPublic} from '../lib/checkout.mjs';
 class Element{constructor(tag){this.tag=tag;this.children=[];this.attributes={};}append(...nodes){this.children.push(...nodes);}setAttribute(k,v){this.attributes[k]=v;}}
 const all=n=>[n,...n.children.flatMap(all)];
-const privateShipping={name:'Anna Jensen',email:'anna@example.test',phone:'+45 12 34 56 78',street:'Testvej 1',postalCode:'8000',city:'Aarhus',country:'DK'};
+const privateShipping={name:'Anna Jensen',email:'anna@example.test',phone:'+45 12 34 56 78',street:'Testvej 1',postalCode:'8000',city:'Aarhus',country:'DK',deliveryComment:'Bygning E'};
 test('private contact keeps existing data and omits absent business information',()=>{
  const result=customerContactData({shipping:{address:privateShipping}},{shipping:privateShipping});
- assert.equal(result.name,'Anna Jensen');assert.equal(result.company,'');assert.equal(result.cvr,'');assert.equal(result.contact,'');assert.deepEqual(result.addresses,[{label:'Leveringsadresse',lines:['Testvej 1','8000 Aarhus','DK']}]);
+ assert.equal(result.name,'Anna Jensen');assert.equal(result.company,'');assert.equal(result.cvr,'');assert.equal(result.contact,'');assert.deepEqual(result.addresses,[{label:'Leveringsadresse',lines:['Testvej 1','Bygning E','8000 Aarhus','DK']}]);
 });
 test('business customer has CVR, explicit separate contact and distinct billing/delivery addresses',()=>{
  const checkout={shipping:{...privateShipping,company:'Eksempel ApS'},billing:{company:'Eksempel ApS',cvr:'12345678',contactPerson:'Bo Hansen',street:'Kontorvej 2',postalCode:'2100',city:'København Ø',country:'DK'}};

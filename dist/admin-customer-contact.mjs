@@ -5,7 +5,7 @@ function address(source){
  if(typeof source==='string')return source.split(/\r?\n/).map(clean).filter(Boolean);
  const value=source.address||source;
  if(typeof value==='string')return address(value);
- return [clean(value.street),clean(value.street2),[clean(value.postalCode),clean(value.city)].filter(Boolean).join(' '),clean(value.country)].filter(Boolean);
+ return [clean(value.street),clean(value.street2),clean(value.deliveryComment||source.deliveryComment),[clean(value.postalCode),clean(value.city)].filter(Boolean).join(' '),clean(value.country)].filter(Boolean);
 }
 const sameAddress=(a,b)=>a.map(s=>s.toLowerCase().replace(/\s+/g,' ').replace(/^danmark$/,'dk')).join('|')===b.map(s=>s.toLowerCase().replace(/\s+/g,' ').replace(/^danmark$/,'dk')).join('|');
 export function customerContactData(order,checkout){
