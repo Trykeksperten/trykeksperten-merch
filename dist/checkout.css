@@ -52,3 +52,5 @@
 @media(max-width:800px){.pf-checkout .cart-layout{grid-template-columns:1fr;gap:24px}.pf-checkout .cart-summary{position:static;grid-row:1;padding:20px}.pf-checkout .checkout-heading{margin-top:24px}.pf-checkout .checkout-intro{margin-bottom:22px}.pf-checkout .cart-summary h2{font-size:21px;margin-bottom:12px}.pf-checkout .payment-methods{margin-top:16px}.pf-checkout #pf-checkout-form>fieldset{padding-top:12px}}
 @media(max-width:480px){.pf-checkout .form-grid{grid-template-columns:1fr}.pf-checkout .checkout-customer-type>label{max-width:none}.pf-checkout .pf-price-total dd{font-size:21px}.pf-checkout .checkout-heading h1{font-size:30px}.pf-checkout #pf-checkout-form>fieldset>legend{font-size:20px}}
 .pf-checkout .legal-check[hidden]{display:none}
+
+.pf-checkout #checkout-business label[hidden]{display:none}
