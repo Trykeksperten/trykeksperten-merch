@@ -62,3 +62,20 @@
  .pf-designer-sidebar input,.pf-designer-sidebar textarea,.pf-designer-sidebar select{scroll-margin-block:20px}
 }
 @media(min-width:1025px){.pf-mobile-preview{display:none}.pf-layer-nudge{display:flex;gap:6px}.pf-layer-nudge button{padding:8px 14px;border:1px solid #ded8d3;border-radius:6px;background:#fff}}
+
+/* Phone-first studio: full-width mockup above the tools, with actions always reachable. */
+@media(max-width:1024px){
+ .pf-visual-designer .pf-designer-workspace{display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;align-items:stretch}
+ .pf-visual-designer .pf-canvas-area{order:0;flex:0 0 auto;width:100%;overflow:visible}
+ .pf-visual-designer .pf-canvas-area>.pf-canvas-shell{flex:0 0 auto;min-height:0;height:auto;padding:10px 10px 12px;overflow:hidden;align-items:center}
+ .pf-visual-designer .pf-designer-stage{width:calc(100vw - 22px);max-width:560px;max-height:none;margin:0 auto;flex:none}
+ .pf-visual-designer .pf-canvas-shell.is-zoomed{overflow:auto;max-height:75dvh}
+ .pf-visual-designer .pf-designer-sidebar{order:1;flex:0 0 auto;width:100%;min-width:0;padding:14px 16px 24px;border-top:1px solid #ded8d3}
+ .pf-visual-designer .pf-canvas-area>.pf-editor-zoom{padding:3px 8px;gap:2px}
+ .pf-visual-designer .pf-editor-zoom button{min-width:40px;min-height:44px;padding:0 8px}
+ .pf-visual-designer .pf-canvas-help{margin:8px 0 0;font-size:11px}
+ .pf-visual-designer .pf-designer-foot{padding:8px 12px max(8px,env(safe-area-inset-bottom))}
+ .pf-visual-designer .pf-designer-actions{display:flex;gap:10px}
+ .pf-visual-designer .pf-editor-leave{font-size:12px}
+ .pf-visual-designer .pf-designer-actions .button{flex:1;min-width:0;min-height:46px}
+}
