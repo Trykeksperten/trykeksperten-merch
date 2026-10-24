@@ -40,7 +40,7 @@ test('fixed customer freight is charged once with correct VAT and survives renew
  const {validateRenewal}=await import('../lib/order-flow.mjs');
  const liveEnv={...env,STRIPE_SECRET_KEY:'sk_live_example',STRIPE_LIVE_ENABLED:'1',STRIPE_CAPTURE_ENABLED:'1',SMERCH_PUBLIC_BASE_URL:'https://smerch.dk',PF_GATEWAY_MODE:'live',PF_GATEWAY_LIVE_ENABLED:'1',PF_AUTO_SUBMIT_ENABLED:'1',PF_WHITE_LABEL_CONFIRMED:'1',PF_PROOF_DELIVERY_CONFIRMED:'1'};
  assert.equal(checkoutConfiguration(liveEnv).freightQuoteRequired,false);
- for(const [customerType,net,gross] of [['consumer',12000,15000],['business',20000,25000]]){
+ for(const [customerType,net,gross] of [['consumer',12000,15000],['business',25000,31250]]){
   const order=prepareCheckout({...input,legal:{customerType},freightExVat:1},{catalog,prices,rules,stock,env:liveEnv,now});
   assert.equal(order.freightExVat,net);assert.equal(order.freightIncVat,gross);assert.equal(order.totalIncVat,order.quote.totalIncVat+gross);assert.equal(order.freightQuote.source,'smerch_fixed');assert.equal(order.freightQuote.supplierExVat,null);assert.equal(order.freightQuote.markupExVat,null);assert.equal(order.freightQuote.customerType,customerType);
   assert.equal(validateRenewal(order,{catalog,prices,rules,stock,env:{...liveEnv,SMERCH_FREIGHT_EX_VAT_DKK:'999'}}),true);

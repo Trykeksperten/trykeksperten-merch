@@ -1,6 +1,6 @@
 # PF-fragt: verificerede muligheder og Smerchs løsning
 
-**Opdatering 24. oktober 2026:** Efter ejerens beslutning bruger webshoppen nu fast kundefragt: 150 kr. inkl. moms for private og 200 kr. ekskl. moms for erhverv. Det manuelle kundetilbud beskrevet nedenfor er afløst som standardflow; API-undersøgelsen er fortsat gældende. PF’s omkostning er ukendt ved bestilling og må ikke udledes af kundens fragtpris.
+**Opdatering 24. oktober 2026:** Efter ejerens beslutning bruger webshoppen nu fast kundefragt: 150 kr. inkl. moms for private og 250 kr. ekskl. moms for erhverv. Det manuelle kundetilbud beskrevet nedenfor er afløst som standardflow; API-undersøgelsen er fortsat gældende. PF’s omkostning er ukendt ved bestilling og må ikke udledes af kundens fragtpris.
 
 Kontrolleret 24. oktober 2026. Ingen PF-ordrer er oprettet under undersøgelsen. Ingen interne PF Store-endpoints er antaget eller anvendt.
 
