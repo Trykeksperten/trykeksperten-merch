@@ -2211,3 +2211,8 @@ body.storefront #main .about-page .about-content{display:block;margin-top:0}
 .home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"]>.brand-marquee-group:first-child{display:contents}
 .home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"]>.brand-marquee-group[aria-hidden="true"]{display:none}
 .home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"]>.brand-marquee-group>a{position:absolute;top:0;left:0;will-change:auto}
+
+/* Horizontal finger drags move the ribbon; vertical gestures still scroll the page. */
+.home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"]{touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none}
+.home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"] a{touch-action:pan-y pinch-zoom;-webkit-user-drag:none}
+.home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"] img{pointer-events:none;-webkit-user-drag:none}
