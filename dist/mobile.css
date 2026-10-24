@@ -77,3 +77,5 @@ html{scroll-padding-top:16px}body{overflow-wrap:break-word}.wrap{width:calc(100%
 .pf-studio button.pf-quantity-tier:hover{border-color:#c94f23;background:#fff0e9}
 .pf-studio button.pf-quantity-tier:focus-visible{outline:2px solid #c94f23;outline-offset:3px}
 .pf-studio #pf-tier-size-label{max-width:260px;margin-top:16px;font-size:14px}
+
+@media(max-width:760px){.masthead .menu-toggle{width:44px;min-width:44px;height:44px;padding:10px;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px}.masthead .menu-toggle svg{margin:auto}.masthead .menu-toggle[aria-expanded="true"]{background:#edf2ed}}

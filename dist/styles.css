@@ -2166,3 +2166,6 @@ body.storefront #main .home-value-strip strong{font-size:13px;line-height:1.25;f
  body.storefront #main .home-value-strip strong{font-size:11px}
  body.storefront #main .home-value-strip>span b{font-size:11px}
 }
+
+/* One familiar menu icon with a full touch target. */
+@media(max-width:760px){.masthead .menu-toggle{width:44px;min-width:44px;height:44px;padding:10px;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px}.masthead .menu-toggle svg{margin:auto}.masthead .menu-toggle[aria-expanded="true"]{background:#edf2ed}}
