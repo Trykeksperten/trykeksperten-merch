@@ -2146,6 +2146,9 @@ body.storefront #main .about-portrait{border-radius:16px}
 }
 
 .home-top-link{display:flex;justify-content:center;padding:12px 0 40px}.home-top-link button{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 20px;border:1px solid var(--line);border-radius:24px;background:#fff;color:var(--ink)}
-.brand-ribbon-play{display:block;margin:4px 16px 0 auto;padding:8px 14px;min-height:44px;border:1px solid var(--line);border-radius:22px;background:#fff;color:var(--ink)}
-@media(hover:none) and (prefers-reduced-motion:no-preference){.home-brand-preview .brand-marquee:has(a:focus-visible) .brand-wordmarks{animation:brand-drift 48s linear infinite}}
-@media(prefers-reduced-motion:reduce){.home-brand-preview[data-motion="running"] .brand-marquee .brand-wordmarks{animation:brand-drift 48s linear infinite;will-change:transform}.home-brand-preview[data-motion="running"] .brand-marquee-group[aria-hidden="true"]{display:flex}.home-brand-preview[data-motion="running"] .brand-marquee:has(a:focus-visible) .brand-wordmarks{animation-play-state:paused}}
+
+
+/* Owner-requested continuous ribbon, including reduced-motion devices. */
+.home-brand-preview .brand-marquee .brand-wordmarks{animation:brand-drift 32s linear infinite;will-change:transform}
+.home-brand-preview .brand-marquee-group[aria-hidden="true"]{display:flex}
+.home-brand-preview .brand-marquee:has(a:focus-visible) .brand-wordmarks{animation:brand-drift 32s linear infinite}

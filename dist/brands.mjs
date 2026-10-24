@@ -28,10 +28,6 @@ export function bindBrandPreview(root=document){
   track.addEventListener('pointerdown',()=>{if(!matchMedia('(max-width:700px)').matches)return;clearTimeout(timer);track.style.animationPlayState='paused';timer=setTimeout(restart,1500);});
   const resume=()=>{clearTimeout(timer);timer=setTimeout(restart,300);};
   track.addEventListener('pointerup',resume);track.addEventListener('pointercancel',resume);track.addEventListener('pointerleave',resume);
-  const section=track.closest?.('.home-brand-preview');
-  if(section&&matchMedia('(prefers-reduced-motion: reduce)').matches){
-   const control=document.createElement('button');control.type='button';control.className='brand-ribbon-play';control.textContent='Afspil produktrækken';control.setAttribute('aria-pressed','false');
-   control.onclick=()=>{const playing=section.dataset.motion!=='running';section.dataset.motion=playing?'running':'stopped';control.textContent=playing?'Stop produktrækken':'Afspil produktrækken';control.setAttribute('aria-pressed',String(playing));restart();};section.append(control);
-  }
+
  }
 }
