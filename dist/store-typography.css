@@ -41,3 +41,7 @@ body.storefront .launch-clock b{font-size:1.5rem;line-height:1.2;font-variant-nu
 body.storefront .payment-methods>p,body.storefront #main .payment-methods>p{font-size:var(--type-meta);font-weight:var(--type-weight);color:var(--muted);letter-spacing:0}
 
 body.storefront #main .editorial-price small{display:block;font-size:var(--type-meta);line-height:1.5}
+
+/* About Smerch follows the homepage typography and text colour. */
+body.storefront #main .about-page h1{font-family:var(--font-sans);font-size:var(--type-h1);font-weight:var(--type-weight);line-height:1.25;letter-spacing:0;color:var(--ink)}
+body.storefront #main .about-page h1 .about-brand{font:inherit;color:inherit;letter-spacing:inherit}

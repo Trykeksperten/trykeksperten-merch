@@ -1444,7 +1444,7 @@ header nav a:focus-visible,
 .about-portrait{display:block;width:100%;max-width:230px;height:auto;border-radius:24px;justify-self:start}
 @media(max-width:760px){.about-content{grid-template-columns:1fr;gap:24px}.about-portrait{justify-self:center}}
 
-.about-page .about-brand{color:var(--blue)}
+.about-page .about-brand{color:inherit}
 
 /* Compact product dropdown over the current page. */
 #product-menu{position:absolute;top:100%;left:max(24px,calc((100% - 1440px)/2));right:auto;width:330px;max-width:calc(100vw - 48px);max-height:min(70vh,640px);overflow:auto;padding:12px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 40px #17201f26}
@@ -2020,9 +2020,9 @@ body.storefront #main .pf-studio .pf-product-tiers>p{margin:10px 0 0}
 }
 
 /* Brand pages use a single, centered logo. */
-.catalog-brand-heading{--brand-logo-height:min(160px,calc((100vw - 48px)/8.1));display:flex;align-items:center;justify-content:center;text-align:center}
+.catalog-brand-heading{--brand-logo-height:min(480px,calc((100vw - 48px)/2.7));display:flex;align-items:center;justify-content:center;text-align:center}
 .catalog-brand-heading h1{margin:0;max-width:100%}
-.catalog-brand-heading .catalog-brand-logo{display:block;width:auto;max-width:none;height:var(--brand-logo-height);object-fit:contain}
+.catalog-brand-heading .catalog-brand-logo{display:block;width:auto;max-width:100%;height:var(--brand-logo-height);object-fit:contain}
 
 
 /* Pair filter and price sorting in one consistent toolbar. */
@@ -2104,7 +2104,7 @@ body.storefront #main .contact-submit p{max-width:440px;font-size:12px}
 body.storefront #main .special-page .cart-summary p{font-size:14px;color:#646a6c}
 body.storefront #main .special-page :is(.notice,.upload){background:#f5f6f5;border-color:#dce1dc;color:#646a6c;border-radius:10px}
 body.storefront #main .about-content{align-items:start;gap:48px;margin-top:32px}
-body.storefront #main .about-story{font-size:16px;line-height:1.75;color:#646a6c}
+body.storefront #main .about-story{font-family:var(--font-sans);font-size:var(--type-body);font-weight:var(--type-weight);line-height:1.6;color:var(--ink)}
 body.storefront #main .about-portrait{border-radius:16px}
 @media(max-width:800px){body.storefront #main :is(.contact-layout,.special-page .cart-layout){grid-template-columns:1fr}body.storefront #main :is(.contact-form,.special-page #special-form,.contact-details,.special-page .cart-summary){padding:20px}body.storefront #main .about-content{gap:24px}}
 
@@ -2173,3 +2173,30 @@ body.storefront #main .home-value-strip strong{font-size:13px;line-height:1.25;f
 
 /* Give the campaign image a little more presence on phones. */
 @media(max-width:760px){.home-campaign img{aspect-ratio:12/5;object-fit:cover;object-position:center;height:auto}}
+
+
+/* Compact phone footer: keep contact and policy links visible without a long stack. */
+@media(max-width:700px){
+ .site-footer .footer-brand{width:108px;padding-top:20px}
+ .site-footer .footer-payments{padding-block:14px}
+ .site-footer .footer-payments .payment-methods>p{font-size:11px;margin-bottom:8px}
+ .site-footer .footer-payments .payment-method-list{gap:10px;flex-wrap:wrap}
+ .site-footer .footer-payments .payment-method-list>li{min-height:22px}
+ .site-footer .footer-payments .payment-method-list img{height:19px;max-width:74px}
+ .site-footer .footer-payments .payment-method-mobilepay img{width:74px}
+ .site-footer .footer-top{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px;padding-block:18px}
+ .site-footer .footer-top h2{font-size:12px;margin:0 0 4px}
+ .site-footer .footer-links,.site-footer .footer-top .footer-contact{gap:3px;font-size:12px;line-height:1.5}
+ .site-footer .footer-links a{display:flex;align-items:center;justify-content:center;min-height:30px}
+ .site-footer .footer-top .footer-contact{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;text-align:center}
+ .site-footer .footer-contact h2,.site-footer .footer-contact address{grid-column:1/-1}
+ .site-footer .footer-contact address{display:block;font-size:12px;line-height:1.5}
+ .site-footer .footer-contact address span+span::before{content:' · '}
+ .site-footer .footer-bottom{gap:5px 12px;padding-block:12px;font-size:11px;line-height:1.5}
+ .site-footer .footer-bottom span,.site-footer .footer-bottom a{white-space:normal}
+ .site-footer .footer-staff-link{font-size:11px;padding:5px 8px}
+}
+
+/* Portrait follows the about-page heading, before the story. */
+body.storefront #main .about-page>.about-portrait{width:230px;max-width:100%;margin:20px 0 24px;border-radius:16px}
+body.storefront #main .about-page .about-content{display:block;margin-top:0}
