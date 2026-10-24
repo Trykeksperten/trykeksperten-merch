@@ -15,6 +15,7 @@ export function appendOrderSummaryState(state,checkout,orders=[]){
  if(Number.isFinite(checkout?.totalIncVat))add('Total inkl. moms',(checkout.totalIncVat/100).toLocaleString('da-DK',{style:'currency',currency:'DKK'}));
  add('Betaling',paymentLabel(checkout));
  const statuses=[...new Set(orders.map(o=>orderLabels[o.status]||o.status).filter(Boolean))];if(statuses.length)add('Status',statuses.join(' · '));
+ if(orders.some(o=>['approval_recorded','processing','confirmed'].includes(o.status)))add('Produktionsstart','Ikke bekræftet');
  const proofs=orders.filter(o=>o.proof).map(o=>`Version ${o.proof.version} · ${o.decision?.decision==='approve'?'godkendt':o.decision?.decision==='reject'?'ændringer ønsket':o.proof.customer?'hos kunden':'til gennemgang'}`);if(proofs.length)add('Korrektur',[...new Set(proofs)].join(' · '));
  const expected=[...new Set(orders.map(o=>o.expectedShipDate).filter(Boolean))];if(expected.length)add('Forventet afsendelse',expected.map(dateTime).join(' · '));
  state.append(facts);
