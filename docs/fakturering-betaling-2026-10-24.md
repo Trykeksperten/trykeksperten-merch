@@ -16,7 +16,7 @@ Financial Outsourcing/e-conomic er den eneste fakturanummeransvarlige. Smerch op
 - PF-leverancer matches med præcis ordregruppe og varelinje. Ukendte, flertydige, ændrede eller manglende vareantal giver manuel afklaring. Tracking alene er aldrig grundlag for en hævning.
 - Leverancebeløb beregnes i øre fra ordrepriser inklusive rabat/tryk/opstart. Fragt fordeles forholdsmæssigt efter nettopris. Kumulative afrundinger sikrer, at sidste levering lukker ordretotalen præcist. Dansk moms anvendes kun på verificerede danske ordretotaler.
 - Fakturagrundlag pr. levering med juridisk sælger, kunde, varer, fragt, moms og Quickpay-/ordrereferencer kan downloades eller sendes til bogholder. Afsendt mail bevarer sin PDF-version. Ændret kundegrundlag giver en ny reference/version.
-- Fulde og delvise hævninger har særskilte, vedvarende handlingsreferencer. Udbyderstatus kontrolleres før og efter POST. Ukendt udfald spærrer nye forsøg, indtil det er afstemt.
+- Smerch hæver hele ordrebeløbet én gang, når alle PF-ordrer er bekræftet fuldt afsendt. Delvise hævninger er blokeret, også ved en gammel miljøindstilling. Hævninger har særskilte, vedvarende handlingsreferencer. Udbyderstatus kontrolleres før og efter POST. Ukendt udfald spærrer nye forsøg, indtil det er afstemt.
 - Quickpay-operationer summeres; flere captures kan tilsammen betale ordren. Gentagne callbacks giver ikke ny betaling eller kvittering. Kvitteringer oprettes pr. verificeret capture, aldrig ved reservation eller bankafregning.
 - Kvitteringsmail og bogholdermail har separate sendestatusser. Usikker SMTP-afsendelse kræver eksplicit kontrol før genforsøg.
 - Udstedte e-conomic-fakturaer og kreditnotaer registreres med nummer, aftalt serie, dato, beløb, moms og original PDF. Numre er entydige på tværs af ordrer. PDF'er kan ikke overskrives.
@@ -41,7 +41,7 @@ Alle værdier nedenfor er serverindstillinger; API-nøgler må ikke ligge i brow
 | SMERCH_ACCOUNTANT_MAIL | `review` (standard) eller `automatic` |
 | SMERCH_PAYMENT_RECEIPT_MAIL | `review` (standard) eller `automatic` |
 | SMERCH_PAYMENT_AGREEMENT_CONFIRMED | `1` efter bekræftelse af smerch.dk, Trykeksperten ApS/CVR og Quickpay/Clearhaus-aftale |
-| SMERCH_PARTIAL_CAPTURES_CONFIRMED | `1` efter bekræftelse af gentagne delvise captures for de faktiske betalingsmetoder og indløseraftaler |
+| QUICKPAY_ACQUIRER | `clearhaus` kan bruges som eksplicit, verificeret indløseropsætning, hvis Quickpays svar ikke angiver indløser. Et svar med en anden indløser tilsidesættes aldrig |
 | SMERCH_AUTOMATIC_SHIPMENT_CAPTURE | `1` for automatisk hævning af verificerede leverancer; ellers manuel handling |
 | SMERCH_ACCOUNTING_MAPPING | Bogholderens konteringsspecifikation; der foretages ingen automatisk bogføring. Ingen kontonumre eller momskoder er indsat |
 | QUICKPAY_CAPTURE_ENABLED / QUICKPAY_REFUND_ENABLED | `1` aktiverer den konkrete betalingshandling; eksisterende hævningsspærre respekteres |
@@ -56,8 +56,18 @@ Bogholder skal levere præcis procedure for fakturering ved afsendelse, serie/nu
 - Forudbetalinger opdages og vises til bogholderen; der udstedes ikke automatisk en ny leverancefaktura eller hæves på ny for at forsøge at løse dem. Særskilt forudbetalingsfakturering og momsprocedure kræver afklaring.
 - Restordre efter refundering kræver ny betaling. Automatisk oprettelse af en ny betalingsreservation for restbeløbet er ikke implementeret; den gamle fornyelsesfunktion blokerer allerede delvist hævede transaktioner for at undgå dobbelt reservation af hele ordren.
 - Clearhaus-afregninger og bankposteringer importeres ikke automatisk. Bogholder registrerer reference og beløb fra de faktiske afregninger. Quickpay-abonnement/gebyrfakturaer håndteres særskilt i e-conomic.
-- Der er ikke udført rigtige gateway-/banktransaktioner eller sendt kundemails under implementeringen. Testmiljø-/aftaleverifikation hos Quickpay/Clearhaus mangler. Tidligere konstateret manglende Quickpay-rettighed til DELETE betalingslink er ikke løst her.
+- Der er ikke udført rigtige gateway-/banktransaktioner eller sendt kundemails under implementeringen. Testmiljø-/aftaleverifikation hos Quickpay/Clearhaus mangler. DELETE `/payments/:id/link` på API user 982902 blev givet efter brugerens udtrykkelige godkendelse 24. oktober 2026 og verificeret efter genindlæsning. Der blev ikke lukket betalingslinks eller gennemført betalinger under kontrollen.
 - Endelige fakturaer og kreditnotaer udstedes/sendes af Financial Outsourcing. Upload i Smerch registrerer dokumentet og sender det ikke automatisk til kunden.
+
+## Clearhaus-afklaring 24. oktober 2026
+
+Aftalen dækker Trykeksperten ApS, CVR 44015773, www.smerch.dk og Quickpay. Quickpay-kontoens regler og testordre 623790094 bekræfter aktiv Clearhaus/MobilePay Online og accepteret autorisation; callback er OK. Ingen betaling er hævet ved denne kontrol.
+
+Ved en verificeret Clearhaus-betaling beregnes hævningsfristen ud fra Quickpays succesfulde autorisationstidspunkt: 179 dage. Manglende eller fremtidig dato blokerer. Andre/ukendte indløsere beholder den konservative kontrol. Eksisterende betalingsfrister opdateres ved verificeret opslag hos Quickpay, uden at gamle betalingsstatusser automatisk genåbnes. Det eksisterende felt `authorizationExpiresAt` anvendes som hævningsfrist ved `captureDeadlinePolicy=clearhaus-179-days`; det er ikke dokumentation for bankens faktiske reservationsvarighed.
+
+Efter syv dage vises late capture-advarsel; aftalen angiver 0,34 % i gebyr. Clearhaus oplyser øget risiko for indsigelser. Automatikken forbliver hårdt slukket. Ingen godkendelse af delvise hævninger kræves eller anvendes.
+
+Kilder: https://helpdesk.clearhaus.com/faq/ og https://quickpay.net/dk/helpdesk/authorize/
 
 ## Drift
 
@@ -67,7 +77,9 @@ Udrulning skal ske som en afgrænset patch mod produktionsversionen. Arbejdsmapp
 
 ## Verifikation
 
-Den afgrænsede release mod produktionsversionen har bestået alle 373 tests, inklusive kontrol af at miljøvariabler ikke kan aktivere automatikken. Tidligere lokal verifikation: 385 tests bestået i samlet suite, efterfulgt af 25 relevante tests efter sidste samordning af annullering/betaling. Testdækningen omfatter HTTP-adgang og oprindelse, ordrelås, afvist og udløbet betaling, annullering, delvise captures, refundering, gentagne callbacks, ukendt betalings-/mailudfald, fakturanumre, dokumentbevaring, korrektioner, afregningsligning og præcis øreafrunding. De sidste ændringer i betalingsafstemning er desuden kontrolleret med 16 økonomitests. Gateway og SMTP er simulerede i tests.
+Efter Clearhaus-tilpasning og krav om én samlet hævning: 378 tests bestået. Dækker bl.a. hævning efter 20 dage, udløbet frist, gamle reservationsfrister, afviste delhævninger, fuld PF-afsendelse og fortsat slukket automatik.
+
+Den første afgrænsede release mod produktionsversionen bestod alle 373 tests, inklusive kontrol af at miljøvariabler ikke kan aktivere automatikken. Tidligere lokal verifikation: 385 tests bestået i samlet suite, efterfulgt af 25 relevante tests efter sidste samordning af annullering/betaling. Testdækningen omfatter HTTP-adgang og oprindelse, ordrelås, afvist og udløbet betaling, annullering, delvise captures, refundering, gentagne callbacks, ukendt betalings-/mailudfald, fakturanumre, dokumentbevaring, korrektioner, afregningsligning og præcis øreafrunding. De sidste ændringer i betalingsafstemning er desuden kontrolleret med 16 økonomitests. Gateway og SMTP er simulerede i tests.
 
 PDF-eksempel renderet og visuelt kontrolleret (1 side). Økonomipanel kontrolleret med fiktive data på desktop og 390 px bredde, uden vandret overflow; forhåndsvisningen brugte fallbackskrifttype, da den ikke indlæste butikkens fontfil.
 

@@ -1,0 +1,21 @@
+KLADDE – IKKE AFSENDT
+Til: trykeksperten@financialoutsourcing.dk
+Emne: Afklaring af fakturering og afstemning for Smerch
+
+Hej Financial
+
+Smerch er Trykeksperten ApS' webshop. Kunden reserverer det fulde ordrebeløb ved bestilling. Vi ønsker én samlet hævning, når alle varer er bekræftet afsendt, og derefter en automatisk betalingskvittering. Ordrebekræftelsen sendes ved bestilling. Smerchs nye økonomiautomatik er fortsat slukket.
+
+Smerch kan klargøre et fakturagrundlag med kunde, fakturaadresse, eventuelt CVR/EAN, ordrelinjer, fragt, moms og ordre-/betalingsreference til manuel oprettelse i e-conomic. Vi vil gerne aftale:
+
+1. Hvordan udstedes og bogføres salgsbilag til henholdsvis privatkunder og virksomheder? Skal I oprette alle fakturaer, inklusive forenklede fakturaer, eller ønsker I en anden dokumenteret procedure for privatsalg?
+2. Hvilken fakturadato, momsperiode, nummerserie og arbejdsgang skal vi anvende ved afsendelse? Hvordan håndteres undtagelser og eventuelle forudbetalinger?
+3. Hvordan registreres den allerede hævede Quickpay-betaling på fakturaen, så kunden ikke opkræves igen, og salget ikke bogføres to gange? Kan Smerchs ordreference følge fakturaen og udligningen?
+4. Hvilke konti og momskoder skal bruges til salg, betalingsmellemregning, Clearhaus-gebyrer, bankudbetalinger, tilbageholdelser og indsigelser? Hvem henter og afstemmer Clearhaus-kontoudtogene?
+5. Hvordan håndteres kreditnota/refundering og efterfølgende ønsker om en fuld faktura? Hvem sender den endelige faktura til kunden, og hvordan får vi nummer og PDF registreret på ordren?
+6. Er det vedlagte/kommende fakturagrundlag tilstrækkeligt, og hvor hurtigt kan I behandle grundlag modtaget på denne mailadresse?
+
+Vi aktiverer først økonomiautomatikken, når proceduren er aftalt. Vi ønsker ikke automatisk bogføring eller en e-conomic-integration på nuværende tidspunkt.
+
+Venlig hilsen
+Joakim / Smerch – Trykeksperten ApS
