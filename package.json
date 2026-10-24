@@ -13,10 +13,14 @@
     "sync:english": "node scripts/sync-pf-english.mjs"
   },
   "engines": {
-    "node": ">=20.12"
+    "node": ">=24.14.0"
   },
   "dependencies": {
-    "nodemailer": "^7.0.13",
+    "html-to-text": "10.0.1",
+    "imapflow": "2.9.1",
+    "mailauth": "8.0.4",
+    "mailparser": "3.12.4",
+    "nodemailer": "10.2.1",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.3.289"
   }

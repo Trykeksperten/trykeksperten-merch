@@ -13,7 +13,7 @@ services:
       sizeGB: 10
     envVars:
       - key: NODE_VERSION
-        value: 20.18.0
+        value: 24.14.0
       - key: SMERCH_DATA_DIR
         value: /var/data
       - key: SMERCH_PUBLIC_BASE_URL
