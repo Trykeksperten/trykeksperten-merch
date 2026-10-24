@@ -4,7 +4,7 @@ import {financePanel} from './admin-finance.mjs';
 import {mountAdminNavigation,bindAdminMenu} from './admin-navigation.mjs';
 import {queueCounts} from './admin-work-queue.mjs';
 import {compactOrderWorkspace} from './admin-order-tabs.mjs?v=compact-2';
-import {orderAutomationPanel} from './admin-automation.mjs?v=actors-1';
+import {orderAutomationPanel} from './admin-automation.mjs?v=compact-history-1';
 import {canReceiveProof} from './proof-upload.mjs';
 import {documentPanel} from './admin-documents.mjs?v=compact-2';
 import {orderActionCard,orderProductCards} from './admin-order-cards.mjs';

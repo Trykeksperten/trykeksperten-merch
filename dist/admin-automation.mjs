@@ -1,4 +1,4 @@
-import {mailActivity,proofActionLabel} from './admin-activity.mjs';
+import {actorLabel,mailActivity,proofActionLabel} from './admin-activity.mjs';
 const el=(tag,text)=>{const n=document.createElement(tag);if(text)n.textContent=text;return n;};
 const labels={review:'Afventer din gennemgang',blocked:'Mangler oplysninger',sent:'Sendt',failed:'Kunne ikke starte afsendelse',uncertain:'Levering ukendt · kræver afstemning',sending:'Afsendelse behandles',pending:'Afventer afsendelse',complete:'Afsluttet',obsolete:'Tidligere version / link'};
 export async function automationPanel(container,api){
@@ -21,8 +21,49 @@ export async function automationPanel(container,api){
  for(const row of data.shipments||[]){const p=el('p'),link=el('a',(labels[row.status]||row.status)+' · '+(row.to||'Modtager mangler'));link.href='/admin/pf-orders#order='+row.orderId;p.append(link);container.append(p);}if(!data.shipments?.length)container.append(el('p','Ingen forsendelsesbeskeder endnu.'));
  }catch(error){container.append(el('p',error.message));}
 }
-export function orderAutomationPanel(order,api){const box=el('details');box.append(el('summary','Beskeder, påmindelser og afsendelsesstatus'));const content=el('div');box.append(content);const url=`/api/pf-orders/${order.id}/automation`;
- async function load(){content.replaceChildren();try{const data=await(await api(url)).json();for(const item of data.intake||[])if(['blocked','review','processing'].includes(item.status)||item.conflict&&item.status!=='reviewed')content.append(el('p','Korrekturimport: '+(item.error||'Afventer gennemgang og afsendelse.')));for(const row of [...data.shipments,...data.proofs.map(p=>({...p,proof:true})),...(data.confirmation?[{...data.confirmation,confirmation:true}]:[])]){const card=el('section'),title=el('h4',row.confirmation?'Ordrebekræftelse':row.proof?proofActionLabel(row.kind)+' · version '+row.version:'Forsendelsesmail');card.append(title,el('p',labels[row.status]||row.status));const participants=el('div');participants.className='mail-participants';for(const line of mailActivity(row))participants.append(el('p',line));card.append(participants);if(row.sentAt||row.lastSentAt)card.append(el('p','Sendt: '+new Date(row.sentAt||row.lastSentAt).toLocaleString('da-DK',{timeZone:'Europe/Copenhagen'})));if(row.text){const details=el('details'),pre=el('pre',row.text);details.append(el('summary','Vis beskedindhold'),pre);card.append(details);}for(const problem of row.problems||[])card.append(el('p',problem));if(row.error)card.append(el('p',row.error));
- if((!row.proof&&['review','failed','uncertain'].includes(row.status))||((row.proof||row.confirmation)&&['uncertain','pending'].includes(row.status))){const button=el('button',row.status==='uncertain'?'Genforsøg efter afstemning':row.status==='failed'?'Prøv igen':row.proof||row.confirmation?'Send besked':'Send forsendelsesmail');button.type='button';button.onclick=async()=>{const uncertain=row.status==='uncertain';if(uncertain&&!confirm('Har du kontrolleret mailkontoen og bekræftet, at denne besked IKKE blev sendt? Et nyt forsøg kan ellers sende en dublet.'))return;button.disabled=true;try{await api(url,'POST',{id:row.id,kind:row.confirmation?'confirmation':row.proof?'proof':'shipment',key:row.key,confirmUncertain:uncertain});await load();}catch(e){card.append(el('p',e.message));button.disabled=false;}};card.append(button);}content.append(card);}if(!data.shipments.length&&!data.proofs.length)content.append(el('p','Ingen beskeder i køen endnu.'));}catch(e){content.append(el('p',e.message));}}
+const shortStates={review:'Til gennemgang',blocked:'Kræver handling',sent:'Sendt',failed:'Afsendelse fejlet',uncertain:'Levering ukendt',sending:'Afsendes',pending:'Afventer afsendelse',complete:'Afsluttet',obsolete:'Tidligere link'};
+function briefTitle(row){
+ if(row.confirmation)return 'Ordrebekræftelse';
+ if(!row.proof)return 'Forsendelsesmail';
+ return ({invitation:'Korrektur til godkendelse',receipt:'Kvittering for korrektursvar',staff_decision:'Internt korrektursvar'}[row.kind]||'Korrekturbesked')+' · v'+row.version;
+}
+function timestamp(value,seconds=false){return value?new Date(value).toLocaleString('da-DK',{timeZone:'Europe/Copenhagen',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',...(seconds?{second:'2-digit'}:{})}):'Ikke sendt';}
+export function orderAutomationPanel(order,api){
+ const box=el('details');box.className='order-mail-history';box.append(el('summary','Beskeder og afsendelser'));
+ const content=el('div');box.append(content);const url=`/api/pf-orders/${order.id}/automation`;
+ async function load(){
+  content.replaceChildren();
+  try{
+   const data=await(await api(url)).json();
+   for(const item of data.intake||[])if(['blocked','review','processing'].includes(item.status)||item.conflict&&item.status!=='reviewed')content.append(el('p','Korrekturimport: '+(item.error||'Afventer gennemgang og afsendelse.')));
+   const rows=[...data.shipments,...data.proofs.map(p=>({...p,proof:true})),...(data.confirmation?[{...data.confirmation,confirmation:true}]:[])];
+   if(!rows.length){content.append(el('p','Ingen beskeder i køen endnu.'));return;}
+   const header=el('div');header.className='mail-history-head';header.setAttribute('aria-hidden','true');for(const label of ['','Tidspunkt','Handling','Udført af','Modtager','Status'])header.append(el('span',label));content.append(header);
+   for(const row of rows){
+    const card=el('details'),summary=el('summary'),body=el('div');card.className='mail-history-row';body.className='mail-history-detail';
+    const arrow=el('span','›');arrow.className='mail-history-chevron';arrow.setAttribute('aria-hidden','true');summary.append(arrow);
+    const at=row.sentAt||row.lastSentAt;summary.setAttribute('aria-label',[timestamp(at),briefTitle(row),'Udført af: '+actorLabel(row.initiatedBy),'Modtager: '+(row.to||'Ikke registreret'),'Status: '+(labels[row.status]||row.status)].join(' · '));
+    for(const [cls,text,title] of [
+     ['time',timestamp(at),at?'Sendt: '+timestamp(at,true):'Afsendelse er ikke registreret'],
+     ['action',briefTitle(row),row.confirmation?'Ordrebekræftelse':row.proof?proofActionLabel(row.kind)+' · version '+row.version:'Forsendelsesmail'],
+     ['actor',actorLabel(row.initiatedBy),'Igangsat af: '+actorLabel(row.initiatedBy)],
+     ['to',row.to||'Ikke registreret','Modtager: '+(row.to||'Ikke registreret')],
+     ['status',shortStates[row.status]||row.status,labels[row.status]||row.status]
+    ]){const cell=el('span',text);cell.className='mail-history-'+cls;cell.title=title;summary.append(cell);}
+    if(['blocked','failed','uncertain'].includes(row.status))card.className+=' needs-attention';
+    body.append(el('h4',row.confirmation?'Ordrebekræftelse':row.proof?proofActionLabel(row.kind)+' · version '+row.version:'Forsendelsesmail'));
+    for(const line of mailActivity(row))body.append(el('p',line));
+    body.append(el('p','Status: '+(labels[row.status]||row.status)),el('p',at?'Sendt: '+timestamp(at,true):'Ingen afsendelse registreret.'));
+    if(row.text)body.append(el('pre',row.text));
+    for(const problem of row.problems||[])body.append(el('p',problem));if(row.error)body.append(el('p',row.error));
+    if((!row.proof&&['review','failed','uncertain'].includes(row.status))||((row.proof||row.confirmation)&&['uncertain','pending'].includes(row.status))){
+     const button=el('button',row.status==='uncertain'?'Genforsøg efter afstemning':row.status==='failed'?'Prøv igen':row.proof||row.confirmation?'Send besked':'Send forsendelsesmail');button.type='button';
+     button.onclick=async()=>{const uncertain=row.status==='uncertain';if(uncertain&&!confirm('Har du kontrolleret mailkontoen og bekræftet, at denne besked IKKE blev sendt? Et nyt forsøg kan ellers sende en dublet.'))return;button.disabled=true;try{await api(url,'POST',{id:row.id,kind:row.confirmation?'confirmation':row.proof?'proof':'shipment',key:row.key,confirmUncertain:uncertain});await load();}catch(e){body.append(el('p',e.message));button.disabled=false;}};
+     body.append(button);
+    }
+    card.append(summary,body);content.append(card);
+   }
+  }catch(e){content.append(el('p',e.message));}
+ }
  load();return box;
 }
