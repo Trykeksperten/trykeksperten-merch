@@ -92,3 +92,30 @@
  .pf-visual-designer .pf-designer-stage,.pf-visual-designer .pf-designer-stage *{touch-action:none}
  .pf-visual-designer .pf-layer-nudge button,.pf-visual-designer .pf-layer-actions button{min-height:44px}
 }
+
+/* Compact phone tools while keeping finger-sized controls and the fixed preview. */
+@media(max-width:1024px){
+ .pf-visual-designer .pf-designer-sidebar{padding:10px 12px 16px}
+ .pf-visual-designer .pf-designer-sidebar label{font-size:12px;line-height:1.35;gap:4px;margin:0}
+ .pf-visual-designer .pf-designer-sidebar #pf-text{height:56px;min-height:56px;max-height:120px;padding:8px 10px;margin-top:4px;line-height:1.35;resize:vertical}
+ .pf-visual-designer[data-content-tab="text"] .pf-designer-sidebar .pf-text-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 12px;margin-top:10px}
+ .pf-visual-designer .pf-text-controls>label,.pf-visual-designer .pf-text-controls>fieldset{min-width:0}
+ .pf-visual-designer .pf-text-controls>label.pf-text-color{display:flex;flex-direction:column;align-items:stretch;gap:4px}
+ .pf-visual-designer .pf-text-controls .pf-text-color input[type=color]{width:100%;height:44px;min-height:44px;margin:0;padding:4px}
+ .pf-visual-designer .pf-text-controls select{height:44px;min-height:44px;padding:7px 9px;margin-top:0}
+ .pf-visual-designer .pf-text-controls>.pf-text-size,.pf-visual-designer .pf-text-controls>.pf-text-rotation,.pf-visual-designer .pf-text-controls>.pf-text-center,.pf-visual-designer .pf-text-controls>p{grid-column:1/-1}
+ .pf-visual-designer .pf-text-size,.pf-visual-designer .pf-text-rotation{gap:3px}
+ .pf-visual-designer .pf-text-size>div{grid-template-columns:44px minmax(0,1fr) 44px;gap:6px}
+ .pf-visual-designer .pf-text-size button{width:44px;min-height:44px}
+ .pf-visual-designer .pf-text-controls legend{font-size:12px;line-height:1.35;margin-bottom:4px}
+ .pf-visual-designer .pf-text-align,.pf-visual-designer .pf-text-rotation-presets{gap:4px;margin:0}
+ .pf-visual-designer .pf-text-align button,.pf-visual-designer .pf-text-rotation-presets button{font-size:12px;min-height:44px;padding:6px 3px}
+ .pf-visual-designer .pf-text-center{min-height:44px;padding:6px 0;font-size:12px;text-align:left}
+ .pf-visual-designer .pf-text-controls>p{font-size:11px;line-height:1.4;margin:0}
+ .pf-visual-designer .pf-designer-sidebar .pf-design-tools{padding-top:10px;margin-top:10px}
+ .pf-visual-designer .pf-designer-sidebar .pf-layer-list{margin-bottom:10px}
+ .pf-visual-designer .pf-designer-sidebar .pf-design-tools h3{font-size:12px;margin-bottom:6px}
+ .pf-visual-designer .pf-designer-sidebar .pf-layer-controls{gap:6px}
+ .pf-visual-designer .pf-designer-sidebar .pf-upload-launch{min-height:56px;padding:7px 10px}
+ .pf-visual-designer #pf-logo-panel>.small{font-size:11px;margin:6px 0}
+}
