@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {orderAutomationPanel} from '../dist/admin-automation.mjs';
+class Element{constructor(tag){this.tag=tag;this.children=[];this.style={};this.attributes={};this.textContent='';}append(...nodes){this.children.push(...nodes);}replaceChildren(...nodes){this.children=[...nodes];}setAttribute(k,v){this.attributes[k]=v;}}
+const all=node=>[node,...node.children.flatMap(all)];
+test('order message history distinguishes action, authenticated staff, sender and recipient',async()=>{
+ const previous=globalThis.document;globalThis.document={createElement:tag=>new Element(tag)};
+ try{const box=orderAutomationPanel({id:'ord-test'},async()=>({json:async()=>({shipments:[],proofs:[{kind:'invitation',version:2,status:'sent',to:'customer@example.test',initiatedBy:{type:'staff',name:'staff@example.test'},sentBy:{type:'system',name:'Smerch korrektur',email:'korrektur@smerch.dk'},lastSentAt:'2026-10-24T10:00:00Z',sentCount:1},{kind:'staff_decision',version:1,status:'complete',to:'korrektur@smerch.dk'}]})}));await new Promise(resolve=>setImmediate(resolve));const texts=all(box).map(n=>n.textContent);assert.ok(texts.includes('Korrektur sendt til godkendelse · version 2'));assert.ok(texts.includes('Igangsat af: Smerch · staff@example.test'));assert.ok(texts.includes('Afsender: Automatik · Smerch korrektur · korrektur@smerch.dk'));assert.ok(texts.includes('Modtager: customer@example.test'));assert.ok(texts.includes('Intern besked om kundens korrektursvar · version 1'));assert.ok(texts.includes('Igangsat af: Ikke registreret'));assert.ok(!texts.includes('staff_decision'));}finally{globalThis.document=previous;}
+});
