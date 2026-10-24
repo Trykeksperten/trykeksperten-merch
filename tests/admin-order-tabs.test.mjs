@@ -21,3 +21,8 @@ test('order tabs keep next step visible, preserve selection on refresh and expos
  const fresh=fixture('another-order');assert.equal(compactOrderWorkspace(fresh.box,fresh.args).panels.get('summary').hidden,false);
  }finally{globalThis.document=old;}
 });
+
+test('shared document rows keep the mail review inside Documents without duplicating it',()=>{
+ const previous=globalThis.document;globalThis.document={createElement:tag=>new Element(tag)};
+ try{const f=fixture('shared-documents'),host=new Element('div');host.className='document-mail-review';f.nodes.documents.append(host);const resend=f.nodes.contact.querySelector('.order-resend');const result=compactOrderWorkspace(f.box,f.args);assert.equal(resend.parentElement,host);assert.equal(result.panels.get('documents').querySelector('.order-resend'),resend);assert.equal(result.panels.get('contact').querySelector('.order-resend'),null);assert.equal(descendants(f.box).filter(node=>node===resend).length,1);}finally{globalThis.document=previous;}
+});

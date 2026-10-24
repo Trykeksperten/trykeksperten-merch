@@ -158,3 +158,13 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 @media(max-width:520px){.customer-contact-grid{grid-template-columns:1fr;gap:16px}}
 
 .mail-participants{min-width:0;overflow-wrap:anywhere}.mail-participants p{margin:3px 0;font-size:13px;line-height:1.5}
+/* One document row keeps its PDF and message actions together. */
+.order-documents>h3{font-size:17px;margin:0 0 5px}.order-documents>p{font-size:13px;color:var(--admin-muted);margin:0 0 12px}.order-documents>p:empty,.order-resend>p:empty{display:none}
+.document-action-list{border-top:1px solid var(--admin-line)}
+.document-action-row{display:grid;grid-template-columns:minmax(155px,1fr) minmax(190px,1.15fr) minmax(170px,1.1fr) minmax(230px,1.4fr);gap:10px 16px;align-items:center;padding:11px 0;border-bottom:1px solid var(--admin-line);font-size:14px;line-height:1.45}
+.document-action-row>div{min-width:0}.document-action-row strong{font-weight:600}.document-action-row small,.document-recipient span{display:block;font-size:12px;color:var(--admin-muted);overflow-wrap:anywhere}.document-recipient strong{font-size:12px;font-weight:500}.document-readiness p{font-size:12px;margin:0;color:var(--admin-muted)}
+.document-row-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:6px}.admin-proofs .document-row-actions button{width:auto;min-height:36px;margin:0;padding:6px 11px;font-size:13px;white-space:normal}.document-row-actions a{font-size:13px;white-space:nowrap;margin:0 4px}
+.document-mail-review .order-resend{padding:0;margin:0;border:0}.document-mail-review .order-resend>div:empty{display:none}.document-mail-review .order-resend>div:not(:empty),.document-send-review{margin:12px 0;padding:12px;border:1px solid var(--admin-line);border-radius:8px}.document-send-review input,.document-send-review textarea{display:block;width:100%;margin:8px 0}.document-send-review button{margin-right:6px}
+.order-documents>details{margin-top:8px}.order-documents>details>section{padding:8px 0;border-top:1px solid var(--admin-line);display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}.order-documents>details>section a{flex:1;min-width:180px}.order-documents>details>section button{min-height:34px;padding:5px 10px;font-size:12px}
+@media(max-width:1200px){.document-action-row{grid-template-columns:minmax(160px,1fr) minmax(200px,1.2fr)}.document-row-actions{justify-content:flex-start}.document-readiness{grid-column:1}}
+@media(max-width:600px){.document-action-row{grid-template-columns:1fr;gap:5px;padding:12px 0}.document-readiness{grid-column:auto}.document-row-actions{margin-top:3px}.admin-proofs .document-row-actions button{min-height:42px;font-size:14px}.document-recipient span{font-size:13px}}
