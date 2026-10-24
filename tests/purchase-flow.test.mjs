@@ -30,3 +30,11 @@ test('freight estimates never treat missing rates or unconfirmed routes as free 
  assert.equal(freightEstimate({ready:true,groups:[{location:'NL',kind:'blank'}]},{freightExVat:4000}),null);
  assert.deepEqual(freightEstimate({ready:true,groups:[{location:'NL',kind:'blank'}]},{blankShipping:{freightExVat:6000}}),{exVat:6000,incVat:7500});
 });
+
+test('fixed customer shipping uses the chosen customer type and remains independent of legacy supplier rates',async()=>{
+ const {freightEstimate}=await import('../dist/purchase-flow.mjs');const {fixedCustomerFreight}=await import('../dist/freight-policy.mjs'),fulfillment={ready:true,groups:[{location:'PL'}]},config={fixedCustomerFreight,freightExVat:999};
+ assert.deepEqual(freightEstimate(fulfillment,config,'consumer'),{exVat:12000,incVat:15000});
+ assert.deepEqual(freightEstimate(fulfillment,config,'business'),{exVat:20000,incVat:25000});
+ for(const type of ['unknown','constructor','__proto__'])assert.equal(freightEstimate(fulfillment,config,type),null);
+ assert.equal(freightEstimate({ready:false,groups:[]},config,'consumer'),null);
+});
