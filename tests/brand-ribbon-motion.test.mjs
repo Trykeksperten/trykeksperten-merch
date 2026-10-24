@@ -35,3 +35,28 @@ test('taps remain links, vertical swipes remain page scrolling and interrupted d
  f.trackEvents.pointerdown(pointer('pointerdown',100,20,200));f.trackEvents.pointermove(pointer('pointermove',20,20,240));f.windowEvents.pointercancel(pointer('pointercancel',20,20,241));const atCancel=f.positions().join();f.advance(1000);assert.notEqual(f.positions().join(),atCancel);
  dispose();assert.deepEqual(f.trackEvents,{});
 });
+function touch(type,x,y,time=0){const finger={identifier:7,clientX:x,clientY:y};return {type,touches:type==='touchend'||type==='touchcancel'?[]:[finger],changedTouches:[finger],timeStamp:time,cancelable:true,preventDefault(){this.prevented=true;}};}
+test('horizontal finger gesture blocks page panning from the first movement and keeps its axis until release',()=>{
+ const f=fixture();bindContinuousRibbon(f.track,f);
+ f.trackEvents.touchstart(touch('touchstart',300,100));
+ const tiny=touch('touchmove',297,101,16);f.trackEvents.touchmove(tiny);assert.equal(tiny.prevented,true);
+ const horizontal=touch('touchmove',270,103,32);f.trackEvents.touchmove(horizontal);assert.equal(horizontal.prevented,true);
+ const diagonal=touch('touchmove',240,240,48);f.trackEvents.touchmove(diagonal);assert.equal(diagonal.prevented,true);assert.ok(f.coverage());
+ // Mobile pointercancel must not release the independent touch lock.
+ f.windowEvents.pointercancel({...pointer('pointercancel',240,240,49),pointerType:'touch'});
+ const further=touch('touchmove',220,300,64);f.trackEvents.touchmove(further);assert.equal(further.prevented,true);
+ f.windowEvents.touchend(touch('touchend',220,300,80));const before=f.positions().join();f.advance(1000);assert.notEqual(f.positions().join(),before);
+});
+test('a vertical touch gesture keeps native scrolling and never switches into horizontal dragging',()=>{
+ const f=fixture();bindContinuousRibbon(f.track,f);f.trackEvents.touchstart(touch('touchstart',200,100));
+ const vertical=touch('touchmove',202,125,16);f.trackEvents.touchmove(vertical);assert.equal(vertical.prevented,undefined);
+ const later=touch('touchmove',100,145,32);f.trackEvents.touchmove(later);assert.equal(later.prevented,undefined);
+ f.windowEvents.touchend(touch('touchend',100,145,48));const tap=pointer('click',100,145,49);f.trackEvents.click(tap);assert.equal(tap.prevented,undefined);
+});
+test('touch cancellation and pinch gestures release the row and touch pointer events do not move it twice',()=>{
+ const f=fixture();bindContinuousRibbon(f.track,f);
+ f.trackEvents.touchstart(touch('touchstart',300,100));f.trackEvents.touchmove(touch('touchmove',250,100,16));const once=f.positions().join();
+ f.trackEvents.pointermove({...pointer('pointermove',200,100,17),pointerType:'touch',pointerId:7});assert.equal(f.positions().join(),once);
+ f.windowEvents.touchcancel(touch('touchcancel',250,100,18));f.advance(1000);assert.notEqual(f.positions().join(),once);
+ f.trackEvents.touchstart(touch('touchstart',300,100,1100));const pinch=touch('touchmove',250,100,1116);pinch.touches.push({identifier:8,clientX:350,clientY:100});f.trackEvents.touchmove(pinch);assert.equal(pinch.prevented,undefined);f.advance(64000);assert.ok(f.coverage());
+});

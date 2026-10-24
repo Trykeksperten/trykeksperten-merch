@@ -1,4 +1,4 @@
-import {bindContinuousRibbon} from './brand-ribbon-motion.mjs?v=3';
+import {bindContinuousRibbon} from './brand-ribbon-motion.mjs?v=4';
 import {brandLogoURL} from './brand-logos.mjs';
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 import {pricedVariants} from './pf-visibility.mjs';
