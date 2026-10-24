@@ -20,12 +20,18 @@ export function brandPreview(brands,products=[],prices){
 
 export function brandsPage(brands,search){const params=new URLSearchParams(search),selected=brands.find(b=>b.id===params.get('brand')),group=params.get('kategori')||'',groups=[...new Set(brands.map(b=>b.group))],list=group?brands.filter(b=>b.group===group):brands;return `<section class="brands-hero"><div class="wrap"><p class="eyebrow">SMERCH · BRAND SELECTION</p><h1>Kendte brands.<br>Jeres <em>særpræg.</em></h1><p>Et kurateret udvalg til arbejdsdagen, rejsen og den gode gave.</p><span class="brand-availability">Produkter og trykvalg · klar til at udforske</span></div></section><section class="wrap section brands-content"><div class="section-heading"><h2>Find jeres match.</h2><p class="muted">${brands.length} udvalgte brands</p></div><nav class="brand-filters" aria-label="Brandkategorier"><a href="/brands" ${!group?'aria-current="page"':''}>Alle brands</a>${groups.map(g=>`<a href="/brands?kategori=${encodeURIComponent(g)}" ${g===group?'aria-current="page"':''}>${escape(g)}</a>`).join('')}</nav>${selected?`<article class="brand-detail"><div><p class="eyebrow">${escape(selected.group)}</p><h2><a href="/produkter?brand=${selected.id}" aria-label="Se produkter fra ${escape(selected.name)}">${logo(selected)}</a></h2><p class="brand-focus">${escape(selected.focus)}</p></div><div><p>${escape(selected.description)}</p><p class="brand-detail-note">Se produkterne og afprøv de tilgængelige trykmuligheder.</p><a class="button" href="/produkter?brand=${selected.id}">Se produkter fra ${escape(selected.name)} ↗</a><a class="text-link close-brand" href="/brands">Tilbage til alle brands</a></div></article>`:''}<div class="brand-directory">${list.map((b,i)=>`<a class="brand-entry ${b.id===selected?.id?'selected':''}" href="/produkter?brand=${b.id}"><span class="brand-number">${String(brands.indexOf(b)+1).padStart(2,'0')}</span><span class="brand-entry-main">${logo(b)}<span>${escape(b.focus)}</span></span><span class="brand-info">Se produkter <span aria-hidden="true">↗</span></span></a>`).join('')}</div><div class="brand-footnote"><h3>Udvalget starter med de rigtige navne.</h3><p>Brandsene er valgt som retning for Smerch. Gem favoritter i kataloget for at sammensætte det kommende sortiment.</p><a class="text-link" href="/produkter">Se hele sortimentet ↗</a></div></section>`;}
 
-// Freeze a moving target while tapping; retain the anchor's native navigation.
+// A cancelled/interrupted touch must never leave the ribbon paused indefinitely.
 export function bindBrandPreview(root=document){
  for(const track of root.querySelectorAll('.home-brand-preview .brand-wordmarks')){
   if(track.dataset.touchBound)continue;track.dataset.touchBound='true';let timer;
-  track.addEventListener('pointerdown',()=>{if(!matchMedia('(max-width:700px)').matches)return;clearTimeout(timer);track.style.animationPlayState='paused';});
-  const resume=()=>{clearTimeout(timer);timer=setTimeout(()=>{if(track.isConnected)track.style.animationPlayState='';},500);};
+  const restart=()=>{clearTimeout(timer);if(track.isConnected)track.style.animationPlayState='';};
+  track.addEventListener('pointerdown',()=>{if(!matchMedia('(max-width:700px)').matches)return;clearTimeout(timer);track.style.animationPlayState='paused';timer=setTimeout(restart,1500);});
+  const resume=()=>{clearTimeout(timer);timer=setTimeout(restart,300);};
   track.addEventListener('pointerup',resume);track.addEventListener('pointercancel',resume);track.addEventListener('pointerleave',resume);
+  const section=track.closest?.('.home-brand-preview');
+  if(section&&matchMedia('(prefers-reduced-motion: reduce)').matches){
+   const control=document.createElement('button');control.type='button';control.className='brand-ribbon-play';control.textContent='Afspil produktrækken';control.setAttribute('aria-pressed','false');
+   control.onclick=()=>{const playing=section.dataset.motion!=='running';section.dataset.motion=playing?'running':'stopped';control.textContent=playing?'Stop produktrækken':'Afspil produktrækken';control.setAttribute('aria-pressed',String(playing));restart();};section.append(control);
+  }
  }
 }
