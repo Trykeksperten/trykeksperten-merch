@@ -20,6 +20,7 @@ import {pilotFreightExVat} from './lib/pilot-freight.mjs';
 import {startPopularitySync} from './lib/pf-popularity.mjs';
 import {inspectArtworkPantone,decorationPantone} from './lib/artwork-pantone.mjs';
 const pantoneAllowed=createAddressLimiter();
+import {receiveProof,proofIntakeStatus,reviewProofIntake} from './lib/proof-intake.mjs';
 import {readPFCallback} from './lib/pf-callback.mjs';
 import {pfColourPolicy} from './lib/pf-colours.mjs';
 import {savePFConfirmation,readPFConfirmation} from './lib/pf-confirmations.mjs';
@@ -275,7 +276,7 @@ const handleRequest=async(req,res)=>{
   if(!adminSessionAuthorized(req)){json(res,401,{error:'Medarbejderlogin kræves.'});return;}
   try{if(req.method==='POST'){json(res,200,await savePFConfirmation(confirmationPath[1],await readJSON(req,15*1024*1024)));}else{const doc=await readPFConfirmation(confirmationPath[1]);if(legalURL.searchParams.get('download')==='1'){res.writeHead(200,{'Content-Type':'application/pdf','Content-Disposition':`attachment; filename="${doc.name}"`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':'sandbox'}).end(Buffer.from(doc.contentBase64,'base64'));}else json(res,200,{name:doc.name,uploadedAt:doc.uploadedAt});}}catch(error){json(res,req.method==='GET'?404:400,{error:req.method==='GET'?'Ingen PF-bekræftelse gemt.':error.message});}return;
  }
- async function presentPFOrder(order){const lines=await Promise.all((order.lines||[]).map(async line=>{try{const product=await loadPFProduct(line.productId),variant=product.variants?.find(v=>v.sku===line.sku);return {...line,productName:line.productName||product.name,color:line.color||variant?.color,size:line.size||variant?.size};}catch{return line;}}));return {...order,lines};}
+ async function presentPFOrder(order){const lines=await Promise.all((order.lines||[]).map(async line=>{try{const product=await loadPFProduct(line.productId),variant=product.variants?.find(v=>v.sku===line.sku);return {...line,productName:line.productName||product.name,color:line.color||variant?.color,size:line.size||variant?.size};}catch{return line;}}));const intake=await proofIntakeStatus(order.id);return {...order,lines,proofIntakeProblems:intake.filter(row=>row.status==='blocked'||row.conflict&&row.status!=='reviewed').map(row=>row.error)};}
  const financePath=legalURL.pathname.match(/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})\/finance$/);
  if(financePath){
   if(!adminSessionAuthorized(req)){json(res,401,{error:'Medarbejderlogin kræves.'});return;}
@@ -295,14 +296,16 @@ const handleRequest=async(req,res)=>{
   if(!authorized(req,process.env.PF_ORDER_ADMIN_TOKEN)&&!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}
   try{
    const pathname=new URL(req.url,'http://localhost').pathname;
+   const intakeReview=/^\/api\/pf-orders\/proof-intake\/([a-f0-9]{64})\/review$/.exec(pathname);
+   if(intakeReview&&req.method==='POST'){if(!adminSessionAuthorized(req)||!checkoutRequestAuthorized(req))throw Error('Medarbejderlogin og gyldig oprindelse kræves.');json(res,200,await reviewProofIntake(intakeReview[1],await readJSON(req,8192)));return;}
    if(pathname==='/api/pf-orders/automation-settings'){
     if(!adminSessionAuthorized(req)){json(res,401,{error:'Medarbejderlogin kræves.'});return;}
-    if(req.method==='GET'){json(res,200,{settings:await automationSettings(),shipments:await shipmentMailStatus()});return;}
+    if(req.method==='GET'){json(res,200,{settings:await automationSettings(),shipments:await shipmentMailStatus(),intake:await proofIntakeStatus()});return;}
     if(req.method==='POST'){if(!checkoutRequestAuthorized(req))throw Error('Ugyldig oprindelse.');json(res,200,await saveAutomationSettings(await readJSON(req,4096)));return;}
    }
    const automation=pathname.match(/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})\/automation$/);
    if(automation){if(!adminSessionAuthorized(req))throw Error('Medarbejderlogin kræves.');const order=await readOrder(automation[1]);await reconcileShipmentMail(order);
-    if(req.method==='GET'){json(res,200,{shipments:await shipmentMailStatus(order.id),proofs:await proofMailStatus(order.id),confirmation:order.checkoutId?await orderConfirmationStatus(order.checkoutId):null});return;}
+    if(req.method==='GET'){json(res,200,{shipments:await shipmentMailStatus(order.id),proofs:await proofMailStatus(order.id),intake:await proofIntakeStatus(order.id),confirmation:order.checkoutId?await orderConfirmationStatus(order.checkoutId):null});return;}
     if(req.method==='POST'){if(!checkoutRequestAuthorized(req))throw Error('Ugyldig oprindelse.');const input=await readJSON(req,4096);if(input.kind==='confirmation'){if(!order.checkoutId)throw Error('Ordren mangler checkout.');await releaseOrderConfirmation(order.checkoutId,{confirmedNotSent:input.confirmUncertain===true});retryOrderConfirmations().catch(()=>{});json(res,200,{queued:true});return;}if(input.kind==='proof'){await retryProofMailRecord(order.id,input.key,{confirmedNotSent:input.confirmUncertain===true});retryProofMail().catch(()=>{});json(res,200,{queued:true});return;}json(res,200,await sendShipmentMail(order.id,input.id,{confirmUncertain:input.confirmUncertain===true}));return;}
    }
    const documents=pathname.match(/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})\/documents(?:\/([a-f0-9-]{36}))?$/);
@@ -349,7 +352,7 @@ const handleRequest=async(req,res)=>{
  }
  if(req.url==='/api/pf-proof-inbox'&&req.method==='POST'){
   if(!proofInboxAuthorized(req)){json(res,401,{error:'Adgang til korrekturindbakken kræves.'});return;}
-  try{const input=await readPFRelayJSON(req,15*1024*1024),reference=String(input.purchaseOrderNumber||'');if(!/^SMERCH-[a-f0-9-]{36}$/.test(reference))throw Error('Ordreferencen mangler.');if(!input.messageId)throw Error('Besked-id kræves.');const order=await recordProof(`ord-${reference.slice(7)}`,{...input,source:'inbox'});const settings=await automationSettings();if(settings.proofPublication==='automatic'&&order.status==='proof_received'&&order.proof?.hash&&!order.proof.customer&&order.checkoutId&&order.proof.mimeType){await publishCustomerProof(order.id,{version:order.proof.version});retryProofMail().catch(()=>{});}json(res,200,{received:true,orderId:order.id,version:order.proof.version});}catch(error){json(res,400,{error:error.message||'Korrekturen kunne ikke modtages.'});}return;
+  try{const result=await receiveProof(await readPFRelayJSON(req,15*1024*1024));if(result.status==='published')retryProofMail().catch(()=>{});json(res,200,{received:true,...result});}catch(error){json(res,400,{error:error.message||'Korrekturen kunne ikke modtages.'});}return;
  }
  if(req.url?.startsWith('/api/pf-callback/')&&req.method==='POST'){
   if(!callbackAuthorized(req)){json(res,401,{error:'PF-adgang kræves.'});return;}
