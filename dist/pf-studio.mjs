@@ -289,13 +289,13 @@ export function bindPF(data,nav,notify,priceData){
   const mobile=window.matchMedia('(max-width:1024px)').matches;
   const portrait=window.innerHeight>=window.innerWidth;
   const fit=mobile?(portrait?Math.min(availableWidth,560):Math.min(availableWidth,Math.max(180,window.innerHeight-220))):Math.min(availableWidth,availableHeight,840);
-  if(availableWidth>0&&(mobile||availableHeight>0)){const size=Math.max(1,Math.floor((fit-2)*(mobile ? .5 : 1)));stage.style.width=`${size}px`;if(mobile)shell.style.setProperty('--mobile-stage-size',`${size}px`);else shell.style.removeProperty('--mobile-stage-size');}
+  if(availableWidth>0&&(mobile||availableHeight>0)){const reserved=mobile?[...designer.querySelectorAll(':scope > .pf-designer-heading,:scope > .pf-editor-tabs,:scope > .pf-designer-foot,.pf-canvas-area > .pf-editor-zoom')].reduce((sum,el)=>sum+el.offsetHeight,140):0;const size=Math.max(1,Math.floor(mobile?Math.min((fit-2)/2,Math.max(80,designer.clientHeight-reserved)):(fit-2)));stage.style.width=`${size}px`;if(mobile)shell.style.setProperty('--mobile-stage-size',`${size}px`);else shell.style.removeProperty('--mobile-stage-size');}
   stage.style.zoom=editorZoom;shell.classList.toggle('is-zoomed',editorZoom>1);
   if(editorZoom<=1){shell.scrollTop=0;shell.scrollLeft=0;}
   $('zoom-value').value=`${Math.round(editorZoom*100)}%`;layoutZone();
  };
  $('undo').onclick=undo;$('redo').onclick=redo;$('zoom-out').onclick=()=>applyEditorZoom(editorZoom-.25);$('zoom-in').onclick=()=>applyEditorZoom(editorZoom+.25);$('zoom-reset').onclick=()=>applyEditorZoom(1);applyEditorZoom(1);
- const canvasResizeObserver=new ResizeObserver(()=>{if(!root.isConnected){canvasResizeObserver.disconnect();return;}applyEditorZoom(editorZoom);});canvasResizeObserver.observe(designer.querySelector('.pf-canvas-shell'));
+ const canvasResizeObserver=new ResizeObserver(()=>{if(!root.isConnected){canvasResizeObserver.disconnect();return;}applyEditorZoom(editorZoom);});canvasResizeObserver.observe(designer.querySelector('.pf-canvas-shell'));canvasResizeObserver.observe(designer.querySelector('.pf-designer-workspace'));
  const onEditorResize=()=>{if(!root.isConnected){window.removeEventListener('resize',onEditorResize);return;}applyEditorZoom(editorZoom);if(!designer.hidden&&option)renderDesigner();};window.addEventListener('resize',onEditorResize);
  let gestureLayer=null,gestureText=false,gestureResize=false,gestureFontSize=0,gestureScale=1;
  const readGesture=()=>gestureText?textPlacement:artworks.find(art=>art.id===activeArtworkId);
