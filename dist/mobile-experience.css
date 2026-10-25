@@ -269,3 +269,16 @@ body.storefront #main .pf-studio .pf-product-total span,.pf-product-total small{
 .pf-method-change-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:20px}
 .pf-method-change-actions button{min-height:44px}
 @media(max-width:600px){.pf-method-change-dialog{padding:20px}.pf-method-change-actions{flex-direction:column}.pf-method-change-actions button{width:100%}}
+
+/* The mobile price overview follows the product choices without desktop details. */
+.pf-mobile-prices{display:none}
+@media(max-width:1024px){
+ .pf-studio>.pf-price-summary{position:sticky;top:0;z-index:30;padding:10px 12px;gap:8px;background:#fff;border-radius:10px;box-shadow:0 3px 12px #17201f0c}
+ .pf-studio>.pf-price-summary.has-mobile-prices{display:block}
+ .pf-studio>.pf-price-summary.has-mobile-prices>div:not(.pf-mobile-prices){display:none}
+ .pf-studio>.pf-price-summary>.pf-mobile-prices{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;width:100%}
+ .pf-mobile-prices>div:last-child{text-align:right}
+ .pf-studio .pf-mobile-prices span{display:block;font-size:11px;line-height:1.3;font-weight:400;color:var(--muted)}
+ .pf-studio .pf-mobile-prices strong{display:block;margin-top:3px;font-size:16px;line-height:1.2;font-weight:500}
+ .pf-studio.designer-active>.pf-price-summary{visibility:hidden;pointer-events:none}
+}

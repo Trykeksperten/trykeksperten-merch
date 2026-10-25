@@ -37,7 +37,7 @@ services:
       - key: PF_PRINT_MARKUP_PERCENT
         value: "100"
       - key: PF_SETUP_MARKUP_PERCENT
-        value: "50"
+        value: "25"
       - key: PF_HEADWEAR_GOODS_MARKUP_PERCENT
         value: "112.5"
       - key: PF_MOLESKINE_GOODS_MARKUP_PERCENT
