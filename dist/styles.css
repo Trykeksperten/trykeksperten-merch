@@ -2306,3 +2306,9 @@ body:has(#main .payment-methods) .site-footer .footer-payments{display:none}
  .pf-category-navigation .pf-category-links{flex-wrap:nowrap;justify-content:flex-start;gap:10px;overflow-x:auto;overscroll-behavior-x:contain;touch-action:pan-x pan-y;padding:3px 16px 8px;scrollbar-width:thin}
  .pf-category-navigation .pf-category-links a{flex:none;white-space:nowrap;padding:5px 9px;font-size:11px}
 }
+
+/* Equal space above and below the title, before the subcategory row. */
+.catalog-heading:has(.pf-category-navigation){--category-title-space:61px;padding-top:var(--category-title-space)}
+.catalog-heading:has(.pf-category-navigation) h1{margin-bottom:var(--category-title-space)}
+@media(max-width:1024px){.catalog-heading:has(.pf-category-navigation){--category-title-space:37px}}
+@media(max-width:700px){.catalog-heading:has(.pf-category-navigation){--category-title-space:23px}}
