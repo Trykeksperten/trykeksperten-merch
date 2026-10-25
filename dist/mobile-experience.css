@@ -282,3 +282,12 @@ body.storefront #main .pf-studio .pf-product-total span,.pf-product-total small{
  .pf-studio .pf-mobile-prices strong{display:block;margin-top:3px;font-size:16px;line-height:1.2;font-weight:500}
  .pf-studio.designer-active>.pf-price-summary{visibility:hidden;pointer-events:none}
 }
+
+@media(max-width:1024px){
+ .pf-studio>.pf-price-summary{padding:9px 10px;min-height:0!important;gap:0;font-size:12px;line-height:1.25}
+ .pf-studio>.pf-price-summary>.pf-mobile-prices{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:nowrap}
+ .pf-studio .pf-mobile-prices>div{display:flex;align-items:baseline;gap:4px;white-space:nowrap;min-width:0}
+ .pf-studio .pf-mobile-prices span{display:inline;font-size:10px;line-height:1.25}
+ .pf-studio .pf-mobile-prices strong{display:inline;margin:0;font-size:12px;line-height:1.25}
+ .pf-studio>.pf-price-summary>.pf-price-prompt{font-size:12px;white-space:nowrap}
+}
