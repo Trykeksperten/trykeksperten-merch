@@ -1,6 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {bindExplicitDesignSave,previewScrollTarget} from '../dist/designer-mobile-controls.mjs';
+import {bindExplicitDesignSave,previewScrollTarget,bindDesignerKeyboard} from '../dist/designer-mobile-controls.mjs';
+function keyboardFixture(mobile=true){
+ const events=()=>{const listeners=new Map();return {addEventListener(type,fn){if(!listeners.has(type))listeners.set(type,new Set());listeners.get(type).add(fn);},removeEventListener(type,fn){listeners.get(type)?.delete(fn);},emit(type){for(const fn of listeners.get(type)||[])fn();},listeners};};
+ const classes=new Set(),viewport={...events(),height:780},media={...events(),matches:mobile},doc={activeElement:null},queued=[];
+ const pane={scrollTop:0,getBoundingClientRect:()=>({top:140,bottom:380})};
+ const input={tagName:'TEXTAREA',type:'textarea',getBoundingClientRect:()=>({top:350,bottom:420})};
+ const designer={...events(),isConnected:true,contains:node=>node===input,querySelector:()=>pane,classList:{remove:name=>classes.delete(name),toggle(name,value){if(value)classes.add(name);else classes.delete(name);}}};
+ const win={...events(),innerHeight:780,visualViewport:viewport,matchMedia:()=>media,requestAnimationFrame:fn=>queued.push(fn),queueMicrotask:fn=>queued.push(fn)};
+ const dispose=bindDesignerKeyboard(designer,{doc,win});
+ return {designer,doc,input,viewport,win,pane,classes,dispose,flush(){while(queued.length)queued.shift()();}};
+}
+test('phone text entry hides save before keyboard animation and reveals the field',()=>{
+ const f=keyboardFixture();f.doc.activeElement=f.input;f.designer.emit('focusin');assert.equal(f.classes.has('pf-keyboard-editing'),true);f.flush();assert.ok(f.pane.scrollTop>0);
+ f.viewport.height=420;f.viewport.emit('resize');assert.equal(f.classes.has('pf-keyboard-editing'),true);
+ f.viewport.height=780;f.viewport.emit('resize');assert.equal(f.classes.has('pf-keyboard-editing'),false,'native keyboard dismissal restores save even if textarea keeps focus');
+ f.viewport.emit('scroll');assert.equal(f.classes.has('pf-keyboard-editing'),false);
+ f.viewport.height=420;f.viewport.emit('resize');assert.equal(f.classes.has('pf-keyboard-editing'),true,'reopening the keyboard on the same focused field hides save again');
+});
+test('blur restores phone controls without saving; desktop never enters phone keyboard layout',()=>{
+ const f=keyboardFixture();f.doc.activeElement=f.input;f.designer.emit('focusin');f.doc.activeElement=null;f.designer.emit('focusout');f.flush();assert.equal(f.classes.has('pf-keyboard-editing'),false);f.dispose();assert.equal(f.viewport.listeners.get('resize').size,0);
+ const desktop=keyboardFixture(false);desktop.doc.activeElement=desktop.input;desktop.designer.emit('focusin');assert.equal(desktop.classes.has('pf-keyboard-editing'),false);
+});
 test('zoom keeps the print area centred and clamps scrolling at preview edges',()=>{
  const frame={left:0,top:0,width:390,height:260};
  assert.deepEqual(previewScrollTarget(frame,{left:300,top:400,width:100,height:20},{left:0,top:0,width:780,height:780}),{left:155,top:280});

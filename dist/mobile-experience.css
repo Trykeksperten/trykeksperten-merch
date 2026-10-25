@@ -150,3 +150,14 @@
  .pf-visual-designer .pf-canvas-shell.is-zoomed .pf-designer-stage,.pf-visual-designer .pf-canvas-shell.is-zoomed #pf-designer-product{touch-action:pan-x pan-y}
  .pf-visual-designer .pf-zone-size{font-size:10px;padding:4px 7px;box-shadow:none;pointer-events:none}
 }
+
+/* Give text entry the available space above a phone's software keyboard. */
+@media(max-width:1024px){
+ .pf-visual-designer.pf-keyboard-editing>.pf-designer-foot,
+ .pf-visual-designer.pf-keyboard-editing .pf-mobile-tools{display:none!important}
+ .pf-visual-designer.pf-keyboard-editing .pf-canvas-area>.pf-canvas-shell,
+ .pf-visual-designer.pf-keyboard-editing .pf-canvas-area>.pf-canvas-shell.is-zoomed{height:130px;min-height:130px;padding:5px;overflow:hidden;align-items:center;justify-content:center}
+ .pf-visual-designer.pf-keyboard-editing .pf-designer-stage{width:120px!important;height:120px!important;zoom:1!important;margin:0 auto!important}
+ .pf-visual-designer.pf-keyboard-editing .pf-designer-sidebar{padding-top:8px;scroll-padding:12px}
+ .pf-visual-designer.pf-keyboard-editing #pf-text{height:64px;min-height:64px;font-size:16px}
+}

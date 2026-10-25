@@ -1,4 +1,4 @@
-import {previewScrollTarget,bindExplicitDesignSave,bindMobileDesignerControls} from './designer-mobile-controls.mjs?v=2';
+import {previewScrollTarget,bindExplicitDesignSave,bindMobileDesignerControls} from './designer-mobile-controls.mjs?v=3';
 import {bindDesignerGestures} from './designer-gestures.mjs';
 import {renderPantonePanel} from './pantone-match.mjs';
 import {printMethodHelp} from './print-method-help.mjs';
