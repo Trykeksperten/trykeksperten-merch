@@ -2072,7 +2072,7 @@ body.storefront #main .pf-pagination .pf-page-status{font-size:12px;font-weight:
 .pf-studio .pf-method-info-close:hover{background:#eceeed;color:#17201f}
 
 /* Keep printing choices consistent with quantity choices. */
-body.storefront #main .pf-studio .pf-method-cards{row-gap:18px}
+body.storefront #main .pf-studio .pf-method-cards{row-gap:18px;align-items:start}
 body.storefront #main .pf-studio .pf-method-card{min-height:148px;border:1px solid #dce1dc;padding:18px 48px 18px 16px;background:#fff}
 body.storefront #main .pf-studio .pf-method-card.selected{border-color:#899b8d;background:#edf1ed;box-shadow:inset 0 0 0 1px #899b8d}
 body.storefront #main .pf-studio .pf-method-card:hover{border-color:#899b8d;transform:none}
