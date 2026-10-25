@@ -2216,14 +2216,3 @@ body.storefront #main .about-page .about-content{display:block;margin-top:0}
 .home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"]{touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none}
 .home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"] a{touch-action:pan-y pinch-zoom;-webkit-user-drag:none}
 .home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"] img{pointer-events:none;-webkit-user-drag:none}
-
-/* Desktop tools share the calm, clearly selected mobile proposal styling. */
-.pf-content-tabs .pf-tool-icon{display:none}
-@media(min-width:1025px){
- .pf-visual-designer .pf-content-tabs{gap:8px;padding:8px;background:#fff}
- .pf-visual-designer .pf-content-tabs button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:82px;padding:12px 20px;border:0;border-radius:12px;background:#fff;color:#172423;box-shadow:none;font-size:15px}
- .pf-visual-designer .pf-content-tabs button.active{background:#edf2ee;color:#36543d;box-shadow:none}
- .pf-visual-designer .pf-content-tabs button:hover{background:#f4f6f3}
- .pf-visual-designer .pf-content-tabs button.active:hover{background:#e5ece6}
- .pf-visual-designer .pf-content-tabs .pf-tool-icon{display:block;flex:none}
-}
