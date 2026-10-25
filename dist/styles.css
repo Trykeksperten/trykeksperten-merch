@@ -2390,3 +2390,17 @@ body.storefront #main .pf-visual-designer .pf-layer-controls input[type=range]{h
 .pf-visual-designer .pf-layer-controls .pf-layer-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:0}
 .pf-visual-designer .pf-layer-controls .pf-layer-actions button{display:flex;align-items:center;justify-content:center;height:44px;min-height:44px;padding:6px;border:1px solid #d8d1cc;border-radius:8px;background:#fff;color:#36543e}
 .pf-visual-designer .pf-layer-controls .pf-layer-actions button:hover{background:#edf1ed}
+
+.pf-overview-open{margin:12px 0 0 10px}.pf-overview-open[hidden]{display:none}
+.pf-design-overview{box-sizing:border-box;width:min(760px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:20px;border:1px solid #d8dfd8;border-radius:18px;background:#fff;color:#17201f;overflow:auto}
+.pf-design-overview::backdrop{background:#17201fa6}
+.pf-design-overview header,.pf-design-overview footer,.pf-overview-paging{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pf-design-overview h2{font-size:22px;margin:0}.pf-design-overview header button{font-size:26px;background:transparent;color:inherit;padding:4px 12px}
+.pf-design-overview nav{display:flex;gap:6px;overflow-x:auto;padding:16px 0}
+.pf-design-overview nav button{flex-shrink:0;padding:8px 12px;border:1px solid #d4dbd5;border-radius:20px;background:#fff;color:#53605b;font-size:13px}
+.pf-design-overview nav button[aria-pressed=true]{background:#36543d;color:#fff;border-color:#36543d}
+.pf-overview-image{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:180px;text-align:center;background:#f5f6f4;border-radius:10px;padding:12px}
+.pf-overview-image img{display:block;max-width:100%;width:auto;max-height:48dvh;object-fit:contain}
+.pf-overview-status{font-size:13px;color:#626c66;margin:10px 0}.pf-overview-paging{justify-content:center;margin:12px 0}.pf-overview-paging button{min-width:44px;min-height:44px;border:1px solid #d8dfd8;border-radius:8px;background:#fff;color:#36543d}.pf-design-overview button:disabled{opacity:.4;cursor:default}
+.pf-design-overview footer .button{padding:10px 16px;font-size:14px;min-height:44px}.pf-design-overview footer{margin-top:16px}
+@media(max-width:600px){.pf-design-overview{padding:14px}.pf-design-overview h2{font-size:19px}.pf-overview-open{margin:10px 0}.pf-overview-image img{max-height:38dvh}}
