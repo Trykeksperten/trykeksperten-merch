@@ -2327,3 +2327,5 @@ body:has(#main .payment-methods) .site-footer .footer-payments{display:none}
 @media(max-width:1024px){.pf-product-back{padding:8px 14px;font-size:13px}}
 
 .purchase-path{border-top:0;border-bottom:0}
+
+.pf-visual-designer .pf-text-controls>.pf-letter-spacing{grid-column:1/-1}
