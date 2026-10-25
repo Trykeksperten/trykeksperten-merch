@@ -15,7 +15,7 @@ import {shouldHandleNavigation} from './navigation.mjs?v=2';
 import {editorialProductCard,editorialStory,bindProductColorSwatches} from './product-editorial.mjs?v=6';
 import {pfCartPage,bindCart,updateCartHeader,readCart as readLiveCart,writeCart as writeLiveCart} from './pf-cart.mjs?v=27';
 import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs?v=26';
-import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=124';
+import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=125';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from './pf-visibility.mjs?v=24';
 import {productGroups,groupSections,productGroupURL,navigationProductGroups} from './product-groups.mjs?v=24';
 import { specialPage, bindSpecial } from './special.mjs?v=23';
@@ -82,11 +82,12 @@ function openBrandsMenu(){
  $('#brands-menu').hidden=false;$('#brands-menu-toggle').setAttribute('aria-expanded','true');
 }
 function openProductMenu(groupId){
+ if(groupId===undefined)groupId=new URLSearchParams(location.search).get('kategori')||'';
  closeBrandsMenu();
  const priced=shopProducts(pfCatalog,pfPrices),products=priced.length?priced:(pfCatalog?.products||[]),groups=navigationProductGroups(products);
  if(matchMedia('(max-width:1024px)').matches){
   const menu=$('#product-menu');menu.classList.remove('has-active-group');
-  menu.innerHTML=`<div class="mobile-category-accordion">${groups.map(group=>`<div class="mobile-category-group"><button type="button" data-mobile-group="${group.id}" aria-expanded="false" aria-controls="mobile-category-${group.id}">${esc(group.name)}<span aria-hidden="true">⌄</span></button><div id="mobile-category-${group.id}" class="mobile-subcategories" hidden><a class="mobile-category-all group-all-button" href="${productGroupURL(group.id)}">${getLanguage()==='en'?'View all in this group':'Se alle i gruppen'}</a>${groupSections(group,products).flatMap(section=>section.items).map(item=>`<a href="${productGroupURL(group.id,item.name)}">${esc(item.name)} <small>${item.count}</small></a>`).join('')}</div></div>`).join('')}<a class="mobile-category-all" href="/produkter">${getLanguage()==='en'?'View all products':'Se alle produkter'}</a></div>`;
+  menu.innerHTML=`<div class="mobile-category-accordion">${groups.map(group=>`<div class="mobile-category-group"><button type="button" data-mobile-group="${group.id}" aria-expanded="${group.id===groupId}" aria-controls="mobile-category-${group.id}">${esc(group.name)}<span aria-hidden="true">⌄</span></button><div id="mobile-category-${group.id}" class="mobile-subcategories" ${group.id===groupId?'':'hidden'}><a class="mobile-category-all group-all-button" href="${productGroupURL(group.id)}">${getLanguage()==='en'?'View all in this group':'Se alle i gruppen'}</a>${groupSections(group,products).flatMap(section=>section.items).map(item=>`<a href="${productGroupURL(group.id,item.name)}">${esc(item.name)} <small>${item.count}</small></a>`).join('')}</div></div>`).join('')}<a class="mobile-category-all" href="/produkter">${getLanguage()==='en'?'View all products':'Se alle produkter'}</a></div>`;
   menu.hidden=false;$('#product-menu-toggle').setAttribute('aria-expanded','true');return;
  }
  const active=groups.find(group=>group.id===groupId),sections=active?groupSections(active,products):[];
