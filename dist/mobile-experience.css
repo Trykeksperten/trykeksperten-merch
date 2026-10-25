@@ -251,3 +251,13 @@ body.storefront #main .pf-studio .pf-colour-count-price small{display:block;font
 body.storefront #main .pf-studio .pf-product-total strong{font-size:24px;line-height:1.2;font-weight:600}
 body.storefront #main .pf-studio .pf-product-total span,.pf-product-total small{font-size:12px;line-height:1.5;color:#53605b}
 .pf-buy-box .pf-approval-summary:empty{display:none}
+
+.pf-desktop-text-rotate{display:none}
+@media(min-width:1025px){
+ .pf-visual-designer #pf-logo-rotation-controls,.pf-visual-designer .pf-text-controls>.pf-text-rotation,.pf-visual-designer .pf-text-size button{display:none}
+ .pf-visual-designer .pf-text-size>div{display:flex}
+ .pf-visual-designer .pf-text-size input{flex:1;min-width:0}
+ .pf-visual-designer .pf-desktop-text-rotate,.pf-visual-designer .pf-mobile-rotate{display:flex;align-items:center;justify-content:center;gap:8px;align-self:flex-start;min-height:40px;padding:8px 12px;border:1px solid #dce2dd;border-radius:8px;background:#f1f4f0;color:#36543d}
+ .pf-visual-designer #pf-layer-controls[data-layer-kind="text"] .pf-mobile-rotate{display:none}
+ .pf-visual-designer .pf-desktop-text-rotate:hover,.pf-visual-designer .pf-mobile-rotate:hover{background:#e4ece2}
+}
