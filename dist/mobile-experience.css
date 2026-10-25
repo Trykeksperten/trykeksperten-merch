@@ -237,3 +237,12 @@
 
 
 @media(max-width:1024px){body.storefront #main .pf-studio .pf-price-prompt{display:block;grid-column:1/-1;font-size:13px;line-height:1.4}}
+
+/* Numbered colour counts match the direct product-colour selection. */
+.pf-colour-count-buttons{display:flex;flex-wrap:wrap;gap:6px}
+body.storefront #main .pf-studio .pf-colour-count-buttons button{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;min-height:40px;padding:0;border:1px solid #ccd5ce;border-radius:50%;background:#fff;color:#172423;font-size:14px;line-height:1}
+body.storefront #main .pf-studio .pf-colour-count-buttons button[aria-pressed="true"]{border-color:#36543d;background:#36543d;color:#fff;box-shadow:0 0 0 2px #fff,0 0 0 3px #36543d}
+body.storefront #main .pf-studio .pf-colour-count-buttons button:focus-visible{outline:2px solid #cf4d22;outline-offset:3px}
+body.storefront #main .pf-studio .pf-colour-count-price{margin:10px 0 0;font-size:13px;line-height:1.5;color:#53605b}
+body.storefront #main .pf-studio .pf-colour-count-price small{display:block;font-size:12px;line-height:1.5}
+@media(max-width:700px){.pf-color-choice{gap:10px;padding:14px}.pf-colour-count-buttons{gap:8px}body.storefront #main .pf-studio .pf-colour-count-buttons button{flex-basis:44px;width:44px;height:44px;min-height:44px}}
