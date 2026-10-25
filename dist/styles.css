@@ -2357,3 +2357,5 @@ body.storefront #main .pf-visual-designer .pf-text-controls input[type=range]{he
 
 .pf-visual-designer .pf-text-controls>#pf-center-text.pf-center-print-button{display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;justify-self:start;grid-column:1/-1;width:auto;min-height:38px;padding:8px 14px;border:1px solid #d2d6d2;border-radius:10px;background:#f1f5f1;color:#36543e;font-size:13px;font-weight:500;line-height:1.3;text-decoration:none}
 .pf-visual-designer .pf-text-controls>#pf-center-text.pf-center-print-button:hover{background:#e4ebe5}
+
+.pf-visual-designer .pf-text-controls>#pf-center-text.pf-center-print-button{width:40px;min-width:40px;height:40px;padding:8px}.pf-center-print-button svg{display:block;flex-shrink:0}
