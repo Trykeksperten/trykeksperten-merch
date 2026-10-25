@@ -2374,3 +2374,19 @@ body.storefront #main .pf-visual-designer .pf-text-controls input[type=range]{he
 .pf-visual-designer .pf-text-align button[aria-pressed="true"]{background:#edf1ed;border-color:#9ba99e;color:#253b2d}
 .pf-visual-designer .pf-text-align>#pf-center-text.pf-center-print-button{color:#36543e}
 .pf-visual-designer .pf-text-align>#pf-center-text.pf-center-print-button:hover{background:#edf1ed}
+
+/* Separate editing modes from print-placement tabs. */
+.pf-visual-designer .pf-content-tabs{gap:6px;padding:6px;background:#f2f4f1}
+.pf-visual-designer .pf-content-tabs button[data-content-tab]{display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid #d4dbd5;border-radius:8px;background:#fff;color:#53605b;box-shadow:none;font-weight:500}
+.pf-visual-designer .pf-content-tabs button[data-content-tab].active{background:#36543d;color:#fff;border-color:#36543d;box-shadow:inset 0 0 0 1px #36543d;font-weight:700}
+.pf-visual-designer .pf-content-tabs button[data-content-tab].active:before{content:'✓';font-size:14px}
+.pf-visual-designer .pf-designer-sidebar #pf-logo-panel .pf-design-tools{margin:12px 0;padding:0;border:0}
+.pf-visual-designer .pf-designer-sidebar .pf-layer-controls{gap:9px;padding:0;border:0;background:transparent}
+.pf-visual-designer .pf-layer-controls>.pf-logo-size{display:flex;flex-direction:column;gap:3px;margin:0}
+.pf-visual-designer .pf-layer-controls .pf-slider-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;line-height:1.35}
+.pf-visual-designer .pf-layer-controls output{font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
+.pf-visual-designer #pf-logo-rotation-controls.pf-rotation-slider{display:flex;gap:3px;margin:0}
+body.storefront #main .pf-visual-designer .pf-layer-controls input[type=range]{height:30px;min-height:30px;padding:0;margin:0;border:0;background:transparent;box-shadow:none;width:100%}
+.pf-visual-designer .pf-layer-controls .pf-layer-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:0}
+.pf-visual-designer .pf-layer-controls .pf-layer-actions button{display:flex;align-items:center;justify-content:center;height:44px;min-height:44px;padding:6px;border:1px solid #d8d1cc;border-radius:8px;background:#fff;color:#36543e}
+.pf-visual-designer .pf-layer-controls .pf-layer-actions button:hover{background:#edf1ed}
