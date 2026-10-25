@@ -1,7 +1,7 @@
 import {loadArtworkPreview} from './artwork-preview.mjs';
 import {placementOptionAssets} from './pf-rules.mjs?v=2';
-import {artworkPrintSize,textPrintSize,optionPrintSize,printableBounds,containMappedBounds,proportionalPrintBounds} from './design-layers.mjs?v=6';
-import {fontFamily} from './pf-text.mjs?v=3';
+import {artworkPrintSize,textPrintSize,optionPrintSize,printableBounds,containMappedBounds,proportionalPrintBounds} from './design-layers.mjs?v=7';
+import {fontFamily} from './pf-text.mjs?v=4';
 import {foilFinish,isFoilOption} from './foil-options.mjs';
 import {recolorArtworkPreview,tintArtworkPreview} from './vector-preview.mjs?v=2';
 

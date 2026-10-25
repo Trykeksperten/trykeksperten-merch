@@ -1,4 +1,4 @@
-import {availableTextFonts,defaultTextPlacement,textAlignments,textLineSpacings} from './pf-text.mjs?v=3';
+import {availableTextFonts,defaultTextPlacement,textAlignments,textLineSpacings,validTextLineSpacing} from './pf-text.mjs?v=4';
 export const clamp=(value,min=0,max=1)=>Math.min(max,Math.max(min,Number(value)||0));
 
 const number=value=>Number.isFinite(Number(value))?Number(value):0;
@@ -76,7 +76,7 @@ export function fitArtworkToOption(artwork={},option={}){
 }
 
 export function textPrintSize(text='',placement={},option={}){
- const print=optionPrintSize(option),scale=clamp(placement.scale??.24,.05,1),lines=String(text).trim().split(/\r?\n/),longest=Math.max(1,...lines.map(line=>Array.from(line).length)),lineSpacing=textLineSpacings.includes(Number(placement.lineSpacing))?Number(placement.lineSpacing):1.25,lineFactor=1+(lines.length-1)*lineSpacing,fontFactor=placement.font==='Lucida Calligraphy'?1.15:placement.font==='Times New Roman'?.95:1,charFactor=Math.max(.55,longest*.55*fontFactor+Math.max(0,longest-1)*clamp(placement.letterSpacing??0,-.05,.5)),radians=Number(placement.rotation||0)*Math.PI/180,sin=Math.abs(Math.sin(radians)),cos=Math.abs(Math.cos(radians));
+ const print=optionPrintSize(option),scale=clamp(placement.scale??.24,.05,1),lines=String(text).trim().split(/\r?\n/),longest=Math.max(1,...lines.map(line=>Array.from(line).length)),lineSpacing=validTextLineSpacing(placement.lineSpacing)?Number(placement.lineSpacing):1.25,lineFactor=1+(lines.length-1)*lineSpacing,fontFactor=placement.font==='Lucida Calligraphy'?1.15:placement.font==='Times New Roman'?.95:1,charFactor=Math.max(.55,longest*.55*fontFactor+Math.max(0,longest-1)*clamp(placement.letterSpacing??0,-.05,.5)),radians=Number(placement.rotation||0)*Math.PI/180,sin=Math.abs(Math.sin(radians)),cos=Math.abs(Math.cos(radians));
  // Scale is the percentage of the largest text that can fit inside this exact
  // print area. At 100%, either the text width or its total line height reaches
  // 95% of the available area, including when the text is rotated.
@@ -92,7 +92,7 @@ export function rotatedTextBounds(size={},rotation=0,option={}){
 }
 
 export function normalizeTextPlacement(text='',placement={},option={}){
- const defaults=defaultTextPlacement(),font=availableTextFonts(option).includes(placement.font)?placement.font:defaults.font,align=textAlignments.includes(placement.align)?placement.align:defaults.align,lineSpacing=textLineSpacings.includes(Number(placement.lineSpacing))?Number(placement.lineSpacing):defaults.lineSpacing,letterSpacing=clamp(placement.letterSpacing??0,-.05,.5),scale=clamp(placement.scale??.24,.05,1),rotation=clamp(placement.rotation??0,-180,180),size=textPrintSize(text,{...placement,font,lineSpacing,letterSpacing,scale,rotation},option),bounds=rotatedTextBounds(size,rotation,option),center=normalizeCenter(placement.x??.5,placement.y??.5,bounds.widthFraction/2,bounds.heightFraction/2,optionPrintSize(option).round);
+ const defaults=defaultTextPlacement(),font=availableTextFonts(option).includes(placement.font)?placement.font:defaults.font,align=textAlignments.includes(placement.align)?placement.align:defaults.align,lineSpacing=validTextLineSpacing(placement.lineSpacing)?Number(placement.lineSpacing):defaults.lineSpacing,letterSpacing=clamp(placement.letterSpacing??0,-.05,.5),scale=clamp(placement.scale??.24,.05,1),rotation=clamp(placement.rotation??0,-180,180),size=textPrintSize(text,{...placement,font,lineSpacing,letterSpacing,scale,rotation},option),bounds=rotatedTextBounds(size,rotation,option),center=normalizeCenter(placement.x??.5,placement.y??.5,bounds.widthFraction/2,bounds.heightFraction/2,optionPrintSize(option).round);
  return {...center,scale,font,align,lineSpacing,letterSpacing,rotation};
 }
 

@@ -2329,3 +2329,11 @@ body:has(#main .payment-methods) .site-footer .footer-payments{display:none}
 .purchase-path{border-top:0;border-bottom:0}
 
 .pf-visual-designer .pf-text-controls>.pf-letter-spacing{grid-column:1/-1}
+
+.pf-visual-designer .pf-text-controls>.pf-line-spacing{grid-column:1/-1}
+
+.pf-text-align button{display:flex;align-items:center;justify-content:center}.pf-text-align button svg{display:block;flex-shrink:0}
+
+.pf-visual-designer .pf-text-controls>label[for="pf-text-font"],.pf-visual-designer .pf-text-controls>fieldset:has(.pf-text-align){grid-column:1/-1}
+
+.pf-logo-size{margin-top:16px}.pf-logo-size[hidden]{display:none!important}

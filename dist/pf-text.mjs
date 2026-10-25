@@ -3,6 +3,7 @@ export const pfTextFonts=Object.freeze(['Arial','Times New Roman','Helvetica','C
 export const pfEmbroideryFonts=Object.freeze(pfTextFonts.slice(0,5));
 export const textAlignments=Object.freeze(['left','center','right']);
 export const textLineSpacings=Object.freeze([1,1.25,1.5]);
+export const validTextLineSpacing=value=>Number.isFinite(Number(value))&&Number(value)>=.8&&Number(value)<=2;
 
 export const availableTextFonts=option=>/brod|embroider/i.test(String(option?.impMethod||''))?pfEmbroideryFonts:pfTextFonts;
 export const defaultTextPlacement=()=>({x:.5,y:.5,scale:.24,font:'Arial',align:'center',lineSpacing:1.25,letterSpacing:0,rotation:0});

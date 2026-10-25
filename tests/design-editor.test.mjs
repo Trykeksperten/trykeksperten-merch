@@ -53,3 +53,11 @@ test('server preserves letter spacing and rejects values outside the allowed ran
  assert.equal(sanitizeDesignLine({products:[product]},line).decorations[0].textPlacement.letterSpacing,.2);
  for(const letterSpacing of [-.1,.51,'invalid'])assert.throws(()=>sanitizeDesignLine({products:[product]},{...line,decorations:[{...design,textPlacement:{...textPlacement,letterSpacing}}]}),/Bogstavafstand/);
 });
+
+test('line spacing supports continuous slider values and preserves older designs',()=>{
+ const option={impWidthMm:100,impHeightMm:80},base={x:.5,y:.5,scale:.5};
+ for(const lineSpacing of [.8,1,1.1,1.25,1.5,1.75,2])assert.equal(normalizeTextPlacement('ONE\nTWO',{...base,lineSpacing},option).lineSpacing,lineSpacing);
+ const tight=textPrintSize('ONE\nTWO',{...base,lineSpacing:.8},option),loose=textPrintSize('ONE\nTWO',{...base,lineSpacing:2},option);
+ assert.ok(loose.heightMm/loose.widthMm>tight.heightMm/tight.widthMm);
+ assert.equal(normalizeTextPlacement('OLD',base,option).lineSpacing,1.25);
+});

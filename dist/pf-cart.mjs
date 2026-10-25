@@ -3,7 +3,7 @@ import {hasPersonalisation,paymentDescription,freightEstimate} from './purchase-
 import {paymentMethodsHTML} from './payment-methods.mjs';
 import {fromInc,fromEx,quoteAmount,vatLabel,customerType} from './customer-pricing.mjs';
 import {cartStatistics,sendStatistics} from './shop-statistics.mjs';
-import {bindCartMockups} from './cart-mockup.mjs?v=5';
+import {bindCartMockups} from './cart-mockup.mjs?v=6';
 import {readJSONResponse} from './api-response.mjs';
 import {loadFile} from './storage.mjs';
 export const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
