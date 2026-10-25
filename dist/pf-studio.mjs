@@ -371,7 +371,7 @@ export function bindPF(data,nav,notify,priceData){
   const version=++quoteVersion;clearTimeout(priceTimer);$('added').hidden=true;
   const show=(html,summary)=>{const pending=/^Beregner (?:vare)?pris…$/.test(html);renderStablePanel($('live-price'),html,{pending});renderStablePanel($('price-summary'),summary||html,{pending});const unit=$('price-summary').querySelector('strong');$('editor-unit-price').textContent=unit?unit.textContent+' · '+vatLabel():$('price-summary').textContent;};
   const quantity=Number($('quantity').value);
-  if(!selectionValid()||!Number.isInteger(quantity)||quantity<1||quantity>100000){show(Object.values(sizeQuantities).some(value=>value!==''&&Number(value)!==0)?'Angiv hele antal fra 0 til 100.000 (maks. 100.000 i alt).':'Vælg antal for at se prisen.');return;}
+  if(!selectionValid()||!Number.isInteger(quantity)||quantity<1||quantity>100000){show(Object.values(sizeQuantities).some(value=>value!==''&&Number(value)!==0)?'Angiv hele antal fra 0 til 100.000 (maks. 100.000 i alt).':'<span class="pf-price-prompt">Vælg antal for at se prisen.</span>');return;}
   if(!decorationChosen){
    const sku=v.sku,exampleOption=quantityEdited?null:visualOptions()[0],exampleQuantity=printExampleQuantity(productTierData?.smallOrderThreshold||priceData?.products?.[p.id]?.fromQuantity||productTierData?.minimumQuantity||priceData?.skuMinimums?.[sku]);
    const estimate=async line=>{const response=await fetch('/api/pf-estimate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(line)});return readJSONResponse(response,'Prisen kunne ikke hentes lige nu.');};
