@@ -2284,3 +2284,13 @@ body:has(#main .payment-methods) .site-footer .footer-payments{display:none}
 @media(max-width:1024px){.pf-category-navigation .pf-category-links{gap:5px}.pf-category-navigation .pf-category-links a{padding:6px 10px;font-size:12px}}
 
 .pf-category-navigation .pf-category-links a[aria-current="page"]{background:#36543e;border-color:#36543e;color:#fff}
+
+/* A quieter, centered category heading with navigation lower in the panel. */
+.catalog-heading:has(.pf-category-navigation){padding-top:100px;padding-bottom:48px;text-align:center}
+.catalog-heading:has(.pf-category-navigation) h1{margin-inline:auto;margin-bottom:26px}
+.catalog-heading .pf-category-navigation{margin-top:0}
+.pf-category-navigation .pf-category-links{justify-content:center;gap:7px}
+.pf-category-navigation .pf-category-links a{background:transparent;border-color:#d0d4d1;color:#5b635e;font-weight:400}
+.pf-category-navigation .pf-category-links a:hover{background:#e5e9e6;border-color:#b5bdb7;color:#26342b}
+.pf-category-navigation .pf-category-links a[aria-current="page"]{background:#dde3de;border-color:#aeb9b0;color:#283d2e;font-weight:500}
+@media(max-width:1024px){.catalog-heading:has(.pf-category-navigation){padding-top:52px;padding-bottom:28px}.catalog-heading:has(.pf-category-navigation) h1{margin-bottom:20px}}
