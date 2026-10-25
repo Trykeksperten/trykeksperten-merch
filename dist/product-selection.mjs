@@ -29,3 +29,14 @@ export function selectionLines(product,source,line,rows){
   return {...structuredClone(design),optionId:target.id,sku:variant.sku,quantity};
  })}));
 }
+
+// Preserve each selected size when changing the product colour. Never silently drop units.
+export function transferColourQuantities(sourceVariants,quantities,targetVariants){
+ const result={};
+ for(const source of sourceVariants){const quantity=Number(quantities[source.sku]||0);if(!quantity)continue;
+  const target=targetVariants.find(row=>normalizedSize(row.size)===normalizedSize(source.size));
+  if(!target)throw Error(`Størrelse ${source.size||'Standard'} findes ikke i denne farve.`);
+  result[target.sku]=(result[target.sku]||0)+quantity;
+ }
+ return result;
+}
