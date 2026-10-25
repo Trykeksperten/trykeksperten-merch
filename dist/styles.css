@@ -2367,3 +2367,10 @@ body.storefront #main .pf-visual-designer .pf-text-controls input[type=range]{he
 .pf-rotation-ticks span{position:relative;padding-top:6px}
 .pf-rotation-ticks span:before{content:"";position:absolute;top:0;left:0;width:1px;height:4px;background:#9aa69d}
 .pf-visual-designer .pf-layer-controls[data-layer-kind="text"] .pf-mobile-rotate{display:none}
+
+/* Keep text alignment and print-area centering in one compact row. */
+.pf-visual-designer .pf-text-align{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pf-visual-designer .pf-text-align button,.pf-visual-designer .pf-text-align>#pf-center-text.pf-center-print-button{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;height:44px;min-height:44px;margin:0;padding:6px;border:1px solid #d8d1cc;border-radius:8px;background:#fff;text-decoration:none}
+.pf-visual-designer .pf-text-align button[aria-pressed="true"]{background:#edf1ed;border-color:#9ba99e;color:#253b2d}
+.pf-visual-designer .pf-text-align>#pf-center-text.pf-center-print-button{color:#36543e}
+.pf-visual-designer .pf-text-align>#pf-center-text.pf-center-print-button:hover{background:#edf1ed}
