@@ -2170,10 +2170,8 @@ body.storefront #main .home-value-strip strong{font-size:13px;line-height:1.25;f
 /* One familiar menu icon with a full touch target. */
 @media(max-width:760px){.masthead .menu-toggle{width:44px;min-width:44px;height:44px;padding:10px;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px}.masthead .menu-toggle svg{margin:auto}.masthead .menu-toggle[aria-expanded="true"]{background:#edf2ed}}
 
-
 /* Give the campaign image a little more presence on phones. */
 @media(max-width:760px){.home-campaign img{aspect-ratio:12/5;object-fit:cover;object-position:center;height:auto}}
-
 
 /* Compact phone footer: keep contact and policy links visible without a long stack. */
 @media(max-width:700px){
@@ -2229,3 +2227,6 @@ body.storefront #main .about-page .about-content{display:block;margin-top:0}
  .pf-visual-designer .pf-desktop-design-info .pf-editor-unit-price{max-width:none;font-size:13px;font-weight:500}
  .pf-visual-designer .pf-desktop-design-info b{font-size:12px;font-weight:400;overflow-wrap:anywhere}
 }
+
+/* Show payment methods once: beside checkout actions when present, otherwise in the footer. */
+body:has(#main .payment-methods) .site-footer .footer-payments{display:none}
