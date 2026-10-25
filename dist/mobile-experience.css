@@ -261,3 +261,11 @@ body.storefront #main .pf-studio .pf-product-total span,.pf-product-total small{
  .pf-visual-designer #pf-layer-controls[data-layer-kind="text"] .pf-mobile-rotate{display:none}
  .pf-visual-designer .pf-desktop-text-rotate:hover,.pf-visual-designer .pf-mobile-rotate:hover{background:#e4ece2}
 }
+
+.pf-method-change-dialog{width:min(440px,calc(100% - 32px));padding:24px;border:1px solid #dce2dd;border-radius:16px;background:#fff;color:#172423;box-shadow:0 16px 70px #17242333}
+.pf-method-change-dialog::backdrop{background:#17242366}
+.pf-method-change-dialog h2{font-size:22px;margin:0 0 12px}
+.pf-method-change-dialog p{font-size:15px;line-height:1.5;margin:10px 0}
+.pf-method-change-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:20px}
+.pf-method-change-actions button{min-height:44px}
+@media(max-width:600px){.pf-method-change-dialog{padding:20px}.pf-method-change-actions{flex-direction:column}.pf-method-change-actions button{width:100%}}
