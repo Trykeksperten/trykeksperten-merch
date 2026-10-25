@@ -2230,3 +2230,11 @@ body.storefront #main .about-page .about-content{display:block;margin-top:0}
 
 /* Show payment methods once: beside checkout actions when present, otherwise in the footer. */
 body:has(#main .payment-methods) .site-footer .footer-payments{display:none}
+
+/* Saved placements stay compact while a newly added print area is configured. */
+.pf-placement-copy .pf-placement-status,.pf-color-choice .pf-placement-status{display:block;margin-top:7px;font-size:12px;font-weight:500;color:#8c4d24}
+.pf-placement-copy .pf-placement-status[data-ready="true"]{color:#36583f}
+.pf-ready-colours{border:1px solid #d8e1d9;border-radius:14px;background:#f5f8f5;overflow:hidden}
+.pf-ready-colours>summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;font-size:14px}
+.pf-ready-colours>summary span{color:var(--muted);font-size:13px}
+.pf-ready-colours>.pf-color-choice{margin:0;border:0;border-top:1px solid #d8e1d9;border-radius:0}

@@ -13,9 +13,9 @@ export function readCart(){try{const value=JSON.parse(localStorage.getItem(key)|
 export function writeCart(lines,{track=true}={}){const before=track?readCart():[];localStorage.setItem(key,JSON.stringify(lines));window.dispatchEvent(new Event('pf-cart-change'));if(track){const events=cartStatistics(before,lines);if(events.length)sendStatistics(events);}}
 export function putCart(line,id){const lines=readCart();if(id&&!lines.some(l=>l.id===id))throw Error('Produktet er fjernet fra kurven. Åbn det igen fra kataloget.');const result={...structuredClone(line),id:id||crypto.randomUUID()};writeCart(id?lines.map(l=>l.id===id?result:l):[...lines,result]);return result;}
 export function putCartLines(items,id){
- const lines=readCart();if(id&&!lines.some(line=>line.id===id))throw Error('Åbn produktet igen fra kurven.');
- const added=items.map((line,index)=>({...structuredClone(line),id:index===0&&id?id:crypto.randomUUID()}));
- writeCart(id?lines.flatMap(line=>line.id===id?added:[line]):[...lines,...added]);return added;
+ const lines=readCart(),ids=Array.isArray(id)?id:id?[id]:[];if(ids.some(id=>!lines.some(line=>line.id===id)))throw Error('Åbn produktet igen fra kurven.');
+ const added=items.map((line,index)=>({...structuredClone(line),id:ids[index]||crypto.randomUUID()}));
+ writeCart(ids.length?lines.flatMap(line=>line.id===ids[0]?added:ids.includes(line.id)?[]:[line]):[...lines,...added]);return added;
 }
 export async function fetchQuote(lines){const r=await fetch('/api/pf-quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lines})});const result=await readJSONResponse(r,'Prisen kunne ikke hentes. Prøv igen.');if(!Array.isArray(result.lines))throw Error('Prisen kunne ikke hentes. Prøv igen.');return result;}
 export function priceHTML(quote,{collapsible=false,inlineDetails=false}={}){
