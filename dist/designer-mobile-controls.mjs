@@ -11,7 +11,8 @@ export function bindExplicitDesignSave(form,button,save){
 export function bindMobileDesignerControls(designer,{doc=document,win=window}={}){
  const tabs=designer.querySelector('.pf-editor-tabs'),zoom=designer.querySelector('.pf-editor-zoom'),tools=designer.querySelector('.pf-designer-sidebar');
  const tabsHome=doc.createComment('editor-tabs'),zoomHome=doc.createComment('editor-zoom'),dock=doc.createElement('div');dock.className='pf-mobile-tools';tabs.before(tabsHome);zoom.before(zoomHome);tools.prepend(dock);
+ const info=doc.createElement('div');info.className='pf-desktop-design-info';const metadata=['#pf-editor-unit-price','#pf-art-quality-badge'].map(selector=>{const node=designer.querySelector(selector),home=doc.createComment('editor-info');node.before(home);return {node,home};});tools.prepend(info);
  const media=win.matchMedia('(max-width:1024px)');
- const sync=()=>{if(!designer.isConnected){media.removeEventListener('change',sync);return;}if(media.matches)dock.append(tabs,zoom);else{tabsHome.after(tabs);zoomHome.after(zoom);}dock.hidden=!media.matches;const leave=designer.querySelector('.pf-editor-leave');if(leave){leave.textContent=media.matches?'Luk':'Forlad designstudiet';leave.setAttribute('aria-label','Luk designstudiet');}};
+ const sync=()=>{if(!designer.isConnected){media.removeEventListener('change',sync);return;}if(media.matches){dock.append(tabs,zoom);for(const {node,home} of metadata)home.after(node);}else{tabsHome.after(tabs);zoomHome.after(zoom);for(const {node} of metadata)info.append(node);}info.hidden=media.matches;dock.hidden=!media.matches;const leave=designer.querySelector('.pf-editor-leave');if(leave){leave.textContent=media.matches?'Luk':'Forlad designstudiet';leave.setAttribute('aria-label','Luk designstudiet');}};
  media.addEventListener('change',sync);sync();return ()=>media.removeEventListener('change',sync);
 }

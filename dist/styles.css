@@ -2216,3 +2216,16 @@ body.storefront #main .about-page .about-content{display:block;margin-top:0}
 .home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"]{touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none}
 .home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"] a{touch-action:pan-y pinch-zoom;-webkit-user-drag:none}
 .home-brand-preview .brand-wordmarks[data-ribbon-motion="cards"] img{pointer-events:none;-webkit-user-drag:none}
+
+/* Quiet desktop heading; operational details belong beside the tools. */
+@media(min-width:1025px){
+ .pf-visual-designer>.pf-designer-heading{min-height:48px;padding:8px 24px;gap:16px;background:#fff;color:#172423;border-bottom:1px solid #dfe4df}
+ .pf-visual-designer>.pf-designer-heading>div:first-child{flex:1;min-width:0}
+ .pf-visual-designer .pf-designer-heading strong{max-width:100%;font-size:15px;line-height:1.4;letter-spacing:0}
+ .pf-visual-designer .pf-designer-kicker,.pf-visual-designer #pf-editor-subtitle{display:none}
+ .pf-visual-designer .pf-editor-close{min-height:32px;padding:2px 0;color:#172423;font-size:14px}
+ .pf-visual-designer .pf-editor-close span{font-size:20px}
+ .pf-visual-designer .pf-desktop-design-info{display:flex;flex-direction:column;gap:6px;padding:0 0 14px;margin-bottom:14px;border-bottom:1px solid #dfe4df;color:#53605b;font-size:13px}
+ .pf-visual-designer .pf-desktop-design-info .pf-editor-unit-price{max-width:none;font-size:13px;font-weight:500}
+ .pf-visual-designer .pf-desktop-design-info b{font-size:12px;font-weight:400;overflow-wrap:anywhere}
+}

@@ -1,4 +1,4 @@
-import {bindExplicitDesignSave,bindMobileDesignerControls} from './designer-mobile-controls.mjs';
+import {bindExplicitDesignSave,bindMobileDesignerControls} from './designer-mobile-controls.mjs?v=1';
 import {bindDesignerGestures} from './designer-gestures.mjs';
 import {renderPantonePanel} from './pantone-match.mjs';
 import {printMethodHelp} from './print-method-help.mjs';
