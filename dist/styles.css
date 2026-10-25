@@ -2337,3 +2337,20 @@ body:has(#main .payment-methods) .site-footer .footer-payments{display:none}
 .pf-visual-designer .pf-text-controls>label[for="pf-text-font"],.pf-visual-designer .pf-text-controls>fieldset:has(.pf-text-align){grid-column:1/-1}
 
 .pf-logo-size{margin-top:16px}.pf-logo-size[hidden]{display:none!important}
+
+/* Keep each slider name, value and track together. */
+.pf-visual-designer .pf-text-controls{gap:12px;margin-top:12px}
+.pf-visual-designer .pf-text-controls .pf-slider-heading,.pf-visual-designer .pf-text-size>label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;line-height:1.35}
+.pf-visual-designer .pf-text-controls>.pf-letter-spacing,.pf-visual-designer .pf-text-controls>.pf-line-spacing,.pf-visual-designer .pf-text-size{gap:3px;margin:0}
+.pf-visual-designer .pf-text-controls output{font-size:13px;font-variant-numeric:tabular-nums;font-weight:500}
+body.storefront #main .pf-visual-designer .pf-text-controls input[type=range]{height:30px;min-height:30px;padding:0;margin:0;border:0;background:transparent;box-shadow:none;width:100%}
+.pf-visual-designer .pf-text-controls select{min-height:38px;height:38px;margin:0;padding:7px 10px}
+.pf-visual-designer .pf-text-controls legend{margin-bottom:5px;font-size:13px}
+.pf-visual-designer .pf-text-align button{min-height:36px;height:36px;padding:6px}
+.pf-visual-designer .pf-text-controls .pf-text-color{font-size:13px}
+@media(max-width:1024px){
+ .pf-visual-designer[data-content-tab="text"] .pf-designer-sidebar .pf-text-controls{gap:9px 10px}
+ .pf-visual-designer .pf-text-controls>label.pf-text-color{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between}
+ .pf-visual-designer .pf-text-controls .pf-text-color input[type=color]{width:58px;height:36px;min-height:36px}
+ .pf-visual-designer .pf-text-controls select{height:38px;min-height:38px}
+}

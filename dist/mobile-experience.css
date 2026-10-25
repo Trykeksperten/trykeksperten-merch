@@ -291,3 +291,7 @@ body.storefront #main .pf-studio .pf-product-total span,.pf-product-total small{
  .pf-studio .pf-mobile-prices strong{display:inline;margin:0;font-size:12px;line-height:1.25}
  .pf-studio>.pf-price-summary>.pf-price-prompt{font-size:12px;white-space:nowrap}
 }
+
+@media(max-width:1024px){
+ .pf-studio[data-mobile-layout="stacked"] .pf-size-selection.has-single-quantity .pf-size-quantities label{justify-content:flex-start;gap:12px}
+}
