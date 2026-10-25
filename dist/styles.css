@@ -2245,3 +2245,42 @@ body:has(#main .payment-methods) .site-footer .footer-payments{display:none}
 .pf-category-links a{border:1px solid var(--line);border-radius:24px;padding:9px 14px;background:#fff;line-height:1.3}
 .pf-category-links a:hover{background:#edf2ed;border-color:#829b87}
 @media(max-width:1024px){.pf-category-navigation{font-size:13px}.pf-category-links{gap:6px}.pf-category-links a{padding:8px 12px}}
+
+.pf-catalog-controls>.pf-category-return{position:absolute;left:112px;top:0;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border:1px solid #d2d6d2;border-radius:24px;font-size:14px;font-weight:500;background:transparent;line-height:1.2}
+.pf-category-return:hover{background:#edf2ed}
+@media(max-width:700px){
+ .pf-catalog-controls:has(>.pf-category-return){display:flex;flex-direction:column}
+ .pf-catalog-controls>.pf-category-return{left:104px;max-width:calc(100% - 104px);padding:0 14px;font-size:13px}
+ .pf-catalog-controls:has(>.pf-category-return)>.pf-filter-sidebar{order:1}
+ .pf-catalog-controls:has(>.pf-category-return)>.pf-results-actions{position:static;order:2;align-self:flex-end;margin-top:10px}
+}
+
+@media(max-width:700px){
+ .pf-catalog-controls:has(>.pf-category-return){display:block}
+ .pf-catalog-controls:has(>.pf-category-return) .mobile-filter-toggle{height:44px;padding:0 10px;font-size:12px;gap:6px}
+ .pf-catalog-controls>.pf-category-return{display:block;left:78px;right:138px;max-width:none;min-width:0;height:44px;line-height:42px;padding:0 7px;font-size:12px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .pf-category-return .pf-back-prefix{display:none}
+ .pf-catalog-controls:has(>.pf-category-return)>.pf-results-actions{position:absolute;right:0;top:0;margin:0}
+ .pf-catalog-controls:has(>.pf-category-return) #pf-sort{height:44px;width:130px;max-width:130px;padding:0 8px;font-size:12px}
+}
+
+@media(max-width:700px){
+ .pf-catalog-controls:has(>.pf-category-return){padding-bottom:16px}
+ .pf-catalog-controls:has(>.pf-category-return) .mobile-filter-toggle{height:40px;padding:0 12px;font-size:13px}
+ .pf-catalog-controls>.pf-category-return{display:flex;align-items:center;justify-content:center;left:90px;right:114px;height:40px;min-height:40px;line-height:1.2;padding:0 10px;font-size:13px;gap:4px}
+ .pf-catalog-controls:has(>.pf-category-return) #pf-sort{height:40px;width:102px;max-width:102px;padding:0 12px;font-size:13px}
+}
+
+@media(max-width:700px){.pf-category-return .pf-category-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+
+@media(max-width:700px){
+ .pf-catalog-controls>.pf-category-return{left:0;right:auto;width:calc(100% - 204px)}
+ .pf-catalog-controls:has(>.pf-category-return) .mobile-filter-toggle{margin-left:calc(100% - 192px)}
+}
+
+/* Compact subcategory links above the catalogue. */
+.pf-category-navigation .pf-category-links{gap:6px}
+.pf-category-navigation .pf-category-links a{padding:6px 11px;border-radius:20px;font-size:12px;line-height:1.35;font-weight:400;min-height:0}
+@media(max-width:1024px){.pf-category-navigation .pf-category-links{gap:5px}.pf-category-navigation .pf-category-links a{padding:6px 10px;font-size:12px}}
+
+.pf-category-navigation .pf-category-links a[aria-current="page"]{background:#36543e;border-color:#36543e;color:#fff}
