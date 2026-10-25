@@ -1,4 +1,4 @@
-import {bindMobileProductFlow,nextRotation} from './mobile-product-flow.mjs';
+import {bindMobileProductFlow,nextRotation} from './mobile-product-flow.mjs?v=2';
 import {previewScrollTarget,bindExplicitDesignSave,bindMobileDesignerControls} from './designer-mobile-controls.mjs?v=3';
 import {bindDesignerGestures} from './designer-gestures.mjs';
 import {renderPantonePanel} from './pantone-match.mjs';
@@ -382,5 +382,5 @@ export function bindPF(data,nav,notify,priceData){
  chooseVariant();
  if(editLine){if(!editLine.decorations.length){$('method').value='blank';chooseMethod();}else{const selected=visualOptions().find(o=>o.id===editLine.decorations[0].optionId);if(selected){selectedPlacementIds=new Set(editLine.decorations.map(d=>d.optionId));$('method').value=String(selected.impMethodCode);chooseMethod();$('position').value=selected.id;chooseOption();}}$('quantity').value=editLine.quantity;}
  schedulePrice();
- bindMobileProductFlow(root,{groups,selectedColour:()=>selectedColor,quantityReady:selectionValid,blank:()=>$('method').value==='blank',designReady:()=>Boolean(selectedOptions().length)&&selectedOptions().every(o=>!needsSaving(o)),editing:Boolean(editLine)});
+ bindMobileProductFlow(root,{groups,selectedColour:()=>selectedColor,designReady:()=>Boolean(selectedOptions().length)&&selectedOptions().every(o=>!needsSaving(o))});
 }
