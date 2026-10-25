@@ -1,7 +1,7 @@
 import {loadArtworkPreview} from './artwork-preview.mjs';
 import {placementOptionAssets} from './pf-rules.mjs?v=2';
-import {artworkPrintSize,textPrintSize,optionPrintSize,printableBounds,containMappedBounds,proportionalPrintBounds} from './design-layers.mjs?v=5';
-import {fontFamily} from './pf-text.mjs?v=2';
+import {artworkPrintSize,textPrintSize,optionPrintSize,printableBounds,containMappedBounds,proportionalPrintBounds} from './design-layers.mjs?v=6';
+import {fontFamily} from './pf-text.mjs?v=3';
 import {foilFinish,isFoilOption} from './foil-options.mjs';
 import {recolorArtworkPreview,tintArtworkPreview} from './vector-preview.mjs?v=2';
 
@@ -55,12 +55,12 @@ export async function renderCartMockup(product,option,design,{loadPreview=loadAr
   await document.fonts.ready;
   const placement={x:.5,y:.5,scale:.24,lineSpacing:1.25,align:'center',...design.textPlacement},size=textPrintSize(design.text,placement,option),lines=design.text.trim().split(/\r?\n/);
   ctx.font='600 100px '+fontFamily(placement.font);
-  const measured=Math.max(1,...lines.map(line=>ctx.measureText(line||' ').width)),spacing=placement.lineSpacing;
+  const measured=Math.max(1,...lines.map(line=>ctx.measureText(line||' ').width+Math.max(0,Array.from(line).length-1)*(placement.letterSpacing||0)*100)),spacing=placement.lineSpacing;
   const fontSize=Math.min(size.widthMm*100/measured,size.heightMm/(.82*(1+(lines.length-1)*spacing)));
   place(placement,()=>{
    ctx.font='600 '+fontSize+'px '+fontFamily(placement.font);ctx.fillStyle=foil||design.ink||'#17201f';ctx.textAlign=placement.align;ctx.textBaseline='middle';
    const x=placement.align==='left'?-size.widthMm/2:placement.align==='right'?size.widthMm/2:0;
-   lines.forEach((line,i)=>ctx.fillText(line,x,(i-(lines.length-1)/2)*fontSize*.82*spacing));
+   lines.forEach((line,i)=>{const y=(i-(lines.length-1)/2)*fontSize*.82*spacing,gap=(placement.letterSpacing||0)*fontSize;if(!gap){ctx.fillText(line,x,y);return;}const chars=Array.from(line),width=ctx.measureText(line).width+Math.max(0,chars.length-1)*gap;let cursor=x-(placement.align==='left'?0:placement.align==='right'?width:width/2);ctx.save();ctx.textAlign='left';for(const char of chars){ctx.fillText(char,cursor,y);cursor+=ctx.measureText(char).width+gap;}ctx.restore();});
   });
  }
  canvas.setAttribute('role','img');canvas.setAttribute('aria-label','Dit design · '+option.impLocation+' · '+option.impMethod);

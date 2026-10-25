@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {designColorCount,suggestedColorCount} from '../dist/design-colors.mjs';
-import {artworkPrintSize,normalizeArtworkForOption,designGroupSize,validateArtworkLayers} from '../dist/design-layers.mjs';
+import {normalizeTextPlacement,textPrintSize,artworkPrintSize,normalizeArtworkForOption,designGroupSize,validateArtworkLayers} from '../dist/design-layers.mjs';
 import {sanitizeDesignLine} from '../lib/design-validation.mjs';
 import {loadPFProduct} from '../lib/pf-catalog-store.mjs';
 const art={id:'test-art',logo:{id:'test-file',name:'logo.pdf',type:'application/pdf',size:1000,pixelWidth:1000,pixelHeight:100},x:.5,y:.5,scale:1};
@@ -36,4 +36,20 @@ test('server retains logo rotation and rejects invalid rotation values',async()=
  const line={productId:product.id,sku:variant.sku,quantity:25,decorations:[{optionId:option.id,width:Math.round(group.widthMm*10)/10,height:Math.round(group.heightMm*10)/10,colors:1,text:'',artworks:[artwork]}]};
  assert.equal(sanitizeDesignLine({products:[product]},line).decorations[0].artworks[0].rotation,90);
  for(const rotation of [181,-181,'invalid'])assert.throws(()=>sanitizeDesignLine({products:[product]},{...line,decorations:[{...line.decorations[0],artworks:[{...artwork,rotation}]}]}),/rotation/);
+});
+
+test('letter spacing changes text proportions and stays inside the print area',()=>{
+ const area={impWidthMm:100,impHeightMm:40},base={x:.5,y:.5,scale:.5,font:'Arial',lineSpacing:1.25};
+ const normal=textPrintSize('SMERCH',{...base,letterSpacing:0},area),wide=textPrintSize('SMERCH',{...base,letterSpacing:.3},area);
+ assert.ok(wide.widthMm/wide.heightMm>normal.widthMm/normal.heightMm);
+ for(const letterSpacing of [-.05,0,.3,.5]){const placement=normalizeTextPlacement('SMERCH',{...base,letterSpacing},area);assert.equal(placement.letterSpacing,letterSpacing);const size=textPrintSize('SMERCH',placement,area);assert.ok(size.widthMm<=100&&size.heightMm<=40);}
+ assert.equal(normalizeTextPlacement('Old design',base,area).letterSpacing,0);
+});
+test('server preserves letter spacing and rejects values outside the allowed range',async()=>{
+ const product=await loadPFProduct('pf-120632'),variant=product.variants[0],option=variant.options[0];
+ const textPlacement=normalizeTextPlacement('TEST',{x:.5,y:.5,scale:.24,letterSpacing:.2},option),size=designGroupSize([],'TEST',textPlacement,option);
+ const design={optionId:option.id,width:Math.round(size.widthMm*10)/10,height:Math.round(size.heightMm*10)/10,colors:1,text:'TEST',textPlacement};
+ const line={productId:product.id,sku:variant.sku,quantity:25,decorations:[design]};
+ assert.equal(sanitizeDesignLine({products:[product]},line).decorations[0].textPlacement.letterSpacing,.2);
+ for(const letterSpacing of [-.1,.51,'invalid'])assert.throws(()=>sanitizeDesignLine({products:[product]},{...line,decorations:[{...design,textPlacement:{...textPlacement,letterSpacing}}]}),/Bogstavafstand/);
 });
