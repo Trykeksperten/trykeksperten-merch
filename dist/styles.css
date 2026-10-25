@@ -2359,3 +2359,11 @@ body.storefront #main .pf-visual-designer .pf-text-controls input[type=range]{he
 .pf-visual-designer .pf-text-controls>#pf-center-text.pf-center-print-button:hover{background:#e4ebe5}
 
 .pf-visual-designer .pf-text-controls>#pf-center-text.pf-center-print-button{width:40px;min-width:40px;height:40px;padding:8px}.pf-center-print-button svg{display:block;flex-shrink:0}
+
+/* Full-circle rotation with four visible quarter-turn stops. */
+.pf-visual-designer .pf-text-controls>.pf-text-rotation.pf-rotation-slider{display:flex;grid-column:1/-1;gap:3px;margin:0}
+.pf-visual-designer .pf-rotation-slider>label{font-size:13px;line-height:1.35}
+.pf-rotation-ticks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0 7px;margin-top:-5px;color:#69756c;font-size:10px;line-height:1.4}
+.pf-rotation-ticks span{position:relative;padding-top:6px}
+.pf-rotation-ticks span:before{content:"";position:absolute;top:0;left:0;width:1px;height:4px;background:#9aa69d}
+.pf-visual-designer .pf-layer-controls[data-layer-kind="text"] .pf-mobile-rotate{display:none}
