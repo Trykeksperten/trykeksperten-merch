@@ -1,4 +1,4 @@
-import {bindMobileProductFlow,nextRotation} from './mobile-product-flow.mjs?v=2';
+import {bindMobileProductFlow,nextRotation} from './mobile-product-flow.mjs?v=3';
 import {previewScrollTarget,bindExplicitDesignSave,bindMobileDesignerControls} from './designer-mobile-controls.mjs?v=3';
 import {bindDesignerGestures} from './designer-gestures.mjs';
 import {renderPantonePanel} from './pantone-match.mjs';

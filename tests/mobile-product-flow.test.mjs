@@ -15,6 +15,8 @@ test('mobile choices stay on one page; only continuing after a ready design scro
  root.listeners.input();assert.equal(scrolls,0,'editing several size quantities never advances the page');
  check.listeners.click();assert.equal(scrolls,0);ready=true;check.listeners.click();assert.equal(scrolls,1);
  media.matches=false;media.listeners.change();assert.equal(root.dataset.mobileLayout,undefined);assert.equal(title.textContent,'1. Vælg farve og antal');
+ swatches.listeners.click({target:{closest:()=>swatches.children[0]}});assert.equal(colour,'black');assert.equal(changes,2);assert.equal(scrolls,1,'desktop colour choice also stays in place');
+ root.listeners.input();assert.equal(scrolls,1,'desktop quantity changes stay in place');check.listeners.click();assert.equal(scrolls,2,'desktop continues to the basket only after a saved design');
 });
 test('eight 45 degree rotations return to the starting orientation and remain in supported range',()=>{
  let angle=0;const angles=[];for(let i=0;i<8;i++){angle=nextRotation(angle);angles.push(angle);assert.ok(angle>=-180&&angle<=180);}
