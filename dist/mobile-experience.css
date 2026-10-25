@@ -119,3 +119,19 @@
  .pf-visual-designer .pf-designer-sidebar .pf-upload-launch{min-height:56px;padding:7px 10px}
  .pf-visual-designer #pf-logo-panel>.small{font-size:11px;margin:6px 0}
 }
+
+/* Mobile chrome belongs to the scrolling tools, leaving the mockup unobstructed. */
+@media(max-width:1024px){
+ .pf-visual-designer>.pf-designer-heading{display:none}
+ .pf-visual-designer .pf-mobile-tools{flex:none;border-bottom:1px solid #e2e5df;padding-bottom:8px;margin-bottom:10px}
+ .pf-visual-designer .pf-mobile-tools>.pf-editor-tabs{display:flex;flex-direction:row;gap:6px;border:0;background:transparent}
+ .pf-visual-designer .pf-mobile-tools .pf-content-tabs{flex:1;min-width:0}
+ .pf-visual-designer .pf-mobile-tools .pf-placement-tabs{flex:1;min-width:0}
+ .pf-visual-designer .pf-mobile-tools .pf-content-tabs button,.pf-visual-designer .pf-mobile-tools .pf-placement-tabs button{min-height:44px;padding:7px 9px;font-size:12px}
+ .pf-visual-designer .pf-mobile-tools .pf-placement-tabs button{min-width:90px}
+ .pf-visual-designer .pf-mobile-tools .pf-mobile-preview{display:none}
+ .pf-visual-designer .pf-mobile-tools>.pf-editor-zoom{display:flex;position:static;inset:auto;transform:none;align-self:stretch;width:100%;max-width:100%;justify-content:center;gap:2px;padding:3px 0 0;margin:0;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none}
+ .pf-visual-designer .pf-mobile-tools .pf-editor-zoom button{min-width:36px;min-height:44px;height:44px;padding:0 6px;font-size:12px}
+ .pf-visual-designer .pf-mobile-tools .pf-editor-zoom output{min-width:36px;font-size:12px}
+ .pf-visual-designer .pf-designer-actions .pf-editor-leave{flex:0 0 auto;min-width:64px}
+}
