@@ -1,4 +1,8 @@
 // A text-field submit or a click retargeted during keyboard movement must not save a design.
+export function previewScrollTarget(frame,zone,scroll){
+ const clamp=(value,max)=>Math.min(Math.max(0,max),Math.max(0,value));
+ return {left:clamp(scroll.left+zone.left+zone.width/2-frame.left-frame.width/2,scroll.width-frame.width),top:clamp(scroll.top+zone.top+zone.height/2-frame.top-frame.height/2,scroll.height-frame.height)};
+}
 export function bindExplicitDesignSave(form,button,save){
  let press=null;
  const down=e=>{press=e.button===undefined||e.button===0?{x:e.clientX,y:e.clientY,time:e.timeStamp}:null;};

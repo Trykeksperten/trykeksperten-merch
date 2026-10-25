@@ -135,3 +135,18 @@
  .pf-visual-designer .pf-mobile-tools .pf-editor-zoom output{min-width:36px;font-size:12px}
  .pf-visual-designer .pf-designer-actions .pf-editor-leave{flex:0 0 auto;min-width:64px}
 }
+
+/* Distinguish the current tool and keep uploaded files manageable on phones. */
+@media(max-width:1024px){
+ .pf-visual-designer .pf-mobile-tools .pf-content-tabs{gap:6px}
+ .pf-visual-designer .pf-mobile-tools .pf-content-tabs button{border:1px solid #d9e0da;border-radius:8px;background:#fff;color:#53605b;box-shadow:none;font-size:14px}
+ .pf-visual-designer .pf-mobile-tools .pf-content-tabs button.active{background:#36543d;color:#fff;border-color:#36543d;font-weight:600;box-shadow:none}
+ .pf-visual-designer .pf-mobile-tools .pf-placement-tabs button.active{background:#fff;color:#53605b;box-shadow:none}
+ .pf-visual-designer #pf-clear-logo{display:inline-flex;align-items:center;min-height:44px;margin:4px 0;color:#a33721;text-decoration:underline}
+ .pf-visual-designer #pf-clear-logo[hidden],.pf-visual-designer .pf-designer-panel[hidden]{display:none!important}
+ .pf-visual-designer .pf-color-warning{padding:12px;font-size:13px;line-height:1.45;margin:8px 0}
+ .pf-visual-designer .pf-color-warning .button{min-height:44px;padding:8px 12px;font-size:13px}
+ .pf-visual-designer .pf-canvas-area>.pf-canvas-shell.is-zoomed{align-items:flex-start;overscroll-behavior:contain;touch-action:pan-x pan-y}
+ .pf-visual-designer .pf-canvas-shell.is-zoomed .pf-designer-stage,.pf-visual-designer .pf-canvas-shell.is-zoomed #pf-designer-product{touch-action:pan-x pan-y}
+ .pf-visual-designer .pf-zone-size{font-size:10px;padding:4px 7px;box-shadow:none;pointer-events:none}
+}
