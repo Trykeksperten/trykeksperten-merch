@@ -23,3 +23,12 @@ test('excluded, discontinued or unpictured variants cannot become the displayed 
  assert.equal(productDisplayVariant(product,selected,'old').sku,'white');
  assert.equal(productDisplayVariant(product,[]),undefined);
 });
+
+test('T-shirt hero colours match the reference and avoid bright blue defaults',()=>{
+ const shirts=[variant('blue','Blå'),variant('navy','Marineblå'),variant('green','Skovgrøn'),variant('orange','Orange'),variant('white','Hvid'),variant('sand','Sandsten'),variant('black','Ensfarvet sort')];
+ for(const [id,sku] of [['pf-38011','green'],['pf-38028','orange'],['pf-39554','white'],['pf-39557','sand']])assert.equal(productDisplayVariant({id,category:'T-shirts'},shirts).sku,sku);
+ for(let i=0;i<30;i++)assert.notEqual(productDisplayVariant({id:'shirt-'+i,category:'T-shirts'},shirts).sku,'blue');
+ assert.equal(productDisplayVariant({id:'pf-38011',category:'T-shirts'},shirts,'blue').sku,'blue');
+ assert.equal(productDisplayVariant({id:'pf-38011',category:'T-shirts'},[shirts[0]]).sku,'blue','a customer colour filter still takes precedence');
+ assert.notEqual(productDisplayVariant({id:'pf-38028',category:'T-shirts'},shirts.filter(v=>v.sku!=='orange')).sku,'blue','missing hero colours use an available neutral');
+});

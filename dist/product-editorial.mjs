@@ -1,4 +1,4 @@
-import {productDisplayVariant} from './product-display-variant.mjs';
+import {productDisplayVariant} from './product-display-variant.mjs?v=2';
 import {fromInc,vatLabel} from './customer-pricing.mjs';
 import {pricedVariants} from './pf-visibility.mjs';
 const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));

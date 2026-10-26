@@ -1,4 +1,4 @@
-import {productDisplayVariant} from './product-display-variant.mjs';
+import {productDisplayVariant} from './product-display-variant.mjs?v=2';
 import {bindConfirmedColourPicker} from './colour-picker.mjs?v=2';
 import {createDesignOverview} from './design-overview.mjs?v=3';
 import {renderCartMockup} from './cart-mockup.mjs?v=6';
@@ -26,7 +26,7 @@ import {productPriceIntro,printExampleQuantity} from './product-price-intro.mjs?
 import {readJSONResponse} from './api-response.mjs';
 import {foilFinishes,foilFinish,isFoilOption,validateFoilFinish} from './foil-options.mjs';
 import {designColorCount} from './design-colors.mjs';
-import {editorialStory,productColorSwatches,cardPrice,cardPriceHTML} from './product-editorial.mjs?v=7';
+import {editorialStory,productColorSwatches,cardPrice,cardPriceHTML} from './product-editorial.mjs?v=8';
 import {readCart,putCartLines,fetchQuote,priceHTML,updateCartHeader} from './pf-cart.mjs?v=29';
 import {saveFile,loadFile} from './storage.mjs?v=22';
 import {validateDecoration,blankProductSelection,placementOptionAssets} from './pf-rules.mjs?v=2';

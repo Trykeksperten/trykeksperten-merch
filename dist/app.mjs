@@ -1,4 +1,4 @@
-import {productDisplayVariant} from './product-display-variant.mjs';
+import {productDisplayVariant} from './product-display-variant.mjs?v=2';
 import {premiumBrands} from './product-collections.mjs';
 import {productLoading} from './product-loading.mjs?v=2';
 import {bindProductSearch} from './product-search.mjs';
@@ -13,10 +13,10 @@ import {aboutPage} from './about.mjs?v=4';
 import {initLanguage} from './i18n.mjs?v=2';
 import {bindProductImageHover} from './product-hover.mjs?v=2';
 import {shouldHandleNavigation} from './navigation.mjs?v=2';
-import {editorialProductCard,editorialStory,bindProductColorSwatches} from './product-editorial.mjs?v=7';
+import {editorialProductCard,editorialStory,bindProductColorSwatches} from './product-editorial.mjs?v=8';
 import {pfCartPage,bindCart,updateCartHeader,readCart as readLiveCart,writeCart as writeLiveCart} from './pf-cart.mjs?v=32';
 import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs?v=28';
-import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=159';
+import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=160';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from './pf-visibility.mjs?v=24';
 import {productGroups,groupSections,productGroupURL,navigationProductGroups} from './product-groups.mjs?v=25';
 import { specialPage, bindSpecial } from './special.mjs?v=23';
