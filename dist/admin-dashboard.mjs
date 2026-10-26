@@ -2,7 +2,7 @@ import {renderFreight} from './admin-freight.mjs';
 import {mountAdminNavigation,bindAdminMenu} from './admin-navigation.mjs';
 import {automationPanel} from './admin-automation.mjs';
 import {renderWorkQueue,queueCounts} from './admin-work-queue.mjs';
-import {orderList} from './admin-order-list.mjs';
+import {orderList} from './admin-order-list.mjs?v=2';
 import {mockupsForPfOrder,mockupsForCheckout,appendMockupOverview,appendMockup} from './admin-mockups.mjs?v=4';
 import {renderCompanies} from './admin-companies.mjs';
 import {proofQueueLabel} from './proof-status.mjs';
