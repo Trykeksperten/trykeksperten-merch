@@ -1,4 +1,4 @@
-import {appendPaymentStatus} from './admin-payment-status.mjs';
+import {appendPaymentStatus} from './admin-payment-status.mjs?v=2';
 import {dateTime,paymentLabel} from './admin-order-state.mjs';
 
 export function appendPaymentAttemptDetails(row,button,checkout){

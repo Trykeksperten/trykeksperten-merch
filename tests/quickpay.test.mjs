@@ -89,3 +89,24 @@ test('only supplier-confirmed wallet metadata identifies a wallet; cards and unk
  assert.equal(quickpayMethod({metadata:{type:'card'}}),'Betalingskort');
  assert.equal(quickpayMethod({link:{payment_methods:'mobilepay,creditcard'}}),null);
 });
+
+test('historical status lookup uses the recorded live mode after the shop returns to test mode',async()=>{
+ const {refreshQuickpayStatus}=await import('../lib/quickpay.mjs');
+ for(const storedMode of ['live',null]){
+  const order={...checkoutFixture(),status:'authorized',adminPilot:true,paymentMode:storedMode};await persistCheckout(order);
+  try{
+   const payment={...paymentFixture(order,false),metadata:{origin:'mobilepay',type:'card',brand:'visa'}};
+   const result=await refreshQuickpayStatus(order.id,{env:{...env,QUICKPAY_MODE:'test'},fetchImpl:async(url,options)=>{assert.equal(options.method,'GET');return response(payment);}});
+   assert.equal(result.paymentMethod,'MobilePay');assert.equal(result.status,'authorized');assert.ok(result.paymentCheckedAt);assert.deepEqual(result.pfOrderIds,[]);
+   await assert.rejects(refreshQuickpayStatus(order.id,{env:{...env,QUICKPAY_MODE:'test'},fetchImpl:async()=>response({...payment,test_mode:true})}),/test\/live/);
+  }finally{await rm(new URL(`../.private/checkouts/${order.id}.json`,import.meta.url),{force:true});}
+ }
+});
+test('historical test status lookup stays in test mode after the shop switches to live',async()=>{
+ const {refreshQuickpayStatus}=await import('../lib/quickpay.mjs');
+ const order={...checkoutFixture(),paymentMode:'test'};await persistCheckout(order);
+ try{
+  const result=await refreshQuickpayStatus(order.id,{env:{...env,QUICKPAY_MODE:'live'},fetchImpl:async()=>response(paymentFixture(order,true))});
+  assert.equal(result.paymentMode,'test');assert.equal(result.status,'authorized');
+ }finally{await rm(new URL(`../.private/checkouts/${order.id}.json`,import.meta.url),{force:true});}
+});

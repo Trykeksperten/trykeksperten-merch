@@ -11,3 +11,12 @@ test('proof approval and generic PF processing never claim confirmed physical pr
  assert.match(nextStep({status:'approval_recorded'},null)[1],/Korrektur godkendt hos PF/);
  assert.match(nextStep({status:'processing'},null)[1],/PF behandler ordren/);
 });
+
+test('unresolved payments require Smerch action even while PF is processing or proof is approved',()=>{
+ for(const status of ['authorization_expired','capture_reconciliation','payment_failed','needs_attention']){
+  for(const pfStatus of ['approval_recorded','processing','proof_received']){
+   const [owner,step]=nextStep({status:pfStatus},{status});assert.equal(owner,'Smerch');assert.match(step,/Afklar betaling/);
+  }
+ }
+ assert.equal(nextStep({status:'cancelled'},{status:'payment_failed'})[0],'Afsluttet');
+});

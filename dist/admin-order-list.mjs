@@ -1,4 +1,4 @@
-import {appendPaymentAttemptDetails} from './admin-payment-attempt.mjs?v=2';
+import {appendPaymentAttemptDetails} from './admin-payment-attempt.mjs?v=3';
 import {appendBankPayment} from './admin-bank-payment.mjs?v=2';
 import {appendPFReview} from './admin-pf-review.mjs';
 import {matchesOrder} from './order-search.mjs';
