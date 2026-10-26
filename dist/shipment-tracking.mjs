@@ -1,9 +1,12 @@
+import {deliveryStatusRows} from './order-delivery-status.mjs';
 export function safeTrackingURL(value){try{const url=new URL(value);return ['https:','http:'].includes(url.protocol)&&!url.username&&!url.password?url.href:null;}catch{return null;}}
 export function trackingEntries(rows){return (Array.isArray(rows)?rows:[]).map(row=>{const id=typeof row==='string'?row:row?.trackingId;return typeof id==='string'&&id.trim()?{trackingId:id.slice(0,500),trackingURL:safeTrackingURL(typeof row==='object'?row.trackingURL:null)}:null;}).filter(Boolean);}
 export function renderShipmentTracking(container,orders){
  container.replaceChildren();
  for(const order of orders||[]){
-  if(!['shipped','partially_shipped'].includes(order.status))continue;
+  if(!['shipped','partially_shipped'].includes(order.status)){
+   const rows=deliveryStatusRows(order);if(rows.length){const section=document.createElement('section');for(const [label,value] of rows){const p=document.createElement('p');p.textContent=label==='Status'?value:label==='Tracking'?value:`${label}: ${value}`;section.append(p);}container.append(section);}continue;
+  }
   const section=document.createElement('section'),title=document.createElement('p');
   title.textContent=`${order.status==='partially_shipped'?'Delvist afsendt':'Afsendt'}${order.carrier?' med '+order.carrier:''}`;section.append(title);
   const entries=trackingEntries(order.trackingDetails?.length?order.trackingDetails:order.tracking);

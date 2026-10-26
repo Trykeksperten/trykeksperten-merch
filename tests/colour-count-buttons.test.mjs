@@ -22,3 +22,10 @@ test('colour count highlights every included colour while keeping one selected v
   assert.equal((html.match(/aria-pressed="true"/g)||[]).length,1);
  }
 });
+test('no explicit choice leaves every colour unselected, including single-colour methods',()=>{
+ for(const options of [choices,choices.slice(0,1)]){
+  const html=colourCountButtons({id:'front',label:'Forside',choices:options,value:0});
+  assert.doesNotMatch(html,/aria-pressed="true"|class="is-included"/);
+  assert.match(html,/Vælg antal farver\./);
+ }
+});

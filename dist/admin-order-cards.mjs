@@ -1,4 +1,4 @@
-import {pfStatusRows} from './admin-pf-status.mjs?v=1';
+import {pfStatusRows} from './admin-pf-status.mjs?v=2';
 import {foilFinish} from './foil-options.mjs';
 import {mockupsForPfOrder,appendMockup} from './admin-mockups.mjs?v=4';
 import {nextStep,orderKind,paymentLabel,dateTime} from './admin-order-state.mjs';
