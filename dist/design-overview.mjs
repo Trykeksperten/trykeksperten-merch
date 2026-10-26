@@ -3,10 +3,17 @@ export function createDesignOverview({root,getItems,renderMockup,onEdit,onContin
  const dialog=document.createElement('dialog');
  dialog.className='pf-design-overview';
  dialog.setAttribute('aria-labelledby','pf-overview-title');
- dialog.innerHTML='<header><h2 id="pf-overview-title">Se hele dit design</h2><button type="button" data-close aria-label="Luk designoversigt">×</button></header><nav aria-label="Trykplaceringer"></nav><div class="pf-overview-image" aria-live="polite"></div><p class="pf-overview-status"></p><div class="pf-overview-paging"><button type="button" data-prev aria-label="Forrige placering">←</button><span></span><button type="button" data-next aria-label="Næste placering">→</button></div><footer><button type="button" class="button light" data-edit>Ret placering</button><button type="button" class="button" data-continue>Fortsæt →</button></footer>';
+ dialog.innerHTML='<header><h2 id="pf-overview-title">Alle placeringer</h2><button type="button" data-close aria-label="Luk designoversigt">×</button></header><nav aria-label="Trykplaceringer"></nav><div class="pf-overview-image" aria-live="polite"></div><p class="pf-overview-status"></p><div class="pf-overview-paging"><button type="button" data-prev aria-label="Forrige placering">←</button><span></span><button type="button" data-next aria-label="Næste placering">→</button></div><footer><button type="button" class="button light" data-edit>Ret placering</button><button type="button" class="button" data-continue>Fortsæt →</button></footer>';
  root.append(dialog);
  const find=s=>dialog.querySelector(s),stage=find('.pf-overview-image'),status=find('.pf-overview-status');
- let items=[],index=0,version=0;
+ let items=[],index=0,version=0,images=new Map();
+ async function loadImage(item){
+  if(!images.has(item)){
+   const pending=(async()=>{const canvas=await renderMockup(item);const image=document.createElement('img');image.src=canvas.toDataURL('image/png');image.alt=`Dit design · ${item.option.impLocation}`;await image.decode();return image;})();
+   images.set(item,pending);pending.catch(()=>{if(images.get(item)===pending)images.delete(item);});
+  }
+  return images.get(item);
+ }
  const close=()=>{version++;dialog.close();};
  async function show(next){
   index=next;const token=++version,item=items[index];
@@ -16,10 +23,12 @@ export function createDesignOverview({root,getItems,renderMockup,onEdit,onContin
   find('[data-edit]').textContent=item.ready?'Ret placering':'Færdiggør placering';
   find('[data-continue]').disabled=!items.every(entry=>entry.ready);
   status.textContent=item.ready?'Gemt design · forhåndsvisning':'Placeringen mangler et gemt design.';
-  stage.textContent=item.ready?'Indlæser mockup…':'Åbn placeringen for at færdiggøre og gemme dit design.';
-  if(!item.ready)return;
-  try{const canvas=await renderMockup(item);if(token!==version||!dialog.open)return;const image=document.createElement('img');image.src=canvas.toDataURL('image/png');image.alt=`Dit design · ${item.option.impLocation}`;stage.replaceChildren(image);}
-  catch{if(token===version&&dialog.open){stage.textContent='Mockuppet kunne ikke indlæses.';const retry=document.createElement('button');retry.type='button';retry.className='button light';retry.textContent='Prøv igen';retry.onclick=()=>show(index);stage.append(retry);}}
+  stage.setAttribute('aria-busy',String(item.ready));
+  if(!item.ready){stage.textContent='Åbn placeringen for at færdiggøre og gemme dit design.';return;}
+  status.textContent=`Indlæser ${item.option.impLocation}…`;
+  if(!stage.querySelector('img'))stage.textContent='Indlæser mockup…';
+  try{const image=await loadImage(item);if(token!==version||!dialog.open)return;stage.replaceChildren(image);stage.setAttribute('aria-busy','false');status.textContent='Gemt design · forhåndsvisning';}
+  catch{if(token===version&&dialog.open){stage.setAttribute('aria-busy','false');status.textContent='Mockuppet kunne ikke indlæses.';stage.textContent='';const retry=document.createElement('button');retry.type='button';retry.className='button light';retry.textContent='Prøv igen';retry.onclick=()=>show(index);stage.append(retry);}}
  }
  find('[data-close]').onclick=close;
  find('[data-prev]').onclick=()=>show(Math.max(0,index-1));
@@ -29,5 +38,5 @@ export function createDesignOverview({root,getItems,renderMockup,onEdit,onContin
  dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)close();}});
  dialog.addEventListener('keydown',event=>{event.stopPropagation();if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();show(Math.max(0,Math.min(items.length-1,index+(event.key==='ArrowRight'?1:-1))));}});
  dialog.addEventListener('close',()=>{version++;});
- return {open(){items=getItems();if(!items.length)return;if(!dialog.open)dialog.showModal();show(0);}};
+ return {open(){images=new Map();stage.replaceChildren();items=getItems();if(!items.length)return;if(!dialog.open)dialog.showModal();show(0);}};
 }
