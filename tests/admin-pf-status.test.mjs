@@ -10,3 +10,7 @@ test('absent or invalid supplier date is explicit; latest status receipt is used
  assert.equal(Object.fromEntries(pfStatusRows({expectedShipDate:'invalid'}))['Forventet afsendelse'],'Ikke modtaget fra PF');
  assert.match(Object.fromEntries(pfStatusRows({events:[{type:'pf_status',at:'2026-10-26T09:00:00Z'},{type:'pf_status',at:'2026-10-23T10:00:00Z'}]}))['Seneste PF-status modtaget'],/26.10.2026/);
 });
+test('latest receipt remains visible when unchanged PF notices do not add history',()=>{
+ const rows=Object.fromEntries(pfStatusRows({pfStatusReceivedAt:'2026-10-26T21:20:00Z',events:[{type:'pf_status',at:'2026-10-26T13:20:00Z'}]}));
+ assert.match(rows['Seneste PF-status modtaget'],/22[.:]20/);
+});

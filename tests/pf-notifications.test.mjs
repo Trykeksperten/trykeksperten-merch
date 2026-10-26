@@ -41,3 +41,29 @@ test('PF processing and shipment cannot bypass missing proof approval',()=>fixtu
  const result=await applyPFNotification('shipment',{ShipmentNotification:{messageId:'unapproved',deliveries:[delivery(a,true,'A')]}});
  assert.equal(result.status,'needs_attention');
 }));
+test('hourly status notices update receipt time without duplicate history; real changes are kept',()=>fixture(async([a])=>{
+ const notice=(messageId,changes={})=>({StatusChangedNotification:{messageId,poNumber:a.purchaseOrderNumber,statusCode:'PROCESSING',statusInformation:'In production',expectedShipDate:'2026-10-29T00:00:00.000Z',...changes}});
+ const first=await applyPFNotification('status',notice('hour-1'));
+ assert.equal(first.events.length,1);assert.equal(first.events[0].expectedShipDate,'2026-10-29T00:00:00.000Z');
+ // A stale receipt timestamp makes the refresh assertion independent of clock resolution.
+ first.pfStatusReceivedAt='2026-01-01T00:00:00.000Z';await writeFile(dataPath('orders',a.id+'.json'),JSON.stringify(first));
+ const repeat=await applyPFNotification('status',notice('hour-2',{expectedShipDate:'2026-10-29T00:00:00Z'}));
+ assert.equal(repeat.events.length,1);assert.notEqual(repeat.pfStatusReceivedAt,first.pfStatusReceivedAt);
+ assert.equal(repeat.shipment,undefined);
+ const dateChange=await applyPFNotification('status',notice('date-change',{expectedShipDate:'2026-10-30'}));
+ assert.equal(dateChange.events.length,2);assert.equal(dateChange.expectedShipDate,'2026-10-30');
+ // Replaying a previously suppressed message must not revert a newer date.
+ const retry=await applyPFNotification('status',notice('hour-2'));
+ assert.deepEqual(retry,dateChange);
+ const infoChange=await applyPFNotification('status',notice('info-change',{expectedShipDate:'2026-10-30',statusInformation:'Waiting for stock'}));
+ assert.equal(infoChange.events.length,3);
+ const statusChange=await applyPFNotification('status',notice('stalled',{expectedShipDate:'2026-10-30',statusCode:'STALLED',statusInformation:'Waiting for stock'}));
+ assert.equal(statusChange.events.length,4);assert.equal(statusChange.status,'needs_attention');
+}));
+test('identical supplier status still enforces changed local proof approval guards',()=>fixture(async([a])=>{
+ const body={poNumber:a.purchaseOrderNumber,statusCode:'PROCESSING'};
+ const first=await applyPFNotification('status',{StatusChangedNotification:{...body,messageId:'before-proof'}});
+ first.lines[0].decorations=[{optionId:'front'}];await writeFile(dataPath('orders',a.id+'.json'),JSON.stringify(first));
+ const next=await applyPFNotification('status',{StatusChangedNotification:{...body,messageId:'after-proof'}});
+ assert.equal(next.status,'needs_attention');assert.equal(next.events.length,2);
+}));
