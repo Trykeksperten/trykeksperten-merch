@@ -2421,3 +2421,24 @@ body.storefront #main .pf-visual-designer .pf-layer-controls input[type=range]{h
 .pf-studio button.pf-overview-open{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:12px 20px;border-radius:999px}
 .pf-studio button.pf-overview-open[hidden]{display:none}
 .pf-studio button.button:focus-visible,.pf-design-overview .button:focus-visible,#pf-check-modal .button:focus-visible,.pf-visual-designer .button:focus-visible{outline:2px solid #64796a;outline-offset:3px}
+
+/* Storefront announcement strip. */
+.demo-bar{background:#cf4d22;color:#fff}
+
+/* Highlight the next step once placement colours have been chosen. */
+.pf-studio #pf-start-design.is-ready{background:#36543d;border-color:#36543d;color:#fff}
+.pf-studio #pf-start-design.is-ready:hover{background:#284532;border-color:#284532;color:#fff}
+
+/* Resize via the size slider, without canvas corner handles. */
+.pf-visual-designer .pf-design-layer::after,.pf-visual-designer .pf-designer-text::after{display:none}
+
+/* Confirm colour selections explicitly on desktop and mobile. */
+.pf-colour-picker{width:100%;box-sizing:border-box;position:static;margin:0;padding:12px;border:1px solid #d4dbd5;border-radius:16px;background:#fff;color:#17201f;box-shadow:none}
+.pf-colour-picker[hidden]{display:none}
+.pf-colour-picker-body{display:grid;gap:10px}.pf-colour-picker header,.pf-colour-picker footer{display:flex;align-items:center;justify-content:space-between;background:transparent;padding:0;border:0}
+.pf-colour-picker header button{background:transparent;color:#36543d;width:40px;height:40px;font-size:24px}
+.pf-colour-picker label{display:grid;gap:6px;margin:0;font-size:14px}.pf-colour-picker input{width:100%;min-width:0;margin:0}
+.pf-colour-field{position:relative;height:140px;touch-action:none;background-image:linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,transparent);border-radius:8px;cursor:crosshair}
+.pf-colour-field i{position:absolute;width:16px;height:16px;border:2px solid #fff;box-shadow:0 0 2px #000;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
+.pf-colour-rgb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.pf-colour-swatch{width:44px;height:44px;border:1px solid #d4dbd5;border-radius:8px}
+.pf-colour-picker .pf-colour-confirm{width:56px;height:44px;background:#36543d;color:white;border:1px solid #36543d;border-radius:8px;font-size:26px}
