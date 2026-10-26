@@ -65,3 +65,27 @@ test('Quickpay sends the customer back to the shop while callbacks stay on the A
   assert.equal(link.continue_url,`https://smerch.dk/ordre?checkout=${id}`);assert.equal(link.cancel_url,'https://smerch.dk/betaling?annulleret=1');assert.equal(link.callback_url,'https://api.smerch.dk/api/quickpay/callback');assert.equal(link.auto_capture,false);assert.equal(link.payment_methods,'mobilepay,apple-pay,google-pay,creditcard');assert.equal(link.auto_fee,false);
  }finally{await rm(new URL(`../.private/checkouts/${id}.json`,import.meta.url),{force:true});}
 });
+
+test('manual status check reads Quickpay, records method and successful check time without sending a payment operation',async()=>{
+ const {refreshQuickpayStatus,paymentStatusSummary}=await import('../lib/quickpay.mjs');
+ const order=checkoutFixture();await persistCheckout(order);const calls=[];
+ try{
+  const payment={...paymentFixture(order),metadata:{type:'card',origin:'mobilepay',brand:'visa',last4:'1234',customer_ip:'private'}};
+  const updated=await refreshQuickpayStatus(order.id,{env,fetchImpl:async(url,options)=>{calls.push([url,options.method]);return response(payment);}});
+  assert.equal(updated.status,'authorized');assert.equal(updated.paymentMethod,'MobilePay');
+  assert.ok(Number.isFinite(Date.parse(updated.paymentCheckedAt)));
+  assert.ok(updated.paymentStatusReceivedAt);assert.deepEqual(updated.pfOrderIds,[]);
+  assert.equal(calls.length,1);assert.equal(calls[0][1],'GET');
+  assert.equal(JSON.stringify(paymentStatusSummary(updated)).includes('1234'),false);
+  const checkedAt=updated.paymentCheckedAt;
+  await assert.rejects(refreshQuickpayStatus(order.id,{env,fetchImpl:async()=>response({...payment,link:{amount:1}})}),/matcher ikke/);
+  assert.equal((await readCheckout(order.id)).paymentCheckedAt,checkedAt,'failed checks retain the last successful check');
+ }finally{await rm(new URL(`../.private/checkouts/${order.id}.json`,import.meta.url),{force:true});}
+});
+test('only supplier-confirmed wallet metadata identifies a wallet; cards and unknown methods stay distinct',async()=>{
+ const {quickpayMethod}=await import('../lib/quickpay.mjs');
+ assert.equal(quickpayMethod({metadata:{type:'card',brand:'visa'}}),'Visa');
+ assert.equal(quickpayMethod({metadata:{origin:'apple-pay',brand:'visa'}}),'Apple Pay');
+ assert.equal(quickpayMethod({metadata:{type:'card'}}),'Betalingskort');
+ assert.equal(quickpayMethod({link:{payment_methods:'mobilepay,creditcard'}}),null);
+});

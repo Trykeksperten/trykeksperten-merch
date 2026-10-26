@@ -178,3 +178,22 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 .order-summary-card .order-summary-customer{font-weight:500;margin:3px 0}.order-summary-card .order-summary-product{margin:5px 0;font-size:13px}.order-summary-contact{display:flex;flex-wrap:wrap;gap:3px 12px;margin-top:5px;font-size:12px;overflow-wrap:anywhere}.order-summary-facts{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:0 0 8px;font-size:13px;line-height:1.45}.order-summary-facts dt{color:var(--admin-muted)}.order-summary-facts dd{margin:0;overflow-wrap:anywhere}.order-summary-card>div:last-child>small{display:block;margin:5px 0 8px}.order-summary-card .order-summary-contact a{color:var(--admin-muted)}@media(max-width:760px){.order-summary-facts{grid-template-columns:minmax(100px,auto) minmax(0,1fr);font-size:12px}.order-summary-contact{font-size:13px}}
 
 @media(max-width:760px){#menu-toggle,#pf-menu-toggle{width:44px;min-width:44px;height:44px;padding:10px;background:#fff;color:#17201f;border:1px solid #dce2dd;border-radius:8px}#menu-toggle svg,#pf-menu-toggle svg{margin:auto}}
+
+/* Payment details share the typography and controls used throughout backoffice. */
+.payment-status-control{margin-top:12px;font:inherit;color:var(--admin-ink);min-width:0}
+.order-next>.payment-status-control{grid-column:1/-1;border-top:1px solid var(--admin-line);padding-top:2px}
+.payment-status-control>summary{padding:10px 0;cursor:pointer;font-size:13px;line-height:1.5;color:var(--admin-muted)}
+.payment-status-control dl,.payment-attempt-details>dl{display:grid;grid-template-columns:minmax(140px,210px) minmax(0,1fr);gap:6px 16px;margin:4px 0 14px;font-size:13px;line-height:1.5}
+.payment-status-control dt,.payment-attempt-details dt{color:var(--admin-muted);font-weight:400}
+.payment-status-control dd,.payment-attempt-details dd{margin:0;color:var(--admin-ink);overflow-wrap:anywhere;font-weight:400}
+.payment-status-control>button,.payment-attempt-toggle{font:inherit;font-size:13px;line-height:1.5;min-height:36px;padding:6px 12px;border:1px solid #ccd5cb;border-radius:999px;background:transparent;color:#34483d;cursor:pointer}
+.payment-status-control>button:hover,.payment-attempt-toggle:hover{background:#edf1e9;border-color:#899b8d}
+.payment-status-control>button:disabled{opacity:.5;cursor:wait}
+.payment-status-control>p{font-size:12px;line-height:1.5;color:var(--admin-muted);margin:8px 0 0}
+.payment-status-control>p:empty{display:none}
+.payment-attempt-card{flex-wrap:wrap;font-size:13px;line-height:1.5}
+.payment-attempt-details{flex:0 0 100%;min-width:0;border-top:1px solid var(--admin-line);padding-top:14px}
+.payment-attempt-details[hidden]{display:none}
+.payment-attempt-details>h3{font-size:15px;line-height:1.45;margin:0 0 8px}
+.payment-attempt-details>p{max-width:780px;font-size:13px;line-height:1.5;color:var(--admin-muted);margin:0 0 14px}
+@media(max-width:500px){.payment-status-control dl,.payment-attempt-details>dl{grid-template-columns:1fr;gap:3px}.payment-status-control dd,.payment-attempt-details dd{margin-bottom:8px}.payment-status-control>button,.payment-attempt-toggle{min-height:42px}}

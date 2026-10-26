@@ -7,7 +7,7 @@ import {compactOrderWorkspace} from './admin-order-tabs.mjs?v=compact-2';
 import {orderAutomationPanel} from './admin-automation.mjs?v=compact-history-1';
 import {canReceiveProof} from './proof-upload.mjs';
 import {documentPanel} from './admin-documents.mjs?v=compact-2';
-import {orderActionCard,orderProductCards} from './admin-order-cards.mjs?v=3';
+import {orderActionCard,orderProductCards} from './admin-order-cards.mjs?v=4';
 import {correspondencePanel} from './admin-correspondence.mjs?v=compact-2';
 import {orderLabels,eventLabels,isTestOrder,dateTime} from './admin-order-state.mjs';
 import {bindTestSubmission} from './pf-test-submit.mjs?v=2';

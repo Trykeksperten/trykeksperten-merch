@@ -12,6 +12,7 @@ export function appendOrderSummaryState(state,checkout,orders=[]){
  const facts=el('dl',null,'order-summary-facts');const add=(label,value)=>{if(value)facts.append(el('dt',label),el('dd',value));};
  if(Number.isFinite(checkout?.totalIncVat))add('Total inkl. moms',(checkout.totalIncVat/100).toLocaleString('da-DK',{style:'currency',currency:'DKK'}));
  add('Betaling',paymentLabel(checkout));
+ if(checkout?.paymentMethod)add('Betalingsmetode',checkout.paymentMethod);
  const statuses=[...new Set(orders.map(o=>o.status==='approval_recorded'?'Afventer produktion hos PF':orderLabels[o.status]||o.status).filter(Boolean))];if(statuses.length)add('Status',statuses.join(' · '));else if(checkout?.pfReview?.required&&!checkout.pfReview.approved)add('Status','Afventer Smerchs godkendelse');
  state.append(facts);
 }
