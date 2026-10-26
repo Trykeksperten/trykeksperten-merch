@@ -14,3 +14,11 @@ test('unavailable counts and missing prices are explicit; labels are escaped',()
  const html=colourCountButtons({id:'"x',label:'<front>',choices:[{colors:1,price:'Pris afventer'},{colors:2,price:'Pris afventer'}],value:4});
  assert.match(html,/ikke tilgængeligt/);assert.doesNotMatch(html,/Samme pris/);assert.match(html,/&lt;front&gt;/);assert.match(html,/data-color-option="&quot;x"/);
 });
+
+test('colour count highlights every included colour while keeping one selected value',()=>{
+ for(const value of [1,2,5,12,2]){
+  const html=colourCountButtons({id:'front',label:'Forside',choices,value});
+  assert.equal((html.match(/class="is-included"/g)||[]).length,value);
+  assert.equal((html.match(/aria-pressed="true"/g)||[]).length,1);
+ }
+});

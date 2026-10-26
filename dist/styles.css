@@ -2442,3 +2442,41 @@ body.storefront #main .pf-visual-designer .pf-layer-controls input[type=range]{h
 .pf-colour-field i{position:absolute;width:16px;height:16px;border:2px solid #fff;box-shadow:0 0 2px #000;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
 .pf-colour-rgb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.pf-colour-swatch{width:44px;height:44px;border:1px solid #d4dbd5;border-radius:8px}
 .pf-colour-picker .pf-colour-confirm{width:56px;height:44px;background:#36543d;color:white;border:1px solid #36543d;border-radius:8px;font-size:26px}
+
+/* Equal space above and below the footer logo, before the payment heading. */
+.site-footer .footer-brand{padding-block:35px}
+.site-footer .footer-brand img{display:block}
+.site-footer .footer-payments{padding-top:0}
+.site-footer .footer-payments .payment-methods>p{color:#000}
+@media(max-width:700px){.site-footer .footer-brand{padding-block:17px}}
+
+/* Full-width orange company and service strip. */
+.site-footer .footer-bottom{width:100%;max-width:none;margin-inline:0;padding-inline:24px;background:#cf4d22;border-top-color:#cf4d22;color:#fff}
+.site-footer .footer-bottom :is(span,a){color:#fff}
+.site-footer .footer-bottom a{text-decoration-color:currentColor}
+.site-footer .footer-bottom .footer-staff-link:hover{color:#fff;background:#ffffff1f}
+.site-footer .footer-bottom a:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* Centre the about-page introduction and keep its story at a readable width. */
+body.storefront #main .about-page{text-align:center}
+body.storefront #main .about-page>.about-portrait{margin-inline:auto}
+body.storefront #main .about-page .about-content{max-width:780px;margin-inline:auto}
+
+/* Single centred contact form; contact details live in the footer. */
+body.storefront #main .contact-page .contact-heading{text-align:center}
+body.storefront #main .contact-page .contact-heading .intro{margin-inline:auto}
+body.storefront #main .contact-page .contact-layout{grid-template-columns:minmax(0,1fr);max-width:760px;margin-inline:auto}
+
+/* Compact spacing for the centred contact form. */
+body.storefront #main .contact-page{padding-block:32px 40px}
+body.storefront #main .contact-page .contact-heading{margin:0 auto 18px}
+body.storefront #main .contact-page .contact-heading h1{margin-bottom:10px}
+body.storefront #main .contact-page .contact-layout{margin-top:18px}
+body.storefront #main .contact-page .contact-form{padding:20px}
+body.storefront #main .contact-page .contact-form-head{margin-bottom:16px}
+body.storefront #main .contact-page .contact-form-head h2{margin-bottom:0}
+body.storefront #main .contact-page .contact-form-grid{gap:0 16px}
+body.storefront #main .contact-page label{gap:5px;margin-bottom:12px}
+body.storefront #main .contact-page textarea{min-height:110px}
+body.storefront #main .contact-page .contact-submit{margin-top:0;gap:10px}
+body.storefront #main .contact-page .contact-status:empty{margin:0;min-height:0}

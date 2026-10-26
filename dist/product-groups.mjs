@@ -19,7 +19,7 @@ export function canonicalSubcategory(name){return name==='Bomuldstasker'?'Mulepo
 export function groupSections(group,products){
  const categories=new Map();
  for(const product of products)if(product.shopCategory===group.id&&product.category)categories.set(product.category,(categories.get(product.category)||0)+1);
- const items=[...categories].sort(([a],[b])=>a.localeCompare(b,'da')).map(([name,count])=>({name,count}));
+ const items=[...categories].sort(([a],[b])=>a.localeCompare(b,'da')).map(([name,count])=>({name,count,label:name==='Caps & hatte'?'Kasketter & hatte':name}));
  return items.length?[{name:'Produktkategorier',items}]:[];
 }
 export function groupLeaves(group,products){return groupSections(group,products).flatMap(section=>section.items);}
