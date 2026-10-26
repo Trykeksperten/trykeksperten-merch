@@ -1,3 +1,4 @@
+import {productDisplayVariant} from './product-display-variant.mjs';
 import {premiumBrands} from './product-collections.mjs';
 import {productLoading} from './product-loading.mjs?v=2';
 import {bindProductSearch} from './product-search.mjs';
@@ -12,10 +13,10 @@ import {aboutPage} from './about.mjs?v=4';
 import {initLanguage} from './i18n.mjs?v=2';
 import {bindProductImageHover} from './product-hover.mjs?v=2';
 import {shouldHandleNavigation} from './navigation.mjs?v=2';
-import {editorialProductCard,editorialStory,bindProductColorSwatches} from './product-editorial.mjs?v=6';
+import {editorialProductCard,editorialStory,bindProductColorSwatches} from './product-editorial.mjs?v=7';
 import {pfCartPage,bindCart,updateCartHeader,readCart as readLiveCart,writeCart as writeLiveCart} from './pf-cart.mjs?v=32';
 import {checkoutPage,orderPage,bindCheckout} from './checkout.mjs?v=28';
-import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=158';
+import {pfListing,pfDesign,pfComingSoon,bindPF} from './pf-studio.mjs?v=159';
 import {isShopProduct,isQuoteOnlyProduct,isComingSoonProduct,shopProducts,pricedVariants} from './pf-visibility.mjs?v=24';
 import {productGroups,groupSections,productGroupURL,navigationProductGroups} from './product-groups.mjs?v=25';
 import { specialPage, bindSpecial } from './special.mjs?v=23';
@@ -46,7 +47,7 @@ function nav(url,{scrollTop=false,replace=false,preserveScroll=false}={}){let ne
 function picture(p,cls='',lazy=true){return `<img class="${cls}" src="${esc(p.colors[0].images[0])}" alt="${esc(p.name)} — demobillede" ${lazy?'loading="lazy"':''} width="700" height="700">`;}
 function card(p){const tier=p.tiers.at(-1);return `<article class="product-card"><a class="product-image" href="/produkt/${p.id}"><span class="image-tag">DEMO</span>${picture(p)}</a><div class="card-meta"><span>${p.minimum} stk. min.</span></div><a href="/produkt/${p.id}" class="product-title">${esc(p.name)}</a><div class="card-bottom"><span>${tier?`Fra ${money(tier.unit)}`:'Få tilbud'}</span><div class="dots" aria-label="${esc(p.colors.map(c=>c.name).join(', '))}">${p.colors.map(c=>`<i style="background:${c.hex}"></i>`).join('')}</div></div><p class="price-note">${tier?`Demopris ved ${tier.min} stk. · ekskl. moms og tryk`:'Pris og specifikationer efter aftale'}</p></article>`;}
 function visibleBrands(){if(!pfCatalog)return catalog.brands||[];const ids=new Set(shopProducts(pfCatalog,pfPrices).map(p=>p.brandId));return (catalog.brands||[]).filter(brand=>ids.has(brand.id));}
-function liveProductImage(product){return pricedVariants(product,pfPrices).find(variant=>variant.images?.[0])?.images[0];}
+function liveProductImage(product){return productDisplayVariant(product,pricedVariants(product,pfPrices))?.images[0];}
 function homeCategoryTiles(){
  const products=shopProducts(pfCatalog,pfPrices).filter(product=>pfPrices?.products?.[product.id]&&liveProductImage(product));
  const categories=[

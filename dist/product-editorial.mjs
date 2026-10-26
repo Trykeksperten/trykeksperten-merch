@@ -1,3 +1,4 @@
+import {productDisplayVariant} from './product-display-variant.mjs';
 import {fromInc,vatLabel} from './customer-pricing.mjs';
 import {pricedVariants} from './pf-visibility.mjs';
 const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
@@ -70,7 +71,7 @@ export function bindProductColorSwatches(root,products=[],prices={}){
  }
 }
 export function editorialProductCard(product,prices,preferredSku){
- const variants=pricedVariants(product,prices),image=(variants.find(v=>v.sku===preferredSku&&v.images?.[0])||variants.find(v=>v.images?.[0]))?.images[0];
+ const variants=pricedVariants(product,prices),image=productDisplayVariant(product,variants,preferredSku)?.images[0];
  if(!image)return '';
  const price=cardPrice(product,prices,image);
  return `<article class="product-card" data-card-product="${escape(product.id)}"><a class="product-image" href="/design/${escape(product.id)}"><img src="${escape(image)}" alt="${escape(product.name)}" loading="lazy" decoding="async" width="500" height="500"></a><div class="card-meta">${productColorSwatches(variants,image)}</div><a class="product-title" href="/design/${escape(product.id)}">${escape(product.name)}</a>${price?`<p class="editorial-price">${cardPriceHTML(price)}</p>`:''}</article>`;
