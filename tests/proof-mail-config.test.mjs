@@ -12,5 +12,5 @@ test('internal decision notification goes only to proof inbox with staff order l
  assert.equal(message.to,'korrektur@smerch.dk');assert.equal(message.replyTo,'customer@example.invalid');
  assert.match(message.subject,/^\[TEST\].*ændringer.*7886901/);
  assert.match(message.text,/https:\/\/smerch.dk\/admin\/pf-orders#order=ord-123/);
- assert.match(message.text,/1 bilag/);assert.match(message.text,/version 2/);assert.match(message.text,/først hæves ved afsendelse/);
+ assert.match(message.text,/1 bilag/);assert.match(message.text,/version 2/);assert.match(message.text,/Ændringsønsker udløser ingen hævning/);assert.doesNotMatch(message.text,/først hæves ved afsendelse/);
 });

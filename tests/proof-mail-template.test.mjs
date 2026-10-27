@@ -18,3 +18,11 @@ test('reminders use the same complete branded template without changing customer
  const reminder=proofMailMessage({...mail,sentCount:1},config);assert.match(reminder.subject,/Påmindelse/);assert.match(reminder.html,/Se og godkend korrektur/);
  const internal=proofMailMessage({...mail,kind:'staff_decision',decision:'approve'},config);assert.equal(internal.to,'korrektur@smerch.dk');assert.match(internal.text,/ingen hævning/);
 });
+
+test('staff and customer receipts respect internal review and agreed payment timing',()=>{
+ const internal=proofMailMessage({...mail,kind:'staff_decision',decision:'approve'},config);
+ assert.match(internal.text,/betalingen være bekræftet.*før svaret sendes til PF/);assert.match(internal.text,/Ældre ordrer følger deres oprindelige vilkår/);assert.doesNotMatch(internal.text,/først hæves ved afsendelse/);
+ const receipt=proofMailMessage({...mail,kind:'receipt',decision:'approve'},config);
+ assert.match(receipt.text,/gennemgår nu din godkendelse hos Smerch/);assert.match(receipt.html,/vilkår, du accepterede ved bestillingen/);
+ const invitation=proofMailMessage(mail,config);assert.match(invitation.text,/Smerchs interne godkendelse/);assert.match(invitation.html,/vilkårene i din ordrebekræftelse/);
+});
