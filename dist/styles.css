@@ -2379,7 +2379,7 @@ body.storefront #main .pf-visual-designer .pf-text-controls input[type=range]{he
 .pf-visual-designer .pf-content-tabs{gap:6px;padding:6px;background:#f2f4f1}
 .pf-visual-designer .pf-content-tabs button[data-content-tab]{display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid #d4dbd5;border-radius:8px;background:#fff;color:#53605b;box-shadow:none;font-weight:500}
 .pf-visual-designer .pf-content-tabs button[data-content-tab].active{background:#36543d;color:#fff;border-color:#36543d;box-shadow:inset 0 0 0 1px #36543d;font-weight:700}
-.pf-visual-designer .pf-content-tabs button[data-content-tab].active:before{content:'✓';font-size:14px}
+.pf-visual-designer .pf-content-tabs button[data-content-tab].active:before{content:none}
 .pf-visual-designer .pf-designer-sidebar #pf-logo-panel .pf-design-tools{margin:12px 0;padding:0;border:0}
 .pf-visual-designer .pf-designer-sidebar .pf-layer-controls{gap:9px;padding:0;border:0;background:transparent}
 .pf-visual-designer .pf-layer-controls>.pf-logo-size{display:flex;flex-direction:column;gap:3px;margin:0}
@@ -2504,3 +2504,49 @@ body.storefront #main .contact-page .contact-status:empty{margin:0;min-height:0}
 body.storefront #main .contact-page .contact-submit p,
 body.storefront #main .contact-page .contact-submit p a{font-size:12px;font-weight:500;line-height:1.5;color:#000}
 body.storefront #main .contact-page .contact-submit p{width:100%;max-width:100%;margin:0;white-space:nowrap;overflow-x:auto}
+
+/* Compact text colour picker with a visible hue spectrum. */
+body.storefront #main .pf-text-controls .pf-text-color{font-size:12px}
+body.storefront #main .pf-text-controls .pf-text-color input[type=color]{width:44px;height:30px;min-height:30px;padding:3px}
+body.storefront #main .pf-colour-picker{width:100%;max-width:320px;padding:10px;border-radius:12px}
+body.storefront #main .pf-colour-picker-body{gap:8px}
+body.storefront #main .pf-colour-picker :is(label,legend,header strong){font-size:12px;line-height:1.4}
+body.storefront #main .pf-colour-picker .pf-colour-field{height:90px}
+body.storefront #main .pf-colour-picker input:not([type=range]){height:32px;min-height:32px;padding:5px 7px;font-size:12px;border:1px solid #c8ceca;border-radius:6px}
+body.storefront #main .pf-visual-designer .pf-text-controls .pf-colour-picker input[data-hue]{appearance:none;-webkit-appearance:none;width:100%;height:14px;min-height:14px;padding:0;border:0;border-radius:7px;background:linear-gradient(to right,#f00 0%,#ff0 16.67%,#0f0 33.33%,#0ff 50%,#00f 66.67%,#f0f 83.33%,#f00 100%);accent-color:transparent}
+body.storefront #main .pf-visual-designer .pf-text-controls .pf-colour-picker input[data-hue]::-webkit-slider-runnable-track{height:14px;background:transparent;border-radius:7px}
+body.storefront #main .pf-visual-designer .pf-text-controls .pf-colour-picker input[data-hue]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;margin-top:-3px;border:2px solid #fff;border-radius:50%;background:transparent;box-shadow:0 0 0 1px #68766e}
+body.storefront #main .pf-visual-designer .pf-text-controls .pf-colour-picker input[data-hue]::-moz-range-track{height:14px;background:transparent;border:0;border-radius:7px}
+body.storefront #main .pf-visual-designer .pf-text-controls .pf-colour-picker input[data-hue]::-moz-range-thumb{width:16px;height:16px;border:2px solid #fff;border-radius:50%;background:transparent;box-shadow:0 0 0 1px #68766e}
+.pf-colour-cmyk{min-width:0;margin:0;padding:0;border:0}.pf-colour-cmyk legend{margin-bottom:6px}.pf-colour-cmyk>div{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+body.storefront #main .pf-colour-picker :is(.pf-colour-help,.pf-colour-error){margin:0;font-size:11px;line-height:1.4}
+.pf-colour-error{color:#a13530}.pf-colour-error:empty{display:none}
+body.storefront #main .pf-colour-picker .pf-colour-swatch{width:30px;height:30px;border-radius:6px}
+body.storefront #main .pf-colour-picker .pf-colour-confirm{width:auto;height:34px;min-height:34px;padding:6px 14px;font-size:12px;font-weight:500;line-height:1.4}
+
+/* Compact editor modes; the active tool differs from the selected placement. */
+body.storefront #main .pf-visual-designer .pf-content-tabs{gap:5px;padding:5px;align-items:center}
+body.storefront #main .pf-visual-designer .pf-content-tabs button[data-content-tab]{flex:0 0 auto;min-width:88px;min-height:38px;padding:7px 12px;font-size:13px;line-height:1.35;border-radius:7px;white-space:nowrap}
+body.storefront #main .pf-visual-designer .pf-content-tabs button[data-content-tab].active{background:#36543d;color:#fff;border-color:#36543d;box-shadow:inset 0 -3px #172b1d;font-weight:700}
+body.storefront #main .pf-visual-designer #pf-placement-tabs{gap:5px;padding:5px;align-items:center}
+body.storefront #main .pf-visual-designer #pf-placement-tabs button{min-width:76px;min-height:38px;padding:7px 10px;font-size:13px;line-height:1.35;border-radius:7px;white-space:nowrap}
+body.storefront #main .pf-visual-designer #pf-placement-tabs button.active{background:#e8eee9;color:#284332;border-color:#9eafa2;box-shadow:none;font-weight:500}
+body.storefront #main .pf-visual-designer #pf-placement-tabs button.active small{background:#d2ded4;color:#284332}
+
+/* Show one colour model at a time to keep the picker short. */
+body.storefront #main .pf-colour-picker{max-width:280px;padding:9px}
+body.storefront #main .pf-colour-picker-body{gap:6px}
+body.storefront #main .pf-colour-picker [data-panel][hidden]{display:none}
+body.storefront #main .pf-colour-picker .pf-colour-field{height:72px}
+body.storefront #main .pf-colour-picker .pf-colour-model{display:flex;align-items:center;justify-content:space-between;gap:8px}
+body.storefront #main .pf-colour-picker .pf-colour-model select{width:118px;min-height:28px;height:28px;padding:3px 7px;font-size:12px;border:1px solid #c8ceca;border-radius:6px;background:#fff;color:#17201f}
+body.storefront #main .pf-colour-picker input:not([type=range]){height:28px;min-height:28px;padding:3px 6px}
+body.storefront #main .pf-colour-picker :is(.pf-colour-rgb,.pf-colour-cmyk>div){gap:5px}
+body.storefront #main .pf-colour-picker .pf-colour-help{font-size:10px;line-height:1.3}
+body.storefront #main .pf-colour-picker .pf-colour-confirm{height:30px;min-height:30px;padding:4px 12px}
+body.storefront #main .pf-colour-picker .pf-colour-swatch{width:26px;height:26px}
+body.storefront #main .pf-visual-designer .pf-text-controls .pf-colour-picker .pf-colour-model{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px;text-align:left}
+body.storefront #main .pf-colour-picker .pf-colour-cmyk legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* Remove the supplied photo’s white side margins within the story card. */
+.product-story--stanley-people>img{transform:scale(1.25);object-position:center}

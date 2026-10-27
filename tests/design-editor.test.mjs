@@ -61,3 +61,14 @@ test('line spacing supports continuous slider values and preserves older designs
  assert.ok(loose.heightMm/loose.widthMm>tight.heightMm/tight.widthMm);
  assert.equal(normalizeTextPlacement('OLD',base,option).lineSpacing,1.25);
 });
+
+test('server preserves requested text colour codes and rejects codes inconsistent with the preview',async()=>{
+ const product=await loadPFProduct('pf-120632'),variant=product.variants[0],option=variant.options[0];
+ const textPlacement=normalizeTextPlacement('TEST',{x:.5,y:.5,scale:.24},option),size=designGroupSize([],'TEST',textPlacement,option);
+ const design={optionId:option.id,width:Math.round(size.widthMm*10)/10,height:Math.round(size.heightMm*10)/10,colors:1,text:'TEST',textPlacement,ink:'#d45d00',inkSpec:{model:'pantone',code:'717 C'}};
+ const line={productId:product.id,sku:variant.sku,quantity:25,decorations:[design]};
+ assert.equal(sanitizeDesignLine({products:[product]},line).decorations[0].inkSpec.code,'717 C');
+ assert.throws(()=>sanitizeDesignLine({products:[product]},{...line,decorations:[{...design,ink:'#000000'}]}),/farvekode matcher/);
+ const cmyk={...design,ink:'#ff0000',inkSpec:{model:'cmyk',values:[0,100,100,0]}};
+ assert.deepEqual(sanitizeDesignLine({products:[product]},{...line,decorations:[cmyk]}).decorations[0].inkSpec.values,[0,100,100,0]);
+});

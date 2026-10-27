@@ -2,15 +2,15 @@ import {productDisplayVariant} from './product-display-variant.mjs?v=2';
 import {fromInc,vatLabel} from './customer-pricing.mjs';
 import {pricedVariants} from './pf-visibility.mjs';
 const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-// Supplier lifestyle photographs, verified against the full product records.
+// Lifestyle photographs for the featured product stories.
 const stories={
- 'pf-100834':{image:'https://images.pfconcept.com/ProductImages_All/JPG/500x500/10083410_M1.jpg',title:'Med på hele dagen.',label:'Stanley Quencher',crop:'portrait'},
- 'pf-107790':{image:'https://images.pfconcept.com/ProductImages_All/JPG/500x500/10779002_M1.jpg',title:'Plads til store idéer.',label:'Karst · Notesbøger',crop:'landscape'}
+ 'pf-100834':{image:'/assets/stanley-quencher-people.jpg',width:800,height:800,alt:'To personer med orange og turkis Stanley Quencher',title:'Med på hele dagen.',label:'Stanley Quencher',crop:'stanley-people'},
+ 'pf-107790':{image:'/assets/karst-orange-journal.webp',width:1080,height:1080,alt:'Orange Karst Stone Paper Journal på orange baggrund',title:'Plads til store idéer.',label:'Karst · Notesbøger',crop:'karst-orange'}
 };
 export function editorialStory(products,id){
  const product=products.find(product=>product.id===id),story=stories[id];
  if(!product||!story)return '';
- return `<a class="product-story product-story--${story.crop}" href="/design/${escape(id)}"><img src="${story.image}" alt="${escape(story.label)} i hverdagen" loading="lazy" decoding="async" width="500" height="500"><div class="product-story-copy"><span>${story.label}</span><h3>${story.title}</h3><span class="product-story-link">Se produktet ↗</span></div></a>`;
+ return `<a class="product-story product-story--${story.crop}" href="/design/${escape(id)}"><img src="${story.image}" alt="${escape(story.alt||story.label+' i hverdagen')}" loading="lazy" decoding="async" width="${story.width||3000}" height="${story.height||3000}"><div class="product-story-copy"><span>${story.label}</span><h3>${story.title}</h3><span class="product-story-link">Se produktet ↗</span></div></a>`;
 }
 // Sizes share a colour; show each supplier colour only once.
 export function productColorSwatches(variants=[],selectedImage=''){
