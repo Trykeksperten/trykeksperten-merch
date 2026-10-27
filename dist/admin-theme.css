@@ -209,3 +209,15 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 
 .order-summary-facts .order-summary-dispatch{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 16px}
 #content .order-summary-dispatch>.action{flex:0 0 auto;margin:0 0 0 auto}
+
+/* Size the mockup to the order information, independently of status rows. */
+.order-summary-card.order-summary-scaled{grid-template-columns:minmax(0,1.3fr) minmax(310px,.9fr)}
+.order-summary-product-block{display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;align-items:stretch}
+.order-summary-media{position:relative;min-width:0}
+.order-summary-media>.mockup-overview{position:absolute;inset:0;max-width:none;display:flex;flex-wrap:nowrap;align-items:stretch;overflow-x:auto}
+.order-summary-media .mockup-overview .admin-mockup.compact{width:100%;height:100%;max-height:100%;display:grid;grid-template-rows:minmax(0,1fr) auto;box-sizing:border-box;margin:0}
+.order-summary-media .admin-mockup.compact>a{display:block;min-height:0}
+.order-summary-media .admin-mockup.compact img{width:100%;height:100%;object-fit:contain}
+.order-summary-product-block .order-summary-product:last-child{margin-bottom:0}
+@media(max-width:1050px){.order-summary-product-block{grid-template-columns:100px minmax(0,1fr);gap:12px}}
+@media(max-width:760px){.order-summary-card.order-summary-scaled{grid-template-columns:minmax(0,1fr)}.order-summary-scaled>div:last-child{grid-column:1}.order-summary-product-block{grid-template-columns:100px minmax(0,1fr)}}
