@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {PDFDocument,StandardFonts} from 'pdf-lib';
+import {customerProofView} from '../lib/customer-proof-view.mjs';
+async function fixture(){const pdf=await PDFDocument.create(),font=await pdf.embedFont(StandardFonts.Helvetica),p=pdf.addPage();for(const [text,x,y] of [['Order Number',40,780],['7886901',200,780],['Customer Reference',40,760],['SMERCH-demo',200,760],['Article',40,740],['Cap',200,740]])p.drawText(text,{x,y,font,size:9});return {mimeType:'application/pdf',data:Buffer.from(await pdf.save())};}
+test('customer copy masks the matched reference row without changing the original file or page geometry',async()=>{const proof=await fixture(),original=Buffer.from(proof.data),result=await customerProofView(proof,'SMERCH-demo');assert.notDeepEqual(result.data,original);assert.deepEqual(proof.data,original);const source=await PDFDocument.load(original),customer=await PDFDocument.load(result.data);assert.equal(customer.getPageCount(),source.getPageCount());assert.deepEqual(customer.getPage(0).getSize(),source.getPage(0).getSize());assert.deepEqual((await customerProofView(proof,'SMERCH-demo')).data,result.data);});
+test('unknown references and non-PDF proofs preserve the original view',async()=>{const proof=await fixture();assert.equal(await customerProofView(proof,'SMERCH-unrelated'),proof);const image={mimeType:'image/png',data:Buffer.from('image')};assert.equal(await customerProofView(image,'SMERCH-demo'),image);});
