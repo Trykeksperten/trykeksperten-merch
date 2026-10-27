@@ -2550,3 +2550,9 @@ body.storefront #main .pf-colour-picker .pf-colour-cmyk legend{position:absolute
 
 /* Remove the supplied photo’s white side margins within the story card. */
 .product-story--stanley-people>img{transform:scale(1.25);object-position:center}
+
+/* Brand lifestyle photos share the product grid without changing its counts. */
+.brand-lifestyle{grid-column:span 2;min-width:0;margin:0;aspect-ratio:1;overflow:hidden;border-radius:18px;background:#eef0ed}
+.brand-lifestyle>img{display:block;width:100%;height:100%;object-fit:cover}
+@media(max-width:700px){.brand-lifestyle{border-radius:12px}}
+@media(max-width:430px){.brand-lifestyle{grid-column:1/-1}}
