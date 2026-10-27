@@ -2490,3 +2490,12 @@ body.storefront #main .contact-page .contact-status:empty{margin:0;min-height:0}
 .pf-studio .pf-print-prices-details>summary::after{content:'+';font-size:18px;line-height:1}
 .pf-studio .pf-print-prices-details[open]>summary::after{content:'−'}
 .pf-studio .pf-print-prices-details>summary:hover{background:#e7ede5;border-color:#899b8d}
+
+/* Match the subcategory-to-divider gap to the catalogue toolbar below. */
+.catalog-heading:has(.pf-category-navigation){padding-bottom:34px}
+@media(min-width:1025px){
+ .catalog-heading:has(.pf-category-navigation) h1{margin-bottom:calc(var(--category-title-space) + 14px)}
+}
+@media(max-width:700px){
+ .catalog-heading:has(.pf-category-navigation){padding-bottom:26px}
+}
