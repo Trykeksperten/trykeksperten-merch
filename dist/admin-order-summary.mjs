@@ -1,3 +1,4 @@
+import {appendCaptureWarning} from './admin-capture-warning.mjs';
 import {pfStatusRows} from './admin-pf-status.mjs?v=3';
 import {orderKind,dateTime,paymentLabel,orderLabels} from './admin-order-state.mjs';
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;};
@@ -20,7 +21,7 @@ export function appendOrderSummaryState(state,checkout,orders=[]){
   add('Seneste PF-status'+suffix,pf['PF-status']);
   const dispatch=add('Forventet afsendelse'+suffix,pf['Forventet afsendelse']);dispatch.className='order-summary-dispatch';dispatchCells.set(order,dispatch);
  }
- state.append(facts);return dispatchCells;
+ state.append(facts);appendCaptureWarning(state,checkout);return dispatchCells;
 }
 
 export function assembleOrderSummaryCard(card,gallery,info,state){

@@ -31,6 +31,10 @@ test('admin payment controls work on the API host with a separate storefront and
   const review=await post('/approve-handoff',{confirmed:false});assert.equal(review.status,400);assert.match((await review.json()).error,/Bekræft gennemgangen/);
   const invoice=await post('/bank-payment',{action:'invoice',invoiceNumber:'TEST-100'});assert.equal(invoice.status,200);assert.equal((await invoice.json()).bankPayment.invoiceNumber,'TEST-100');
   const list=await(await fetch(base+'/api/admin/checkouts',{headers})).json();assert.equal(list[0].status,'awaiting_bank_payment');assert.equal(list[0].paymentCheckedAt,null);assert.deepEqual(list[0].pfOrderIds,[]);
+  const cardId='pay-'+randomUUID(),authorizedAt='2026-10-20T10:00:00.000Z',authorizationExpiresAt='2027-04-17T10:00:00.000Z';
+  await writeFile(join(root,'checkouts',cardId+'.json'),JSON.stringify({id:cardId,paymentProvider:'quickpay',status:'authorized',createdAt:authorizedAt,authorizedAt,authorizationExpiresAt,captureDeadlinePolicy:'clearhaus-179-days',paymentTotals:{captured:0,refunded:0},totalIncVat:10000,lines:[],events:[]}));
+  const cards=await(await fetch(base+'/api/admin/checkouts',{headers})).json(),card=cards.find(c=>c.id===cardId);
+  assert.equal(card.captureDeadlinePolicy,'clearhaus-179-days');assert.equal(card.authorizationExpiresAt,authorizationExpiresAt);assert.deepEqual(card.paymentTotals,{captured:0,refunded:0});
  }finally{
   if(child.exitCode===null&&child.signalCode===null){const done=once(child,'exit');child.kill('SIGTERM');await done;}
   await rm(root,{recursive:true,force:true});

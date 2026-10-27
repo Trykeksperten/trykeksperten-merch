@@ -221,3 +221,5 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 .order-summary-product-block .order-summary-product:last-child{margin-bottom:0}
 @media(max-width:1050px){.order-summary-product-block{grid-template-columns:100px minmax(0,1fr);gap:12px}}
 @media(max-width:760px){.order-summary-card.order-summary-scaled{grid-template-columns:minmax(0,1fr)}.order-summary-scaled>div:last-child{grid-column:1}.order-summary-product-block{grid-template-columns:100px minmax(0,1fr)}}
+
+.capture-warning{grid-column:1/-1;margin:12px 0;padding:12px 14px;border-left:3px solid #a66b00;border-radius:4px;background:#fff6de;color:#604100;line-height:1.5}.capture-warning strong{display:block;font-size:14px}.capture-warning p{margin:5px 0 0;font-size:13px}.capture-warning-overdue{border-color:#a13530;background:#fceceb;color:#8e2924}
