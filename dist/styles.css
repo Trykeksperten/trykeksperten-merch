@@ -2499,3 +2499,8 @@ body.storefront #main .contact-page .contact-status:empty{margin:0;min-height:0}
 @media(max-width:700px){
  .catalog-heading:has(.pf-category-navigation){padding-bottom:26px}
 }
+
+/* One consistent, black contact notice, including its links. */
+body.storefront #main .contact-page .contact-submit p,
+body.storefront #main .contact-page .contact-submit p a{font-size:12px;font-weight:500;line-height:1.5;color:#000}
+body.storefront #main .contact-page .contact-submit p{width:100%;max-width:100%;margin:0;white-space:nowrap;overflow-x:auto}
