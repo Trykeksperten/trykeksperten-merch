@@ -205,4 +205,4 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 .order-summary-card .action{margin-left:0}
 @media(max-width:1050px){.order-summary-facts{grid-template-columns:128px minmax(0,1fr)}}
 @media(max-width:760px){.order-summary-facts{grid-template-columns:minmax(110px,40%) minmax(0,1fr)}}
-.order-summary-card>div:last-child>.action{display:table;margin-left:auto}
+#content .order-summary-card>div:last-child>.action{display:flex;width:max-content;max-width:100%;margin-left:auto}
