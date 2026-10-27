@@ -8,7 +8,7 @@ import {queueCounts} from './admin-work-queue.mjs?v=shared-orders-3';
 import {compactOrderWorkspace} from './admin-order-tabs.mjs?v=payment-history-3';
 import {orderAutomationPanel} from './admin-automation.mjs?v=compact-history-1';
 import {canReceiveProof} from './proof-upload.mjs';
-import {documentPanel} from './admin-documents.mjs?v=compact-2';
+import {documentPanel} from './admin-documents.mjs?v=payment-branding-3';
 import {orderActionCard,orderProductCards} from './admin-order-cards.mjs?v=6';
 import {correspondencePanel} from './admin-correspondence.mjs?v=compact-2';
 import {orderLabels,eventLabels,isTestOrder,dateTime} from './admin-order-state.mjs';
