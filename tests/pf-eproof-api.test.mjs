@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {proofPdf} from './helpers/proof-pdf.mjs';
-import {normalizeEproof,eproofCallbackAuthorized,eproofConfiguration,postEproof} from '../lib/pf-eproof-api.mjs';
+import {normalizeEproof,eproofCallbackAuthorized,eproofConfiguration,eproofReadiness,postEproof} from '../lib/pf-eproof-api.mjs';
 import {receiveEproofAPI,sendEproofDecision,readOrder,decideProof} from '../lib/pf-orders.mjs';
 const root=await mkdtemp(join(tmpdir(),'eproof-api-'));process.env.SMERCH_DATA_DIR=root;
 after(()=>rm(root,{recursive:true,force:true}));
@@ -26,3 +26,20 @@ test('unknown/non-success response cannot be called accepted',async()=>{for(cons
 test('partial delivery keeps accepted configuration and blocks retries or superseding proof',async()=>{const f=await fixture();f.item.configuration.push({...f.item.configuration[0],EproofRef:'SECOND'});await receiveEproofAPI(f.payload,{env});await decide(f.id);let calls=0;await assert.rejects(sendEproofDecision(f.id,{version:1,confirmed:true,performedBy},{env,fetchImpl:async()=>{if(++calls===2)throw Error('timeout');return success();}}));const order=await readOrder(f.id);assert.equal(order.decision.apiDispatch.requests[0].state,'delivered');assert.equal(order.decision.apiDispatch.requests[1].state,'sending');assert.equal(order.decision.apiDispatch.state,'uncertain');const revised={...f.item,Base64Image:(await proofPdf('Revised after uncertainty')).toString('base64')};await assert.rejects(receiveEproofAPI({Eproof:[revised]},{env}),/afstemmes/);assert.equal((await readOrder(f.id)).proof.version,1);});
 test('durable dispatch lock blocks a second process or restart',async()=>{const f=await fixture();await receiveEproofAPI(f.payload,{env});await decide(f.id);await mkdir(join(root,'eproof-locks',f.id),{recursive:true});await assert.rejects(sendEproofDecision(f.id,{version:1,confirmed:true,performedBy},{env,fetchImpl:async()=>{throw Error('must not send');}}),/genstart/);});
 test('renewed supplier URL alone does not create a new proof version',async()=>{const f=await fixture();await receiveEproofAPI(f.payload,{env});f.item['Url-Eproof']='https://pf.example.test/proof?token=renewed';assert.equal((await receiveEproofAPI(f.payload,{env}))[0].duplicate,true);assert.equal((await readOrder(f.id)).proof.version,1);});
+
+test('Gateway credential reuse selects test and live credentials without crossing environments',()=>{
+ const shared={PF_EPROOF_ENABLED:'1',PF_GATEWAY_USERNAME:'gateway-user',PF_GATEWAY_SENDER_ID:'SMERCH',PF_GATEWAY_MODE:'live',PF_GATEWAY_TEST_PASSWORD:'test-only',PF_GATEWAY_PROD_PASSWORD:'live-only'};
+ const testConfig=eproofConfiguration({...shared,PF_EPROOF_MODE:'test'});assert.equal(testConfig.username,'gateway-user');assert.equal(testConfig.password,'test-only');assert.match(testConfig.url,/\/test\//);
+ assert.equal(eproofConfiguration({...shared,PF_EPROOF_MODE:'live'}).password,'live-only');
+ assert.throws(()=>eproofConfiguration({...shared,PF_EPROOF_MODE:'test',PF_GATEWAY_TEST_PASSWORD:undefined,PF_GATEWAY_PASSWORD:'live-legacy'}),/testadgangskode/);
+ assert.throws(()=>eproofConfiguration({...shared,PF_EPROOF_MODE:'live',PF_GATEWAY_PROD_PASSWORD:undefined,PF_GATEWAY_MODE:'test',PF_GATEWAY_PASSWORD:'test-legacy'}),/produktionsadgangskode/);
+ assert.equal(eproofConfiguration({...shared,PF_EPROOF_MODE:'test',PF_GATEWAY_MODE:'test',PF_GATEWAY_TEST_PASSWORD:undefined,PF_GATEWAY_PASSWORD:'test-legacy'}).password,'test-legacy');
+ assert.throws(()=>eproofConfiguration({...shared,PF_EPROOF_MODE:'test',PF_EPROOF_USERNAME:'partial-override'}),/Begge/);
+});
+test('administrative readiness contains no secrets and stays blocked until sender identity is confirmed',()=>{
+ const shared={...env,PF_EPROOF_USERNAME:undefined,PF_EPROOF_PASSWORD:undefined,PF_GATEWAY_USERNAME:'private-username',PF_GATEWAY_TEST_PASSWORD:'private-password'};
+ assert.equal(eproofReadiness(shared).ready,true);assert.equal(eproofReadiness(shared).credentialSource,'gateway');
+ assert.equal(eproofReadiness({...shared,PF_EPROOF_ENABLED:'0'}).ready,false);
+ const status=eproofReadiness({...shared,PF_EPROOF_EXPECTED_SENDER_ID:undefined});assert.equal(status.ready,false);assert.ok(status.missing.some(key=>key.includes('EXPECTED_SENDER')));
+ for(const secret of ['private-username','private-password',env.PF_EPROOF_CALLBACK_PASSWORD])assert.ok(!JSON.stringify(status).includes(secret));
+});

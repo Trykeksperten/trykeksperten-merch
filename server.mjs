@@ -1,4 +1,4 @@
-import {eproofCallbackAuthorized} from './lib/pf-eproof-api.mjs';
+import {eproofCallbackAuthorized,eproofReadiness} from './lib/pf-eproof-api.mjs';
 import {receiveEproofAPI,sendEproofDecision} from './lib/pf-orders.mjs';
 import {bankInvoiceBasis} from './lib/bank-invoice-basis.mjs';
 import {prepareBankPayment,registerBankPaymentAndHandoff,publicBankPayment} from './lib/bank-payment.mjs';
@@ -380,6 +380,7 @@ const handleRequest=async(req,res)=>{
     const sent=await dispatchOrder(order.id,{env});
     json(res,201,{id:sent.id,purchaseOrderNumber:sent.purchaseOrderNumber,status:sent.status,gatewayResponse:sent.gatewayResponse,test:true,paymentCreated:false});return;
    }
+   if(pathname==='/api/pf-orders/eproof-status'&&req.method==='GET'){json(res,200,eproofReadiness());return;}
    if(pathname==='/api/pf-orders'&&req.method==='GET'){json(res,200,await Promise.all((await listOrders()).map(async ({gatewayPayload,lines,supplierTotal,...order})=>presentPFOrder({...order,isTest:gatewayPayload?.Header?.isTest===true,lines:lines.map(({supplierUnitPrice,...line})=>line)}))));return;}
    if(pathname==='/api/pf-orders'&&req.method==='POST'){const input=await readJSON(req,2*1024*1024);if(input.checkoutId)throw Error('Kundeordrer oprettes kun gennem det interne betalingsflow.');const catalog=await loadProductCatalog(input.lines?.map(line=>line.productId)||[]),{prices,rules}=await loadPricing(),stock=await loadStock(),order=await prepareOrder(input,{catalog,prices,rules,stock});json(res,201,{id:order.id,status:order.status,quote:order.quote});return;}
    const match=/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})(?:\/(send|proof|proof-file|decision|approval-delivery|external-approval|publish|mail-status|feedback-file|eproof-send))?$/.exec(pathname);

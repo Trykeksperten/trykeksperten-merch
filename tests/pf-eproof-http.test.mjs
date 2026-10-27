@@ -23,9 +23,10 @@ test('PF callback requires dedicated auth; outbound requires staff session and o
   const callback={authorization:'Basic '+Buffer.from('pf:'+'x'.repeat(32)).toString('base64')};
   assert.equal((await post('/api/pf-eproof',callback)).status,200);
   assert.equal((await(await post('/api/pf-eproof',callback)).json()).results[0].duplicate,true);
+  assert.equal((await fetch(base+'/api/pf-orders/eproof-status')).status,401);
   const path='/api/pf-orders/'+id+'/eproof-send';assert.equal((await post(path,{},{})).status,401);
   const bearer=await post(path,{authorization:'Bearer admin-test-token'},{});assert.notEqual(bearer.status,200);
-  const login=await post('/api/admin/login',{}, {username:'test',password:'test-password'});assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];
+  const login=await post('/api/admin/login',{}, {username:'test',password:'test-password'});assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];const readinessResponse=await fetch(base+'/api/pf-orders/eproof-status',{headers:{cookie}});assert.equal(readinessResponse.status,200);const readiness=await readinessResponse.json();assert.equal(readiness.mode,'test');assert.equal(readiness.ready,false);assert.ok(readiness.missing.includes('PF_GATEWAY_USERNAME'));assert.ok(!JSON.stringify(readiness).includes('x'.repeat(32)));
   assert.equal((await post(path,{cookie,origin:'https://wrong.test','x-smerch-admin':'1'},{})).status,401);
   const result=await post(path,{cookie,origin:base,'x-smerch-admin':'1'}, {version:1,confirmed:true});assert.equal(result.status,400);assert.match((await result.json()).error,/konfigureret|bruger|Sender-id/);
   const stored=JSON.parse(await readFile(join(root,'orders',id+'.json')));assert.equal(stored.proof.version,1);assert.equal(stored.decision,null);
