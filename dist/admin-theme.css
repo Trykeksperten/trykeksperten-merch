@@ -206,3 +206,6 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 @media(max-width:1050px){.order-summary-facts{grid-template-columns:128px minmax(0,1fr)}}
 @media(max-width:760px){.order-summary-facts{grid-template-columns:minmax(110px,40%) minmax(0,1fr)}}
 #content .order-summary-card>div:last-child>.action{display:flex;width:max-content;max-width:100%;margin-left:auto}
+
+.order-summary-facts .order-summary-dispatch{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 16px}
+#content .order-summary-dispatch>.action{flex:0 0 auto;margin:0 0 0 auto}

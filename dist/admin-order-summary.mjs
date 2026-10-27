@@ -10,7 +10,7 @@ export function appendOrderSummaryInfo(info,{checkout,orders=[],lines}){
  for(const line of lines||checkout?.lines||order.lines||[]){const name=checkout?.productNames?.[line.productId]||line.productName||line.productId||line.sku;info.append(el('p',`${line.quantity} stk. · ${name}`,'order-summary-product'));}
 }
 export function appendOrderSummaryState(state,checkout,orders=[]){
- const facts=el('dl',null,'order-summary-facts');const add=(label,value)=>{if(value)facts.append(el('dt',label),el('dd',value));};
+ const facts=el('dl',null,'order-summary-facts'),dispatchCells=new Map();const add=(label,value)=>{if(!value)return;const cell=el('dd',value);facts.append(el('dt',label),cell);return cell;};
  if(Number.isFinite(checkout?.totalIncVat))add('Total inkl. moms',(checkout.totalIncVat/100).toLocaleString('da-DK',{style:'currency',currency:'DKK'}));
  add('Betaling',paymentLabel(checkout));
  if(checkout?.paymentMethod)add('Betalingsmetode',checkout.paymentMethod);
@@ -18,7 +18,7 @@ export function appendOrderSummaryState(state,checkout,orders=[]){
  for(const order of orders){
   const pf=Object.fromEntries(pfStatusRows(order)),suffix=orders.length>1?' · '+(order.pfOrderNumber||order.purchaseOrderNumber||'PF-nummer afventer'):'';
   add('Seneste PF-status'+suffix,pf['PF-status']);
-  add('Forventet afsendelse'+suffix,pf['Forventet afsendelse']);
+  const dispatch=add('Forventet afsendelse'+suffix,pf['Forventet afsendelse']);dispatch.className='order-summary-dispatch';dispatchCells.set(order,dispatch);
  }
- state.append(facts);
+ state.append(facts);return dispatchCells;
 }
