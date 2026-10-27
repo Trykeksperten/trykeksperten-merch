@@ -1,4 +1,4 @@
-import {eproofCallbackAuthorized,eproofReadiness} from './lib/pf-eproof-api.mjs';
+import {eproofCallbackAuthorized,eproofReadiness,eproofConnectionCheck} from './lib/pf-eproof-api.mjs';
 import {receiveEproofAPI,sendEproofDecision} from './lib/pf-orders.mjs';
 import {bankInvoiceBasis} from './lib/bank-invoice-basis.mjs';
 import {prepareBankPayment,registerBankPaymentAndHandoff,publicBankPayment} from './lib/bank-payment.mjs';
@@ -390,7 +390,14 @@ const handleRequest=async(req,res)=>{
  }
  if(req.url==='/api/pf-eproof'&&req.method==='POST'){
   if(!eproofCallbackAuthorized(req)){json(res,401,{error:'PF-korrektur adgang kræves.'});return;}
-  try{if(!String(req.headers['content-type']||'').startsWith('application/json'))throw Error('JSON kræves.');const results=await receiveEproofAPI(await readJSON(req,30*1024*1024));json(res,200,{received:true,results});}catch(error){json(res,400,{error:error.message||'Korrekturen kunne ikke modtages.'});}return;
+  try{
+   const emptyBody=!req.headers['transfer-encoding']&&Number(req.headers['content-length']||0)===0;
+   const payload=emptyBody?{}:await readJSON(req,30*1024*1024);
+   if(eproofConnectionCheck(payload)){json(res,200,{authenticated:true,connectionTest:true,received:false,message:'Connection successful. No e-proof was submitted.'});return;}
+   if(process.env.PF_EPROOF_ENABLED!=='1'){json(res,503,{authenticated:true,received:false,error:'E-proof processing is not enabled yet. This notification was not accepted; please retry after activation.'});return;}
+   if(!process.env.PF_EPROOF_EXPECTED_SENDER_ID){json(res,503,{authenticated:true,received:false,error:'E-proof SenderId configuration is pending. This notification was not accepted; please retry after activation.'});return;}
+   const results=await receiveEproofAPI(payload);json(res,200,{received:true,results});
+  }catch(error){json(res,400,{error:error.message||'Korrekturen kunne ikke modtages.'});}return;
  }
  if(req.url==='/api/pf-proof-inbox'&&req.method==='POST'){
   if(!proofInboxAuthorized(req)){json(res,401,{error:'Adgang til korrekturindbakken kræves.'});return;}

@@ -25,3 +25,11 @@ Requests and IDs are saved before network I/O. A timeout, unknown response, part
 Before enabling: arrange PF callback registration, confirm inbound SenderId and test credentials, send a PF test proof and verify customer review, staff gate, rejection/new artwork and approval with PF. Then configure live mode separately. Existing pilot order 7886901 must not be resent. Existing mailbox import remains as fallback; avoid enabling both PF push and mailbox auto-publication until the end-to-end test is complete.
 
 Preparation status is available to authenticated admins at GET /api/pf-orders/eproof-status. It reports missing variable names only, never credentials. Keep PF_EPROOF_MODE=test while preparing the first decorated test order. This setting is independent of the Gateway mode used for existing live orders. Do not turn on PF_EPROOF_ENABLED until the inbound SenderId is confirmed and PF is ready to send.
+
+## Authenticated connection test (before proof processing is enabled)
+
+POST https://smerch.dk/api/pf-eproof with HTTP Basic Auth using the exact configured callback username (`pf-eproof-smerch`) and the previously shared callback password. Do not use `pf-smerch` or the Gateway username here.
+
+Use Content-Type application/json and body `{}` or `{"connectionTest":true}`. An empty POST body is also supported. A successful check returns HTTP 200 with `authenticated:true`, `connectionTest:true`, `received:false`. It does not create an order, import a proof, send a mail, or send any request to PF. Wrong credentials return HTTP 401.
+
+Authentication is independent of PF_EPROOF_ENABLED. Actual proof notifications still require that flag and the confirmed PF_EPROOF_EXPECTED_SENDER_ID. Before activation, non-probe bodies return HTTP 503 with `received:false`, so PF must retry after activation; no proof receipt is acknowledged or silently discarded. Tests containing proof data cannot masquerade as a connection check. Readiness exposes `connectionReady` separately from full processing `ready`.

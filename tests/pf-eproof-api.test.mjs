@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {proofPdf} from './helpers/proof-pdf.mjs';
-import {normalizeEproof,eproofCallbackAuthorized,eproofConfiguration,eproofReadiness,postEproof} from '../lib/pf-eproof-api.mjs';
+import {normalizeEproof,eproofCallbackAuthorized,eproofConfiguration,eproofReadiness,eproofConnectionCheck,postEproof} from '../lib/pf-eproof-api.mjs';
 import {receiveEproofAPI,sendEproofDecision,readOrder,decideProof} from '../lib/pf-orders.mjs';
 const root=await mkdtemp(join(tmpdir(),'eproof-api-'));process.env.SMERCH_DATA_DIR=root;
 after(()=>rm(root,{recursive:true,force:true}));
@@ -42,4 +42,13 @@ test('administrative readiness contains no secrets and stays blocked until sende
  assert.equal(eproofReadiness({...shared,PF_EPROOF_ENABLED:'0'}).ready,false);
  const status=eproofReadiness({...shared,PF_EPROOF_EXPECTED_SENDER_ID:undefined});assert.equal(status.ready,false);assert.ok(status.missing.some(key=>key.includes('EXPECTED_SENDER')));
  for(const secret of ['private-username','private-password',env.PF_EPROOF_CALLBACK_PASSWORD])assert.ok(!JSON.stringify(status).includes(secret));
+});
+
+test('connection authentication works before processing is enabled; probes cannot acknowledge proof data',()=>{
+ const req={headers:{authorization:'Basic '+Buffer.from('callback:'+env.PF_EPROOF_CALLBACK_PASSWORD).toString('base64')}};
+ assert.equal(eproofCallbackAuthorized(req,{...env,PF_EPROOF_ENABLED:'0',PF_EPROOF_EXPECTED_SENDER_ID:undefined}),true);
+ assert.equal(eproofReadiness({...env,PF_EPROOF_ENABLED:'0'}).connectionReady,true);
+ assert.equal(eproofReadiness({}).connectionReady,false);
+ for(const probe of [{},{connectionTest:true}])assert.equal(eproofConnectionCheck(probe),true);
+ for(const payload of [null,[],{connectionTest:false},{connectionTest:true,Eproof:[]},{Eproof:[]},{other:true}])assert.equal(eproofConnectionCheck(payload),false);
 });
