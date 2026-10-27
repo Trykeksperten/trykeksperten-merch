@@ -2556,3 +2556,8 @@ body.storefront #main .pf-colour-picker .pf-colour-cmyk legend{position:absolute
 .brand-lifestyle>img{display:block;width:100%;height:100%;object-fit:cover}
 @media(max-width:700px){.brand-lifestyle{border-radius:12px}}
 @media(max-width:430px){.brand-lifestyle{grid-column:1/-1}}
+
+/* Keep the Herschel lifestyle photographs together in one row. */
+.brand-lifestyle-pair{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;min-width:0}
+.brand-lifestyle-pair>.brand-lifestyle{grid-column:auto}
+@media(max-width:700px){.brand-lifestyle-pair{gap:12px}}

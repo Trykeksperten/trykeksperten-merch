@@ -14,9 +14,11 @@ const photos={
 // Keys are product counts: the photographs never replace or count as products.
 export function brandEditorialBlocks(brand,count){
  const blocks=new Map();if(!Number.isInteger(count)||count<1)return blocks;
+ const renderPhoto=photo=>`<figure class="brand-lifestyle"><img src="/assets/brand-lifestyle/${photo.file}.webp" alt="${photo.alt}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async"></figure>`;
+ if(brand==='herschel'){blocks.set(Math.min(count,4),`<div class="brand-lifestyle-pair">${photos.herschel.map(renderPhoto).join('')}</div>`);return blocks;}
  for(const [index,photo] of (photos[brand]||[]).entries()){
   const after=Math.min(count,count<=4?(index+1)*2:4+index*8);
-  const html=`<figure class="brand-lifestyle"><img src="/assets/brand-lifestyle/${photo.file}.webp" alt="${photo.alt}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async"></figure>`;
+  const html=renderPhoto(photo);
   blocks.set(after,(blocks.get(after)||'')+html);
  }
  return blocks;
