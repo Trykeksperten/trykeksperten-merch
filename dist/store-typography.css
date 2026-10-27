@@ -46,5 +46,5 @@ body.storefront #main .editorial-price small{display:block;font-size:var(--type-
 body.storefront #main .about-page h1{font-family:var(--font-sans);font-size:var(--type-h1);font-weight:var(--type-weight);line-height:1.25;letter-spacing:0;color:var(--ink)}
 body.storefront #main .about-page h1 .about-brand{font:inherit;color:inherit;letter-spacing:inherit}
 
-/* Extra-bold product group titles. */
-body.storefront #main .catalog-heading .wrap:not(.catalog-brand-heading) h1{font-weight:800}
+/* Bold product group titles. */
+body.storefront #main .catalog-heading .wrap:not(.catalog-brand-heading) h1{font-weight:700}
