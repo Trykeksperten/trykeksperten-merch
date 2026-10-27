@@ -3,6 +3,7 @@ export const hasPersonalisation=lines=>Array.isArray(lines)&&lines.some(line=>li
 export const hasBlankProducts=lines=>Array.isArray(lines)&&lines.some(line=>!line.decorations?.length);
 export const isMixedPurchase=lines=>hasPersonalisation(lines)&&hasBlankProducts(lines);
 export function paymentDescription(lines,locale='da'){
+ if(hasPersonalisation(lines))return locale==='en'?'Payment is authorised when ordering and captured after your proof approval and Smerch’s internal approval, before approval is sent to the production partner and production starts.':'Beløbet reserveres ved bestilling og hæves efter din korrekturgodkendelse og Smerchs interne godkendelse, før godkendelsen sendes til produktionspartneren og produktionen starter.';
  return locale==='en'?'Payment is authorised when ordering and captured no earlier than dispatch.':'Beløbet reserveres ved bestilling og hæves tidligst ved afsendelse.';
 }
 export function freightEstimate(fulfillment,config,type){

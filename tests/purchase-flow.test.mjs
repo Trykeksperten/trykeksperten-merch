@@ -15,7 +15,7 @@ test('blank purchases do not require or record personalisation or prepayment con
 test('payment copy reflects the actual contents of the basket in both languages',()=>{
  assert.equal(hasPersonalisation(blank),false);assert.equal(isMixedPurchase([...blank,...decorated]),true);
  assert.match(paymentDescription(blank),/tidligst ved afsendelse/);assert.doesNotMatch(paymentDescription(blank),/korrektur/);
- assert.match(paymentDescription(decorated),/tidligst ved afsendelse/);assert.match(paymentDescription(blank,'en'),/no earlier than dispatch/);
+ assert.match(paymentDescription(decorated),/korrekturgodkendelse og Smerchs interne godkendelse/);assert.match(paymentDescription(blank,'en'),/no earlier than dispatch/);
 });
 test('interface translations take priority over generic supplier product categories',()=>{
  installProductTranslations({Andet:'Other Pens & Writing Accessories'});
