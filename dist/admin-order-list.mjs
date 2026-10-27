@@ -2,7 +2,7 @@ import {appendPaymentAttemptDetails} from './admin-payment-attempt.mjs?v=3';
 import {appendBankPayment} from './admin-bank-payment.mjs?v=2';
 import {appendPFReview} from './admin-pf-review.mjs';
 import {matchesOrder} from './order-search.mjs';
-import {appendOrderSummaryInfo,appendOrderSummaryState} from './admin-order-summary.mjs?v=2';
+import {appendOrderSummaryInfo,appendOrderSummaryState} from './admin-order-summary.mjs?v=3';
 import {orderKind,isTestOrder,nextStep,dateTime,paymentLabel,orderLabels} from './admin-order-state.mjs';
 import {mockupsForCheckout,mockupsForPfOrder,appendMockupOverview} from './admin-mockups.mjs?v=4';
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;};

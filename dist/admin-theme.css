@@ -197,3 +197,12 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 .payment-attempt-details>h3{font-size:15px;line-height:1.45;margin:0 0 8px}
 .payment-attempt-details>p{max-width:780px;font-size:13px;line-height:1.5;color:var(--admin-muted);margin:0 0 14px}
 @media(max-width:500px){.payment-status-control dl,.payment-attempt-details>dl{grid-template-columns:1fr;gap:3px}.payment-status-control dd,.payment-attempt-details dd{margin-bottom:8px}.payment-status-control>button,.payment-attempt-toggle{min-height:42px}}
+
+/* Keep list-row media, order details and supplier facts aligned. */
+.order-summary-card{align-items:start}
+.order-summary-card>div{min-width:0}
+.order-summary-facts{grid-template-columns:148px minmax(0,1fr);align-items:baseline;row-gap:6px}
+.order-summary-card .action{margin-left:0}
+@media(max-width:1050px){.order-summary-facts{grid-template-columns:128px minmax(0,1fr)}}
+@media(max-width:760px){.order-summary-facts{grid-template-columns:minmax(110px,40%) minmax(0,1fr)}}
+.order-summary-card>div:last-child>.action{display:table;margin-left:auto}

@@ -1,3 +1,4 @@
+import {pfStatusRows} from './admin-pf-status.mjs?v=3';
 import {orderKind,dateTime,paymentLabel,orderLabels} from './admin-order-state.mjs';
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;};
 export function appendOrderSummaryInfo(info,{checkout,orders=[],lines}){
@@ -14,5 +15,10 @@ export function appendOrderSummaryState(state,checkout,orders=[]){
  add('Betaling',paymentLabel(checkout));
  if(checkout?.paymentMethod)add('Betalingsmetode',checkout.paymentMethod);
  const statuses=[...new Set(orders.map(o=>o.status==='approval_recorded'?'Afventer produktion hos PF':orderLabels[o.status]||o.status).filter(Boolean))];if(statuses.length)add('Status',statuses.join(' · '));else if(checkout?.pfReview?.required&&!checkout.pfReview.approved)add('Status','Afventer Smerchs godkendelse');
+ for(const order of orders){
+  const pf=Object.fromEntries(pfStatusRows(order)),suffix=orders.length>1?' · '+(order.pfOrderNumber||order.purchaseOrderNumber||'PF-nummer afventer'):'';
+  add('Seneste PF-status'+suffix,pf['PF-status']);
+  add('Forventet afsendelse'+suffix,pf['Forventet afsendelse']);
+ }
  state.append(facts);
 }
