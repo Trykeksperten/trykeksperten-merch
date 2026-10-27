@@ -22,3 +22,8 @@ export function appendOrderSummaryState(state,checkout,orders=[]){
  }
  state.append(facts);return dispatchCells;
 }
+
+export function assembleOrderSummaryCard(card,gallery,info,state){
+ const productBlock=el('div',null,'order-summary-product-block');gallery.className='order-summary-media';productBlock.append(gallery,info);card.className+=' order-summary-scaled';card.append(productBlock,state);
+ return card;
+}

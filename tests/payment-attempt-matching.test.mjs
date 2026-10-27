@@ -27,3 +27,11 @@ test('successful or linked payments never appear as failed attempts',()=>{
 test('an authorized checkout without a PF order cannot hide a previous attempt',()=>{
  assert.equal(matchedPaymentAttempts([attempt,{...ordered,pfOrderIds:[]}]).size,0);
 });
+
+test('changed delivery email still matches the same billing email and purchase',()=>{
+ const a={...attempt,shipping:{email:'personal@example.test'},billing:{email:' billing@example.test '}};
+ const c={...ordered,shipping:{email:'business@example.test'},billing:{email:'BILLING@example.test'}};
+ assert.equal(match(a,[c]).get('order')[0].id,'attempt');
+ assert.equal(match({...a,billing:{email:'unrelated@example.test'}},[c]).size,0);
+ assert.equal(match(a,[c,{...c,id:'ambiguous'}]).size,0);
+});
