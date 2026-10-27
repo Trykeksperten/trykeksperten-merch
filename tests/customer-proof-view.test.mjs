@@ -5,11 +5,11 @@ import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
 import {customerProofView} from '../lib/customer-proof-view.mjs';
 import {createCanvas} from '@napi-rs/canvas';
 const reference='SMERCH-demo';
-async function fixture({split=false,rotate=0,pages=1,embedded=false,merged=false}={}){
+async function fixture({split=false,rotate=0,pages=1,embedded=false,merged=false,companySplit=false}={}){
  const pdf=await PDFDocument.create(),font=await pdf.embedFont(StandardFonts.Helvetica);pdf.setTitle(reference);pdf.setSubject('Customer Reference '+reference);
  for(let i=0;i<pages;i++){
   const p=pdf.addPage([595,842]);if(rotate)p.setRotation(degrees(rotate));
-  for(const [text,x,y] of [['Order Number',40,780],['7886901',200,780],...(merged?[[`Customer Reference: ${reference}`,40,760]]:[['Customer Reference',40,760],...(split?[['SMERCH-',200,760],['demo',242,760]]:[[reference,200,760]])]),['Article',40,740],['Cap',200,740]])p.drawText(text,{x,y,font,size:9});
+  for(const [text,x,y] of [['Order Number',40,780],['7886901',200,780],...(companySplit?[['Trykeksperten',360,780],['ApS',418,780]]:[['Trykeksperten ApS',360,780]]),...(merged?[[`Customer Reference: ${reference}`,40,760]]:[['Customer Reference',40,760],...(split?[['SMERCH-',200,760],['demo',242,760]]:[[reference,200,760]])]),['Article',40,740],['Cap',200,740]])p.drawText(text,{x,y,font,size:9});
   const a=pdf.context.register(pdf.context.obj({Type:'Annot',Subtype:'Link',Rect:[10,10,100,30],Contents:PDFString.of(reference),A:{S:'URI',URI:PDFString.of('https://example.test/'+reference)}}));p.node.addAnnot(a);
  }
  if(embedded)await pdf.attach(Buffer.from(reference),'internal.txt',{description:reference});
@@ -28,12 +28,12 @@ test('customer PDF contains no source text, metadata, annotations or attachments
  assert.deepEqual((await customerProofView(proof,reference)).data,result.data);
  const before=await render(original),after=await render(result.data);
  assert.ok(darkPixels(before,35,70,280,18)>100);assert.equal(darkPixels(after,35,70,280,18),0);
- assert.ok(darkPixels(after,35,50,280,17)>100,'order number retained');assert.ok(darkPixels(after,35,90,280,17)>30,'article retained');
+ assert.ok(darkPixels(before,355,50,140,17)>50,'source company name exists');assert.equal(darkPixels(after,355,50,140,17),0,'company name removed');assert.ok(darkPixels(after,35,50,280,17)>100,'order number retained');assert.ok(darkPixels(after,35,90,280,17)>30,'article retained');
 });
 test('split, merged and repeated references are removed from every page',async()=>{
- for(const options of [{split:true,pages:2},{merged:true,pages:2}]){
+ for(const options of [{split:true,pages:2,companySplit:true},{merged:true,pages:2}]){
   const proof=await fixture(options),result=await customerProofView(proof,reference),pdf=await PDFDocument.load(result.data);assert.equal(pdf.getPageCount(),2);assert.equal((await inspect(result.data)).text.trim(),'');
-  const image=await render(result.data);assert.equal(darkPixels(image,35,70,280,18),0);assert.ok(darkPixels(image,35,50,280,17)>100);
+  const image=await render(result.data);assert.equal(darkPixels(image,35,70,280,18),0);assert.equal(darkPixels(image,355,50,140,17),0);assert.ok(darkPixels(image,35,50,280,17)>100);
  }
 });
 test('rotated pages preserve the displayed geometry and remove the reference',async()=>{
