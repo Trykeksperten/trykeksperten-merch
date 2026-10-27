@@ -1,5 +1,5 @@
 import {confirmCartRemoval} from './cart-remove-dialog.mjs?v=2';
-import {cartItemHTML} from './cart-item.mjs?v=4';
+import {cartItemHTML} from './cart-item.mjs?v=5';
 import {hasPersonalisation,paymentDescription,freightEstimate} from './purchase-flow.mjs';
 import {paymentMethodsHTML} from './payment-methods.mjs';
 import {fromInc,fromEx,quoteAmount,vatLabel,customerType} from './customer-pricing.mjs';

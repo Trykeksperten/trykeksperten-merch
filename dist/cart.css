@@ -37,8 +37,8 @@
 
 .pf-cart-page .pf-cart-controls{position:relative}
 .cart-remove-confirmation{position:absolute;right:0;bottom:calc(100% + 6px);z-index:5;display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font-size:13px;line-height:1.4;white-space:nowrap;box-shadow:0 2px 8px #17201f0d}
-.pf-cart-page .pf-cart-controls .cart-remove-confirmation button{min-height:30px;padding:3px 5px;font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
-.pf-cart-page .pf-cart-controls .cart-remove-confirmation button:hover{color:var(--ink)}
+.pf-cart-page .pf-cart-actions .cart-remove-confirmation button{min-height:30px;padding:3px 5px;font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.pf-cart-page .pf-cart-actions .cart-remove-confirmation button:hover{color:var(--ink)}
 
 @media(max-width:600px){
  .pf-cart-page .pf-cart-item{grid-template-columns:72px minmax(0,1fr);gap:6px 12px;padding-block:16px}
@@ -90,3 +90,19 @@ body.storefront #main .pf-cart-page :is(.pf-cart-controls,.pf-cart-controls labe
 
 .pf-cart-page .cart-summary .purchase-assurances,.pf-cart-page .cart-summary .purchase-assurances li,.pf-cart-page .cart-summary>.small.muted{color:#000}
 .pf-cart-page .cart-summary .purchase-assurances li::before{color:#36543d}
+
+
+/* Quiet actions beside the design, with quantity and price on the right. */
+.pf-cart-page .pf-cart-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:10px}
+body.storefront #main .pf-cart-page .pf-cart-actions :is(.pf-cart-edit,[data-pf-remove]){display:inline-flex;justify-content:center;align-items:center;min-height:36px;min-width:100px;padding:7px 16px;border:0;border-radius:999px;background:#f0ebea;color:#000;font-family:inherit;font-size:var(--type-body);font-weight:var(--type-weight);line-height:1.4;text-decoration:none;margin:0}
+body.storefront #main .pf-cart-page .pf-cart-actions :is(.pf-cart-edit,[data-pf-remove]):hover{background:#e6dfdc}
+.pf-cart-page .pf-cart-actions .pf-cart-delete-action{justify-self:auto}
+@container(min-width:620px){
+ .pf-cart-page .pf-cart-controls{display:flex;justify-content:flex-end;align-items:center}
+ .pf-cart-page .pf-cart-item-info{align-self:start}
+ .pf-cart-page .pf-line-price{align-self:end}
+}
+@media(max-width:600px){
+ body.storefront #main .pf-cart-page .pf-cart-actions :is(.pf-cart-edit,[data-pf-remove]){min-height:44px;min-width:80px;padding-inline:12px}
+ .pf-cart-page .pf-cart-actions .cart-remove-confirmation{right:auto;left:0;white-space:normal;min-width:180px;max-width:calc(100vw - 48px)}
+}
