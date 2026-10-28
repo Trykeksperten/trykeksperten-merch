@@ -33,3 +33,7 @@ POST https://smerch.dk/api/pf-eproof with HTTP Basic Auth using the exact config
 Use Content-Type application/json and body `{}` or `{"connectionTest":true}`. An empty POST body is also supported. A successful check returns HTTP 200 with `authenticated:true`, `connectionTest:true`, `received:false`. It does not create an order, import a proof, send a mail, or send any request to PF. Wrong credentials return HTTP 401.
 
 Authentication is independent of PF_EPROOF_ENABLED. Actual proof notifications still require that flag and the confirmed PF_EPROOF_EXPECTED_SENDER_ID. Before activation, non-probe bodies return HTTP 503 with `received:false`, so PF must retry after activation; no proof receipt is acknowledged or silently discarded. Tests containing proof data cannot masquerade as a connection check. Readiness exposes `connectionReady` separately from full processing `ready`.
+
+## PF singleton delivery compatibility
+
+PF’s actual delivery can use `{"Eproof":{...}}` for a single proof, while appendix 1.2.1 illustrates `{"Eproof":[{...}]}`. Both forms pass through the same validation, order/SKU/environment matching and fingerprinting. Retrying a singleton as a batch (or vice versa) must not create another proof version. Configurations and SKUs retain their documented array forms. Malformed containers, missing files and wrong sender IDs remain rejected.

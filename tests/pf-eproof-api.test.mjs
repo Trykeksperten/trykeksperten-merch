@@ -52,3 +52,21 @@ test('connection authentication works before processing is enabled; probes canno
  for(const probe of [{},{connectionTest:true}])assert.equal(eproofConnectionCheck(probe),true);
  for(const payload of [null,[],{connectionTest:false},{connectionTest:true,Eproof:[]},{Eproof:[]},{other:true}])assert.equal(eproofConnectionCheck(payload),false);
 });
+
+test('PF singleton object with front/back configurations imports once and matches a batch retry',async()=>{
+ const f=await fixture(),sender='TRYKEKSPERTENDK',supplierEnv={...env,PF_EPROOF_EXPECTED_SENDER_ID:sender};
+ const item={...f.item,SenderId:sender,configuration:[{...f.item.configuration[0],EproofRef:'CNL2_123_1_1',methodCode:2,methodDescription:'Screenprint',location:'front',NumberOfColors:1,dimensionMM:'0',color:'717 C'},{...f.item.configuration[0],EproofRef:'CNL2_123_1_2',methodCode:2,methodDescription:'Screenprint',location:'back',NumberOfColors:1,dimensionMM:'0',color:'7548 C'}]};
+ const object=await normalizeEproof({Eproof:item},{env:supplierEnv}),batch=await normalizeEproof({Eproof:[item]},{env:supplierEnv});
+ assert.deepEqual(object,batch);
+ const first=await receiveEproofAPI({Eproof:item},{env:supplierEnv});assert.equal(first[0].review,true);
+ assert.equal((await receiveEproofAPI({Eproof:[item]},{env:supplierEnv}))[0].duplicate,true);
+ const order=await readOrder(f.id);assert.equal(order.proofs.length,1);assert.equal(order.proof.api.configurations.length,2);assert.equal(order.decision,null);assert.equal(order.proof.customer,undefined);
+ let outboundCalls=0;await assert.rejects(sendEproofDecision(f.id,{version:1,confirmed:true,performedBy},{env:supplierEnv,fetchImpl:async()=>{outboundCalls++;return success();}}));assert.equal(outboundCalls,0);
+});
+test('singleton compatibility retains sender, file, and container validation',async()=>{
+ const f=await fixture();
+ for(const Eproof of [null,[],1,'text',true,[null],[[]],Array(21).fill(f.item)])await assert.rejects(normalizeEproof({Eproof},{env}),/1–20/);
+ await assert.rejects(normalizeEproof({Eproof:{...f.item,SenderId:'wrong'}},{env}),/SenderId/);
+ await assert.rejects(normalizeEproof({Eproof:{...f.item,Base64Image:undefined}},{env}),/Base64Image/);
+ assert.equal((await readOrder(f.id)).proof,undefined);
+});
