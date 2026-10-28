@@ -2583,7 +2583,7 @@ body.storefront #main .pf-colour-picker .pf-colour-cmyk legend{position:absolute
  .brand-gallery{gap:12px}
  .brand-gallery-row{flex-wrap:wrap;gap:12px;max-width:100%!important}
  .brand-gallery-tile{flex:1 1 calc(50% - 6px);border-radius:12px}
- .brand-gallery-tile--wide{flex-basis:100%}
+ .brand-gallery-tile--wide,.brand-gallery-row--featured .brand-gallery-tile{flex-basis:100%}
  .brand-gallery-tile .brand-lifestyle-pair{gap:8px}
  .brand-discovery-feed{padding-bottom:36px}
 }

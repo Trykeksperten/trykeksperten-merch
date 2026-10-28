@@ -38,19 +38,21 @@ export function brandDiscoveryPage(brands,search,products=[],prices){
   for(const {brand,images} of groups){
    const image=images[round];if(!image)continue;
    const format=galleryImageFormat(image);
-   tiles.push({ratio:format.ratio,width:format.width,html:`<a class="brand-gallery-tile${format.ratio>=1.5?' brand-gallery-tile--wide':''}" style="--image-ratio:${format.ratio.toFixed(4)}" data-discovery-brand="${escape(brand.id)}" href="/produkter?brand=${encodeURIComponent(brand.id)}" aria-label="Se produkter fra ${escape(brand.name)}">${image}</a>`});
+   tiles.push({ratio:format.ratio,width:format.width,featured:brand.id==='ocean-bottle'||brand.id==='stanley-1913',html:`<a class="brand-gallery-tile${format.ratio>=1.5?' brand-gallery-tile--wide':''}" style="--image-ratio:${format.ratio.toFixed(4)}" data-discovery-brand="${escape(brand.id)}" href="/produkter?brand=${encodeURIComponent(brand.id)}" aria-label="Se produkter fra ${escape(brand.name)}">${image}</a>`});
   }
  }
  const rows=[];let row=[],ratio=0;
  const flush=()=>{
   if(row.length){
    const total=row.reduce((sum,tile)=>sum+tile.ratio,0),gaps=(row.length-1)*24;
-   const maxWidth=Math.floor(Math.min(total*360+gaps,...row.map(tile=>tile.width/tile.ratio*total+gaps)));
-   rows.push(`<div class="brand-gallery-row" style="max-width:${maxWidth}px">${row.map(tile=>tile.html).join('')}</div>`);
+   const featured=row.some(tile=>tile.featured),height=featured?900:row.every(tile=>tile.width>=1400)?500:360;
+   const maxWidth=Math.floor(Math.min(total*height+gaps,...row.map(tile=>tile.width/tile.ratio*total+gaps)));
+   rows.push(`<div class="brand-gallery-row${featured?' brand-gallery-row--featured':''}" style="max-width:${maxWidth}px">${row.map(tile=>tile.html).join('')}</div>`);
   }
   row=[];ratio=0;
  };
  for(const tile of tiles){
+  if(row.length&&row[0].featured!==tile.featured)flush();
   if(tile.ratio>=3){flush();row.push(tile);flush();continue;}
   row.push(tile);ratio+=tile.ratio;
   if(ratio>=3.4||row.length>=4)flush();
