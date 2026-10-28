@@ -2569,25 +2569,24 @@ body.storefront #main .pf-colour-picker .pf-colour-cmyk legend{position:absolute
 /* A calm menu invitation and a brand discovery page with coherent brand groups. */
 #brands-menu .brands-menu-all{display:inline-flex;align-items:center;justify-content:center;width:fit-content;gap:0;margin-top:12px;padding:10px 14px;border:0;border-radius:10px;background:#f0f3ef;color:#17201f;text-decoration:none;font-size:14px;font-weight:500;line-height:1.3}
 #brands-menu .brands-menu-all:hover{background:#e4ebe2;color:#17201f}
-/* Image-only brand discovery: photographs link to their own brand assortment. */
+/* Justified photo rows preserve each image's original proportions and artwork. */
 .brand-discovery-feed{padding-top:0;padding-bottom:64px}
-.brand-gallery{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:clamp(300px,38vw,580px);gap:24px}
-.brand-gallery-tile{display:block;grid-column:span 4;min-width:0;min-height:0;overflow:hidden;border-radius:18px;background:#edf0ec;text-decoration:none}
-.brand-gallery-tile:nth-child(7n+1){grid-column:span 8}
-.brand-gallery-tile:nth-child(7n+6),.brand-gallery-tile:nth-child(7n+7){grid-column:span 6}
+.brand-gallery{display:flex;flex-direction:column;gap:24px}
+.brand-gallery-row{display:flex;align-items:start;gap:24px;min-width:0;width:100%}
+.brand-gallery-tile{display:block;flex:var(--image-ratio) 1 0;aspect-ratio:var(--image-ratio);min-width:0;overflow:hidden;border-radius:18px;background:#fff;text-decoration:none}
 .brand-gallery-tile .brand-lifestyle{margin:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0}
-.brand-gallery-tile .brand-lifestyle img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
-.brand-gallery-tile:hover .brand-lifestyle img{transform:scale(1.025)}
+.brand-gallery-tile .brand-lifestyle img{display:block;width:100%;height:100%;object-fit:contain}
 .brand-gallery-tile:focus-visible{outline:3px solid #cf4d22;outline-offset:4px}
-.brand-gallery-tile .brand-lifestyle-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;height:100%}
+.brand-gallery-tile .brand-lifestyle-pair{display:flex;gap:12px;height:100%}
+.brand-gallery-tile .brand-lifestyle-pair .brand-lifestyle{flex:1;min-width:0}
 @media(max-width:700px){
- .brand-gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:clamp(220px,65vw,360px);gap:12px}
- .brand-gallery-tile:nth-child(n){grid-column:span 1;border-radius:12px}
- .brand-gallery-tile:nth-child(5n+1){grid-column:span 2}
+ .brand-gallery{gap:12px}
+ .brand-gallery-row{flex-wrap:wrap;gap:12px;max-width:100%!important}
+ .brand-gallery-tile{flex:1 1 calc(50% - 6px);border-radius:12px}
+ .brand-gallery-tile--wide{flex-basis:100%}
  .brand-gallery-tile .brand-lifestyle-pair{gap:8px}
  .brand-discovery-feed{padding-bottom:36px}
 }
-@media(prefers-reduced-motion:reduce){.brand-gallery-tile .brand-lifestyle img{transition:none}}
 
 /* The studio shares the product page's sage selection cards and quiet controls. */
 body.storefront #main .pf-visual-designer{--studio-selected:#edf1ed;--studio-border:#8c9f90;--studio-ink:#36543d;font-family:var(--font-sans,Roboto,sans-serif);color:#17201f;background:#f5f6f3}

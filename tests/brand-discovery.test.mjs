@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {brandDiscoveryGroups,brandDiscoveryPage,selectDiscoveryProducts} from '../dist/brand-discovery.mjs';
+import {brandDiscoveryGroups,brandDiscoveryPage,selectDiscoveryProducts,galleryImageFormat} from '../dist/brand-discovery.mjs';
 const brands=[{id:'camelbak',name:'CamelBak',group:'Drikkegrej'},{id:'karst',name:'Karst',group:'Kontor'},{id:'miir',name:'MiiR',group:'Drikkegrej'},{id:'thule',name:'Thule',group:'Tasker'},{id:'empty',name:'Empty',group:'Tasker'},{id:'unbranded',name:'Unbranded',group:'Kontor'},{id:'trykeksperten-select',name:'Trykeksperten Select',group:'Kontor'}];
 const products=brands.filter(b=>b.id!=='empty').flatMap(b=>Array.from({length:6},(_,i)=>({id:b.id+'-'+i,name:b.name+' product '+i,brandId:b.id,popularity:100-i,variants:[{sku:b.id+'-'+i,color:'Sort',images:['https://example.com/'+b.id+'-'+i+'.jpg']}]})));
 const prices={available:true,products:Object.fromEntries(products.map(p=>[p.id,{fromIncVat:25000+Number(p.id.slice(-1))*10000}])),skus:Object.fromEntries(products.map(p=>[p.variants[0].sku,true])),variantPrices:Object.fromEntries(products.map(p=>[p.variants[0].sku,{fromIncVat:25000,fromExVat:20000,fromQuantity:25}]))};
@@ -26,4 +26,20 @@ test('image-only gallery links to its own brand without visible names, products 
  assert.match(html,/brand-gallery/);assert.match(html,/data-discovery-brand="karst"/);assert.match(html,/brand-campaign\/karst-/);
  assert.match(html,/href="\/produkter\?brand=karst"/);assert.match(html,/aria-label="Se produkter fra Karst"/);
  assert.doesNotMatch(html,/data-card-product|product-card|editorial-price|editorial-swatches|brand-collage-intro|>Karst<|data-discovery-brand="camelbak"/);
+});
+test('gallery includes brands beyond the former shortlist and all their campaign images',()=>{
+ const expandedBrands=[...brands,{id:'luxe',name:'Luxe',group:'Kontor'}];
+ const expandedProducts=[...products,{...products[0],brandId:'luxe'}];
+ const groups=brandDiscoveryGroups(expandedBrands,expandedProducts,prices,{seed:17});
+ const luxe=groups.find(g=>g.brand.id==='luxe');assert.ok(luxe);assert.equal(luxe.images.length,2);
+ const html=brandDiscoveryPage(expandedBrands,'',expandedProducts,prices);
+ assert.match(html,/luxe-1.webp/);assert.match(html,/luxe-2.webp/);
+ assert.equal((html.match(/class="brand-gallery-tile(?: brand-gallery-tile--wide)?"/g)||[]).length,groups.reduce((sum,g)=>sum+g.images.length,0));
+ assert.equal((html.match(/luxe-1.webp/g)||[]).length,1);
+});
+
+test('wide campaign artwork keeps its native proportions in the gallery',()=>{
+ assert.equal(galleryImageFormat('<img width="888" height="450">').ratio,888/450);
+ const html=brandDiscoveryPage([...brands,{id:'parker',name:'Parker'}],'?brand=parker',[{...products[0],brandId:'parker'}],prices);
+ assert.match(html,/brand-gallery-tile--wide/);assert.match(html,/--image-ratio:1.9733/);
 });

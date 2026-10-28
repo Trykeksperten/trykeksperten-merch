@@ -1,4 +1,4 @@
-import {brandEditorialBlocks} from './brand-editorial.mjs';
+import {brandEditorialImages} from './brand-editorial.mjs?v=2';
 import {pricedVariants} from './pf-visibility.mjs';
 import {isInternalShopBrand} from './shop-brand-policy.mjs';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -19,16 +19,42 @@ export function selectDiscoveryProducts(products,prices,{seed=visitSeed,limit=3}
  for(const product of [...available].sort((a,b)=>popularity(b)-popularity(a)||priceOf(b,prices)-priceOf(a,prices)||tie(a,b)))add(product);
  return selected.slice(0,limit);
 }
-export function brandDiscoveryGroups(brands,products,prices,{category='',selected='',seed=visitSeed,limit=14}={}){
- const groups=brands.filter(brand=>!isInternalShopBrand(brand)&&(!category||brand.group===category)&&(!selected||brand.id===selected)&&(selected||editorialBrands.includes(brand.id))).map(brand=>{
+export function brandDiscoveryGroups(brands,products,prices,{category='',selected='',seed=visitSeed,limit=Infinity}={}){
+ const groups=brands.filter(brand=>!isInternalShopBrand(brand)&&(!category||brand.group===category)&&(!selected||brand.id===selected)).map(brand=>{
   const matches=products.filter(p=>p.brandId===brand.id),featured=selectDiscoveryProducts(matches,prices,{seed});
-  const image=[...brandEditorialBlocks(brand.id,Math.min(matches.length,24)).values()][0]||'';
-  return {brand,products:featured,image};
+  const images=brandEditorialImages(brand.id),image=images[0]||'';
+  return {brand,products:featured,image,images};
  }).filter(group=>group.products.length&&group.image);
  return groups.sort((a,b)=>editorialBrands.indexOf(a.brand.id)-editorialBrands.indexOf(b.brand.id)).slice(0,limit).sort((a,b)=>{const priority=id=>id==='ocean-bottle'?0:id==='stanley-1913'?1:2;return priority(a.brand.id)-priority(b.brand.id)||score(a.brand.id,seed)-score(b.brand.id,seed)||a.brand.id.localeCompare(b.brand.id);}).map((group,index)=>({...group,layout:index%4}));
 }
+export function galleryImageFormat(image){
+ const dimensions=[...image.matchAll(/width="(\d+)" height="(\d+)"/g)].map(([,width,height])=>({width:Number(width),height:Number(height)}));
+ return {ratio:dimensions.reduce((sum,d)=>sum+d.width/d.height,0)||1,width:Math.min(...dimensions.map(d=>d.width))};
+}
 export function brandDiscoveryPage(brands,search,products=[],prices){
  const params=new URLSearchParams(search),groups=brandDiscoveryGroups(brands,products,prices,{category:params.get('kategori')||'',selected:params.get('brand')||''});
- const content=groups.map(({brand,image})=>`<a class="brand-gallery-tile" data-discovery-brand="${escape(brand.id)}" href="/produkter?brand=${encodeURIComponent(brand.id)}" aria-label="Se produkter fra ${escape(brand.name)}">${image}</a>`).join('');
- return `<section class="wrap brand-discovery-feed"><h1 class="sr-only">Udforsk alle brands</h1><div class="brand-gallery">${content}</div></section>`;
+ const tiles=[];
+ for(let round=0;round<Math.max(0,...groups.map(group=>group.images.length));round++){
+  for(const {brand,images} of groups){
+   const image=images[round];if(!image)continue;
+   const format=galleryImageFormat(image);
+   tiles.push({ratio:format.ratio,width:format.width,html:`<a class="brand-gallery-tile${format.ratio>=1.5?' brand-gallery-tile--wide':''}" style="--image-ratio:${format.ratio.toFixed(4)}" data-discovery-brand="${escape(brand.id)}" href="/produkter?brand=${encodeURIComponent(brand.id)}" aria-label="Se produkter fra ${escape(brand.name)}">${image}</a>`});
+  }
+ }
+ const rows=[];let row=[],ratio=0;
+ const flush=()=>{
+  if(row.length){
+   const total=row.reduce((sum,tile)=>sum+tile.ratio,0),gaps=(row.length-1)*24;
+   const maxWidth=Math.floor(Math.min(total*360+gaps,...row.map(tile=>tile.width/tile.ratio*total+gaps)));
+   rows.push(`<div class="brand-gallery-row" style="max-width:${maxWidth}px">${row.map(tile=>tile.html).join('')}</div>`);
+  }
+  row=[];ratio=0;
+ };
+ for(const tile of tiles){
+  if(tile.ratio>=3){flush();row.push(tile);flush();continue;}
+  row.push(tile);ratio+=tile.ratio;
+  if(ratio>=3.4||row.length>=4)flush();
+ }
+ flush();
+ return `<section class="wrap brand-discovery-feed"><h1 class="sr-only">Udforsk alle brands</h1><div class="brand-gallery">${rows.join('')}</div></section>`;
 }
