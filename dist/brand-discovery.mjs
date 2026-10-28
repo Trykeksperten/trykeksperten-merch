@@ -39,5 +39,5 @@ export function brandDiscoveryPage(brands,search,products=[],prices){
   column=(photoColumn+2+cards.length-before)%4;
   return `<section class="brand-grid-group" data-discovery-brand="${escape(brand.id)}" aria-label="Udvalgt fra ${escape(brand.name)}">${tiles.join('')}</section>`;
  }).join('');
- return `<section class="brand-collage-intro wrap"><p class="eyebrow">SMERCH · BRANDS</p><h1>Udforsk vores brands.</h1><p>Udvalgte favoritter, populære valg og design lidt ud over det sædvanlige.</p></section><section class="home-featured wrap brand-discovery-feed"><div class="product-grid editorial-grid brand-collage">${content}</div></section>`;
+ return `<section class="home-featured wrap brand-discovery-feed"><h1 class="sr-only">Udforsk alle brands</h1><div class="product-grid editorial-grid brand-collage">${content}</div></section>`;
 }

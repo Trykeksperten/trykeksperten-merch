@@ -79,7 +79,7 @@ function closeBrandsMenu(){$('#brands-menu').hidden=true;$('#brands-menu-toggle'
 function openBrandsMenu(){
  closeProductMenu();
  const brands=(pfCatalog?[...new Map(shopProducts(pfCatalog,pfPrices).filter(product=>product.brandId&&product.brand).map(product=>[product.brandId,{id:product.brandId,name:product.brand}])).values()]:visibleBrands()).sort((a,b)=>a.name.localeCompare(b.name,'da'));
- $('#brands-menu').innerHTML=`<div class="brands-menu-list">${brands.map(brand=>`<a href="/produkter?brand=${encodeURIComponent(brand.id)}">${esc(brand.name)}</a>`).join('')}</div><a class="brands-menu-all" href="/brands"><span><strong>Udforsk alle brands</strong><small>Brandbilleder og udvalgte produkter</small></span><span class="brands-menu-all-arrow" aria-hidden="true">↗</span></a>`;
+ $('#brands-menu').innerHTML=`<div class="brands-menu-list">${brands.map(brand=>`<a href="/produkter?brand=${encodeURIComponent(brand.id)}">${esc(brand.name)}</a>`).join('')}</div><a class="brands-menu-all" href="/brands"><span>Udforsk alle brands</span></a>`;
  $('#brands-menu').hidden=false;$('#brands-menu-toggle').setAttribute('aria-expanded','true');
 }
 function openProductMenu(groupId){
