@@ -22,7 +22,7 @@ export function orderTasks(order,checkout,context=order.attention||{}){
 }
 export function proofStages(order){const p=order.proof,d=order.decision,current=d&&Number(d.version)===Number(p?.version);return [
  ['Kunden',current&&d.actor==='customer'?(d.decision==='approve'?'Godkendt':'Ændringer ønsket'):p?.customer?'Afventer svar':'Ikke sendt til kunden'],
- ['Smerch',current&&d.staffApproval?.version===p?.version?'Godkendt':current?'Afventer gennemgang':'Afventer kundens svar'],
+ ['Smerch',current&&d.staffApproval&&Number(d.staffApproval.version)===Number(p?.version)?'Godkendt':p?.approvalReference||(current&&(d.delivery?.reference||d.apiDispatch?.state==='delivered'))?'Afsluttet i tidligere forløb':current?'Afventer gennemgang':'Afventer kundens svar'],
  ['Svar til PF',current&&(d.delivery?.reference||d.apiDispatch?.state==='delivered')?'Sendt':d?.apiDispatch?.state==='uncertain'?'Skal afstemmes':'Ikke sendt'],
  ['PF',p?.approvalReference?'Godkendelse bekræftet':current&&(d.delivery?.reference||d.apiDispatch?.state==='delivered')?'Afventer bekræftelse':'Afventer svar fra Smerch']];}
 // Semantic fingerprints ignore repeated timestamps for unchanged supplier status.
