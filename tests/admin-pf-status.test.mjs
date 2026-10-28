@@ -27,3 +27,7 @@ test('PF message text is visible even when the order is processing',()=>{
  assert.equal(rows['Besked fra PF'],'Expected dispatch confirmed');
  assert.equal(Object.fromEntries(pfStatusRows({pfStatusInformation:' '}))['Besked fra PF'],undefined);
 });
+test('shipment is shown with actual date without rewriting separate supplier status evidence',()=>{
+ const o={status:'shipped',pfStatus:'PROCESSING',expectedShipDate:'2026-10-29',shipment:{shipDate:'2026-10-28T00:00:00Z'}};
+ const rows=Object.fromEntries(pfStatusRows(o));assert.equal(rows.Afsendt,'28.10.2026');assert.match(rows['PF-status'],/særskilt statusbesked/);assert.equal(o.pfStatus,'PROCESSING');
+});

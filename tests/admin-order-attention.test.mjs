@@ -22,3 +22,21 @@ test('new versions and uncertain dispatch still require review despite older com
  o.decision={version:3,actor:'customer',decision:'approve',apiDispatch:{state:'uncertain'}};
  assert.equal(proofStages(o)[1][1],'Afventer gennemgang');assert.equal(orderTasks(o)[0].id,'pf-uncertain');
 });
+
+test('sent document basis resolves shipment task but never clears outstanding capture or invoice',()=>{
+ const o={id:'sent-basis',status:'shipped',proof:{version:1,approvalReference:'ack'},decision:{version:1,delivery:{reference:'ack'}},attention:{documents:{documents:[{id:'basis-v1',type:'basis',version:1}]},correspondence:[{id:'mail',kind:'email',audience:'accountant',documentId:'basis-v1',status:'sent'}],finance:{shipments:[{key:'delivery',invoiceStatus:'awaiting_accountant'}],mail:[],summary:{problems:['Faktura afventer.','Hævning afventer.','Faktura afventer.']}}}};
+ const tasks=orderTasks(o,{status:'authorized'});assert.equal(tasks.length,1);assert.equal(tasks[0].id,'finance');assert.equal(tasks[0].detail,'Faktura afventer. Hævning afventer.');
+ o.attention.documents.documents.push({id:'basis-v2',type:'basis',version:2});assert.ok(orderTasks(o).some(t=>t.id==='basis-delivery'));
+ o.attention.correspondence.push({id:'new',kind:'email',audience:'accountant',documentId:'basis-v2',status:'uncertain'});assert.equal(orderTasks(o).filter(t=>t.id.startsWith('basis-')).length,0);assert.ok(orderTasks(o).some(t=>t.id==='mail-new'&&t.error));
+});
+test('customer attachments cannot be mistaken for a basis sent to accountant',()=>{
+ const o={status:'processing',attention:{documents:{documents:[{id:'b',type:'basis',version:1}]},correspondence:[{kind:'email',documentId:'b',audience:'customer',status:'sent'}],finance:{shipments:[{key:'delivery'}],mail:[]}}};assert.ok(orderTasks(o).some(t=>t.id==='basis-delivery'));
+});
+test('duplicate queue records produce one action and fresh finance summary wins over stale checkout',()=>{
+ const o={status:'processing',attention:{shipments:[{id:'m',status:'review'},{id:'m',status:'review'}],finance:{summary:{problems:[]}}}};
+ assert.equal(orderTasks(o,{finance:{problems:['Old problem']}}).length,1);
+});
+test('HTTP errors are visible as incomplete task status',async()=>{
+ const {loadAttention}=await import('../dist/admin-order-attention.mjs');
+ const context=await loadAttention({id:'x'},async()=>({ok:false,json:async()=>({error:'Login'})}));assert.equal(context.error,true);assert.ok(orderTasks({status:'processing'},null,context).some(t=>t.id==='load'));
+});

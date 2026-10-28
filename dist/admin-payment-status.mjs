@@ -11,7 +11,7 @@ export function appendPaymentStatus(parent,checkout,{onUpdate=()=>{}}={}){
   try{
    const response=await fetch('/api/admin/checkouts/'+encodeURIComponent(checkout.id)+'/payment-status',{method:'POST',credentials:'same-origin',headers:{'X-Smerch-Admin':'1'},cache:'no-store'}),data=await response.json();
    if(!response.ok)throw Error(data.error||'Status kunne ikke hentes.');
-   Object.assign(checkout,data);draw();onUpdate(checkout);feedback.textContent='Betalingsstatus er kontrolleret hos Quickpay.';
+   Object.assign(checkout,data);draw();await onUpdate(checkout);feedback.textContent='Betalingsstatus er kontrolleret hos Quickpay.';
   }catch(error){feedback.textContent=error.message;}finally{button.disabled=false;}
  };
  draw();box.append(summary,facts,button,feedback);parent.append(box);

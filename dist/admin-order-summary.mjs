@@ -19,7 +19,7 @@ export function appendOrderSummaryState(state,checkout,orders=[]){
  for(const order of orders){
   const pf=Object.fromEntries(pfStatusRows(order)),suffix=orders.length>1?' · '+(order.pfOrderNumber||order.purchaseOrderNumber||'PF-nummer afventer'):'';
   add('Seneste PF-status'+suffix,pf['PF-status']);
-  const dispatch=add('Forventet afsendelse'+suffix,pf['Forventet afsendelse']);dispatch.className='order-summary-dispatch';dispatchCells.set(order,dispatch);
+  const dispatchLabel=pf['Afsendt']?'Afsendt':pf['Seneste delleverance']?'Seneste delleverance':'Forventet afsendelse';const dispatch=add(dispatchLabel+suffix,pf[dispatchLabel]);dispatch.className='order-summary-dispatch';dispatchCells.set(order,dispatch);
  }
  state.append(facts);appendCaptureWarning(state,checkout);return dispatchCells;
 }

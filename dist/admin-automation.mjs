@@ -28,7 +28,7 @@ function briefTitle(row){
  return ({invitation:'Korrektur til godkendelse',receipt:'Kvittering for korrektursvar',staff_decision:'Internt korrektursvar'}[row.kind]||'Korrekturbesked')+' · v'+row.version;
 }
 function timestamp(value,seconds=false){return value?new Date(value).toLocaleString('da-DK',{timeZone:'Europe/Copenhagen',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',...(seconds?{second:'2-digit'}:{})}):'Ikke sendt';}
-export function orderAutomationPanel(order,api){
+export function orderAutomationPanel(order,api,{onChanged=async()=>{}}={}){
  const box=el('details');box.className='order-mail-history';box.append(el('summary','Beskeder og afsendelser'));
  const content=el('div');box.append(content);const url=`/api/pf-orders/${order.id}/automation`;
  async function load(){
@@ -58,7 +58,7 @@ export function orderAutomationPanel(order,api){
     for(const problem of row.problems||[])body.append(el('p',problem));if(row.error)body.append(el('p',row.error));
     if((!row.proof&&['review','failed','uncertain'].includes(row.status))||((row.proof||row.confirmation)&&['uncertain','pending'].includes(row.status))){
      const button=el('button',row.status==='uncertain'?'Genforsøg efter afstemning':row.status==='failed'?'Prøv igen':row.proof||row.confirmation?'Send besked':'Send forsendelsesmail');button.type='button';
-     button.onclick=async()=>{const uncertain=row.status==='uncertain';if(uncertain&&!confirm('Har du kontrolleret mailkontoen og bekræftet, at denne besked IKKE blev sendt? Et nyt forsøg kan ellers sende en dublet.'))return;button.disabled=true;try{await api(url,'POST',{id:row.id,kind:row.confirmation?'confirmation':row.proof?'proof':'shipment',key:row.key,confirmUncertain:uncertain});await load();}catch(e){body.append(el('p',e.message));button.disabled=false;}};
+     button.onclick=async()=>{if(button.disabled)return;const uncertain=row.status==='uncertain';if(uncertain&&!confirm('Har du kontrolleret mailkontoen og bekræftet, at denne besked IKKE blev sendt? Et nyt forsøg kan ellers sende en dublet.'))return;button.disabled=true;try{await api(url,'POST',{id:row.id,kind:row.confirmation?'confirmation':row.proof?'proof':'shipment',key:row.key,confirmUncertain:uncertain});await load();try{await onChanged();}catch{body.append(el('p','Opdatér siden for den nye status. Gentag ikke afsendelsen.'));}}catch(e){body.append(el('p',e.message));button.disabled=false;}};
      body.append(button);
     }
     card.append(summary,body);content.append(card);

@@ -62,3 +62,7 @@ test('persistent shipment mail lock prevents a second process from sending',asyn
 test('released automation remains disabled even for a fully shipped and captured eligible order',async()=>{
  const before=await readFile(join(root,'sales-ledger.json'),'utf8');await processSalesFinance({env:{...env,SMERCH_FINANCE_START_AT:'2020-01-01',SMERCH_AUTOMATIC_SHIPMENT_CAPTURE:'1',SMERCH_ACCOUNTANT_MAIL:'automatic',SMERCH_PAYMENT_RECEIPT_MAIL:'automatic'}});assert.equal(await readFile(join(root,'sales-ledger.json'),'utf8'),before);
 });
+test('shipment mail uses checkout product names even when PF line only has SKU',async()=>{
+ const f=await fixture();f.pf.lines[0].productName=undefined;await writeFile(join(root,'orders',f.pf.id+'.json'),JSON.stringify(f.pf));await updateCheckout(f.order.id,o=>{o.productNames={demo:'Grafton kasket'};return o;});
+ await delivered(f);const row=(await shipmentMailStatus(f.pf.id))[0];assert.match(row.text,/4 × Grafton kasket/);
+});
