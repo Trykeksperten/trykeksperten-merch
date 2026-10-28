@@ -30,10 +30,13 @@ export function brandDiscoveryGroups(brands,products,prices,{category='',selecte
 }
 export function brandDiscoveryPage(brands,search,products=[],prices){
  const params=new URLSearchParams(search),groups=brandDiscoveryGroups(brands,products,prices,{category:params.get('kategori')||'',selected:params.get('brand')||''});
+ let column=0;
  const content=groups.map(({brand,products:featured,image},index)=>{
-  const photo=`<div class="brand-grid-photo" data-discovery-brand="${escape(brand.id)}" aria-label="${escape(brand.name)}">${image}</div>`;
+  const photo=`<div class="brand-grid-photo brand-grid-photo--${index%2?'right':'left'}" data-discovery-brand="${escape(brand.id)}" aria-label="${escape(brand.name)}">${image}</div>`;
   const cards=featured.map(product=>editorialProductCard(product,prices));
-  const tiles=index%2?[...cards.slice(0,2),photo,...cards.slice(2)]:[photo,...cards];
+  const photoColumn=index%2?2:0,before=Math.min((photoColumn-column+4)%4,cards.length);
+  const tiles=[...cards.slice(0,before),photo,...cards.slice(before)];
+  column=(photoColumn+2+cards.length-before)%4;
   return `<section class="brand-grid-group" data-discovery-brand="${escape(brand.id)}" aria-label="Udvalgt fra ${escape(brand.name)}">${tiles.join('')}</section>`;
  }).join('');
  return `<section class="brand-collage-intro wrap"><p class="eyebrow">SMERCH · BRANDS</p><h1>Udforsk vores brands.</h1><p>Udvalgte favoritter, populære valg og design lidt ud over det sædvanlige.</p></section><section class="home-featured wrap brand-discovery-feed"><div class="product-grid editorial-grid brand-collage">${content}</div></section>`;
