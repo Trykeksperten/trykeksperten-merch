@@ -1,4 +1,4 @@
-const primary=[['overview','I dag'],['orders','Alle ordrer'],['proofs','Korrekturer'],['production','Produktion'],['deliveries','Leveringer'],['blocked','Fejl og mangler']];
+const primary=[['overview','I dag'],['actions','Kræver handling'],['orders','Alle ordrer'],['proofs','Korrekturer'],['production','Produktion'],['deliveries','Leveringer'],['blocked','Fejl og mangler']];
 const secondary=[['freight','Fragt og tilbud'],['products','Produkter'],['companies','Virksomheder'],['statistics','Statistik'],['withdrawals','Fortrydelser'],['marketing','Kundekartotek'],['automation','Automatik og beskeder'],['integration','PF-integration'],['tests','Opret testordre']];
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
 export function mountAdminNavigation(root,{active='overview',navigate,onLogout}={}){
@@ -6,7 +6,7 @@ export function mountAdminNavigation(root,{active='overview',navigate,onLogout}=
  const nav=el('nav');nav.setAttribute('aria-label','Hovednavigation');const more=el('section',null,'admin-nav-secondary');const links=new Map(),badges=new Map();
  for(const [key,title] of [...primary,...secondary]){const a=el('a',null,'admin-nav-link');a.href=key==='tests'?'/admin/pf-orders#test':key==='overview'?'/admin':'/admin#'+key;a.dataset.view=key;const name=el('span',title),count=el('span',null,'admin-nav-count');count.hidden=true;a.append(name,count);if(navigate&&key!=='tests')a.onclick=event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();navigate(key);};links.set(key,a);badges.set(key,count);(primary.some(([k])=>k===key)?nav:more).append(a);}
  nav.append(more);const bottom=el('div',null,'sidebar-bottom'),shop=el('a','Til webshoppen'),logout=el('button','Log ud');shop.href='/';logout.type='button';logout.onclick=onLogout;bottom.append(shop,logout);root.append(brand,nav,bottom);
- function update(view,counts={}){const key=view==='actions'?'overview':view;for(const [k,a] of links){const current=k===key;a.classList.toggle('active',current);if(current)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');const n=counts[k]||0;badges.get(k).hidden=n===0;badges.get(k).textContent=n?String(n):'';}}
+ function update(view,counts={}){const key=view;for(const [k,a] of links){const current=k===key;a.classList.toggle('active',current);if(current)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');const n=(k==='actions'?counts.overview:counts[k])||0;badges.get(k).hidden=n===0;badges.get(k).textContent=n?String(n):'';}}
  update(active);return {update};
 }
 export function bindAdminMenu({shell,button,sidebar}){
