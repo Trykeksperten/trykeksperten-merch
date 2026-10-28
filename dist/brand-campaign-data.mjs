@@ -94,14 +94,6 @@ export const brandCampaignPhotos={
  ],
  "parker": [
   {
-   "file": "parker-1.webp",
-   "width": 888,
-   "height": 450,
-   "alt": "Parker – brandets produkter i brug og præsentation",
-   "ratio": 1.9733,
-   "wide": false
-  },
-  {
    "file": "parker-2.webp",
    "width": 888,
    "height": 450,
