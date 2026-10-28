@@ -1,3 +1,4 @@
+import {brandCampaignPhotos} from './brand-campaign-data.mjs';
 const photos={
  herschel:[
   {file:'herschel-1',width:2400,height:1591,alt:'Herschel-taske med plads til hverdagens ting'},
@@ -14,9 +15,11 @@ const photos={
 // Keys are product counts: the photographs never replace or count as products.
 export function brandEditorialBlocks(brand,count){
  const blocks=new Map();if(!Number.isInteger(count)||count<1)return blocks;
- const renderPhoto=photo=>`<figure class="brand-lifestyle"><img src="/assets/brand-lifestyle/${photo.file}.webp" alt="${photo.alt}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async"></figure>`;
+ const renderPhoto=photo=>`<figure class="brand-lifestyle${photo.ratio?' brand-lifestyle--campaign':''}${photo.wide?' brand-lifestyle--wide':''}"${photo.ratio?` style="--brand-photo-ratio:${photo.ratio>3?photo.ratio:Math.max(1,photo.ratio)}"`: ''}><img src="${photo.ratio?'/assets/brand-campaign/'+photo.file:'/assets/brand-lifestyle/'+photo.file+'.webp'}" alt="${photo.alt}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async"></figure>`;
  if(brand==='herschel'){blocks.set(Math.min(count,4),`<div class="brand-lifestyle-pair">${photos.herschel.map(renderPhoto).join('')}</div>`);return blocks;}
- for(const [index,photo] of (photos[brand]||[]).entries()){
+ const requested=count<10?1:count<24?2:3;
+ const candidates=photos[brand]?[...photos[brand],...(brand==='stanley-1913'?brandCampaignPhotos[brand]||[]:[])]:brandCampaignPhotos[brand]||[];
+ for(const [index,photo] of candidates.slice(0,requested).entries()){
   const after=Math.min(count,count<=4?(index+1)*2:4+index*8);
   const html=renderPhoto(photo);
   blocks.set(after,(blocks.get(after)||'')+html);

@@ -2561,3 +2561,134 @@ body.storefront #main .pf-colour-picker .pf-colour-cmyk legend{position:absolute
 .brand-lifestyle-pair{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;min-width:0}
 .brand-lifestyle-pair>.brand-lifestyle{grid-column:auto}
 @media(max-width:700px){.brand-lifestyle-pair{gap:12px}}
+
+/* Preserve brand campaign artwork and text instead of cropping wide photos. */
+.brand-lifestyle--campaign{aspect-ratio:var(--brand-photo-ratio,1)}
+.brand-lifestyle--wide{grid-column:1/-1}
+
+/* A calm menu invitation and a brand discovery page with coherent brand groups. */
+#brands-menu .brands-menu-all{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:14px;padding:16px 18px;border:0;border-radius:12px;background:#f0f3ef;color:#17201f;text-decoration:none}
+#brands-menu .brands-menu-all>span:first-child{display:grid;gap:4px}
+#brands-menu .brands-menu-all strong{font-size:15px;font-weight:500;line-height:1.3}
+#brands-menu .brands-menu-all small{font-size:12px;font-weight:400;color:#647168;line-height:1.4}
+#brands-menu .brands-menu-all .brands-menu-all-arrow{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border:1px solid #c7d0c6;border-radius:50%;font-size:21px;font-weight:400}
+#brands-menu .brands-menu-all:hover{background:#e4ebe2;color:#17201f}
+/* An editorial collage: varied scale, offset product notes and related brand imagery. */
+.brand-collage-intro{padding-top:70px;padding-bottom:62px}
+.brand-collage-intro .eyebrow{font-size:11px;letter-spacing:.17em;color:#69746b;margin-bottom:24px}
+.brand-collage-intro h1{font-size:clamp(44px,7.6vw,104px);line-height:.99;letter-spacing:-.055em;font-weight:500;margin:0 0 26px;max-width:950px}
+.brand-collage-intro h1 span{color:#647565}
+.brand-collage-intro>p:last-child{font-size:15px;line-height:1.65;max-width:400px;margin:0;color:#657066}
+.brand-collage{padding-bottom:100px}
+.brand-collage-cluster{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:42px 24px;align-items:start;position:relative;margin-bottom:100px;isolation:isolate}
+.brand-collage-cluster:last-child{margin-bottom:0}
+.brand-collage-photo{grid-column:1/span 7;grid-row:1/span 2;min-width:0;align-self:start}
+.brand-collage-photo .brand-lifestyle{margin:0;border-radius:10px}
+.brand-collage-photo .brand-lifestyle-pair{gap:14px}
+.brand-collage-product{min-width:0;position:relative;z-index:1}
+.brand-collage-name{display:block;font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:#647064;margin-bottom:10px}
+.brand-collage-product-1{grid-column:9/span 3;grid-row:1;margin-top:80px}
+.brand-collage-product-2{grid-column:8/span 3;grid-row:2;margin-top:6px}
+.brand-collage-product-3{grid-column:3/span 3;grid-row:3;margin-top:-12px}
+.brand-collage-product .product-image{display:flex;align-items:center;justify-content:center;aspect-ratio:1;background:#f2f3ef;border-radius:10px;overflow:hidden;transition:background .2s ease}
+.brand-collage-product .product-image:hover{background:#e8ece5}
+.brand-collage-product .product-image img{display:block;width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;transition:transform .35s ease}
+.brand-collage-product .product-image:hover img{transform:scale(1.035)}
+.brand-collage-product .product-title{display:block;margin:12px 0 0;font-size:13px;line-height:1.5;font-weight:500;text-decoration:none}
+.brand-collage-product .card-meta{display:none}
+.brand-collage-product .editorial-price{margin:7px 0 0}
+.brand-collage-product .editorial-price strong{font-size:12px;font-weight:500}
+.brand-collage-product .editorial-price small{display:block;margin-top:4px;font-size:10px;line-height:1.45;color:#747b72}
+.brand-collage-layout-1{margin-top:-48px}
+.brand-collage-layout-1 .brand-collage-photo{grid-column:6/span 7;grid-row:1/span 2;margin-top:120px}
+.brand-collage-layout-1 .brand-collage-product-1{grid-column:1/span 3;margin-top:0}
+.brand-collage-layout-1 .brand-collage-product-2{grid-column:2/span 3;margin-top:26px}
+.brand-collage-layout-1 .brand-collage-product-3{grid-column:8/span 3;grid-row:3;margin-top:20px}
+.brand-collage-layout-2 .brand-collage-photo{grid-column:1/span 8;grid-row:1}
+.brand-collage-layout-2 .brand-collage-product-1{grid-column:10/span 3;grid-row:1;margin-top:140px}
+.brand-collage-layout-2 .brand-collage-product-2{grid-column:2/span 3;grid-row:2;margin-top:-20px}
+.brand-collage-layout-2 .brand-collage-product-3{grid-column:7/span 3;grid-row:2;margin-top:80px}
+.brand-collage-layout-3 .brand-collage-photo{grid-column:5/span 8;grid-row:2;margin-top:0}
+.brand-collage-layout-3 .brand-collage-product-1{grid-column:2/span 3;grid-row:1;margin-top:30px}
+.brand-collage-layout-3 .brand-collage-product-2{grid-column:8/span 3;grid-row:1;margin-top:0}
+.brand-collage-layout-3 .brand-collage-product-3{grid-column:1/span 3;grid-row:2;margin-top:130px}
+@media(min-width:1600px){.brand-collage-cluster{gap:50px 32px;margin-bottom:130px}}
+@media(max-width:700px){
+ .brand-collage-intro{padding-top:38px;padding-bottom:38px}
+ .brand-collage-intro .eyebrow{font-size:10px;margin-bottom:18px}
+ .brand-collage-intro h1{font-size:clamp(44px,12vw,70px);margin-bottom:20px}
+ .brand-collage-intro>p:last-child{font-size:13px;max-width:290px}
+ .brand-collage{padding-bottom:50px}
+ .brand-collage-cluster{grid-template-columns:repeat(6,minmax(0,1fr));gap:28px 12px;margin-top:0;margin-bottom:58px}
+ .brand-collage-cluster .brand-collage-photo{grid-column:1/span 5;grid-row:1;margin-top:0}
+ .brand-collage-cluster .brand-collage-product-1{grid-column:4/span 3;grid-row:2;margin-top:-4px}
+ .brand-collage-cluster .brand-collage-product-2{grid-column:1/span 3;grid-row:2;margin-top:56px}
+ .brand-collage-cluster .brand-collage-product-3{grid-column:3/span 3;grid-row:3;margin-top:0}
+ .brand-collage-layout-1 .brand-collage-photo,.brand-collage-layout-3 .brand-collage-photo{grid-column:2/span 5}
+ .brand-collage-layout-1 .brand-collage-product-1,.brand-collage-layout-3 .brand-collage-product-1{grid-column:1/span 3;grid-row:2;margin-top:0}
+ .brand-collage-layout-1 .brand-collage-product-2,.brand-collage-layout-3 .brand-collage-product-2{grid-column:4/span 3;grid-row:2;margin-top:70px}
+ .brand-collage-layout-2 .brand-collage-photo{grid-column:1/-1}
+ .brand-collage-name{font-size:9px;letter-spacing:.08em;margin-bottom:8px}
+ .brand-collage-product .product-title{font-size:12px;margin-top:9px}
+ .brand-collage-product .editorial-price strong{font-size:11px}
+ .brand-collage-product .editorial-price small{font-size:9px}
+ .brand-collage-photo .brand-lifestyle-pair{gap:8px}
+}
+@media(prefers-reduced-motion:reduce){.brand-collage-product .product-image,.brand-collage-product .product-image img{transition:none}}
+/* Keep the collage's typography and spacing independent of catalogue defaults. */
+body.storefront #main .brand-collage-intro h1{font-size:clamp(44px,7.6vw,104px);line-height:.99;letter-spacing:-.055em;font-weight:500}
+body.storefront #main .brand-collage-intro .eyebrow{font-size:10px;letter-spacing:.17em}
+body.storefront #main .brand-collage-product .product-title{font-size:13px;line-height:1.5;font-weight:500}
+body.storefront #main .brand-collage-product .editorial-price strong{font-size:12px;line-height:1.5;font-weight:500}
+body.storefront #main .brand-collage-product .editorial-price small{font-size:10px;line-height:1.45}
+.brand-collage-layout-0 .brand-collage-photo{grid-row:1}
+.brand-collage-layout-0 .brand-collage-product-2{grid-column:2/span 3;grid-row:2;margin-top:-18px}
+.brand-collage-layout-0 .brand-collage-product-3{grid-column:7/span 3;grid-row:2;margin-top:65px}
+.brand-collage-layout-1 .brand-collage-photo{grid-row:1}
+.brand-collage-layout-1 .brand-collage-product-2{grid-column:3/span 3;grid-row:2;margin-top:-25px}
+.brand-collage-layout-1 .brand-collage-product-3{grid-column:9/span 3;grid-row:2;margin-top:55px}
+@media(max-width:700px){
+ body.storefront #main .brand-collage-intro h1{font-size:clamp(44px,12vw,70px)}
+ body.storefront #main .brand-collage-product .product-title{font-size:12px}
+ body.storefront #main .brand-collage-product .editorial-price strong{font-size:11px}
+ body.storefront #main .brand-collage-product .editorial-price small{font-size:9px}
+ .brand-collage-layout-0 .brand-collage-product-2{grid-column:1/span 3;grid-row:2;margin-top:56px}
+ .brand-collage-layout-0 .brand-collage-product-3{grid-column:3/span 3;grid-row:3;margin-top:0}
+ .brand-collage-layout-1 .brand-collage-product-2{grid-column:4/span 3;grid-row:2;margin-top:70px}
+ .brand-collage-layout-1 .brand-collage-product-3{grid-column:3/span 3;grid-row:3;margin-top:0}
+}
+/* The studio shares the product page's sage selection cards and quiet controls. */
+body.storefront #main .pf-visual-designer{--studio-selected:#edf1ed;--studio-border:#8c9f90;--studio-ink:#36543d;font-family:var(--font-sans,Roboto,sans-serif);color:#17201f;background:#f5f6f3}
+body.storefront #main .pf-visual-designer :is(button,input,select,textarea){font-family:inherit;font-weight:500;letter-spacing:0}
+body.storefront #main .pf-visual-designer .pf-designer-heading{background:#fff;color:#17201f;border-bottom:1px solid #d6ddd7}
+body.storefront #main .pf-visual-designer .pf-designer-heading strong{color:#17201f;font-size:15px;font-weight:500;line-height:1.4}
+body.storefront #main .pf-visual-designer #pf-editor-subtitle{display:block;margin-top:5px;color:#526657;font-size:12px;font-weight:500;line-height:1.4;white-space:normal}
+body.storefront #main .pf-visual-designer .pf-designer-kicker{display:none}
+body.storefront #main .pf-visual-designer :is(.pf-content-tabs,#pf-placement-tabs){background:#f5f6f3}
+body.storefront #main .pf-visual-designer .pf-content-tabs button[data-content-tab]{border-radius:999px;background:#fff;color:#53605b;border:1px solid #d4dbd5;font-weight:500}
+body.storefront #main .pf-visual-designer .pf-content-tabs button[data-content-tab].active{background:var(--studio-selected);color:#17201f;border-color:var(--studio-border);box-shadow:inset 0 0 0 1px var(--studio-border);font-weight:500}
+body.storefront #main .pf-visual-designer #pf-placement-tabs button{border-radius:12px;background:#fff;color:#53605b;border:1px solid #d4dbd5;font-weight:500}
+body.storefront #main .pf-visual-designer #pf-placement-tabs button.active{background:var(--studio-selected);color:#17201f;border-color:var(--studio-border);box-shadow:inset 0 0 0 1px var(--studio-border);font-weight:500}
+body.storefront #main .pf-visual-designer #pf-placement-tabs button.active small{background:#d9e2d9;color:var(--studio-ink)}
+body.storefront #main .pf-visual-designer #pf-placement-tabs button.active b{background:#8c9f90;color:#fff}
+body.storefront #main .pf-visual-designer .pf-designer-sidebar{background:#fff;border-color:#d6ddd7}
+body.storefront #main .pf-visual-designer :is(.pf-designer-panel,.pf-designer-foot,.pf-editor-zoom){border-color:#d6ddd7}
+body.storefront #main .pf-visual-designer :is(.pf-panel-kicker,.pf-designer-kicker){color:#647469;font-weight:500}
+body.storefront #main .pf-visual-designer .pf-layer-list button{background:#fff;border:1px solid #d4dbd5;color:#526257;border-radius:12px;font-weight:500}
+body.storefront #main .pf-visual-designer .pf-layer-list button.active{background:var(--studio-selected);color:#17201f;border-color:var(--studio-border);box-shadow:inset 0 0 0 1px var(--studio-border)}
+body.storefront #main .pf-visual-designer :is(.pf-text-align button[aria-pressed=true],.pf-colour-count-buttons button[aria-pressed=true],.pf-text-rotation-presets button[aria-pressed=true]){background:var(--studio-selected);border-color:var(--studio-border);color:#17201f;box-shadow:inset 0 0 0 1px var(--studio-border)}
+body.storefront #main .pf-visual-designer :is(.pf-upload-launch,.pf-editor-leave,.pf-editor-close,.pf-designer-actions .button){background:#f1f4f0;border:1px solid #d4dbd5;border-radius:999px;color:var(--studio-ink);box-shadow:none;font-weight:500}
+body.storefront #main .pf-visual-designer .pf-editor-close{padding:7px 12px;min-height:36px}
+body.storefront #main .pf-visual-designer .pf-upload-launch{padding:12px 16px}
+body.storefront #main .pf-visual-designer :is(.pf-upload-launch,.pf-editor-leave,.pf-editor-close,.pf-designer-actions .button):hover{background:#e4ebe5;border-color:#aebeb1;color:#284532}
+body.storefront #main .pf-visual-designer :is(.pf-upload-launch,.pf-editor-leave,.pf-editor-close,.pf-designer-actions .button):focus-visible{outline:2px solid #64796a;outline-offset:3px}
+body.storefront #main .pf-visual-designer :is(.pf-layer-controls,.pf-text-controls) input[type=range]:not([data-hue]){accent-color:#8c9f90}
+@media(max-width:700px){
+ body.storefront #main .pf-visual-designer .pf-designer-heading strong{font-size:13px}
+ body.storefront #main .pf-visual-designer #pf-editor-subtitle{font-size:11px;margin-top:3px}
+ body.storefront #main .pf-visual-designer .pf-editor-close{min-height:34px;padding:5px 10px;font-size:12px}
+}
+
+/* Keep the unprinted choice visible, including supplier restrictions. */
+body.storefront #main .pf-method-card.pf-method-unavailable{opacity:1;background:#f7f8f6;border-style:dashed;color:#626c66;cursor:not-allowed}
+body.storefront #main .pf-method-card.pf-method-unavailable strong{color:#626c66}
