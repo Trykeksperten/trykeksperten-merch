@@ -70,3 +70,12 @@ test('singleton compatibility retains sender, file, and container validation',as
  await assert.rejects(normalizeEproof({Eproof:{...f.item,Base64Image:undefined}},{env}),/Base64Image/);
  assert.equal((await readOrder(f.id)).proof,undefined);
 });
+test('PF standalone test publishes one customer invitation, reads safely and accepts customer decision without a payment',async()=>{
+ const {publishCustomerProof,customerProof}=await import('../lib/pf-orders.mjs');const {proofMailStatus,retryProofMail}=await import('../lib/proof-mail.mjs');
+ const f=await fixture(),o=await readOrder(f.id);o.shipping={name:'Testmodtager',email:'hello@example.test'};o.lines[0].decorations=[];await writeFile(join(root,'orders',f.id+'.json'),JSON.stringify(o));
+ const result=await receiveEproofAPI(f.payload,{env});assert.equal(result[0].published,true);assert.equal((await proofMailStatus(f.id)).length,1);
+ await receiveEproofAPI(f.payload,{env});assert.equal((await proofMailStatus(f.id)).length,1);
+ let sent;await retryProofMail({env,orderIds:[f.id],transport:{sendMail:async mail=>{sent=mail;return {accepted:[mail.to]};}}});assert.equal(sent.to,'hello@example.test');assert.match(sent.subject,/\[TEST\]/);
+ const link=await publishCustomerProof(f.id,{version:1});const token=new URLSearchParams(new URL(link.url).hash.slice(1)).get('token');assert.equal((await customerProof(f.id,token)).paymentActive,true);
+ await decideProof(f.id,{version:1,decision:'approve',customerToken:token});const done=await readOrder(f.id);assert.equal(done.decision.actor,'customer');assert.equal(done.status,'approval_pending_pf');assert.equal(done.decision.apiDispatch,undefined);
+});
