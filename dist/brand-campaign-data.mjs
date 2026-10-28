@@ -8,6 +8,22 @@ export const brandCampaignPhotos={
    "alt": "CamelBak – brandets produkter i brug og præsentation",
    "ratio": 1.7204,
    "wide": false
+  },
+  {
+   "file": "camelbak-extra-12.webp",
+   "width": 888,
+   "height": 450,
+   "alt": "Camelbak – brandets produkter i brug",
+   "ratio": 1.9733,
+   "wide": false
+  },
+  {
+   "file": "camelbak-extra-13.webp",
+   "width": 888,
+   "height": 450,
+   "alt": "Camelbak – brandets produkter i brug",
+   "ratio": 1.9733,
+   "wide": false
   }
  ],
  "elevate": [
@@ -54,6 +70,14 @@ export const brandCampaignPhotos={
    "alt": "LARQ – brandets produkter i brug og præsentation",
    "ratio": 1.5,
    "wide": false
+  },
+  {
+   "file": "larq-extra-56.webp",
+   "width": 1799,
+   "height": 1200,
+   "alt": "Larq – brandets produkter i brug",
+   "ratio": 1.4992,
+   "wide": false
   }
  ],
  "miir": [
@@ -62,6 +86,14 @@ export const brandCampaignPhotos={
    "width": 1850,
    "height": 938,
    "alt": "MiiR – brandets produkter i brug og præsentation",
+   "ratio": 1.9723,
+   "wide": false
+  },
+  {
+   "file": "miir-extra-27.webp",
+   "width": 1850,
+   "height": 938,
+   "alt": "Miir – brandets produkter i brug",
    "ratio": 1.9723,
    "wide": false
   }
@@ -118,6 +150,14 @@ export const brandCampaignPhotos={
    "alt": "Stanley 1913 – brandets produkter i brug og præsentation",
    "ratio": 1.7956,
    "wide": false
+  },
+  {
+   "file": "stanley-1913-extra-2.webp",
+   "width": 808,
+   "height": 450,
+   "alt": "Stanley 1913 – brandets produkter i brug",
+   "ratio": 1.7956,
+   "wide": false
   }
  ],
  "thule": [
@@ -135,6 +175,14 @@ export const brandCampaignPhotos={
    "height": 494,
    "alt": "Thule – brandets produkter i brug og præsentation",
    "ratio": 1.7976,
+   "wide": false
+  },
+  {
+   "file": "thule-extra-64.webp",
+   "width": 888,
+   "height": 495,
+   "alt": "Thule – brandets produkter i brug",
+   "ratio": 1.7939,
    "wide": false
   }
  ],
@@ -411,6 +459,34 @@ export const brandCampaignPhotos={
    "height": 450,
    "alt": "Zens – brandets produkter i brug og præsentation",
    "ratio": 1.9733,
+   "wide": false
+  }
+ ],
+ "herschel": [
+  {
+   "file": "herschel-extra-20.webp",
+   "width": 808,
+   "height": 450,
+   "alt": "Herschel – brandets produkter i brug",
+   "ratio": 1.7956,
+   "wide": false
+  },
+  {
+   "file": "herschel-extra-21.webp",
+   "width": 808,
+   "height": 450,
+   "alt": "Herschel – brandets produkter i brug",
+   "ratio": 1.7956,
+   "wide": false
+  }
+ ],
+ "ocean-bottle": [
+  {
+   "file": "ocean-bottle-extra-42.webp",
+   "width": 808,
+   "height": 450,
+   "alt": "Ocean Bottle – brandets produkter i brug",
+   "ratio": 1.7956,
    "wide": false
   }
  ]

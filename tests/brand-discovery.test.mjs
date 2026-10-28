@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {brandDiscoveryGroups,brandDiscoveryPage,selectDiscoveryProducts,galleryImageFormat} from '../dist/brand-discovery.mjs';
+import {brandDiscoveryGroups,brandDiscoveryPage,selectDiscoveryProducts,galleryImageFormat,composeGallery} from '../dist/brand-discovery.mjs';
 const brands=[{id:'camelbak',name:'CamelBak',group:'Drikkegrej'},{id:'karst',name:'Karst',group:'Kontor'},{id:'miir',name:'MiiR',group:'Drikkegrej'},{id:'thule',name:'Thule',group:'Tasker'},{id:'empty',name:'Empty',group:'Tasker'},{id:'unbranded',name:'Unbranded',group:'Kontor'},{id:'trykeksperten-select',name:'Trykeksperten Select',group:'Kontor'}];
 const products=brands.filter(b=>b.id!=='empty').flatMap(b=>Array.from({length:6},(_,i)=>({id:b.id+'-'+i,name:b.name+' product '+i,brandId:b.id,popularity:100-i,variants:[{sku:b.id+'-'+i,color:'Sort',images:['https://example.com/'+b.id+'-'+i+'.jpg']}]})));
 const prices={available:true,products:Object.fromEntries(products.map(p=>[p.id,{fromIncVat:25000+Number(p.id.slice(-1))*10000}])),skus:Object.fromEntries(products.map(p=>[p.variants[0].sku,true])),variantPrices:Object.fromEntries(products.map(p=>[p.variants[0].sku,{fromIncVat:25000,fromExVat:20000,fromQuantity:25}]))};
@@ -46,4 +46,13 @@ test('wide campaign artwork keeps its native proportions in the gallery',()=>{
 test('brand discovery excludes Elevate imagery even when products are available',()=>{
  const html=brandDiscoveryPage([...brands,{id:'elevate',name:'Elevate'}],'',[...products,{...products[0],brandId:'elevate'}],prices);
  assert.doesNotMatch(html,/elevate-/);
+});
+test('mixed-format collage keeps every image exactly once and fills rows without fixed maximum widths',()=>{
+ const tiles=Array.from({length:25},(_,i)=>({ratio:[.75,.8,1.5,1.97,1,4.5][i%6],width:1600,featured:i%3===0,html:`<a data-photo="${i}"></a>`}));
+ const html=composeGallery(tiles).join('');
+ for(let i=0;i<tiles.length;i++)assert.equal((html.match(new RegExp(`data-photo="${i}"`,'g'))||[]).length,1);
+ assert.match(html,/brand-gallery-column--stack/);
+ assert.doesNotMatch(html,/max-width:|NaN|Infinity/);
+ assert.deepEqual(composeGallery([]),[]);
+ assert.match(composeGallery([tiles[0]]).join(''),/data-photo="0"/);
 });

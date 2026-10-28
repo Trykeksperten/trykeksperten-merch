@@ -1,4 +1,4 @@
-import {brandEditorialImages} from './brand-editorial.mjs?v=3';
+import {brandEditorialImages} from './brand-editorial.mjs?v=4';
 import {pricedVariants} from './pf-visibility.mjs';
 import {isInternalShopBrand} from './shop-brand-policy.mjs';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -42,22 +42,52 @@ export function brandDiscoveryPage(brands,search,products=[],prices){
    tiles.push({ratio:format.ratio,width:format.width,featured:largePhotoBrands.has(brand.id)&&format.width>=1200&&format.ratio<3,html:`<a class="brand-gallery-tile${format.ratio>=1.5?' brand-gallery-tile--wide':''}" style="--image-ratio:${format.ratio.toFixed(4)}" data-discovery-brand="${escape(brand.id)}" href="/produkter?brand=${encodeURIComponent(brand.id)}" aria-label="Se produkter fra ${escape(brand.name)}">${image}</a>`});
   }
  }
- const rows=[];let row=[],ratio=0;
- const flush=()=>{
-  if(row.length){
-   const total=row.reduce((sum,tile)=>sum+tile.ratio,0),gaps=(row.length-1)*24;
-   const featured=row.some(tile=>tile.featured),height=featured?900:row.every(tile=>tile.width>=1400)?500:360;
-   const maxWidth=Math.floor(Math.min(total*height+gaps,...row.map(tile=>tile.width/tile.ratio*total+gaps)));
-   rows.push(`<div class="brand-gallery-row${featured?' brand-gallery-row--featured':''}" style="max-width:${maxWidth}px">${row.map(tile=>tile.html).join('')}</div>`);
-  }
-  row=[];ratio=0;
- };
- for(const tile of tiles){
-  if(row.length&&row[0].featured!==tile.featured)flush();
-  if(tile.ratio>=3||tile.featured&&tile.ratio>=1.5){flush();row.push(tile);flush();continue;}
-  row.push(tile);ratio+=tile.ratio;
-  if(ratio>=3.4||row.length>=(tile.featured?2:4))flush();
- }
- flush();
+ const rows=composeGallery(tiles);
+
  return `<section class="wrap brand-discovery-feed"><h1 class="sr-only">Udforsk alle brands</h1><div class="brand-gallery">${rows.join('')}</div></section>`;
+}
+
+// A portrait pair, alternating large photo + small stack, and compact campaign rows.
+// Both column widths and stack heights use the source ratios: no cropping or empty cells.
+export function composeGallery(tiles){
+ const remaining=[...tiles],rows=[];
+ const leaf=tile=>({ratio:tile.ratio,tiles:[tile]});
+ const stack=items=>({ratio:1/items.reduce((sum,t)=>sum+1/t.ratio,0),tiles:items});
+ const render=columns=>{
+  const ratio=columns.reduce((sum,c)=>sum+c.ratio,0);
+  const stackGap=columns.reduce((sum,c)=>sum+c.ratio*(c.tiles.length-1),0);
+  const gapFactor=columns.length-1-stackGap;
+  const html=columns.map(c=>`<div class="brand-gallery-column${c.tiles.length>1?' brand-gallery-column--stack':''}" style="--column-ratio:${c.ratio};--stack-gaps:${c.tiles.length-1}">${c.tiles.map(t=>t.html).join('')}</div>`).join('');
+  rows.push(`<div class="brand-gallery-row${columns.some(c=>c.tiles.length>1)?' brand-gallery-row--composition':''}${columns.some(c=>c.tiles.some(t=>t.featured))?' brand-gallery-row--featured':''}" style="--row-ratio:${ratio};--row-gap-factor:${gapFactor}">${html}</div>`);
+ };
+ // Keep Ocean Bottle and Stanley at the beginning.
+ if(remaining.length>=2)render([leaf(remaining.shift()),leaf(remaining.shift())]);
+ let alternate=false;
+ while(remaining.length){
+  const heroIndex=remaining.findIndex(t=>t.featured&&t.ratio<2.8);
+  const first=remaining.splice(heroIndex>=0?heroIndex:0,1)[0];
+  if(first.featured&&first.ratio<2.8&&remaining.length>=2){
+   const companions=[];
+   for(let i=0;i<2;i++){
+    const candidate=remaining.findIndex(t=>!t.featured&&t.ratio>=1&&t.ratio<3);
+    if(candidate<0)break;
+    companions.push(remaining.splice(candidate,1)[0]);
+   }
+   if(companions.length===2){
+    const columns=[leaf(first),stack(companions)];
+    if(alternate)columns.reverse();
+    render(columns);alternate=!alternate;continue;
+   }
+   remaining.unshift(...companions);
+  }
+  const group=[first];
+  let sum=first.ratio;
+  while(remaining.length&&group.length<3&&sum<3.8){
+   const candidate=remaining.findIndex(t=>!t.featured||first.ratio<1&&t.ratio<1);
+   if(candidate<0)break;
+   const next=remaining.splice(candidate,1)[0];group.push(next);sum+=next.ratio;
+  }
+  render(group.map(leaf));
+ }
+ return rows;
 }

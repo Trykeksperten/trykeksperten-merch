@@ -45,3 +45,9 @@ body.admin-proofs #login .login-back{display:inline-block;margin-top:18px;color:
 .pf-order-table .mockup-cell{width:112px;min-width:112px;vertical-align:middle}
 .pf-order-table .mockup-cell .admin-mockup{margin:0}
 .finance-totals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr) minmax(0,1fr));gap:8px;margin:16px 0}.finance-totals dd{margin:0;font-weight:600}.finance-table{width:100%;border-collapse:collapse;margin:16px 0}.finance-table td,.finance-table th{padding:8px;text-align:left;border-bottom:1px solid #dce3dd}.finance-table td:last-child{display:flex;gap:12px;align-items:center;flex-wrap:wrap}@media(max-width:800px){.finance-totals{grid-template-columns:1fr 1fr}.finance-table{display:block;overflow-x:auto}}
+
+
+.event-with-description{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 28px;align-items:start}
+.event-with-description>div{min-width:0}
+.event .event-description{margin:0;color:#192626;line-height:1.5;font-weight:400}
+@media(max-width:900px){.event-with-description{grid-template-columns:minmax(0,1fr);gap:4px}}

@@ -2569,22 +2569,26 @@ body.storefront #main .pf-colour-picker .pf-colour-cmyk legend{position:absolute
 /* A calm menu invitation and a brand discovery page with coherent brand groups. */
 #brands-menu .brands-menu-all{display:inline-flex;align-items:center;justify-content:center;width:fit-content;gap:0;margin-top:12px;padding:10px 14px;border:0;border-radius:10px;background:#f0f3ef;color:#17201f;text-decoration:none;font-size:14px;font-weight:500;line-height:1.3}
 #brands-menu .brands-menu-all:hover{background:#e4ebe2;color:#17201f}
-/* Justified photo rows preserve each image's original proportions and artwork. */
+/* Editorial mosaic: full-width compositions with uncropped source proportions. */
 .brand-discovery-feed{padding-top:0;padding-bottom:64px}
-.brand-gallery{display:flex;flex-direction:column;gap:24px}
-.brand-gallery-row{display:flex;align-items:start;gap:24px;min-width:0;width:100%}
-.brand-gallery-tile{display:block;flex:var(--image-ratio) 1 0;aspect-ratio:var(--image-ratio);min-width:0;overflow:hidden;border-radius:18px;background:#fff;text-decoration:none}
-.brand-gallery-tile .brand-lifestyle{margin:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0}
+.brand-gallery{container-type:inline-size;--gallery-gap:20px;display:flex;flex-direction:column;gap:var(--gallery-gap)}
+.brand-gallery-row{--row-height:calc((100cqw - var(--row-gap-factor) * var(--gallery-gap)) / var(--row-ratio));display:flex;gap:var(--gallery-gap);width:100%;height:var(--row-height);min-width:0}
+.brand-gallery-column{display:flex;flex-direction:column;gap:var(--gallery-gap);width:calc(var(--column-ratio) * (var(--row-height) - var(--stack-gaps) * var(--gallery-gap)));min-width:0;flex:none}
+.brand-gallery-tile{display:block;width:100%;aspect-ratio:var(--image-ratio);min-width:0;flex:none;overflow:hidden;border-radius:18px;background:#fff;text-decoration:none}
+.brand-gallery-tile .brand-lifestyle{margin:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0;background:transparent}
 .brand-gallery-tile .brand-lifestyle img{display:block;width:100%;height:100%;object-fit:contain}
+.brand-gallery-tile .brand-lifestyle--trim-white img{width:125%;max-width:none;margin-left:-12.5%;object-fit:fill}
 .brand-gallery-tile:focus-visible{outline:3px solid #cf4d22;outline-offset:4px}
-.brand-gallery-tile .brand-lifestyle-pair{display:flex;gap:12px;height:100%}
+.brand-gallery-tile .brand-lifestyle-pair{display:flex;gap:8px;height:100%}
 .brand-gallery-tile .brand-lifestyle-pair .brand-lifestyle{flex:var(--photo-aspect) 1 0;min-width:0;width:auto;background:transparent}
 @media(max-width:700px){
- .brand-gallery{gap:12px}
- .brand-gallery-row{flex-wrap:wrap;gap:12px;max-width:100%!important}
- .brand-gallery-tile{flex:1 1 calc(50% - 6px);border-radius:12px}
- .brand-gallery-tile--wide,.brand-gallery-row--featured .brand-gallery-tile{flex-basis:100%}
- .brand-gallery-tile .brand-lifestyle-pair{gap:8px}
+ .brand-gallery{--gallery-gap:12px}
+ .brand-gallery-row--composition{height:auto;flex-direction:column}
+ .brand-gallery-row--composition .brand-gallery-column{width:100%;gap:12px}
+ .brand-gallery-row--composition .brand-gallery-column--stack{flex-direction:row;align-items:start}
+ .brand-gallery-column--stack .brand-gallery-tile{flex:var(--image-ratio) 1 0;width:auto}
+ .brand-gallery-tile{border-radius:12px}
+ .brand-gallery-tile .brand-lifestyle-pair{gap:6px}
  .brand-discovery-feed{padding-bottom:36px}
 }
 
