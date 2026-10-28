@@ -2578,7 +2578,7 @@ body.storefront #main .pf-colour-picker .pf-colour-cmyk legend{position:absolute
 .brand-gallery-tile .brand-lifestyle img{display:block;width:100%;height:100%;object-fit:contain}
 .brand-gallery-tile:focus-visible{outline:3px solid #cf4d22;outline-offset:4px}
 .brand-gallery-tile .brand-lifestyle-pair{display:flex;gap:12px;height:100%}
-.brand-gallery-tile .brand-lifestyle-pair .brand-lifestyle{flex:1;min-width:0}
+.brand-gallery-tile .brand-lifestyle-pair .brand-lifestyle{flex:var(--photo-aspect) 1 0;min-width:0;width:auto;background:transparent}
 @media(max-width:700px){
  .brand-gallery{gap:12px}
  .brand-gallery-row{flex-wrap:wrap;gap:12px;max-width:100%!important}

@@ -12,7 +12,7 @@ const photos={
  'stanley-1913':[{file:'stanley',width:1619,height:2400,alt:'Stanley-krus på tur i sneen'}],
  chipolo:[{file:'chipolo',width:2400,height:2399,alt:'Chipolo-tracker på en rygsæk'}]
 };
-const renderPhoto=photo=>`<figure class="brand-lifestyle${photo.ratio?' brand-lifestyle--campaign':''}${photo.wide?' brand-lifestyle--wide':''}"${photo.ratio?` style="--brand-photo-ratio:${photo.ratio>3?photo.ratio:Math.max(1,photo.ratio)}"`: ''}><img src="${photo.ratio?'/assets/brand-campaign/'+photo.file:'/assets/brand-lifestyle/'+photo.file+'.webp'}" alt="${photo.alt}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async"></figure>`;
+const renderPhoto=photo=>`<figure class="brand-lifestyle${photo.ratio?' brand-lifestyle--campaign':''}${photo.wide?' brand-lifestyle--wide':''}" style="--photo-aspect:${photo.width/photo.height}${photo.ratio?`;--brand-photo-ratio:${photo.ratio>3?photo.ratio:Math.max(1,photo.ratio)}`:''}"><img src="${photo.ratio?'/assets/brand-campaign/'+photo.file:'/assets/brand-lifestyle/'+photo.file+'.webp'}" alt="${photo.alt}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async"></figure>`;
 export function brandEditorialImages(brand){
  if(brand==='herschel')return [`<div class="brand-lifestyle-pair">${photos.herschel.map(renderPhoto).join('')}</div>`];
  const candidates=photos[brand]?[...photos[brand],...(brand==='stanley-1913'?brandCampaignPhotos[brand]||[]:[])]:brandCampaignPhotos[brand]||[];

@@ -43,3 +43,7 @@ test('wide campaign artwork keeps its native proportions in the gallery',()=>{
  const html=brandDiscoveryPage([...brands,{id:'parker',name:'Parker'}],'?brand=parker',[{...products[0],brandId:'parker'}],prices);
  assert.match(html,/brand-gallery-tile--wide/);assert.match(html,/--image-ratio:1.9733/);
 });
+test('brand discovery excludes Elevate imagery even when products are available',()=>{
+ const html=brandDiscoveryPage([...brands,{id:'elevate',name:'Elevate'}],'',[...products,{...products[0],brandId:'elevate'}],prices);
+ assert.doesNotMatch(html,/elevate-/);
+});
