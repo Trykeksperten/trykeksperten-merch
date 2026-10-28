@@ -27,3 +27,22 @@ test('sending an older basis PDF pre-fills the current accountant address and st
  const previous=globalThis.document;globalThis.document={createElement:tag=>new Element(tag)};
  try{const rows=createDocumentRows({}),posts=[];const api=async(url,method,input)=>{if(method==='POST')posts.push(input);return {json:async()=>url.includes('?snapshot=')?{company:{accountantEmail:''}}:{company:{accountantEmail:'financial@example.test'},documents:[{id:'old',type:'basis',title:'Fakturagrundlag',createdAt:'2026-10-01T10:00:00Z',version:1}],options:[]}};};const panel=documentPanel({id:'test'},api,rows);await settle();all(rows.root).find(n=>n.tag==='button'&&n.textContent==='Gennemse og send PDF').onclick();await settle();assert.equal(all(panel).find(n=>n.attributes['aria-label']==='Modtagerens e-mail').value,'financial@example.test');assert.equal(posts.length,0);}finally{globalThis.document=previous;}
 });
+
+test('accepted PDF mail refreshes the workspace once and blocks duplicate submission even if refresh fails',async()=>{
+ const previous=globalThis.document;globalThis.document={createElement:tag=>new Element(tag)};
+ try{const order={id:'test'},rows=createDocumentRows(order),posts=[];let refreshes=0;
+ const record={id:'doc',type:'basis',title:'Fakturagrundlag',createdAt:'2026-10-28T10:00:00Z',version:1};
+ const api=async(url,method,input)=>{if(method==='POST'){posts.push(input);return {json:async()=>({status:'sent',documentId:'doc',to:'finance@example.test'})};}return {json:async()=>({company:{accountantEmail:'finance@example.test'},documents:[record],options:[]})};};
+ const panel=documentPanel(order,api,rows,{onChanged:async()=>{refreshes++;throw Error('refresh failed');}});await settle();
+ all(rows.root).find(n=>n.textContent==='Gennemse og send PDF').onclick();await settle();
+ const form=all(panel).find(n=>n.tag==='form'),submit=()=>form.onsubmit({preventDefault(){}});await Promise.all([submit(),submit()]);await submit();
+ assert.equal(posts.length,1);assert.equal(refreshes,1);assert.ok(all(panel).some(n=>n.textContent.includes('send ikke igen')));assert.ok(all(panel).some(n=>n.tag==='button'&&n.textContent==='Accepteret af mailserver'&&n.disabled));assert.match(rows.ensure('basis').statuses.get('mail'),/accepteret af mailserver.*finance@example.test/i);
+ }finally{globalThis.document=previous;}
+});
+test('a previously accepted PDF displays its recipient and timestamp after reopening the order',async()=>{
+ const previous=globalThis.document;globalThis.document={createElement:tag=>new Element(tag)};
+ try{const order={id:'test',attention:{correspondence:[{documentId:'doc',status:'sent',to:'finance@example.test',sentAt:'2026-10-28T16:15:00Z'}]}},rows=createDocumentRows(order);
+ documentPanel(order,async()=>({json:async()=>({documents:[{id:'doc',type:'basis',title:'Fakturagrundlag',version:1,createdAt:'2026-10-28T10:00:00Z'}],options:[]})}),rows);await settle();
+ assert.match(rows.ensure('basis').statuses.get('mail'),/accepteret af mailserver.*finance@example.test/i);assert.equal(rows.ensure('basis').sendPDF.textContent,'Gennemse og gensend PDF');
+ }finally{globalThis.document=previous;}
+});
