@@ -1,5 +1,4 @@
 import {brandEditorialBlocks} from './brand-editorial.mjs';
-import {editorialProductCard} from './product-editorial.mjs?v=9';
 import {pricedVariants} from './pf-visibility.mjs';
 import {isInternalShopBrand} from './shop-brand-policy.mjs';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -30,14 +29,6 @@ export function brandDiscoveryGroups(brands,products,prices,{category='',selecte
 }
 export function brandDiscoveryPage(brands,search,products=[],prices){
  const params=new URLSearchParams(search),groups=brandDiscoveryGroups(brands,products,prices,{category:params.get('kategori')||'',selected:params.get('brand')||''});
- let column=0;
- const content=groups.map(({brand,products:featured,image},index)=>{
-  const photo=`<div class="brand-grid-photo brand-grid-photo--${index%2?'right':'left'}" data-discovery-brand="${escape(brand.id)}" aria-label="${escape(brand.name)}">${image}</div>`;
-  const cards=featured.map(product=>editorialProductCard(product,prices));
-  const photoColumn=index%2?2:0,before=Math.min((photoColumn-column+4)%4,cards.length);
-  const tiles=[...cards.slice(0,before),photo,...cards.slice(before)];
-  column=(photoColumn+2+cards.length-before)%4;
-  return `<section class="brand-grid-group" data-discovery-brand="${escape(brand.id)}" aria-label="Udvalgt fra ${escape(brand.name)}">${tiles.join('')}</section>`;
- }).join('');
- return `<section class="home-featured wrap brand-discovery-feed"><h1 class="sr-only">Udforsk alle brands</h1><div class="product-grid editorial-grid brand-collage">${content}</div></section>`;
+ const content=groups.map(({brand,image})=>`<a class="brand-gallery-tile" data-discovery-brand="${escape(brand.id)}" href="/produkter?brand=${encodeURIComponent(brand.id)}" aria-label="Se produkter fra ${escape(brand.name)}">${image}</a>`).join('');
+ return `<section class="wrap brand-discovery-feed"><h1 class="sr-only">Udforsk alle brands</h1><div class="brand-gallery">${content}</div></section>`;
 }

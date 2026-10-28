@@ -2569,25 +2569,25 @@ body.storefront #main .pf-colour-picker .pf-colour-cmyk legend{position:absolute
 /* A calm menu invitation and a brand discovery page with coherent brand groups. */
 #brands-menu .brands-menu-all{display:inline-flex;align-items:center;justify-content:center;width:fit-content;gap:0;margin-top:12px;padding:10px 14px;border:0;border-radius:10px;background:#f0f3ef;color:#17201f;text-decoration:none;font-size:14px;font-weight:500;line-height:1.3}
 #brands-menu .brands-menu-all:hover{background:#e4ebe2;color:#17201f}
-/* Brand discovery follows the homepage product grid and larger image tiles. */
-.brand-discovery-feed{padding-top:0;padding-bottom:80px}
-.brand-grid-group{display:contents}
-.brand-grid-photo{grid-column:span 2;min-width:0;align-self:start;aspect-ratio:1;border-radius:18px;overflow:hidden}
-.brand-grid-photo .brand-lifestyle{margin:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0}
-.brand-grid-photo .brand-lifestyle img{width:100%;height:100%;object-fit:cover}
-.brand-grid-photo .brand-lifestyle-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;height:100%}
-.brand-grid-photo .brand-lifestyle-pair .brand-lifestyle{border-radius:18px}
-.brand-discovery-feed .product-grid{align-items:start}
-@media(min-width:1101px){
- .brand-grid-photo--left{grid-column:1/span 2}
- .brand-grid-photo--right{grid-column:3/span 2}
-}
-@media(max-width:1100px){.brand-grid-photo{aspect-ratio:1.4}}
+/* Image-only brand discovery: photographs link to their own brand assortment. */
+.brand-discovery-feed{padding-top:0;padding-bottom:64px}
+.brand-gallery{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:clamp(300px,38vw,580px);gap:24px}
+.brand-gallery-tile{display:block;grid-column:span 4;min-width:0;min-height:0;overflow:hidden;border-radius:18px;background:#edf0ec;text-decoration:none}
+.brand-gallery-tile:nth-child(7n+1){grid-column:span 8}
+.brand-gallery-tile:nth-child(7n+6),.brand-gallery-tile:nth-child(7n+7){grid-column:span 6}
+.brand-gallery-tile .brand-lifestyle{margin:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0}
+.brand-gallery-tile .brand-lifestyle img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
+.brand-gallery-tile:hover .brand-lifestyle img{transform:scale(1.025)}
+.brand-gallery-tile:focus-visible{outline:3px solid #cf4d22;outline-offset:4px}
+.brand-gallery-tile .brand-lifestyle-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;height:100%}
 @media(max-width:700px){
- .brand-grid-photo,.brand-grid-photo .brand-lifestyle-pair .brand-lifestyle{border-radius:12px}
- .brand-grid-photo .brand-lifestyle-pair{gap:8px}
- .brand-discovery-feed{padding-bottom:48px}
+ .brand-gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:clamp(220px,65vw,360px);gap:12px}
+ .brand-gallery-tile:nth-child(n){grid-column:span 1;border-radius:12px}
+ .brand-gallery-tile:nth-child(5n+1){grid-column:span 2}
+ .brand-gallery-tile .brand-lifestyle-pair{gap:8px}
+ .brand-discovery-feed{padding-bottom:36px}
 }
+@media(prefers-reduced-motion:reduce){.brand-gallery-tile .brand-lifestyle img{transition:none}}
 
 /* The studio shares the product page's sage selection cards and quiet controls. */
 body.storefront #main .pf-visual-designer{--studio-selected:#edf1ed;--studio-border:#8c9f90;--studio-ink:#36543d;font-family:var(--font-sans,Roboto,sans-serif);color:#17201f;background:#f5f6f3}

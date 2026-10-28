@@ -21,8 +21,9 @@ test('scoped links remain supported and unpriced products are not shown',()=>{
  assert.deepEqual(brandDiscoveryGroups(brands,products,prices,{selected:'karst'}).map(g=>g.brand.id),['karst']);
  assert.equal(brandDiscoveryGroups(brands,products,{available:false}).length,0);
 });
-test('collage contains selected product links without brand directory controls or all-products calls to action',()=>{
+test('image-only gallery links to its own brand without visible names, products or prices',()=>{
  const html=brandDiscoveryPage(brands,'?brand=karst',products,prices);
- assert.match(html,/brand-collage/);assert.match(html,/data-discovery-brand="karst"/);assert.match(html,/brand-campaign\/karst-/);
- assert.doesNotMatch(html,/Se alle|Se produktet|brand-filters|brand-discovery-all|href="\/produkter|data-discovery-brand="camelbak"/);assert.equal((html.match(/data-card-product=/g)||[]).length,3);
+ assert.match(html,/brand-gallery/);assert.match(html,/data-discovery-brand="karst"/);assert.match(html,/brand-campaign\/karst-/);
+ assert.match(html,/href="\/produkter\?brand=karst"/);assert.match(html,/aria-label="Se produkter fra Karst"/);
+ assert.doesNotMatch(html,/data-card-product|product-card|editorial-price|editorial-swatches|brand-collage-intro|>Karst<|data-discovery-brand="camelbak"/);
 });
