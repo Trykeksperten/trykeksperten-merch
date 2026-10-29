@@ -18,7 +18,7 @@ export async function automationPanel(container,api){
  const save=el('button','Gem automatik'),status=el('p');status.setAttribute('role','status');form.append(save,status);form.onsubmit=async e=>{e.preventDefault();save.disabled=true;try{await api('/api/pf-orders/automation-settings','POST',settings);status.textContent='Indstillinger gemt.';}catch(error){status.textContent=error.message;}finally{save.disabled=false;}};container.append(form,el('h3','Korrekturimport'));
  for(const row of [...data.intake||[],...(data.mailbox?.items||[]).filter(item=>item.status==='blocked').map(item=>({...item,mailbox:true}))]){if(!['blocked','review','processing'].includes(row.status)&&!row.conflict||row.status==='reviewed')continue;const p=el('p','Korrekturimport · '+(row.error||'Gennemgå korrekturen og send den til kunden.'));if(row.orderId){const a=el('a',' Åbn ordre');a.href='/admin/pf-orders#order='+row.orderId;p.append(a);}else p.append(document.createTextNode(' · Ingen sikker ordretilknytning. Find originalmailen i korrektur@smerch.dk.'));const done=el('button','Markér manuelt behandlet');done.type='button';done.onclick=async()=>{const note=prompt('Beskriv den manuelle behandling. Dette sender ingen mail og tilknytter ikke automatisk en ordre.');if(!note?.trim())return;done.disabled=true;try{await api('/api/pf-orders/'+(row.mailbox?'proof-mailbox/':'proof-intake/')+row.key+'/review','POST',{note});p.remove();}catch(e){p.append(el('span',e.message));done.disabled=false;}};p.append(done);container.append(p);}
  container.append(el('h3','Forsendelsesbeskeder'));
- for(const row of data.shipments||[]){const p=el('p'),link=el('a',(labels[row.status]||row.status)+' · '+(row.to||'Modtager mangler'));link.href='/admin/pf-orders#order='+row.orderId;p.append(link);container.append(p);}if(!data.shipments?.length)container.append(el('p','Ingen forsendelsesbeskeder endnu.'));
+ for(const row of data.shipments||[]){const p=el('p');if(row.status==='sent')p.className='step-complete';const link=el('a',(row.status==='sent'?'✓ ':'')+(labels[row.status]||row.status)+' · '+(row.to||'Modtager mangler'));link.href='/admin/pf-orders#order='+row.orderId;p.append(link);container.append(p);}if(!data.shipments?.length)container.append(el('p','Ingen forsendelsesbeskeder endnu.'));
  }catch(error){container.append(el('p',error.message));}
 }
 const shortStates={review:'Til gennemgang',blocked:'Kræver handling',sent:'Sendt',failed:'Afsendelse fejlet',uncertain:'Levering ukendt',sending:'Afsendes',pending:'Afventer afsendelse',complete:'Afsluttet',obsolete:'Tidligere link'};
@@ -40,7 +40,7 @@ export function orderAutomationPanel(order,api,{onChanged=async()=>{}}={}){
    if(!rows.length){content.append(el('p','Ingen beskeder i køen endnu.'));return;}
    const header=el('div');header.className='mail-history-head';header.setAttribute('aria-hidden','true');for(const label of ['','Tidspunkt','Handling','Udført af','Modtager','Status'])header.append(el('span',label));content.append(header);
    for(const row of rows){
-    const card=el('details'),summary=el('summary'),body=el('div');card.className='mail-history-row';body.className='mail-history-detail';
+    const card=el('details'),summary=el('summary'),body=el('div');card.className='mail-history-row'+(row.status==='sent'?' step-complete':'');body.className='mail-history-detail';
     const arrow=el('span','›');arrow.className='mail-history-chevron';arrow.setAttribute('aria-hidden','true');summary.append(arrow);
     const at=row.sentAt||row.lastSentAt;summary.setAttribute('aria-label',[timestamp(at),briefTitle(row),'Udført af: '+actorLabel(row.initiatedBy),'Modtager: '+(row.to||'Ikke registreret'),'Status: '+(labels[row.status]||row.status)].join(' · '));
     for(const [cls,text,title] of [
@@ -48,7 +48,7 @@ export function orderAutomationPanel(order,api,{onChanged=async()=>{}}={}){
      ['action',briefTitle(row),row.confirmation?'Ordrebekræftelse':row.proof?proofActionLabel(row.kind)+' · version '+row.version:'Forsendelsesmail'],
      ['actor',actorLabel(row.initiatedBy),'Igangsat af: '+actorLabel(row.initiatedBy)],
      ['to',row.to||'Ikke registreret','Modtager: '+(row.to||'Ikke registreret')],
-     ['status',shortStates[row.status]||row.status,labels[row.status]||row.status]
+     ['status',(row.status==='sent'?'✓ ':'')+(shortStates[row.status]||row.status),labels[row.status]||row.status]
     ]){const cell=el('span',text);cell.className='mail-history-'+cls;cell.title=title;summary.append(cell);}
     if(['blocked','failed','uncertain'].includes(row.status))card.className+=' needs-attention';
     body.append(el('h4',row.confirmation?'Ordrebekræftelse':row.proof?proofActionLabel(row.kind)+' · version '+row.version:'Forsendelsesmail'));

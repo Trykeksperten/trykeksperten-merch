@@ -232,3 +232,13 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 .document-action-row.document-is-sent{background:#eef6ef;box-shadow:inset 3px 0 #39804d;padding-left:12px;padding-right:12px}
 .document-readiness .document-sent-badge{color:#28613a;font-weight:650}
 .document-readiness .document-sent-detail{color:#28613a}
+
+/* Recorded completed steps, including automatic messages. */
+.step-complete{color:#28613a;background:#eef6ef;border-radius:8px;padding:8px 12px}
+.completed-steps{margin-top:16px;border-top:1px solid #d8e2d9;padding-top:12px}
+.completed-steps>summary{color:#28613a;font-weight:650;cursor:pointer}
+.completed-steps>div{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px}
+.completed-steps button{color:inherit;background:none;border:0;padding:0;text-align:left;font:inherit;cursor:pointer}
+.completed-steps small{color:inherit}
+.mail-history-row.step-complete .mail-history-status{font-weight:650;color:#28613a}
+@media(max-width:700px){.completed-steps>div{align-items:flex-start;flex-direction:column;gap:4px}}
