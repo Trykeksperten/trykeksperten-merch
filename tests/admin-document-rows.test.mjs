@@ -46,3 +46,17 @@ test('a previously accepted PDF displays its recipient and timestamp after reope
  assert.match(rows.ensure('basis').statuses.get('mail'),/accepteret af mailserver.*finance@example.test/i);assert.equal(rows.ensure('basis').sendPDF.textContent,'Gennemse og gensend PDF');
  }finally{globalThis.document=previous;}
 });
+
+test('sent documents stay green when readiness loads; pending mails and old proofs do not',()=>{
+ const previous=globalThis.document;globalThis.document={createElement:tag=>new Element(tag)};
+ try{const rows=createDocumentRows({proof:{version:2},attention:{confirmation:{status:'sent',to:'customer@example.test',sentAt:'2026-10-28T10:00:00Z'},shipments:[{id:'shipment',status:'sent'}],proofs:[{key:'old',kind:'invitation',version:1,status:'sent'},{key:'new',kind:'invitation',version:2,status:'pending'}]}});
+ rows.ensure('confirmation').setStatus('mail','Klar til genafsendelse.');
+ assert.match(rows.ensure('confirmation').row.className,/document-is-sent/);
+ assert.match(rows.ensure('shipment').row.className,/document-is-sent/);
+ assert.ok(!all(rows.ensure('confirmation').state).some(n=>n.textContent==='Klar til genafsendelse.'));
+ for(const type of ['proof','receipt','basis'])assert.ok(!rows.ensure(type).row.className.includes('document-is-sent'));
+ const basis=rows.ensure('basis');basis.setSent('pdf',{status:'sent'});assert.match(basis.row.className,/document-is-sent/);
+ basis.setSent('pdf',null);assert.ok(!basis.row.className.includes('document-is-sent'));
+ basis.setSent('pdf',{status:'uncertain'});assert.ok(!basis.row.className.includes('document-is-sent'));
+ }finally{globalThis.document=previous;}
+});

@@ -59,10 +59,19 @@ test('persistent shipment mail lock prevents a second process from sending',asyn
  const f=await fixture();await delivered(f);const row=(await shipmentMailStatus(f.pf.id))[0],lock=join(root,'shipment-mail',row.id+'.lock');await mkdir(lock);try{await assert.rejects(sendShipmentMail(f.pf.id,row.id,{transport:{sendMail:()=>{throw Error('must not send');}}}),/afstemning/);}finally{await rm(lock,{recursive:true});}
  assert.equal((await sendShipmentMail(f.pf.id,row.id,{transport:accepted})).status,'sent');
 });
-test('released automation remains disabled even for a fully shipped and captured eligible order',async()=>{
- const before=await readFile(join(root,'sales-ledger.json'),'utf8');await processSalesFinance({env:{...env,SMERCH_FINANCE_START_AT:'2020-01-01',SMERCH_AUTOMATIC_SHIPMENT_CAPTURE:'1',SMERCH_ACCOUNTANT_MAIL:'automatic',SMERCH_PAYMENT_RECEIPT_MAIL:'automatic'}});assert.equal(await readFile(join(root,'sales-ledger.json'),'utf8'),before);
+test('explicitly disabled shipment automation leaves eligible orders unchanged',async()=>{
+ const before=await readFile(join(root,'sales-ledger.json'),'utf8');await processSalesFinance({env:{...env,SMERCH_FINANCE_START_AT:'2020-01-01',SMERCH_AUTOMATIC_SHIPMENT_CAPTURE:'0',SMERCH_ACCOUNTANT_MAIL:'automatic',SMERCH_PAYMENT_RECEIPT_MAIL:'automatic'}});assert.equal(await readFile(join(root,'sales-ledger.json'),'utf8'),before);
 });
 test('shipment mail uses checkout product names even when PF line only has SKU',async()=>{
  const f=await fixture();f.pf.lines[0].productName=undefined;await writeFile(join(root,'orders',f.pf.id+'.json'),JSON.stringify(f.pf));await updateCheckout(f.order.id,o=>{o.productNames={demo:'Grafton kasket'};return o;});
  await delivered(f);const row=(await shipmentMailStatus(f.pf.id))[0];assert.match(row.text,/4 × Grafton kasket/);
+});
+
+test('worker captures a completed shipment automatically once and leaves mails for review',async()=>{
+ const f=await fixture(),start=new Date().toISOString();await updateCheckout(f.order.id,o=>({...o,createdAt:start}));
+ const options={env:{...env,SMERCH_FINANCE_START_AT:start},fetchImpl:f.fetchImpl};
+ await processSalesFinance(options);assert.equal(f.posts(),0);
+ await delivered(f);await processSalesFinance(options);await processSalesFinance(options);
+ assert.equal(f.posts(),1);assert.equal((await readCheckout(f.order.id)).status,'paid');
+ assert.equal((await financeView(f.order.id)).mail.find(m=>m.kind==='payment_receipt').status,'review');
 });
