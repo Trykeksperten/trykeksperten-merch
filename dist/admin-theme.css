@@ -242,3 +242,14 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 .completed-steps small{color:inherit}
 .mail-history-row.step-complete .mail-history-status{font-weight:650;color:#28613a}
 @media(max-width:700px){.completed-steps>div{align-items:flex-start;flex-direction:column;gap:4px}}
+
+/* One workspace for pending steps; documents remain available separately. */
+.order-action-hub{display:grid;gap:1rem}
+.order-action-hub>h3,.order-action-hub>p{margin:0}
+.order-action-buttons{display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-start}
+.order-action-item{max-width:32rem}
+.order-action-item>button{padding:.8rem 1.2rem;border-radius:999px}
+.order-action-item>button.action-needs-attention{border-color:#bd4b26;color:#943c20}
+.order-action-item>details{margin-top:.5rem;font-size:.9rem}
+.order-action-hub>.completed-steps{border-top:1px solid #d7ded8;padding-top:1rem}
+.order-action-hub>.order-finance-controls{border-top:1px solid #d7ded8;padding-top:1rem}

@@ -3,7 +3,7 @@ const el=(tag,text)=>{const n=document.createElement(tag);if(text)n.textContent=
 const money=n=>(n/100).toLocaleString('da-DK',{style:'currency',currency:'DKK'});
 const labels={review:'Afventer afsendelse',sending:'Afsendes – afstem før genforsøg',uncertain:'Udfald ukendt – kræver afstemning',sent:'Sendt',confirmed:'Bekræftet',failed:'Afvist',requested:'Afventer bekræftelse'};
 export function financePanel(order,api,{onChanged=async()=>{}}={}){
- const root=el('details'),body=el('div'),feedback=el('p');root.append(el('summary','Betaling og fakturagrundlag'),body,feedback);feedback.setAttribute('role','status');
+ const root=el('details'),body=el('div'),feedback=el('p');root.append(el('summary','Betaling og fakturagrundlag'),body,feedback);root.className='order-finance-controls';feedback.setAttribute('role','status');
  if(!order.checkoutId){body.append(el('p','Ingen betalingsordre tilknyttet.'));return root;}
  const url=`/api/pf-orders/${order.id}/finance`;let loaded=false,busy=false;
  let verified=false;
