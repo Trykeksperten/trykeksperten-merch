@@ -14,3 +14,16 @@ for(const fails of [false,true])test('opening finance checks Quickpay without ca
  root.ontoggle();assert.equal(calls.filter(Boolean).length,1);
  }finally{globalThis.document=previous;}
 });
+
+for(const status of ['sent','uncertain'])test('accountant basis completion is independent of returned invoice: '+status,async()=>{
+ const previous=globalThis.document;globalThis.document={createElement:t=>new Element(t)};
+ try{
+  const fixture={...data,shipments:[{key:'shipment1',shipDate:'2026-10-28',total:10000,invoiceStatus:'awaiting_accountant'}],mail:[{kind:'accountant_basis',shipmentKey:'shipment1',status}]};
+  const root=financePanel({id:'ord',checkoutId:'pay'},async()=>({json:async()=>fixture}));root.open=true;root.ontoggle();await new Promise(r=>setTimeout(r,20));
+  const text=all(root).map(n=>n.textContent).join('\n');
+  assert.doesNotMatch(text,/Afventer bogholder|afventer faktura fra bogholder/);
+  assert.equal(text.includes('✓ Sendt til bogholder'),status==='sent');
+  assert.equal(text.includes('Fakturagrundlag sendt til Financial Outsourcing.'),status==='sent');
+  assert.ok(all(root).some(n=>n.textContent.startsWith('Bekræft hævning')));
+ }finally{globalThis.document=previous;}
+});

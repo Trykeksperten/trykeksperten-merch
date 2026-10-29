@@ -48,3 +48,10 @@ test('monetary delivery allocations alone cannot release capture without PF comp
 });
 
 test('shipment capture can be explicitly disabled',()=>{assert.equal(financeConfiguration({SMERCH_AUTOMATIC_SHIPMENT_CAPTURE:'0'}).automaticCapture,false);assert.equal(financeConfiguration({}).automaticCapture,true);});
+
+test('external invoice is not an outstanding Smerch task, payment remains separate',()=>{
+ const order={totalIncVat:10000,legal:{customerType:'consumer'},shipping:{country:'DK'}};
+ const finance={shipments:[{total:10000,invoiceStatus:'awaiting_accountant'}],documents:[],payments:[]};
+ assert.deepEqual(financeSummary(order,finance).problems,['Hævning af afsendte varer afventer.']);
+ assert.deepEqual(financeSummary(order,{...finance,payments:[{type:'capture',amount:10000}]}).problems,[]);
+});
