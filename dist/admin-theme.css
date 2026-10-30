@@ -253,3 +253,8 @@ body.admin-pf-shell:has(#pf-nav:not([hidden])){display:grid;grid-template-column
 .order-action-item>details{margin-top:.5rem;font-size:.9rem}
 .order-action-hub>.completed-steps{border-top:1px solid #d7ded8;padding-top:1rem}
 .order-action-hub>.order-finance-controls{border-top:1px solid #d7ded8;padding-top:1rem}
+
+/* Completed tabs share one green surface, including the completion count. */
+.admin-proofs .order-tabs button.order-tab-complete{color:#28613a;background:#eef6ef}
+.admin-proofs .order-tabs button.order-tab-complete .step-complete{color:inherit;background:transparent}
+.admin-proofs .order-tabs button.order-tab-complete[aria-selected=true]{background:#e2efe5;border-bottom-color:#28613a}
