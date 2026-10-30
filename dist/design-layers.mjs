@@ -1,4 +1,4 @@
-import {availableTextFonts,defaultTextPlacement,textAlignments,textLineSpacings,validTextLineSpacing} from './pf-text.mjs?v=4';
+import {availableTextFonts,defaultTextPlacement,textAlignments,textLineSpacings,validTextLineSpacing} from './pf-text.mjs?v=5';
 export const clamp=(value,min=0,max=1)=>Math.min(max,Math.max(min,Number(value)||0));
 
 const number=value=>Number.isFinite(Number(value))?Number(value):0;
@@ -93,7 +93,7 @@ export function rotatedTextBounds(size={},rotation=0,option={}){
 
 export function normalizeTextPlacement(text='',placement={},option={}){
  const defaults=defaultTextPlacement(),font=availableTextFonts(option).includes(placement.font)?placement.font:defaults.font,align=textAlignments.includes(placement.align)?placement.align:defaults.align,lineSpacing=validTextLineSpacing(placement.lineSpacing)?Number(placement.lineSpacing):defaults.lineSpacing,letterSpacing=clamp(placement.letterSpacing??0,-.05,.5),scale=clamp(placement.scale??.24,.05,1),rotation=clamp(placement.rotation??0,-180,180),size=textPrintSize(text,{...placement,font,lineSpacing,letterSpacing,scale,rotation},option),bounds=rotatedTextBounds(size,rotation,option),center=normalizeCenter(placement.x??.5,placement.y??.5,bounds.widthFraction/2,bounds.heightFraction/2,optionPrintSize(option).round);
- return {...center,scale,font,align,lineSpacing,letterSpacing,rotation};
+ return {...center,scale,font,align,lineSpacing,letterSpacing,rotation,bold:placement.bold===true,italic:placement.italic===true,underline:placement.underline===true};
 }
 
 export function artworkGroupSize(artworks=[],option={}){

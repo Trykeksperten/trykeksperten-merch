@@ -1,3 +1,4 @@
+import {notebookPageInfo} from './notebook-pages.mjs?v=2';
 import {isHighEndProduct,isHighEndSelection} from './product-collections.mjs';
 import {matchesProductSearch} from './product-search.mjs';
 import {fromInc} from './customer-pricing.mjs';
@@ -63,7 +64,7 @@ export function sortPFProducts(products,mode,priceData,tierFor=()=> 'recommended
 }
 
 export function filterPFProducts(products,params,priceData,qualityTier){
- const q=(params.get('q')||'').toLocaleLowerCase('da'),category=params.get('kategori')||'',subcategory=canonicalSubcategory(params.get('underkategori')||''),brand=params.get('brand')||'',level=params.get('niveau')||'',color=params.get('farve')||'',insulation=params.get('isolering')||'',method=params.get('tryk')||'',price=params.get('pris')||'';
+ const q=(params.get('q')||'').toLocaleLowerCase('da'),category=params.get('kategori')||'',subcategory=canonicalSubcategory(params.get('underkategori')||''),brand=params.get('brand')||'',level=params.get('niveau')||'',color=params.get('farve')||'',insulation=params.get('isolering')||'',method=params.get('tryk')||'',price=params.get('pris')||'',paper=params.get('papirtype')||'';
  return products.filter(product=>{
   if(category==='caps'){if(!['Caps & hatte','Huer'].includes(product.category))return false;}else if(category==='bomuldstasker'){if(product.shopCategory!=='tasker'||!(/bomuld|cotton/i.test(product.name+' '+(product.material||''))||product.category==='Bomuldstasker'))return false;}else if(category&&product.shopCategory!==category)return false;
   if(subcategory&&product.category!==subcategory)return false;
@@ -71,6 +72,7 @@ export function filterPFProducts(products,params,priceData,qualityTier){
   if(isHighEndSelection(params)&&!isHighEndProduct(product))return false;
   if(level&&level!=='premium'&&qualityTier(product)!==level)return false;
   if(q&&!matchesProductSearch(product,q))return false;
+  if(paper&&!notebookPageInfo(product)?.layouts.includes(paper))return false;
   if(color&&!productColors(product,priceData).includes(color))return false;
   if(insulation&&product.insulation!==insulation)return false;
   if(method&&!productMethods(product,priceData).includes(method))return false;

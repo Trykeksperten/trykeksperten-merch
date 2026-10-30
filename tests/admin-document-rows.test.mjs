@@ -16,7 +16,7 @@ test('PDF and mail actions share one row per document and distinguish Financial 
  const order={id:'ord-test',shipping:{email:'customer@example.test'}},rows=createDocumentRows(order),calls=[];
  const api=async(url,method,payload)=>{calls.push({url,method,payload});if(url.endsWith('/resend'))return {json:async()=>[{action:'confirmation',available:true,label:'Gensend ordrebekræftelse'},{action:'tracking',available:false,reason:'Afventer tracking.'},{action:'invoice',available:false,reason:'Ingen bogført faktura.'},{action:'proof',available:false,reason:'Ingen aktiv korrektur.'}]};return {json:async()=>({company:{accountantEmail:'finance@example.test'},documents:[{id:'doc-1',type:'basis',title:'Fakturagrundlag',version:1,createdAt:'2026-10-24T10:00:00Z'}],options:[{type:'basis',reason:''},{type:'confirmation',reason:''},{type:'shipment',reason:'Afsendelse kræves.'},{type:'receipt',reason:'Betaling kræves.'}]})};};
  documentPanel(order,api,rows);resendPanel(order,api,async()=>{},rows);await settle();
- assert.equal(rows.entries.size,6);assert.equal(rows.root.children.length,6);const confirmation=rows.entries.get('confirmation');assert.ok(all(confirmation.row).some(n=>n.textContent==='Opret PDF'));assert.ok(all(confirmation.row).some(n=>n.textContent==='Gensend ordremail'));assert.equal(all(rows.root).filter(n=>n.textContent==='Ordrebekræftelse').length,1);assert.equal(rows.entries.get('basis').email.textContent,'finance@example.test');assert.equal(confirmation.email.textContent,'customer@example.test');assert.ok(all(rows.entries.get('basis').row).some(n=>n.textContent==='Gennemse og send PDF'));assert.ok(all(rows.entries.get('receipt').row).some(n=>n.tag==='button'&&n.disabled));assert.equal(calls.filter(c=>c.method==='POST').length,0);
+ assert.equal(rows.entries.size,5);assert.equal(rows.root.children.length,5);assert.equal(rows.entries.has('invoice'),false);const confirmation=rows.entries.get('confirmation');assert.ok(all(confirmation.row).some(n=>n.textContent==='Opret PDF'));assert.ok(all(confirmation.row).some(n=>n.textContent==='Gensend ordremail'));assert.equal(all(rows.root).filter(n=>n.textContent==='Ordrebekræftelse').length,1);assert.equal(rows.entries.get('basis').email.textContent,'finance@example.test');assert.equal(confirmation.email.textContent,'customer@example.test');assert.ok(all(rows.entries.get('basis').row).some(n=>n.textContent==='Gennemse og send PDF'));assert.ok(all(rows.entries.get('receipt').row).some(n=>n.tag==='button'&&n.disabled));assert.equal(calls.filter(c=>c.method==='POST').length,0);
  }finally{globalThis.document=previous;}
 });
 test('clicking a mail action previews the exact recipient and never sends without a second action',async()=>{
@@ -59,4 +59,19 @@ test('sent documents stay green when readiness loads; pending mails and old proo
  basis.setSent('pdf',null);assert.ok(!basis.row.className.includes('document-is-sent'));
  basis.setSent('pdf',{status:'uncertain'});assert.ok(!basis.row.className.includes('document-is-sent'));
  }finally{globalThis.document=previous;}
+});
+
+test('invoice orders record manual sending and show green status after reopening without a mailserver claim',async()=>{
+ const previous=globalThis.document,previousConfirm=globalThis.confirm;globalThis.document={createElement:tag=>new Element(tag)};globalThis.confirm=()=>true;
+ try{
+ const checkout={id:'pay-test',paymentProvider:'bank_transfer',shipping:{email:'customer@example.test'},bankPayment:{}},rows=createDocumentRows({},checkout),posts=[];
+ const api=async(url,method,input)=>{if(method==='POST'){posts.push({url,input});return {ok:true,json:async()=>({})};}return {json:async()=>[{action:'invoice',label:'Gensend faktura',available:false}]};};
+ resendPanel({id:'ord-test'},api,async()=>{},rows);await settle();
+ const button=all(rows.root).find(n=>n.tag==='button'&&n.textContent==='Faktura sendt');assert.ok(button);await button.onclick();
+ assert.deepEqual(posts,[{url:'/api/admin/checkouts/pay-test/bank-payment',input:{action:'invoice_sent',confirmed:true}}]);assert.equal(button.disabled,true);
+ const reopened=createDocumentRows({}, {...checkout,bankPayment:{invoicedAt:'2026-10-30T19:00:00Z'}}),entry=reopened.ensure('invoice');
+ assert.match(entry.row.className,/document-is-sent/);
+ assert.ok(all(entry.state).some(n=>n.textContent==='Faktura sendt · manuelt fra hello@smerch.dk'));
+ assert.ok(!all(entry.state).some(n=>/mailserver|markér den som sendt/.test(n.textContent)));
+ }finally{globalThis.document=previous;globalThis.confirm=previousConfirm;}
 });

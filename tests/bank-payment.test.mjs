@@ -61,3 +61,15 @@ test('registering full payment starts PF handoff automatically; partial payment 
  await registerBankPaymentAndHandoff(o.id,final,{actor,handoff:successful});assert.equal(calls,2);
  }finally{if(previous===undefined)delete process.env.SMERCH_DATA_DIR;else process.env.SMERCH_DATA_DIR=previous;await rm(root,{recursive:true,force:true});}
 });
+
+test('manual invoice sent is recorded once, permits verified bank receipts and never marks an order paid by itself',()=>{
+ const order=seed(),now=Date.now();
+ assert.throws(()=>applyBankPayment(order,{action:'invoice_sent'},{actor}),/Bekræft/);
+ assert.throws(()=>applyBankPayment({...order,paymentProvider:'quickpay'},{action:'invoice_sent',confirmed:true},{actor}),/bankbetaling/);
+ applyBankPayment(order,{action:'invoice_sent',confirmed:true},{actor,now});
+ applyBankPayment(order,{action:'invoice_sent',confirmed:true},{actor,now:now+1000});
+ assert.equal(order.events.filter(e=>e.type==='bank_invoice_sent').length,1);
+ assert.equal(order.bankPayment.invoicedAt,new Date(now).toISOString());
+ assert.equal(order.status,'awaiting_bank_payment');assert.equal(supplierPaymentReady(order),false);
+ receipt(order,order.totalIncVat);assert.equal(order.status,'paid');
+});

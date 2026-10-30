@@ -1,8 +1,8 @@
 import {loadArtworkPreview} from './artwork-preview.mjs';
 import {placementOptionAssets} from './pf-rules.mjs?v=2';
-import {artworkPrintSize,textPrintSize,optionPrintSize,printableBounds,containMappedBounds,proportionalPrintBounds} from './design-layers.mjs?v=7';
-import {fontFamily} from './pf-text.mjs?v=4';
-import {foilFinish,isFoilOption} from './foil-options.mjs';
+import {artworkPrintSize,textPrintSize,optionPrintSize,printableBounds,containMappedBounds,proportionalPrintBounds} from './design-layers.mjs?v=8';
+import {fontFamily} from './pf-text.mjs?v=5';
+import {decorationPreviewColor} from './decoration-preview.mjs';
 import {recolorArtworkPreview,tintArtworkPreview} from './vector-preview.mjs?v=2';
 
 const loadImage=src=>new Promise((resolve,reject)=>{
@@ -17,7 +17,7 @@ async function productDetail(id){
  if(!products.has(id))products.set(id,fetch('/api/pf-product/'+encodeURIComponent(id)).then(r=>{if(!r.ok)throw Error();return r.json();}).catch(error=>{products.delete(id);throw error;}));
  return products.get(id);
 }
-export async function renderCartMockup(product,option,design,{loadPreview=loadArtworkPreview}={}){
+export async function renderCartMockup(product,option,design,{loadPreview=loadArtworkPreview,variant}={}){
  const assets=placementOptionAssets(product,option);
  if(!assets.ready)throw Error('Der mangler et placeringsbillede.');
  const image=await loadImage(assets.svg?'/api/pf-placement-art?src='+encodeURIComponent(assets.svg):'/api/pf-imprint-image?src='+encodeURIComponent(assets.image));
@@ -38,14 +38,14 @@ export async function renderCartMockup(product,option,design,{loadPreview=loadAr
   ctx.scale(zone.width*1024/print.width,zone.height*1024/print.height);
   ctx.rotate((placement.rotation||0)*Math.PI/180);draw();ctx.restore();
  };
- const foil=isFoilOption(option)?foilFinish(design.foilFinish)?.hex:null;
+ const previewColor=decorationPreviewColor(option,{foil:design.foilFinish,productHex:variant?.hex});
  const artworks=design.artworks?.length?design.artworks:design.logo?[{logo:design.logo,x:.5,y:.5,scale:.34}]:[];
  for(const art of artworks){
   const file=await loadPreview(art.logo);
   if(!file)throw Error('Logofilen kan ikke vises som skitse.');
   let url;
   try{
-   url=foil?await tintArtworkPreview(file,foil):art.paletteColors?.length&&art.logo.recolorable?await recolorArtworkPreview(file,art.paletteColors):art.color&&art.logo.recolorable?await tintArtworkPreview(file,art.color):null;
+   url=previewColor?await tintArtworkPreview(file,previewColor):art.paletteColors?.length&&art.logo.recolorable?await recolorArtworkPreview(file,art.paletteColors):art.color&&art.logo.recolorable?await tintArtworkPreview(file,art.color):null;
    url ||= URL.createObjectURL(file);
    const logo=await loadImage(url),size=artworkPrintSize(art,option);
    place(art,()=>ctx.drawImage(logo,-size.widthMm/2,-size.heightMm/2,size.widthMm,size.heightMm));
@@ -54,13 +54,13 @@ export async function renderCartMockup(product,option,design,{loadPreview=loadAr
  if(design.text?.trim()){
   await document.fonts.ready;
   const placement={x:.5,y:.5,scale:.24,lineSpacing:1.25,align:'center',...design.textPlacement},size=textPrintSize(design.text,placement,option),lines=design.text.trim().split(/\r?\n/);
-  ctx.font='600 100px '+fontFamily(placement.font);
+  const fontStyle=(placement.italic?'italic ':'')+(placement.bold?'700 ':'400 ');ctx.font=fontStyle+'100px '+fontFamily(placement.font);
   const measured=Math.max(1,...lines.map(line=>ctx.measureText(line||' ').width+Math.max(0,Array.from(line).length-1)*(placement.letterSpacing||0)*100)),spacing=placement.lineSpacing;
   const fontSize=Math.min(size.widthMm*100/measured,size.heightMm/(.82*(1+(lines.length-1)*spacing)));
   place(placement,()=>{
-   ctx.font='600 '+fontSize+'px '+fontFamily(placement.font);ctx.fillStyle=foil||design.ink||'#17201f';ctx.textAlign=placement.align;ctx.textBaseline='middle';
+   ctx.font=fontStyle+fontSize+'px '+fontFamily(placement.font);ctx.fillStyle=previewColor||design.ink||'#17201f';ctx.textAlign=placement.align;ctx.textBaseline='middle';
    const x=placement.align==='left'?-size.widthMm/2:placement.align==='right'?size.widthMm/2:0;
-   lines.forEach((line,i)=>{const y=(i-(lines.length-1)/2)*fontSize*.82*spacing,gap=(placement.letterSpacing||0)*fontSize;if(!gap){ctx.fillText(line,x,y);return;}const chars=Array.from(line),width=ctx.measureText(line).width+Math.max(0,chars.length-1)*gap;let cursor=x-(placement.align==='left'?0:placement.align==='right'?width:width/2);ctx.save();ctx.textAlign='left';for(const char of chars){ctx.fillText(char,cursor,y);cursor+=ctx.measureText(char).width+gap;}ctx.restore();});
+   lines.forEach((line,i)=>{const y=(i-(lines.length-1)/2)*fontSize*.82*spacing,gap=(placement.letterSpacing||0)*fontSize;if(placement.underline&&line){const width=ctx.measureText(line).width+Math.max(0,Array.from(line).length-1)*gap,left=x-(placement.align==='left'?0:placement.align==='right'?width:width/2);ctx.fillRect(left,y+fontSize*.43,width,Math.max(fontSize*.05,.1));}if(!gap){ctx.fillText(line,x,y);return;}const chars=Array.from(line),width=ctx.measureText(line).width+Math.max(0,chars.length-1)*gap;let cursor=x-(placement.align==='left'?0:placement.align==='right'?width:width/2);ctx.save();ctx.textAlign='left';for(const char of chars){ctx.fillText(char,cursor,y);cursor+=ctx.measureText(char).width+gap;}ctx.restore();});
   });
  }
  canvas.setAttribute('role','img');canvas.setAttribute('aria-label','Dit design · '+option.impLocation+' · '+option.impMethod);
@@ -101,7 +101,7 @@ export function bindCartMockups(root,lines){
     try{
      const product=await productDetail(line.productId),variant=product.variants.find(v=>v.sku===line.sku),option=variant?.options.find(o=>o.id===design.optionId);
      if(!option)throw Error('Placeringen findes ikke længere.');
-     const canvas=await renderCartMockup(product,option,design);
+     const canvas=await renderCartMockup(product,option,design,{variant});
      if(!target.isConnected)return;
      const image=document.createElement('img'),button=document.createElement('button'),captionText=option.impLocation+' · Dit design';
      image.src=canvas.toDataURL('image/png');image.alt=`Mockup af ${product.name}, ${option.impLocation}`;

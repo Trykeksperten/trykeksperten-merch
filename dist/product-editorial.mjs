@@ -1,3 +1,4 @@
+import {notebookPaperBadge} from './notebook-pages.mjs?v=2';
 import {productDisplayVariant} from './product-display-variant.mjs?v=2';
 import {fromInc,vatLabel} from './customer-pricing.mjs';
 import {pricedVariants} from './pf-visibility.mjs';
@@ -74,5 +75,5 @@ export function editorialProductCard(product,prices,preferredSku){
  const variants=pricedVariants(product,prices),image=productDisplayVariant(product,variants,preferredSku)?.images[0];
  if(!image)return '';
  const price=cardPrice(product,prices,image);
- return `<article class="product-card" data-card-product="${escape(product.id)}"><a class="product-image" href="/design/${escape(product.id)}"><img src="${escape(image)}" alt="${escape(product.name)}" loading="lazy" decoding="async" width="500" height="500"></a><div class="card-meta">${productColorSwatches(variants,image)}</div><a class="product-title" href="/design/${escape(product.id)}">${escape(product.name)}</a>${price?`<p class="editorial-price">${cardPriceHTML(price)}</p>`:''}</article>`;
+ return `<article class="product-card" data-card-product="${escape(product.id)}"><a class="product-image" href="/design/${escape(product.id)}">${notebookPaperBadge(product)}<img src="${escape(image)}" alt="${escape(product.name)}" loading="lazy" decoding="async" width="500" height="500"></a><div class="card-meta">${productColorSwatches(variants,image)}</div><a class="product-title" href="/design/${escape(product.id)}">${escape(product.name)}</a>${price?`<p class="editorial-price">${cardPriceHTML(price)}</p>`:''}</article>`;
 }

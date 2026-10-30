@@ -37,3 +37,10 @@ test('supplier text is escaped', () => {
   assert.doesNotMatch(html, /<img/);
   assert.match(html, /&lt;img/);
 });
+
+test('paper type is inferred from actual page descriptions and preserves mixed layouts',()=>{
+ for(const [description,key] of [['80 linjerede sider.','lined'],['192 kvadrerede sider.','squared'],['240 prikkede sider.','dotted'],['192 sider med blankt papir.','blank']])assert.deepEqual(notebookPageInfo({name:'Notesbog',description}).layouts,[key]);
+ assert.deepEqual(notebookPageInfo({name:'Notesbog',description:'40 sider med halvt prikket og halvt blankt layout.'}).layouts,['dotted','blank']);
+ assert.deepEqual(notebookPageInfo({name:'Notesbog - blank',description:'Blanke sider. Findes også med linjeret papir.'}).layouts,['blank']);
+ assert.deepEqual(notebookPageInfo({name:'Notesbog',description:'Sort omslag. Fås også med prikkede sider.'}).layouts,[]);
+});

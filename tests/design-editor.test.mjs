@@ -72,3 +72,19 @@ test('server preserves requested text colour codes and rejects codes inconsisten
  const cmyk={...design,ink:'#ff0000',inkSpec:{model:'cmyk',values:[0,100,100,0]}};
  assert.deepEqual(sanitizeDesignLine({products:[product]},{...line,decorations:[cmyk]}).decorations[0].inkSpec.values,[0,100,100,0]);
 });
+
+test('text formatting survives normalization and server validation, including combined styles',async()=>{
+ const product=await loadPFProduct('pf-120632'),variant=product.variants[0],option=variant.options[0];
+ for(const flags of [{bold:true,italic:true,underline:true},{bold:false,italic:false,underline:false},{bold:true,italic:false,underline:true}]){
+  const textPlacement=normalizeTextPlacement('SMERCH',{x:.5,y:.5,scale:.24,...flags},option),size=designGroupSize([],'SMERCH',textPlacement,option);
+  const design={optionId:option.id,width:Math.round(size.widthMm*10)/10,height:Math.round(size.heightMm*10)/10,colors:1,text:'SMERCH',textPlacement};
+  const line={productId:product.id,sku:variant.sku,quantity:25,decorations:[design]};
+  const saved=sanitizeDesignLine({products:[product]},JSON.parse(JSON.stringify(line))).decorations[0].textPlacement;
+  for(const key of ['bold','italic','underline']){
+   assert.equal(saved[key],flags[key]);
+   assert.throws(()=>sanitizeDesignLine({products:[product]},{...line,decorations:[{...design,textPlacement:{...textPlacement,[key]:'true'}}]}),/formatering/);
+  }
+ }
+ const legacy=normalizeTextPlacement('Ældre tekst',{},option);
+ assert.equal(legacy.bold,false);assert.equal(legacy.italic,false);assert.equal(legacy.underline,false);
+});

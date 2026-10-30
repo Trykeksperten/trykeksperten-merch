@@ -1,4 +1,4 @@
-import {renderCartMockup,mailMockupBase64} from './cart-mockup.mjs?v=2';
+import {renderCartMockup,mailMockupBase64} from './cart-mockup.mjs?v=9';
 import {createVectorPreview} from './vector-preview.mjs?v=2';
 const status=document.querySelector('#status'),save=document.querySelector('#save'),previews=document.querySelector('#previews');
 const id=new URLSearchParams(location.search).get('order');
@@ -11,7 +11,7 @@ try{
   const product=source.catalog.products.find(p=>p.id===line.productId),variant=product.variants.find(v=>v.sku===line.sku);
   for(const [decorationIndex,design] of line.decorations.entries()){
    status.textContent='Genskaber mockup…';
-   const canvas=await renderCartMockup(product,variant.options.find(o=>o.id===design.optionId),design,{loadPreview});
+   const canvas=await renderCartMockup(product,variant.options.find(o=>o.id===design.optionId),design,{loadPreview,variant});
    const base64=mailMockupBase64(canvas);
    canvas.style.cssText='max-width:360px;width:100%;height:auto';previews.append(canvas);
    mockups.push({lineIndex,decorationIndex,base64});

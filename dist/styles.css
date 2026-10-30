@@ -2628,5 +2628,28 @@ body.storefront #main .pf-visual-designer :is(.pf-layer-controls,.pf-text-contro
 body.storefront #main .pf-method-card.pf-method-unavailable{opacity:1;background:#f7f8f6;border-style:dashed;color:#626c66;cursor:not-allowed}
 body.storefront #main .pf-method-card.pf-method-unavailable strong{color:#626c66}
 
+/* Supplier page information beside notebook selection. */
 .pf-notebook-pages{margin:0 0 20px;padding:14px 16px;background:#eef2ee;border:1px solid #d5ddd6;border-radius:12px}
 .pf-notebook-pages p{margin:6px 0 0;font-weight:400}
+
+/* Text formatting in the design studio. */
+.pf-visual-designer .pf-text-style{display:flex;gap:6px;grid-column:1/-1}
+.pf-visual-designer .pf-text-style button{width:44px;min-height:40px;padding:6px;border:1px solid var(--line);border-radius:8px;background:#fff;color:#17201f;font-size:19px}
+body.storefront #main .pf-visual-designer .pf-text-style button[aria-pressed="true"]{background:#edf1ed;border-color:#879e8b;color:#253b2d;box-shadow:inset 0 0 0 1px #879e8b}
+
+/* Supplier paper layout: visible before configuration and on catalogue cards. */
+body.storefront #main .pf-notebook-pages{font-size:17px;line-height:1.5;padding:18px 20px;margin-bottom:22px}
+body.storefront #main .pf-notebook-pages strong{font-size:19px}
+body.storefront #main .pf-notebook-pages p{font-size:17px}
+.pf-paper-badge{display:inline-flex;gap:4px;align-items:center;color:#26352e}
+.pf-paper-badge svg{display:block;flex-shrink:0}
+.pf-paper-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.product-image{position:relative}
+.product-image>.pf-paper-badge{position:absolute;z-index:2;top:14px;left:14px;padding:5px;border-radius:5px;background:rgba(255,255,255,.8);pointer-events:none}
+.pf-notebook-pages>.pf-paper-badge{float:right;margin-left:12px}
+@media(max-width:600px){body.storefront #main .pf-notebook-pages,body.storefront #main .pf-notebook-pages p{font-size:16px}.product-image>.pf-paper-badge{top:9px;left:9px}.product-image>.pf-paper-badge svg{width:19px;height:26px}}
+
+/* Keep the current print method prominent while editing on every screen size. */
+body.storefront #main .pf-visual-designer #pf-editor-subtitle.pf-selected-print-method{display:inline-flex;align-items:center;width:fit-content;max-width:100%;box-sizing:border-box;margin-top:7px;padding:6px 11px;border:1px solid #8c9f90;border-radius:8px;background:#edf1ed;color:#253b2d;font-size:15px;font-weight:600;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
+@media(max-width:700px){body.storefront #main .pf-visual-designer #pf-editor-subtitle.pf-selected-print-method{margin-top:5px;padding:5px 8px;font-size:13px}}
+@media(max-width:1024px){body.storefront #main .pf-visual-designer>.pf-designer-heading{display:flex;flex-direction:row;align-items:center;flex-shrink:0}body.storefront #main .pf-visual-designer>.pf-designer-heading>div:first-child{flex:1;min-width:0;max-width:none}}

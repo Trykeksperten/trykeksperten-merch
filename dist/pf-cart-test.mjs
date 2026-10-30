@@ -1,5 +1,5 @@
 import {renderTestColourChoice} from './pf-test-colours.mjs';
-import {renderCartMockup,mailMockupBase64} from './cart-mockup.mjs?v=4';
+import {renderCartMockup,mailMockupBase64} from './cart-mockup.mjs?v=9';
 import {readCart} from './pf-cart.mjs';
 import {loadFile} from './storage.mjs';
 import {artworkColorChanges,assertProductionColors} from './artwork-production-colors.mjs';
@@ -38,7 +38,7 @@ export function bindCartTest(){
    const product=await response.json(),variant=product.variants.find(v=>v.sku===line.sku);
    for(const [decorationIndex,design] of (line.decorations||[]).entries()){
     const option=variant?.options.find(o=>o.id===design.optionId);if(!option)throw Error('Trykplaceringen mangler til mockuppet.');
-    const base64=mailMockupBase64(await renderCartMockup(product,option,design));
+    const base64=mailMockupBase64(await renderCartMockup(product,option,design,{variant}));
     if(base64.length>2*1024*1024||mockups.reduce((n,m)=>n+m.base64.length,0)+base64.length>8*1024*1024)throw Error('Mockups er for store. Test færre placeringer ad gangen.');
     mockups.push({lineIndex,decorationIndex,base64});
    }

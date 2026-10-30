@@ -1,6 +1,7 @@
 // Completion is derived from recorded outcomes, never from an available button.
 export function completedSteps(order,checkout,context=order.attention||{}){
  const rows=[],add=(id,tab,title,at,to)=>rows.push({id,tab,title,at,to});
+ if(checkout?.paymentProvider==='bank_transfer'&&checkout.bankPayment?.invoicedAt)add('manual-invoice-sent','documents','Faktura manuelt sendt',checkout.bankPayment.invoicedAt,checkout.billing?.email||checkout.shipping?.email);
  const p=order.proof,d=order.decision,current=d&&Number(d.version)===Number(p?.version);
  if(p)add('proof-received','proof','Korrektur modtaget fra PF',p.receivedAt);
  if(current){add('customer-decision','proof',d.actor==='customer'?(d.decision==='approve'?'Kundens godkendelse modtaget':'Kundens ændringsønske modtaget'):'Korrektursvar registreret',d.createdAt);

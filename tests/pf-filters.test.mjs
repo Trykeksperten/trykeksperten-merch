@@ -44,3 +44,17 @@ test('high-end selection and old premium links exclude budget products even with
  }
  assert.equal(filterPFProducts(products,new URLSearchParams(),{},()=> 'recommended').length,2);
 });
+
+test('paper layout filters notebooks before opening a product and combines with category and brand',()=>{
+ const products=[
+ {id:'blank',name:'Notesbog - blank',shopCategory:'papir',brandId:'a',variants:[],description:'192 blanke sider. Fås også med linjeret papir.'},
+ {id:'lined',name:'Notesbog',shopCategory:'papir',brandId:'a',variants:[],description:'80 linjerede sider.'},
+ {id:'dotted',name:'Notesbog',shopCategory:'papir',brandId:'b',variants:[],description:'240 prikkede sider.'},
+ {id:'unknown',name:'Notesbog',shopCategory:'papir',brandId:'a',variants:[],description:'Blåt omslag.'}
+ ];
+ const select=query=>filterPFProducts(products,new URLSearchParams(query),{},()=> 'recommended').map(p=>p.id);
+ assert.deepEqual(select('kategori=papir&papirtype=blank'),['blank']);
+ assert.deepEqual(select('kategori=papir&papirtype=lined&brand=a'),['lined']);
+ assert.deepEqual(select('kategori=papir&papirtype=dotted&brand=a'),[]);
+ assert.deepEqual(select('kategori=papir'),['blank','lined','dotted','unknown']);
+});
