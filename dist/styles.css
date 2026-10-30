@@ -2627,3 +2627,6 @@ body.storefront #main .pf-visual-designer :is(.pf-layer-controls,.pf-text-contro
 /* Keep the unprinted choice visible, including supplier restrictions. */
 body.storefront #main .pf-method-card.pf-method-unavailable{opacity:1;background:#f7f8f6;border-style:dashed;color:#626c66;cursor:not-allowed}
 body.storefront #main .pf-method-card.pf-method-unavailable strong{color:#626c66}
+
+.pf-notebook-pages{margin:0 0 20px;padding:14px 16px;background:#eef2ee;border:1px solid #d5ddd6;border-radius:12px}
+.pf-notebook-pages p{margin:6px 0 0;font-weight:400}
