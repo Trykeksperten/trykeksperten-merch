@@ -1,9 +1,8 @@
 import {invoiceBasisFilename} from './dist/document-filenames.mjs';
 import {documentOrderNumber,withDocumentOrderNumbers} from './lib/document-order-number.mjs';
+import {queueRefundBasis} from './lib/refund-basis.mjs';
 import {eproofCallbackAuthorized,eproofReadiness,eproofConnectionCheck} from './lib/pf-eproof-api.mjs';
 import {confirmOrderDelivery,revokeOrderDelivery,receiveEproofAPI,sendEproofDecision} from './lib/pf-orders.mjs';
-import {bankInvoiceBasis} from './lib/bank-invoice-basis.mjs';
-import {prepareBankPayment,registerBankPaymentAndHandoff,publicBankPayment} from './lib/bank-payment.mjs';
 import {publicPFDelivery} from './dist/order-delivery-status.mjs';
 import {pfReviewState,approvePFReview} from './lib/pf-order-review.mjs';
 import {recordCheckoutMarketing} from './lib/checkout-marketing.mjs';
@@ -19,6 +18,10 @@ import {retryProofMailRecord} from './lib/proof-mail.mjs';
 import {automationSettings,saveAutomationSettings} from './lib/automation-settings.mjs';
 import {shipmentMailStatus,sendShipmentMail,reconcileShipmentMail,processShipmentMail} from './lib/shipment-mail.mjs';
 import {sendOrderDocument} from './lib/order-document-send.mjs';
+import {backofficeHTTP} from './lib/backoffice/http.mjs';
+import {databaseEnabled,databaseHealth,assertStorageMode} from './lib/backoffice/database.mjs';
+import {importLegacy} from './lib/backoffice/migration.mjs';
+import {runJobs} from './lib/backoffice/jobs.mjs';
 import {companySettings,saveCompanySettings,documentSeed,documentEligibility,reviewDocument,createOrderDocument,readOrderDocument,listOrderDocuments} from './lib/order-documents.mjs';
 import {resendOptions,prepareResend,sendResend,readResendDraft} from './lib/order-resend.mjs';
 import {readCorrespondence,addCorrespondence} from './lib/order-correspondence.mjs';
@@ -61,11 +64,13 @@ import {validateCheckoutConsent} from './dist/legal-consent.mjs';
 import {listProductDocuments,downloadProductDocument} from './lib/pf-documents.mjs';
 import {adminPriceSummary,adminProductPricing,listPFPrintPrices,listPFProductPrices,listPFProductTiers,listPFStock,loadPricing,loadStock,quotePFCart,estimatePFLine} from './lib/pf-pricing.mjs';
 import {authorized,callbackAuthorized,proofInboxAuthorized,gatewayTestOrderInput,prepareOrder,dispatchOrder,readOrder,listOrders,applyPFNotificationBatch,recordProof,readProofFile,decideProof,recordApprovalDelivery,recordExternalApproval} from './lib/pf-orders.mjs';
-import {createAdminSession,adminSessionActor,adminSessionAuthorized,closeAdminSession,loginAllowed} from './lib/admin-auth.mjs';
+import {createAdminSession,adminSessionActor,adminSessionAuthorized,closeAdminSession,loginAllowed,staffSession} from './lib/admin-auth.mjs';
 import {gatewayRequirements} from './lib/pf-gateway.mjs';
 import {applyStripeEvent,cancelCheckout,checkoutConfiguration,checkoutFulfillmentAssessment,checkoutPublic,createStripeSession,listCheckouts,persistCheckout,persistCheckoutArtwork,prepareCheckout,validateDelivery,readCheckout,reauthorizeCheckout,refreshAuthorizationExpiry,updateCheckout,verifyStripeEvent} from './lib/checkout.mjs';
 import {readSignedArtwork} from './lib/pf-artwork.mjs';
 import {verifyPFRelaySignature} from './lib/webhook-signing.mjs';
+import {bankInvoiceBasis} from './lib/bank-invoice-basis.mjs';
+import {prepareBankPayment,registerBankPaymentAndHandoff,publicBankPayment} from './lib/bank-payment.mjs';
 import {refreshQuickpayStatus,paymentStatusSummary,getQuickpayPayment,applyQuickpayCallback,cancelQuickpay,createQuickpayLink,renewQuickpay,verifyQuickpayCallback} from './lib/quickpay.mjs';
 import {approveProofPayment} from './lib/pf-orders.mjs';
 import {captureApprovedCheckout,handoffAuthorizedCheckout,handoffConfiguration,pfAssetsForGroup,setPFColours,validateRenewal} from './lib/order-flow.mjs';
@@ -105,10 +110,12 @@ async function quoteOnlyProductIds(catalog,priceResult){
  }catch{return [];}
 }
 const handleRequest=async(req,res)=>{
+ if(await backofficeHTTP(req,res,{readJSON,json}))return;
  if(blocksLaunchOrder(new URL(req.url,'http://localhost').pathname,req.method)){json(res,503,{error:launchMessage});return;}
  res.setHeader('X-Content-Type-Options','nosniff');
  res.setHeader('Cache-Control','no-store');
  if(/^\/(?:api|admin)(?:\/|$)/.test(new URL(req.url,'http://localhost').pathname))res.setHeader('X-Robots-Tag','noindex');
+ if(req.url==='/health'&&databaseEnabled()&&['GET','HEAD'].includes(req.method)){try{const status=databaseHealth();json(res,status.integrity?200:503,{status:status.integrity?'ok':'unhealthy'});}catch{json(res,503,{status:'unhealthy'});}return;}
  if(req.url==='/health'&&['GET','HEAD'].includes(req.method)){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify({status:'ok'}));return;}
  const legalURL=new URL(req.url,'http://localhost');
  const customerPath=/^\/api\/customer-proofs\/(ord-[a-f0-9-]{36})(?:\/(file|decision))?$/.exec(legalURL.pathname);
@@ -249,8 +256,8 @@ const handleRequest=async(req,res)=>{
  if(req.url==='/api/admin/login'&&req.method==='POST'){
   try{if(!loginAllowed(req)){json(res,429,{error:'For mange forsøg. Prøv igen senere.'});return;}const input=await readJSON(req,8192);if(createAdminSession(req,res,input)){json(res,200,{authenticated:true});return;}json(res,401,{error:'Forkert brugernavn eller adgangskode.'});}catch{json(res,400,{error:'Login kunne ikke gennemføres.'});}return;
  }
- if(req.url==='/api/admin/session'&&req.method==='GET'){json(res,200,{authenticated:adminSessionAuthorized(req)});return;}
- if(req.url==='/api/admin/logout'&&req.method==='POST'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Du er ikke logget ind.'});return;}closeAdminSession(req,res);json(res,200,{authenticated:false});return;}
+ if(req.url==='/api/admin/session'&&req.method==='GET'){json(res,200,{authenticated:adminSessionAuthorized(req)||!!staffSession(req),role:staffSession(req)?.role||null});return;}
+ if(req.url==='/api/admin/logout'&&req.method==='POST'){if(!adminSessionAuthorized(req)&&!staffSession(req)){json(res,401,{error:'Du er ikke logget ind.'});return;}closeAdminSession(req,res);json(res,200,{authenticated:false});return;}
  const adminPricePath=/^\/api\/admin\/products\/(pf-[a-z0-9]+)\/prices$/i.exec(req.url||'');
  if(adminPricePath&&['GET','POST'].includes(req.method)){
   if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}
@@ -318,9 +325,10 @@ const handleRequest=async(req,res)=>{
  if(financePath){
   if(!adminSessionAuthorized(req)){json(res,401,{error:'Medarbejderlogin kræves.'});return;}
   try{const pf=await readOrder(financePath[1]);if(!pf.checkoutId)throw Error('Ordren mangler en betalingsordre.');const id=pf.checkoutId;res.setHeader('Cache-Control','no-store');
-   if(req.method==='GET'){const basis=legalURL.searchParams.get('basis');if(basis){const f=(await readLedger()).orders[id],shipment=f?.shipments.find(s=>s.key===basis);if(!shipment)throw Error('Leverancen findes ikke.');const basisOrder=await withDocumentOrderNumbers(await readCheckout(id));res.writeHead(200,{'Content-Type':'application/pdf','Content-Disposition':`attachment; filename="${invoiceBasisFilename(documentOrderNumber(basisOrder))}"`,'Content-Security-Policy':'sandbox'}).end(Buffer.from(await salesBasisPDF(basisOrder,shipment,f)));return;}const file=legalURL.searchParams.get('document');if(file){const doc=(await readLedger()).orders[id]?.documents.find(d=>d.id===file);if(!doc)throw Error('Bilag ikke fundet.');res.writeHead(200,{'Content-Type':'application/pdf','Content-Disposition':'attachment; filename="Smerch-bilag.pdf"','Content-Security-Policy':'sandbox'}).end(Buffer.from(doc.pdf,'base64'));return;}await reconcileSalesShipments(id);json(res,200,await financeView(id));return;}
+   if(req.method==='GET'){const refund=legalURL.searchParams.get('refundBasis');if(refund){const row=(await readLedger()).orders[id]?.mail.find(m=>m.kind==='refund_basis'&&m.key===refund);if(!row?.pdf)throw Error('Refunderingsgrundlag findes ikke.');res.writeHead(200,{'Content-Type':'application/pdf','Content-Disposition':'attachment; filename="Smerch-refunderingsgrundlag.pdf"','Content-Security-Policy':'sandbox'}).end(Buffer.from(row.pdf,'base64'));return;}const basis=legalURL.searchParams.get('basis');if(basis){const f=(await readLedger()).orders[id],shipment=f?.shipments.find(s=>s.key===basis);if(!shipment)throw Error('Leverancen findes ikke.');const basisOrder=await withDocumentOrderNumbers(await readCheckout(id));res.writeHead(200,{'Content-Type':'application/pdf','Content-Disposition':`attachment; filename="${invoiceBasisFilename(documentOrderNumber(basisOrder))}"`,'Content-Security-Policy':'sandbox'}).end(Buffer.from(await salesBasisPDF(basisOrder,shipment,f)));return;}const file=legalURL.searchParams.get('document');if(file){const doc=(await readLedger()).orders[id]?.documents.find(d=>d.id===file);if(!doc)throw Error('Bilag ikke fundet.');res.writeHead(200,{'Content-Type':'application/pdf','Content-Disposition':'attachment; filename="Smerch-bilag.pdf"','Content-Security-Policy':'sandbox'}).end(Buffer.from(doc.pdf,'base64'));return;}await reconcileSalesShipments(id);json(res,200,await financeView(id));return;}
    if(req.method==='POST'){if(!adminRequestOriginAllowed(req))throw Error('Ugyldig oprindelse.');const input=await readJSON(req,15*1024*1024);
-    if(input.action==='payment')json(res,200,await executeSalesPayment(id,input));
+    if(input.action==='refund_basis')json(res,200,await queueRefundBasis(id,input.basis));
+    else if(input.action==='payment')json(res,200,await executeSalesPayment(id,input));
     else if(input.action==='reconcile')json(res,200,await reconcileSalesPayment(id));
     else if(input.action==='accountant'){const row=await queueAccountantBasis(id,input.shipmentKey);json(res,200,await sendFinanceMail(id,row.key));}
     else if(input.action==='receipt')json(res,200,await sendFinanceMail(id,input.key,{confirmedNotSent:input.confirmedNotSent===true}));
@@ -521,13 +529,15 @@ const handleRequest=async(req,res)=>{
  res.writeHead(200,{'Content-Type':types[extension],'Cache-Control':cacheControl,'Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);
  }catch{res.writeHead(404).end('Siden findes ikke');}
 };
+assertStorageMode();
+if(databaseEnabled()){await importLegacy();setInterval(()=>runJobs().catch(()=>console.error(JSON.stringify({event:'worker_failure',code:'worker_unavailable'}))),5000).unref();}
 async function freightContext(input,req){
  if(!Array.isArray(input.lines)||!input.lines.length||input.lines.length>20)throw Error('Kurven skal indeholde 1–20 varer.');
  const resolved=await resolveCompanyCart(input.lines,await companySession(req),{loadCatalog:loadProductCatalog}),catalog=await loadProductCatalog(resolved.lines.map(line=>line.productId)),lines=resolved.lines.map(line=>sanitizeDesignLine(catalog,line)),shipping=validateDelivery(input.shipping),config=checkoutConfiguration(),fulfillment=checkoutFulfillmentAssessment(catalog,lines,config.freightByLocation,{...config,freightQuoteRequired:true});
  if(!fulfillment.ready)throw Error(fulfillment.message);const {prices,rules}=await loadPricing(),quote=quotePFCart(catalog,lines,prices,rules);if(!Number.isSafeInteger(quote.totalIncVat)||quote.totalIncVat<=0)throw Error('Vareprisen skal afklares før fragt.');
  return {lines,shipping,deliveryMethod:input.deliveryMethod||'STD',goodsTotalIncVat:quote.totalIncVat,groups:fulfillment.groups};
 }
-const server=createServer(handleRequest);
+const server=createServer((req,res)=>handleRequest(req,res).catch(()=>{console.error(JSON.stringify({event:'request_failed',code:'unexpected_error'}));if(!res.headersSent)json(res,500,{error:'Der opstod en fejl. Prøv igen senere.'});else res.end();}));
 server.on('error',e=>{console.error(e.message);process.exit(1)});
 setInterval(()=>{processProofMailbox().catch(()=>{});processSalesFinance().catch(()=>{});retryWithdrawalReceipts().catch(()=>{});retryOrderConfirmations().catch(()=>{});retryProofMail().catch(()=>{});processShipmentMail().catch(()=>{});syncEconomicInvoices().catch(()=>{});},60000).unref();
 server.listen(port,host,()=>console.log(`Smerch server listening on ${host}:${port}`));
@@ -542,4 +552,3 @@ if(hasPriceFeeds&&Number.isFinite(syncMinutes)&&syncMinutes>=15){
 }
 
 startPopularitySync();
-

@@ -1,5 +1,5 @@
 import {createDocumentRows} from './admin-document-rows.mjs';
-import {invoiceBasisEditor} from './invoice-basis-editor.mjs?v=2';
+import {invoiceBasisEditor} from './invoice-basis-editor.mjs?v=accounting-1';
 const titles={confirmation:'Ordrebekræftelse',basis:'Fakturagrundlag',shipment:'Forsendelsesbekræftelse',receipt:'Kvittering'};
 const el=(tag,text)=>{const node=document.createElement(tag);if(text)node.textContent=text;return node;};
 const kr=n=>n===null?'Mangler':(n/100).toLocaleString('da-DK',{minimumFractionDigits:2,maximumFractionDigits:2})+' kr.';

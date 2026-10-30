@@ -99,3 +99,19 @@ Importposter og PDF’er ligger privat i `SMERCH_DATA_DIR/proof-intake`, korrekt
 **395 tests bestået, 0 fejl** i det isolerede miljø med produktionsafhængigheder. Ti nye tests dækker import, usikker tilknytning, manglende/ændret kundemail, nye referencer og kommentarer, gamle kundelinks, dubletter, SMTP-afstemning, låse og den faktiske HTTP-modtagelse med manglende/udløbet signatur. Eksisterende tests for dokumenter, betaling og korrektursvar består fortsat.
 
 Testene bruger midlertidige mapper, fiktive kunder, falsk SMTP og lokale HTTP-servere uden produktionsnøgler. Der er ikke dokumenteret en virkelig indbakkeforbindelse eller en PF-til-Smerch-korrekturbesked ved at køre disse tests.
+
+## Tillæg: originalmail modtaget og undersøgt
+
+Efter ovenstående implementering har Joakim leveret den originale .eml for testordre 7886901. Punkterne ovenfor om manglende adgang til en originalmail er dermed løst for **dette ene eksempel**; en revideret korrektur er endnu ikke undersøgt.
+
+Verificerede observationer fra MIME-indholdet:
+
+- From og Return-Path er `ccc@pfconcept.com`; modtager er `korrektur@smerch.dk`.
+- One.coms Authentication-Results angiver SPF pass, DKIM pass med domænet pfconcept.com og DMARC pass. Dette er aflæste modtagelsesresultater; der er ikke udført en ny kryptografisk DKIM-verifikation af den eksporterede fil. En kommende automatisk læser skal stole på resultater fra den faktiske modtagende mailserver, ikke på vilkårlige medsendte headers.
+- Mailen har Message-ID og Date, ét HTML-indhold og én vedhæftet `application/pdf`, `33111961.pdf`, på 884.434 bytes. PDF’en er læsbar og har én side.
+- Emnelinje, HTML-footer og PDF er enige om PF-ordre 7886901 og Smerchs PO-reference. De tre steder giver et konkret grundlag for krydskontrol i en parser. Der må ikke vælges en kunde ud fra mailens modtager: den adresse er Smerchs egen korrekturpostkasse.
+- HTML-linket går til PF’s `/en_cz/eproof/detail/view` med parametrene Language, ActionBy og EproofID. Linket er ikke åbnet. Det bevares fortroligt og må ikke publiceres som kundens Smerch-link. EproofID er ikke identisk med PDF-filnavnets tal; de to må ikke antages at være samme reference eller revisionsnummer.
+- PDF’en angiver SKU 38687070, 10 stk., Forside, Broderi fixed, 85 × 22,6 mm og Pantone 717 C (Madeira 1765). Der er ikke ændret noget i ordren eller korrekturen på baggrund af denne aflæsning.
+- Mailens tekst indeholder generelle kontrolpunkter, instruktioner til PF’s egen svarside, en oplysning om ny korrektur inden for 2–4 timer samt en generel advarsel om metalvarer. Den indeholder ingen særskilt, ordrebestemt kunstnerkommentar i dette eksempel. Hele HTML-mailen skal derfor ikke kopieres som `supplierMessage`; især må PF’s generelle tidsangivelse og metaladvarsel ikke automatisk blive løfter eller relevante advarsler for en kasketordre.
+
+Rå originalmail, PDF, linkværdier og signaturer er ikke kopieret ind i denne rapport eller sendt til en anden tjeneste. Ingen kundemail, godkendelse eller live-import er udløst. Det resterende arbejde er mailforbindelsen, parseren for dette dokumenterede format og kontrol af revisionsrækkefølge på en ny korrektur. Automatisk publicering forbliver slået fra.

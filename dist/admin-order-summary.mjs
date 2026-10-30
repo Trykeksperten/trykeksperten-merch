@@ -1,6 +1,6 @@
 import {appendCaptureWarning} from './admin-capture-warning.mjs';
 import {pfStatusRows} from './admin-pf-status.mjs?v=3';
-import {orderKind,dateTime,paymentLabel,orderLabels} from './admin-order-state.mjs';
+import {orderKind,dateTime,paymentLabel,orderStatusLabel} from './admin-order-state.mjs';
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;};
 export function appendOrderSummaryInfo(info,{checkout,orders=[],lines}){
  const order=orders[0]||{},shipping=checkout?.shipping||order.shipping||{},numbers=orders.map(o=>o.pfOrderNumber).filter(Boolean);
@@ -15,7 +15,7 @@ export function appendOrderSummaryState(state,checkout,orders=[]){
  if(Number.isFinite(checkout?.totalIncVat))add('Total inkl. moms',(checkout.totalIncVat/100).toLocaleString('da-DK',{style:'currency',currency:'DKK'}));
  add('Betaling',paymentLabel(checkout));
  if(checkout?.paymentMethod)add('Betalingsmetode',checkout.paymentMethod);
- const statuses=[...new Set(orders.map(o=>o.deliveryConfirmation?'Leveret':o.status==='approval_recorded'?'Afventer produktion hos PF':orderLabels[o.status]||o.status).filter(Boolean))];if(statuses.length)add('Status',statuses.join(' · '));else if(checkout?.pfReview?.required&&!checkout.pfReview.approved)add('Status','Afventer Smerchs godkendelse');
+ const statuses=[...new Set(orders.map(o=>o.deliveryConfirmation?'Leveret':o.status==='approval_recorded'?'Afventer produktion hos PF':orderStatusLabel(o)).filter(Boolean))];if(statuses.length)add('Status',statuses.join(' · '));else if(checkout?.pfReview?.required&&!checkout.pfReview.approved)add('Status','Afventer Smerchs godkendelse');
  for(const order of orders){
   const pf=Object.fromEntries(pfStatusRows(order)),suffix=orders.length>1?' · '+(order.pfOrderNumber||order.purchaseOrderNumber||'PF-nummer afventer'):'';
   if(pf['PF-status'])add('Seneste PF-status'+suffix,pf['PF-status']);

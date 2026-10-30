@@ -7,8 +7,9 @@ const order={id:'o1',checkoutId:'c1',status:'shipped',lines:[],shipment:{deliver
 const paid={id:'c1',status:'paid'};
 const sent=[{orderId:'o1',deliveryKey:'parcel-1',status:'sent'}];
 test('shipment remains actionable until payment and every delivery mail are complete',()=>{
- assert.equal(nextStep(order,paid,sent)[0],'Afsluttet');
+ assert.equal(nextStep(order,paid,sent)[0],'Smerchs opgaver udført');
  assert.equal(queueCounts([order],[paid],sent).overview,0);
+ assert.equal(nextStep({...order,deliveryConfirmation:{at:'2026-10-30T12:00:00Z'}},paid,sent)[0],'Afsluttet');
  const reserved={...paid,status:'authorized'};
  assert.match(nextStep(order,reserved,sent)[1],/Hæv betalingen/);
  assert.equal(queueCounts([order],[reserved],sent).overview,1);
@@ -28,7 +29,7 @@ test('shipment remains actionable until payment and every delivery mail are comp
 test('fresh order mail and finance state clears all counters despite stale global queues',()=>{
  const current={...order,attention:{shipments:sent,finance:{summary:{problems:[]},shipments:[{key:'parcel-1',invoiceStatus:'issued'}],mail:[]}}};
  const stale={...paid,finance:{problems:['Faktura afventer.']}};
- assert.equal(nextStep(current,stale,[{...sent[0],status:'failed'}])[0],'Afsluttet');
+ assert.equal(nextStep(current,stale,[{...sent[0],status:'failed'}])[0],'Smerchs opgaver udført');
  const counts=queueCounts([current],[stale],[{...sent[0],status:'failed'}]);
  assert.equal(counts.overview,0);assert.equal(counts.blocked,0);assert.equal(counts.deliveries,1);
  current.attention.shipments=[{...sent[0],id:'mail',status:'uncertain'}];

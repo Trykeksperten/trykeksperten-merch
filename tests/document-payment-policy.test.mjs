@@ -8,7 +8,7 @@ test('bank basis requires a prepayment invoice and full payment before ordering,
  const before=structuredClone(checkout),seed=documentSeed(order,checkout,company,'basis');
  assert.match(seed.paymentInstruction,/forudbetalingsfaktura/);
  assert.match(seed.paymentTerms,/før varebestilling og produktionsstart/);
- assert.equal(seed.paymentStatus,'Afventer forudbetaling via bankoverførsel');
+ assert.equal(seed.paymentStatus,'Afventer forudbetaling – produktion må ikke startes');
  const checked=reviewDocument(order,checkout,company,{...seed,paymentTerms:'30 dages kredit',paymentInstruction:'Opret kreditfaktura'});
  assert.equal(checked.paymentTerms,seed.paymentTerms);
  assert.equal(checked.paymentInstruction,seed.paymentInstruction);

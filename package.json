@@ -16,12 +16,13 @@
     "node": ">=24.14.0"
   },
   "dependencies": {
+    "better-sqlite3": "12.4.1",
+    "nodemailer": "10.2.1",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.3.289",
     "html-to-text": "10.0.1",
     "imapflow": "2.9.1",
     "mailauth": "8.0.4",
-    "mailparser": "3.12.4",
-    "nodemailer": "10.2.1",
-    "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^6.3.289"
+    "mailparser": "3.12.4"
   }
 }

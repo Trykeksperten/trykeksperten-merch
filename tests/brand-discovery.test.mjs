@@ -40,8 +40,8 @@ test('gallery includes brands beyond the former shortlist and all their campaign
 
 test('wide campaign artwork keeps its native proportions in the gallery',()=>{
  assert.equal(galleryImageFormat('<img width="888" height="450">').ratio,888/450);
- const html=brandDiscoveryPage([...brands,{id:'parker',name:'Parker'}],'?brand=parker',[{...products[0],brandId:'parker'}],prices);
- assert.match(html,/brand-gallery-tile--wide/);assert.match(html,/--image-ratio:1.9733/);
+ const html=brandDiscoveryPage(brands,'?brand=camelbak',products,prices);
+ assert.match(html,/camelbak-extra-12.webp/);assert.match(html,/--image-ratio:1.9733/);
 });
 test('brand discovery excludes Elevate imagery even when products are available',()=>{
  const html=brandDiscoveryPage([...brands,{id:'elevate',name:'Elevate'}],'',[...products,{...products[0],brandId:'elevate'}],prices);

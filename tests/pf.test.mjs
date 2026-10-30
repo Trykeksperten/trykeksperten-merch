@@ -121,7 +121,7 @@ test('PF text fonts, alignment and multiline spacing survive design validation',
  assert.deepEqual(availableTextFonts({impMethod:'Lasergravering'}),['Arial','Times New Roman','Helvetica','Calibri','Futura','Lucida Calligraphy','Myriad Pro']);
  assert.deepEqual(availableTextFonts({impMethod:'Broderi fixed'}),['Arial','Times New Roman','Helvetica','Calibri','Futura']);
  const text='Din jubilæums\nbøsse',textPlacement={x:.5,y:.5,scale:.24,font:'Lucida Calligraphy',align:'right',lineSpacing:1.5,rotation:90},group=designGroupSize([],text,textPlacement,o),line={productId:p.id,sku:v.sku,quantity:25,decorations:[{optionId:o.id,width:Math.round(group.widthMm*10)/10,height:Math.round(group.heightMm*10)/10,colors:1,text,textPlacement,artworks:[]}]};
- assert.deepEqual(sanitizeDesignLine(catalog,line).decorations[0].textPlacement,{...textPlacement,letterSpacing:0});
+ assert.deepEqual(sanitizeDesignLine(catalog,line).decorations[0].textPlacement,{...textPlacement,letterSpacing:0,bold:false,italic:false,underline:false});
  assert.match(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],textPlacement:{...textPlacement,font:'Comic Sans MS'}}]}),/tilladt skrifttype/);
  assert.match(validateDesignLine(catalog,{...line,decorations:[{...line.decorations[0],textPlacement:{...textPlacement,rotation:270}}]}),/rotation/);
  assert.ok(group.heightMm>0);

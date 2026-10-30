@@ -6,7 +6,7 @@ import {matchedPaymentAttempts} from './payment-attempt-matching.mjs?v=2';
 import {paymentAttemptHistory} from './admin-payment-attempt-history.mjs';
 import {createDocumentRows} from './admin-document-rows.mjs';
 import {actorLabel} from './admin-activity.mjs';
-import {financePanel} from './admin-finance.mjs';
+import {financePanel} from './admin-finance.mjs?v=accounting-1';
 import {mountAdminNavigation,bindAdminMenu} from './admin-navigation.mjs?v=attention-1';
 import {queueCounts} from './admin-work-queue.mjs?v=attention-1';
 import {compactOrderWorkspace} from './admin-order-tabs.mjs?v=attention-1';
@@ -15,7 +15,7 @@ import {canReceiveProof} from './proof-upload.mjs';
 import {documentPanel} from './admin-documents.mjs?v=send-refresh-1';
 import {orderActionCard,orderProductCards} from './admin-order-cards.mjs?v=delivery-controls-2';
 import {correspondencePanel} from './admin-correspondence.mjs?v=compact-2';
-import {orderLabels,eventLabels,isTestOrder,dateTime} from './admin-order-state.mjs';
+import {orderLabels,orderStatusLabel,eventLabels,isTestOrder,dateTime} from './admin-order-state.mjs';
 import {bindTestSubmission} from './pf-test-submit.mjs?v=2';
 import {mockupsForPfOrder,appendMockupOverview,appendMockup} from './admin-mockups.mjs?v=4';
 import {productionPaymentActive} from './production-payment.mjs';
@@ -28,7 +28,7 @@ const menu=bindAdminMenu({shell:document.body,button:$('pf-menu-toggle'),sidebar
 const labels=orderLabels;
 function el(tag,txt,cls){const node=document.createElement(tag);if(txt!=null)node.textContent=String(txt);if(cls)node.className=cls;return node;}
 function statusTone(order){if(['needs_attention','needs_reconciliation'].includes(order.status))return 'error';if(order.status==='revision_requested')return 'changes';if(['approval_pending_pf','approval_recorded','shipped'].includes(order.status))return 'approved';if(proofQueue(order)==='pf')return 'waiting';if(proofQueue(order)==='customer')return 'customer';return 'neutral';}
-function badges(order){const group=el('div',null,'proof-badges');group.append(el('span',order.deliveryConfirmation?'Leveret':labels[order.status]||order.status,'pill tone-'+statusTone(order)));return group;}
+function badges(order){const group=el('div',null,'proof-badges');group.append(el('span',orderStatusLabel(order),'pill tone-'+statusTone(order)));return group;}
 function fold(title){const node=el('details',null,'proof-fold');node.append(el('summary',title));return node;}
 function decisionCard(decision,title){const approved=decision.decision==='approve',card=el('section',null,'decision-card tone-'+(approved?'approved':'changes'));card.append(el('span',title,'decision-label'),el('h3',approved?'Godkendt':'Ændringer ønsket'));if(decision.at)card.append(el('small',new Date(decision.at).toLocaleString('da-DK')));if(decision.comment){const quote=el('blockquote',decision.comment);card.append(quote);}return card;}
 function say(message){$('feedback').textContent=message||'';if(!$('login').hidden)$('login-feedback').textContent=message||'';}
@@ -41,7 +41,7 @@ async function show(id){selectedId=id;$('gateway-test').hidden=true;$('workspace
  const documentUrl=`/api/admin/pf-confirmations/${id}`;
  async function loadConfirmation(){try{const doc=await(await api(documentUrl)).json();docStatus.replaceChildren();const link=el('a','Hent '+doc.name);link.href=documentUrl+'?download=1';docStatus.append(link);}catch{docStatus.textContent='Ingen PF-bekræftelse gemt.';}}
  await loadConfirmation();uploadButton.onclick=async()=>{const file=upload.files[0];if(!file)return;uploadButton.disabled=true;try{if(file.size>10*1024*1024)throw Error('PDF må højst fylde 10 MB.');const contentBase64=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file);});await api(documentUrl,'POST',{name:file.name,contentBase64});upload.value='';await loadConfirmation();}catch(error){docStatus.textContent=error.message||'Filen kunne ikke gemmes.';}finally{uploadButton.disabled=false;}};
- 
+
  let currentDecision;if(order.decision){const card=decisionCard(order.decision,order.decision.actor==='customer'?'Kundens tilbagemelding':'Smerchs tilbagemelding');card.append(el('p',order.adminTest?'Test: Betaling og produktion er blokeret.':order.decision.decision==='approve'&&order.proof?.approvalReference&&Number(order.decision.version)===Number(order.proof.version)?'PF har bekræftet denne korrekturversion. Afventer produktion og afsendelse.':order.decision.delivery?.reference?'Sendt til PF. Afventer deres tilbagemelding.':order.decision.decision==='approve'?'Næste skridt: Kontrollér reservationen og send godkendelsen til PF. Ved aftalt forudbetaling skal hævningen være bekræftet, før du godkender hos PF.':'Næste skridt: Send ændringsønsket til PF, og indhent en ny korrektur.'));currentDecision=card;box.append(card);}
  const isTest=order.adminTest===true||order.gatewayPayload?.Header?.isTest===true,hasDecorations=order.lines?.some(line=>line.decorations?.length);if(isTest&&!order.decision)box.append(el('p',order.adminTest?'Intern korrekturtest · ingen betaling eller produktion':'PF-testordre · ingen betaling · kan ikke frigives til produktion','status ready'));
  const documentRows=createDocumentRows(order,checkouts.find(c=>c.id===order.checkoutId)||checkout),documents=fold('Dokumenter og afsendelse');documents.append(documentPanel(order,api,documentRows,{onChanged:async(result,message)=>{await show(id);say(message);}}),financePanel(order,api,{onChanged:()=>show(id)}));const contact=fold('Kundekontakt og interne noter');contact.append(correspondencePanel(order,api,checkouts.find(c=>c.id===order.checkoutId)||checkout,documentRows,{onChanged:()=>show(id)}));const automation=orderAutomationPanel(order,api,{onChanged:()=>show(id)});box.append(documents,automation,contact);let history;if(order.proofs?.length){const section=fold(`Tidligere versioner og svar (${order.proofs.length})`);history=section;for(const proof of order.proofs){const a=el('a',`Version ${proof.version} · ${proof.reference} · ${new Date(proof.receivedAt).toLocaleString('da-DK')}`);a.href=proof.mimeType?`/api/pf-orders/${id}/proof-file?version=${proof.version}`:proof.url;a.target='_blank';a.rel='noopener noreferrer';section.append(a,document.createElement('br'));if(proof.decision){section.append(decisionCard(proof.decision,'Tilbagemelding · version '+proof.version));for(const file of proof.decision.attachments||[]){const attachment=el('a',`Bilag: ${file.name}`);attachment.href=`/api/pf-orders/${id}/feedback-file?hash=${file.hash}`;section.append(attachment,document.createElement('br'));}}}box.append(section);}

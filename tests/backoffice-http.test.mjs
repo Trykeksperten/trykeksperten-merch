@@ -1,0 +1,33 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {randomUUID,scryptSync} from 'node:crypto';
+import {once} from 'node:events';
+import {createServer} from 'node:net';
+test('database HTTP: roles, CSRF, durable login, idempotency and public checkout closure',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'smerch-core-http-')),probe=createServer();
+ await new Promise(r=>probe.listen(0,'127.0.0.1',r));const port=probe.address().port;await new Promise(r=>probe.close(r));
+ const base=`http://127.0.0.1:${port}`,salt='22'.repeat(16),password='demo-password-123',hash=scryptSync(password,Buffer.from(salt,'hex'),64).toString('hex');let child;
+ const launch=async()=>{child=spawn(process.execPath,[fileURLToPath(new URL('../server.mjs',import.meta.url))],{cwd:root,env:{PATH:process.env.PATH,NODE_ENV:'production',PORT:String(port),HOST:'127.0.0.1',SMERCH_DATA_DIR:root,SMERCH_DATABASE_ENABLED:'1',SMERCH_ADMIN_USERNAME:'admin',SMERCH_ADMIN_PASSWORD_HASH:salt+':'+hash,PF_AUTO_SUBMIT_ENABLED:'0',QUICKPAY_CAPTURE_ENABLED:'0'},stdio:['ignore','pipe','pipe']});await Promise.race([once(child.stdout,'data'),once(child,'exit').then(()=>{throw Error('Startup failed');}),new Promise((_,reject)=>setTimeout(()=>reject(Error('Timeout')),10000).unref())]);};
+ const stop=async()=>{if(child?.exitCode===null&&child.signalCode===null){const done=once(child,'exit');child.kill();await done;}};
+ try{await launch();assert.equal((await fetch(base+'/api/backoffice/orders')).status,401);
+ const login=await fetch(base+'/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:'admin',password})});assert.equal(login.status,200);
+ const cookie=login.headers.get('set-cookie').split(';')[0],headers={cookie,origin:base,'x-smerch-admin':'1','content-type':'application/json','idempotency-key':randomUUID()};
+ const body={name:'Demo',email:'demo@example.test'},post=(path,data,h=headers)=>fetch(base+'/api/backoffice'+path,{method:'POST',headers:h,body:JSON.stringify(data)});
+ assert.equal((await post('/customers',body,{...headers,origin:'https://evil.test'})).status,401);
+ const saved=await post('/customers',body);assert.equal(saved.status,200);const customer=await saved.json();assert.deepEqual(await(await post('/customers',body)).json(),customer);
+ assert.equal((await post('/customers',{...body,name:'Other'})).status,400);
+ const user=await post('/users',{username:'buyer',password,role:'customer',customerId:customer.id},{...headers,'idempotency-key':randomUUID()});assert.equal(user.status,200);
+ await stop();await launch();assert.equal((await fetch(base+'/api/backoffice/session',{headers})).status,200);
+ const buyerLogin=await fetch(base+'/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:'buyer',password})});const buyerCookie=buyerLogin.headers.get('set-cookie').split(';')[0];
+ assert.equal((await post('/users',{username:'hack',password,role:'administrator'},{...headers,cookie:buyerCookie,'idempotency-key':randomUUID()})).status,403);
+ assert.equal((await fetch(base+'/api/backoffice/users',{headers:{cookie:buyerCookie}})).status,403);
+ assert.equal((await fetch(base+'/api/backoffice/orders/other',{headers:{cookie:buyerCookie}})).status,404);
+ assert.equal((await fetch(base+'/api/checkout/session',{method:'POST',headers,body:'{}'})).status,503);
+ assert.equal((await(await fetch(base+'/api/backoffice/health',{headers})).json()).integrity,true);
+ }finally{await stop();await rm(root,{recursive:true,force:true});}
+});
