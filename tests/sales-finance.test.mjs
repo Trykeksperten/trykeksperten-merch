@@ -55,3 +55,13 @@ test('external invoice is not an outstanding Smerch task, payment remains separa
  assert.deepEqual(financeSummary(order,finance).problems,['Hævning af afsendte varer afventer.']);
  assert.deepEqual(financeSummary(order,{...finance,payments:[{type:'capture',amount:10000}]}).problems,[]);
 });
+
+
+test('agreed proof prepayment is not an outstanding finance task before shipment',()=>{
+ const order={totalIncVat:10000,legal:{customerType:'consumer',prepayment:true,prepaymentText:'Betaling efter godkendt korrektur, før produktion.',acceptedAt:'2026-10-28T12:00:00Z'},shipping:{country:'DK'}};
+ const finance={shipments:[],documents:[],payments:[{type:'capture',amount:10000}]};
+ assert.deepEqual(financeSummary(order,finance).problems,[]);
+ for(const legal of [{...order.legal,prepayment:false},{...order.legal,prepaymentText:''},{...order.legal,acceptedAt:null}]){
+  assert.ok(financeSummary({...order,legal},finance).problems.includes('Forudbetaling: afklar fakturering og moms særskilt.'));
+ }
+});

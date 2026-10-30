@@ -20,7 +20,7 @@ test('finance HTTP requires staff and same origin, links shipment once, download
  let view=await(await fetch(url,{headers})).json();assert.equal(view.shipments.length,1);assert.equal(view.summary.shipped,4170);assert.equal(view.summary.captured,0);assert.equal(view.shipments[0].invoiceStatus,'awaiting_accountant');view=await(await fetch(url,{headers})).json();assert.equal(view.shipments.length,1);
  const pdf=await fetch(url+'?basis='+encodeURIComponent(view.shipments[0].key),{headers});assert.equal(pdf.status,200);assert.equal(Buffer.from(await pdf.arrayBuffer()).subarray(0,5).toString(),'%PDF-');assert.equal((await fetch(url+'?basis='+encodeURIComponent(view.shipments[0].key))).status,401);
  const post=body=>fetch(url,{method:'POST',headers,body:JSON.stringify(body)});assert.equal((await fetch(url,{method:'POST',headers:{...headers,origin:'https://wrong.test'},body:'{}'})).status,401);assert.equal((await post({action:'payment',kind:'capture',amount:4170,key:'capture:http-test'})).status,400);
- const list=await(await fetch(base+'/api/admin/checkouts',{headers})).json();assert.ok(list.find(c=>c.id===pay).finance.problems.some(p=>p.includes('faktura')));
+ const list=await(await fetch(base+'/api/admin/checkouts',{headers})).json();assert.ok(list.find(c=>c.id===pay).finance.problems.includes('Hævning af afsendte varer afventer.'));assert.ok(!list.find(c=>c.id===pay).finance.problems.some(p=>p.includes('faktura afventer')));
  assert.equal((await fetch(base+'/api/checkout/session',{method:'POST',headers,body:'{}'})).status,503);
  }finally{if(child.exitCode===null&&child.signalCode===null){const done=once(child,'exit');child.kill('SIGTERM');await done;}await rm(root,{recursive:true,force:true});}
 });
