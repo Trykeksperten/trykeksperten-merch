@@ -18,7 +18,8 @@ export function appendOrderSummaryState(state,checkout,orders=[]){
  const statuses=[...new Set(orders.map(o=>o.status==='approval_recorded'?'Afventer produktion hos PF':orderLabels[o.status]||o.status).filter(Boolean))];if(statuses.length)add('Status',statuses.join(' · '));else if(checkout?.pfReview?.required&&!checkout.pfReview.approved)add('Status','Afventer Smerchs godkendelse');
  for(const order of orders){
   const pf=Object.fromEntries(pfStatusRows(order)),suffix=orders.length>1?' · '+(order.pfOrderNumber||order.purchaseOrderNumber||'PF-nummer afventer'):'';
-  add('Seneste PF-status'+suffix,pf['PF-status']);
+  if(pf['PF-status'])add('Seneste PF-status'+suffix,pf['PF-status']);
+  add('Seneste opdatering fra PF'+suffix,pf['Seneste opdatering fra PF']);
   const dispatchLabel=pf['Afsendt']?'Afsendt':pf['Seneste delleverance']?'Seneste delleverance':'Forventet afsendelse';const dispatch=add(dispatchLabel+suffix,pf[dispatchLabel]);dispatch.className='order-summary-dispatch';dispatchCells.set(order,dispatch);
  }
  state.append(facts);appendCaptureWarning(state,checkout);return dispatchCells;
