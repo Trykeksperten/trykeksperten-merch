@@ -1,3 +1,4 @@
+import {withDocumentOrderNumbers} from './lib/document-order-number.mjs';
 import {eproofCallbackAuthorized,eproofReadiness,eproofConnectionCheck} from './lib/pf-eproof-api.mjs';
 import {receiveEproofAPI,sendEproofDecision} from './lib/pf-orders.mjs';
 import {bankInvoiceBasis} from './lib/bank-invoice-basis.mjs';
@@ -290,7 +291,7 @@ const handleRequest=async(req,res)=>{
  const colourPath=/^\/api\/admin\/checkouts\/(pay-[a-f0-9-]{36})\/colours$/.exec(new URL(req.url,'http://localhost').pathname);
  if(colourPath&&req.method==='POST'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}try{const input=await readJSON(req,8192),order=await setPFColours(colourPath[1],input.lineIndex,input.decorationIndex,input.codes);json(res,200,{id:order.id,pfColourOverrides:order.pfColourOverrides});}catch(error){json(res,400,{error:error.message});}return;}
  const bankBasis=/^\/api\/admin\/checkouts\/(pay-[a-f0-9-]{36})\/invoice-basis$/.exec(new URL(req.url,'http://localhost').pathname);
- if(bankBasis&&req.method==='GET'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Medarbejderlogin kræves.'});return;}try{const html=bankInvoiceBasis(await readCheckout(bankBasis[1]));res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'"}).end(html);}catch(error){json(res,400,{error:error.message});}return;}
+ if(bankBasis&&req.method==='GET'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Medarbejderlogin kræves.'});return;}try{const html=bankInvoiceBasis(await withDocumentOrderNumbers(await readCheckout(bankBasis[1])));res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'"}).end(html);}catch(error){json(res,400,{error:error.message});}return;}
  const bankAction=/^\/api\/admin\/checkouts\/(pay-[a-f0-9-]{36})\/bank-payment$/.exec(new URL(req.url,'http://localhost').pathname);
  if(bankAction&&req.method==='POST'){
   if(!adminSessionAuthorized(req)||!adminRequestOriginAllowed(req)){json(res,403,{error:'Medarbejderlogin og gyldig oprindelse kræves.'});return;}
