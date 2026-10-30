@@ -60,26 +60,26 @@ test('persistent shipment mail lock prevents a second process from sending',asyn
  assert.equal((await sendShipmentMail(f.pf.id,row.id,{transport:accepted})).status,'sent');
 });
 test('explicitly disabled shipment automation leaves eligible orders unchanged',async()=>{
- const before=await readFile(join(root,'sales-ledger.json'),'utf8');await processSalesFinance({env:{...env,SMERCH_FINANCE_START_AT:'2020-01-01',SMERCH_AUTOMATIC_SHIPMENT_CAPTURE:'0',SMERCH_ACCOUNTANT_MAIL:'automatic',SMERCH_PAYMENT_RECEIPT_MAIL:'review'}});assert.equal(await readFile(join(root,'sales-ledger.json'),'utf8'),before);
+ const before=await readFile(join(root,'sales-ledger.json'),'utf8');await processSalesFinance({env:{...env,SMERCH_FINANCE_START_AT:'2020-01-01',SMERCH_AUTOMATIC_SHIPMENT_CAPTURE:'0',SMERCH_ACCOUNTANT_MAIL:'review',SMERCH_PAYMENT_RECEIPT_MAIL:'review'}});assert.equal(await readFile(join(root,'sales-ledger.json'),'utf8'),before);
 });
 test('shipment mail uses checkout product names even when PF line only has SKU',async()=>{
  const f=await fixture();f.pf.lines[0].productName=undefined;await writeFile(join(root,'orders',f.pf.id+'.json'),JSON.stringify(f.pf));await updateCheckout(f.order.id,o=>{o.productNames={demo:'Grafton kasket'};return o;});
  await delivered(f);const row=(await shipmentMailStatus(f.pf.id))[0];assert.match(row.text,/4 × Grafton kasket/);
 });
 
-test('worker captures a completed shipment and automatically sends exactly one receipt',async()=>{
+test('worker captures a completed shipment and automatically sends one receipt and one accountant basis',async()=>{
  const f=await fixture(),start=new Date().toISOString();await updateCheckout(f.order.id,o=>({...o,createdAt:start}));
  const mails=[];const options={env:{...env,SMERCH_FINANCE_START_AT:start},fetchImpl:f.fetchImpl,transport:{sendMail:async mail=>{mails.push(mail);return {accepted:[mail.to]};}}};
  await processSalesFinance(options);assert.equal(f.posts(),0);assert.equal(mails.length,0);
  await delivered(f);await processSalesFinance(options);await processSalesFinance(options);
  assert.equal(f.posts(),1);assert.equal((await readCheckout(f.order.id)).status,'paid');
- assert.equal((await financeView(f.order.id)).mail.find(m=>m.kind==='payment_receipt').status,'sent');assert.equal(mails.length,1);assert.equal(mails[0].subject,'Smerch – betalingskvittering');
+ assert.equal((await financeView(f.order.id)).mail.find(m=>m.kind==='payment_receipt').status,'sent');assert.equal(mails.length,2);assert.equal(mails.filter(m=>m.subject==='Smerch – betalingskvittering').length,1);assert.equal(mails.filter(m=>m.to==='trykeksperten@financialoutsourcing.dk').length,1);assert.equal((await financeView(f.order.id)).mail.find(m=>m.kind==='accountant_basis').status,'sent');
 });
 
 test('receipt worker sends an existing captured payment with capture disabled and never retries uncertain mail',async()=>{
  const f=await fixture(),start=new Date().toISOString();await updateCheckout(f.order.id,o=>({...o,createdAt:start}));await delivered(f);
  await executeSalesPayment(f.order.id,{kind:'capture',amount:13750,key:'capture:existing'},{env,fetchImpl:f.fetchImpl});
- let calls=0;const options={env:{...env,SMERCH_FINANCE_START_AT:start,SMERCH_AUTOMATIC_SHIPMENT_CAPTURE:'0'},transport:{sendMail:async()=>{calls++;return {};}}};
+ let calls=0;const options={env:{...env,SMERCH_FINANCE_START_AT:start,SMERCH_AUTOMATIC_SHIPMENT_CAPTURE:'0',SMERCH_ACCOUNTANT_MAIL:'review'},transport:{sendMail:async()=>{calls++;return {};}}};
  await processSalesFinance({...options,env:{...options.env,SMERCH_PAYMENT_RECEIPT_MAIL:'review'}});assert.equal(calls,0);
  await processSalesFinance(options);await processSalesFinance(options);
  assert.equal(calls,1);assert.equal(f.posts(),1);assert.equal((await financeView(f.order.id)).mail.find(m=>m.kind==='payment_receipt').status,'uncertain');
