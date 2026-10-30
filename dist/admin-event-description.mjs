@@ -1,5 +1,7 @@
 // Explain the event as it happened, never using the order's current state.
 const descriptions={
+ delivery_confirmed:'En medarbejder kontrollerede og bekræftede manuelt, at hele ordren er leveret.',
+ delivery_confirmation_revoked:'En medarbejder fjernede den manuelle leveringsbekræftelse. Ordren afventer igen bekræftelse af levering.',
  prepared:'Ordreoplysninger og varer blev samlet i Smerch og gjort klar til afsendelse til PF.',
  submitting:'Smerch startede afsendelsen af ordren til PF. Denne hændelse er ikke en kvittering for modtagelse.',
  gateway_accepted:'PF’s system kvitterede teknisk for ordren. Det er endnu ikke en ordrebekræftelse eller en bekræftelse på produktionsstart.',

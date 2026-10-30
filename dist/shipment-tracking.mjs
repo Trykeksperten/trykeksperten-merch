@@ -1,6 +1,15 @@
 import {deliveryStatusRows} from './order-delivery-status.mjs';
 export function safeTrackingURL(value){try{const url=new URL(value);return ['https:','http:'].includes(url.protocol)&&!url.username&&!url.password?url.href:null;}catch{return null;}}
-export function trackingEntries(rows){return (Array.isArray(rows)?rows:[]).map(row=>{const id=typeof row==='string'?row:row?.trackingId;return typeof id==='string'&&id.trim()?{trackingId:id.slice(0,500),trackingURL:safeTrackingURL(typeof row==='object'?row.trackingURL:null)}:null;}).filter(Boolean);}
+export function localizedTrackingURL(value,trackingId){
+ const safe=safeTrackingURL(value);if(!safe)return null;
+ const url=new URL(safe);
+ if(/^(www\.)?postnord\.(se|dk|no|fi)$/.test(url.hostname)||url.hostname==='tracking.postnord.com'){
+  const target=new URL('https://www.postnord.dk/varktojer/track-trace');
+  target.searchParams.set('shipmentId',trackingId);return target.href;
+ }
+ return safe;
+}
+export function trackingEntries(rows){return (Array.isArray(rows)?rows:[]).map(row=>{const id=typeof row==='string'?row:row?.trackingId;return typeof id==='string'&&id.trim()?{trackingId:id.slice(0,500),trackingURL:localizedTrackingURL(typeof row==='object'?row.trackingURL:null,id.trim().slice(0,500))}:null;}).filter(Boolean);}
 export function renderShipmentTracking(container,orders){
  container.replaceChildren();
  for(const order of orders||[]){

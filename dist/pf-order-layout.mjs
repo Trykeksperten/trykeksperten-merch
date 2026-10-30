@@ -1,4 +1,4 @@
-import {renderShipmentTracking} from './shipment-tracking.mjs';
+import {renderShipmentTracking} from './shipment-tracking.mjs?v=3';
 // Presentation only: supplier references are shown exactly as stored.
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;};
 export function orderOverview(order,checkout){

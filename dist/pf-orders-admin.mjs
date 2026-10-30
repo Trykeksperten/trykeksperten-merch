@@ -13,13 +13,13 @@ import {compactOrderWorkspace} from './admin-order-tabs.mjs?v=attention-1';
 import {orderAutomationPanel} from './admin-automation.mjs?v=compact-history-1';
 import {canReceiveProof} from './proof-upload.mjs';
 import {documentPanel} from './admin-documents.mjs?v=send-refresh-1';
-import {orderActionCard,orderProductCards} from './admin-order-cards.mjs?v=capture-warning-1';
+import {orderActionCard,orderProductCards} from './admin-order-cards.mjs?v=delivery-controls-2';
 import {correspondencePanel} from './admin-correspondence.mjs?v=compact-2';
 import {orderLabels,eventLabels,isTestOrder,dateTime} from './admin-order-state.mjs';
 import {bindTestSubmission} from './pf-test-submit.mjs?v=2';
 import {mockupsForPfOrder,appendMockupOverview,appendMockup} from './admin-mockups.mjs?v=4';
 import {productionPaymentActive} from './production-payment.mjs';
-import {orderOverview} from './pf-order-layout.mjs?v=2';
+import {orderOverview} from './pf-order-layout.mjs?v=3';
 import {bindCartTest} from './pf-cart-test.mjs?v=4';
 import {proofQueue,proofQueueLabel} from './proof-status.mjs';
 import {foilFinish} from './foil-options.mjs';
@@ -28,7 +28,7 @@ const menu=bindAdminMenu({shell:document.body,button:$('pf-menu-toggle'),sidebar
 const labels=orderLabels;
 function el(tag,txt,cls){const node=document.createElement(tag);if(txt!=null)node.textContent=String(txt);if(cls)node.className=cls;return node;}
 function statusTone(order){if(['needs_attention','needs_reconciliation'].includes(order.status))return 'error';if(order.status==='revision_requested')return 'changes';if(['approval_pending_pf','approval_recorded','shipped'].includes(order.status))return 'approved';if(proofQueue(order)==='pf')return 'waiting';if(proofQueue(order)==='customer')return 'customer';return 'neutral';}
-function badges(order){const group=el('div',null,'proof-badges');group.append(el('span',labels[order.status]||order.status,'pill tone-'+statusTone(order)));return group;}
+function badges(order){const group=el('div',null,'proof-badges');group.append(el('span',order.deliveryConfirmation?'Leveret':labels[order.status]||order.status,'pill tone-'+statusTone(order)));return group;}
 function fold(title){const node=el('details',null,'proof-fold');node.append(el('summary',title));return node;}
 function decisionCard(decision,title){const approved=decision.decision==='approve',card=el('section',null,'decision-card tone-'+(approved?'approved':'changes'));card.append(el('span',title,'decision-label'),el('h3',approved?'Godkendt':'Ændringer ønsket'));if(decision.at)card.append(el('small',new Date(decision.at).toLocaleString('da-DK')));if(decision.comment){const quote=el('blockquote',decision.comment);card.append(quote);}return card;}
 function say(message){$('feedback').textContent=message||'';if(!$('login').hidden)$('login-feedback').textContent=message||'';}
