@@ -5,7 +5,7 @@ import {once} from 'node:events';
 import {mkdtemp,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {PDFDocument} from 'pdf-lib';
+import {PDFDocument,StandardFonts} from 'pdf-lib';
 import {createFileProcessRunner,runFileTask} from '../lib/file-process.mjs';
 const entry=new URL('./helpers/file-process-fixture.mjs',import.meta.url),input=reference=>({files:[{bytes:Buffer.from('synthetic only'),mimeType:'application/pdf'}],reference});
 test('file process does not inherit application secrets or permit reads of unrelated private files',async()=>{
@@ -39,4 +39,10 @@ test('Linux native canvas allocation failure leaves the parent and next parsing 
  const runner=createFileProcessRunner({entry});assert.deepEqual(await runner.run('pdf',input('normal')),{pages:1});
  try{const result=JSON.parse(await runner.run('extract',input('native')));assert.equal(result.denied,true);}catch(e){assert.equal(e.code,'FILE_PROCESS_FAILED');}
  assert.deepEqual(await runner.run('pdf',input('normal')),{pages:1});
+});
+
+test('actual bounded render reports safe resource diagnostics and returns a sanitized PDF',async t=>{
+ const pdf=await PDFDocument.create(),font=await pdf.embedFont(StandardFonts.Helvetica),page=pdf.addPage([595,842]);page.drawText('Synthetic proof',{x:40,y:780,size:12,font});
+ try{const result=await runFileTask('render',{files:[{bytes:Buffer.from(await pdf.save()),mimeType:'application/pdf'}],reference:'SMERCH-synthetic'});assert.equal(result.subarray(0,5).toString(),'%PDF-');}
+ catch(e){t.diagnostic(JSON.stringify({code:e.code,resources:e.fileDiagnostics||null}));throw e;}
 });

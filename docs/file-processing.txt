@@ -20,9 +20,10 @@ gælder ikke. Native grænser skal bevises i Linux-CI, ikke via oversprungne tes
 
 Kundekopien indlejrer de opaque, redigerede RGB-pixels direkte med tabsfri
 Flate-kompression. Ingen JPEG-konvertering og ingen genbrug af kilde-PDF-objekter.
-PNG-genafkodning undgås; pixelbuffere kan indsamles efter hver side.
+PNG-genafkodning undgås. Pixels læses i 64-rækkers striber for at undgå ekstra
+fuldsides native buffere; midlertidige buffere kan indsamles løbende.
 
-Node køres jitless, med 96 MiB V8-old-space og én V8-/libuv-puljetråd. Den
+Node køres jitless, med 64 MiB V8-old-space og én V8-/libuv-puljetråd. Den
 arver kun PATH og faste runtimevalg. Ingen .env, HOME eller providercredentials.
 Node-filtilladelser tillader kun lib, node_modules og projektets package.json;
 skrivning og start af underprocesser/worker threads gives ikke. PDF.js-eval,
