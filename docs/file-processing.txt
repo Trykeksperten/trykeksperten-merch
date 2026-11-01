@@ -35,6 +35,9 @@ er kernelgrænser; dependency-/container-/hostingbeskyttelse er fortsat relevant
 KØ, TIDSFRISTER OG DATA
 Der tillades én aktiv filproces og én ventende opgave på tværs af parserne.
 Ventetid højst fem sekunder. Yderligere arbejde afvises til retry/manuel kontrol.
+Midlertidig køafvisning bevares som retry gennem PDF-validering og mailimport:
+postkassens UID flyttes ikke forbi mailen, og relæ/API får 503 og Retry-After.
+Postkassens opsætning/pausestatus i drift er ikke ændret.
 Vægurstid: Pantone 3 s, PDF/billedvalidering 10 s, tekst/sammenlægning 20 s,
 redigeret kundekopi 60 s. Ved timeout/for stort svar bruges SIGKILL, og pladsen
 frigives først efter procesafslutning og lukket pipe. CPU-grænsen gælder også.

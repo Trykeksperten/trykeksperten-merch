@@ -30,3 +30,7 @@ test('a simulated revised PF email invalidates the old approval and stale links;
  const second=await message({id:uuid,date:'Sat, 24 Oct 2026 12:00:00 +0200',label:'Version 2 changed logo size'}),b=await parsePFProofEmail(second.raw,{verify});assert.equal(b.status,'ready',b.error);const result=await receiveProof(b.input,{mailbox:true});assert.equal(result.version,2);assert.equal((await readOrder(id)).decision,null);assert.equal((await readOrder(id)).status,'proof_received');await assert.rejects(customerProof(id,token));
  await receiveProof(b.input,{mailbox:true});const oldAgain=await message({id:uuid,pdf:first.pdf});const oldParsed=await parsePFProofEmail(oldAgain.raw,{verify});assert.equal((await receiveProof(oldParsed.input,{mailbox:true})).status,'obsolete');assert.equal((await readOrder(id)).proof.version,2);assert.equal((await proofMailStatus(id)).length,3);
 });
+
+test('a busy file process remains a retryable error instead of permanently blocking a valid PF email',async()=>{
+ const {raw}=await message();await assert.rejects(parsePFProofEmail(raw,{verify,extractPDF:async()=>{throw Object.assign(Error('Synthetic busy'),{code:'FILE_PROCESS_BUSY'});}}),{code:'FILE_PROCESS_BUSY'});
+});
