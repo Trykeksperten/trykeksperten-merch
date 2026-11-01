@@ -3,8 +3,9 @@ AUTOMATISK EKSTERN BACKUP — LOKALT KLARGJORT, IKKE AKTIVERET
 
 Aktuel status
 Koden er klargjort til den eksisterende JSON-webshop med én Node-instans.
-Der er ikke sat backupmiljøvariabler i produktion, oprettet nye B2-nøgler,
-ændret Render, uploadet rigtige data eller deployet denne kode.
+Produktionsmiljøet er ikke ændret, og der er hverken uploadet rigtige data
+eller deployet denne kode. Midlertidige B2-prøvenøgler blev brugt til en
+godkendt syntetisk sluttest og er tilbagekaldt. Ingen driftsnøgle er oprettet.
 PF Gateway ændres aldrig af backupfunktionen. PF står fortsat på TEST.
 
 Afgrænsning
@@ -102,7 +103,8 @@ Rettigheder præcis: listFiles, readFiles, writeFiles, readFileRetentions.
 Ingen deleteFiles, bypassGovernance, nøgleadministration eller bucketændringer.
 Den tidligere syntetiske B2-test havde ikke behov for listFiles i uploaderen;
 den nye klient bruger den til kontrolleret retry og det samlede størrelsesloft.
-Nøglen er ikke oprettet eller afprøvet live med denne Node-klient endnu.
+Ingen vedvarende driftsnøgle er oprettet. En midlertidig nøgle med dette scope
+bestod sluttesten med den rigtige Node-klient og er derefter tilbagekaldt.
 
 Privat credentialfilformat (kun skabelon, aldrig indsæt rigtige værdier her):
 {"keyId":"REPLACE_LOCALLY","applicationKey":"REPLACE_LOCALLY"}
@@ -122,7 +124,8 @@ Før rigtige data
 Validering
 Tests bruger syntetiske ordre-/checkoutfiler, nye prøvenøgler/certifikater,
 en simuleret B2-udbyder og en isoleret rigtig HTTP-server på loopback.
-Ny Node-klient mod rigtig B2 og ny kode i Render er ikke afprøvet/aktiveret her.
+Node-klienten er også afprøvet mod rigtig B2 som beskrevet nedenfor.
+Den nye kode er ikke kørt eller aktiveret i Render.
 Den tidligere virkelige B2-cloudtest med kun syntetiske data er fortsat bevaret
 som særskilt dokumentation i output/b2-synthetic-validation-2026-11-01/.
 Samlet testresultat for denne kode findes i
@@ -133,7 +136,7 @@ Den nye createBackupRuntime/runNow og B2-klient er nu kørt mod den rigtige
 private EU-bucket med kun syntetiske data, midlertidigt certifikat og begrænset
 uploader: 1.647 bytes, verificeret version/hash/lås, ekstern download, dekryptering,
 manifestkontrol og isoleret restore. Ingen rigtige data eller produktionsnøgler.
-Det tidligere afsnit om manglende liveprøve af Node-klienten er dermed afsluttet.
+Denne cloudprøve omfatter den samme runtime som de lokale tests.
 
 Den første opsætningsnøgles engangsvisning blev ikke fanget; den blev tilbagekaldt
 uden brug og erstattet inden for samme godkendte tidsvindue. Erstatningen havde
