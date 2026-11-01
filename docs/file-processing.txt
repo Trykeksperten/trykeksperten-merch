@@ -1,0 +1,59 @@
+FILBEHANDLING — SEPARAT PROCES, AFVENTER DEPLOY OG PLATFORMACCEPT
+1. november 2026
+
+Kunde-/leverandørfiler parses ikke længere i webprocessen eller dens worker
+threads. En fælles dispatcher kører Pantone-analyse, PDF-tekst, kundekorrekturens
+redaktion, uploadvalidering, korrekturimport og bilagskontrol i en ny proces.
+Kun de konkrete inputbytes og nødvendige valg sendes. Originaler omskrives ikke.
+Egen faktura-layoutkode anvender fortsat det betroede, medfølgende Smerch-logo.
+
+LINUX-POLITIK
+Python 3 er påkrævet. Med -I -S anvendes kun standardbiblioteket. Før Node
+startes sættes både bløde og hårde RLIMIT-grænser:
+- Virtuelt adresserum: 768 MiB (reservationsgrænse, ikke tildelt fysisk RAM).
+- Datasegment/allokeringer: 192 MiB; begrænser også native brk/mmap-allokeringer
+  på den testede moderne Linux-kerne. Dette er ikke en separat cgroup-RSS-grænse.
+- CPU-tid: 30 sekunder; core dumps og almindelig filskrivning: 0 bytes.
+Manglende Python eller afviste grænser giver fejl. Ingen ubegrænset Linux-fallback.
+På macOS kører samme separate proces og protokol, men Linux-RLIMIT-påstande
+gælder ikke. Native grænser skal bevises i Linux-CI, ikke via oversprungne tests.
+
+Node køres jitless, med 96 MiB V8-old-space og én V8-/libuv-puljetråd. Den
+arver kun PATH og faste runtimevalg. Ingen .env, HOME eller providercredentials.
+Node-filtilladelser tillader kun lib, node_modules og projektets package.json;
+skrivning og start af underprocesser/worker threads gives ikke. PDF.js-eval,
+XFA og systemfonte er slået fra, og fetch afvises. Native canvas kræver addons.
+Det betyder, at Node-permission-modellen ikke påstås at være et komplet
+OS-sikkerhedssandbox mod en udnyttet native afhængighed. Ressourcegrænserne
+er kernelgrænser; dependency-/container-/hostingbeskyttelse er fortsat relevant.
+
+KØ, TIDSFRISTER OG DATA
+Der tillades én aktiv filproces og én ventende opgave på tværs af parserne.
+Ventetid højst fem sekunder. Yderligere arbejde afvises til retry/manuel kontrol.
+Vægurstid: Pantone 3 s, PDF/billedvalidering 10 s, tekst/sammenlægning 20 s,
+redigeret kundekopi 60 s. Ved timeout/for stort svar bruges SIGKILL, og pladsen
+frigives først efter procesafslutning og lukket pipe. CPU-grænsen gælder også.
+
+Input: Pantone 5 MiB, tekst/validering 10 MiB, kundekopi 15 MiB, sammenlægning
+20 MiB samlet og højst 20 filer. Output er særskilt begrænset; PDF-output højst
+24 MiB, tekst højst 2 MiB. Svar kontrolleres for korrekt type, grænser og format.
+Korrekturer højst 40 sider, bilagskontrol højst 200. Billeder højst 40 megapixel;
+PNG-dimensioner kontrolleres før decode. Eksisterende kundekopi beholder sine
+side-/pixel-/redaktionsregler. Et mislykket redaktionsjob returnerer aldrig
+leverandøroriginalen. Fejl sender ingen mails og ændrer ingen afgørelser alene.
+
+FØR FRIGIVELSE
+Faktiske parserkald skal bestå den samlede Linux-CI, herunder native allokerings-
+fejl gennem den samme launcher og fortsat korrekt redaktion. Den konkrete
+Render-plan har 512 MiB samlet RAM; parent, kø/cache, andre HTTP-kald og barnet
+deler hostingbudgettet. Et testet enkeltjobs peak-RSS er ikke et bevis for
+hele webshoppens maksimale samtidige RSS. En kontrolleret platform-/belastnings-
+accept og driftsbeslutning kræves før frigivelse; det er ikke udført i produktion.
+Proxy-ingress afstemmes separat som beskrevet i proxy-rate-limits.txt.
+
+Kilder: Node 24.14.0 worker_threads/resourceLimits og CLI permission options,
+https://nodejs.org/download/release/v24.14.0/docs/api/worker_threads.html
+https://nodejs.org/download/release/v24.14.0/docs/api/cli.html
+Linux getrlimit/setrlimit: RLIMIT_AS, DATA, CPU, CORE og FSIZE; RLIMIT_RSS
+er ikke anvendt som en virkende moderne Linux-grænse.
+https://man7.org/linux/man-pages/man2/getrlimit.2.html
