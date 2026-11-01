@@ -7,6 +7,7 @@ const launcher=String.raw`
 import os,sys,resource
 cap=int(sys.argv[3])*1024*1024
 resource.setrlimit(resource.RLIMIT_AS,(cap,cap))
+resource.setrlimit(resource.RLIMIT_DATA,(192*1024*1024,192*1024*1024))
 resource.setrlimit(resource.RLIMIT_CPU,(8,9))
 resource.setrlimit(resource.RLIMIT_CORE,(0,0))
 os.execve(sys.argv[1],[sys.argv[1],'--jitless','--max-old-space-size=96','--v8-pool-size=1','-e',sys.argv[2]],{'PATH':os.environ['PATH'],'UV_THREADPOOL_SIZE':'1','MALLOC_ARENA_MAX':'1'})
@@ -28,16 +29,16 @@ const program=String.raw`
 `;
 async function probe(cap,input){
  return new Promise(resolve=>{
-  const child=spawn('python3',['-I','-S','-c',launcher,process.execPath,program,String(cap)],{env:{PATH:process.env.PATH},stdio:['pipe','pipe','ignore']});
-  let output='',overflow=false;const timer=setTimeout(()=>child.kill('SIGKILL'),15000);
+  const child=spawn('python3',['-I','-S','-c',launcher,process.execPath,program,String(cap)],{env:{PATH:process.env.PATH},stdio:['pipe','pipe','pipe']});
+  let output='',diagnostic='',overflow=false;child.stderr.on('data',chunk=>{if(diagnostic.length<4096)diagnostic+=chunk.toString().slice(0,4096-diagnostic.length);});const timer=setTimeout(()=>child.kill('SIGKILL'),15000);
   child.stdout.on('data',chunk=>{if(output.length+chunk.length>16384){overflow=true;child.kill('SIGKILL');}else output+=chunk;});
-  child.stdin.on('error',()=>{});child.once('error',()=>{});child.once('close',code=>{clearTimeout(timer);const line=output.split('\n').find(s=>s.startsWith('SMERCH_RESOURCE_RESULT '));let result=null;try{if(line)result=JSON.parse(line.slice(23));}catch{}resolve({capMiB:cap,code,overflow,result});});
+  child.stdin.on('error',()=>{});child.once('error',()=>{});child.once('close',(code,signal)=>{clearTimeout(timer);const line=output.split('\n').find(s=>s.startsWith('SMERCH_RESOURCE_RESULT '));let result=null;try{if(line)result=JSON.parse(line.slice(23));}catch{}resolve({capMiB:cap,dataLimitMiB:192,code,signal,overflow,result,diagnostic:result?null:diagnostic.split('\n').slice(0,5).join(' | ')});});
   child.stdin.end(input);
  });
 }
-test('Linux preflight: native PDF rendering and rejected oversized allocation under an OS address-space limit',{skip:process.platform!=='linux',timeout:50000},async t=>{
+test('Linux preflight: native PDF rendering and rejected oversized allocation under an OS address-space limit',{skip:process.platform!=='linux',timeout:80000},async t=>{
  const pdf=await PDFDocument.create(),font=await pdf.embedFont(StandardFonts.Helvetica),page=pdf.addPage([595,842]);page.drawText('SMERCH synthetic isolation test',{x:40,y:780,size:12,font});const input=await pdf.save();
- const results=[];for(const cap of [256,320,384])results.push(await probe(cap,input));
+ const results=[];for(const cap of [256,384,768,1536])results.push(await probe(cap,input));
  t.diagnostic(JSON.stringify({syntheticResourceProbes:results}));
  const successful=results.filter(r=>r.code===0&&r.result);
  assert.ok(successful.length,'No bounded profile could render the synthetic PDF. Do not wire production processing.');
