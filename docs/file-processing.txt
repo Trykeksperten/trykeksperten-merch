@@ -25,6 +25,8 @@ fuldsides native buffere; midlertidige buffere kan indsamles løbende.
 
 Node køres jitless, med 64 MiB V8-old-space og én V8-/libuv-puljetråd. Den
 arver kun PATH og faste runtimevalg. Ingen .env, HOME eller providercredentials.
+Native canvas indlæser heller ikke systemets eller brugerens fonte automatisk;
+kun PDF.js' kontrollerede, pakkede fontdata bruges til denne pipeline.
 Node-filtilladelser tillader kun lib, node_modules og projektets package.json;
 skrivning og start af underprocesser/worker threads gives ikke. PDF.js-eval,
 XFA og systemfonte er slået fra, og fetch afvises. Native canvas kræver addons.
