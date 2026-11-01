@@ -15,3 +15,6 @@ Smerch-backup-*/
 # bygges eller distribueres sammen med webshoppen.
 dist/assets/rollup/
 dist/assets/**/*.zip
+
+# Local recovery keys and codes: never commit.
+/PRIVAT-RECOVERY/

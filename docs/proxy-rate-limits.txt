@@ -1,0 +1,49 @@
+PROXY-IP OG RATE LIMITS — LOKALT RETTET, EDGE-ACCEPT AFVENTER
+1. november 2026
+
+Fælles klientadresse bruges nu til adminlogin, virksomhedskonti, kontaktformular,
+adressesøgning, Pantone-kontrol og statistik. Direkte/untrusted forbindelser bruger
+transportens socketadresse. Indsendt X-Forwarded-For eller CF-Connecting-IP kan
+ikke i sig selv give klienten en ny rate-limit-identitet.
+
+Betroede proxyer kræver eksplicit SMERCH_TRUSTED_PROXY_CIDRS (kommasepareret).
+Ingen Render-adresser antages eller er tilføjet i produktionen. /0-ranges, ugyldige
+CIDR'er, for lange lister og ukendte headernavne afvises. IPv4 og IPv6 understøttes.
+SMERCH_CLIENT_IP_HEADER kan være cf-connecting-ip (standard) eller x-forwarded-for.
+For XFF følges kæden bagfra til første ikke-betroede adresse; en spoofet venstre
+adresse vælges ikke blindt. Ugyldige/for lange headers giver socket-fallback.
+Kontaktformularens adressetællere er desuden begrænset og udløber.
+
+VIGTIGT FØR DEPLOY
+På en delt Render-proxy kan socket-fallback samle flere brugere i samme bucket.
+De konkrete betroede ingress-peer-ranges skal derfor dokumenteres og accepteres,
+før denne ændring bruges i produktion. Der må ikke gættes på ranges eller vælges
+trust-all. Ellers kan legitime brugere fejlagtigt dele en rate limit.
+
+Den eksisterende loginbeskyttede GET /api/admin/operations indeholder minimale
+network-felter for administratorens EGEN forespørgsel: transportadresse, valgt
+klientadresse, normaliseret CF-header og om forwarding er konfigureret. Ingen
+cookies, authorization-headere, rå headerkæder eller andre besøgendes oplysninger.
+Der logges ikke automatisk IP-adresser med denne ændring.
+
+Efter særskilt godkendt deploy, fortsat med checkout lukket og PF på TEST:
+1. Log ind som administrator og læs operations-status fra kendte forbindelser.
+2. Afstem socket-/edge-/valgt adresse med den dokumenterede Render-ingress.
+3. Kontrollér forsigtigt med få egne læsekald, at en selvvalgt XFF ikke ændrer
+   den valgte klient-IP. Ingen belastningstest eller bruteforce i produktion.
+4. Dokumentér afgrænsning til én instans og proceslokale tællere. Flere instanser
+   kræver et fælles lager og en separat gennemgang.
+
+Lokalt er samme HTTP-server testet med syntetiske honeypotbeskeder, der aldrig
+sender mails: fem beskeder accepteres, sjette afvises trods skiftende falske
+headers. Med eksplicit lokal testproxy adskilles to klienter korrekt, og XFF
+kan ikke nulstille hverken kontakt- eller loginbegrænsningen. IPv6, ugyldige
+ranges, headergrænser og private admin-diagnosefelter er også dækket.
+
+Dokumentation fra Render, kontrolleret 1. november 2026:
+https://render.com/articles/how-render-handles-ddos-attacks
+https://render.com/articles/host-pocketbase-on-render
+https://render.com/articles/fastapi-production-best-practices
+Render beskriver XFF bag sine proxyer. PocketBase-guiden advarer specifikt mod
+venstre XFF-led og viser CF-Connecting-IP; FastAPI-guiden understreger begrænset
+proxytrust. Det er vejledning, ikke en udført edge-prøve af denne webshop.

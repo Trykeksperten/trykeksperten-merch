@@ -1,0 +1,152 @@
+AUTOMATISK EKSTERN BACKUP — LOKALT KLARGJORT, IKKE AKTIVERET
+1. november 2026
+
+Aktuel status
+Koden er klargjort til den eksisterende JSON-webshop med én Node-instans.
+Der er ikke sat backupmiljøvariabler i produktion, oprettet nye B2-nøgler,
+ændret Render, uploadet rigtige data eller deployet denne kode.
+PF Gateway ændres aldrig af backupfunktionen. PF står fortsat på TEST.
+
+Afgrænsning
+Kun én skrivende applikationsproces er understøttet. SQLite og WEB_CONCURRENCY
+andet end 1 afvises ved aktivering. Operatøren skal bekræfte, at der ikke er
+andre processer/CLI-scripts, der skriver til datalageret. Bekræftelsesflaget er
+en driftsforudsætning, ikke automatisk detektion af enhver ekstern proces.
+Manuelle data-/feed-/migrationsscripts må ikke køre sideløbende med snapshot.
+
+Sikker skrivepause
+Alle almindelige HTTP-kald, også læsninger som kan starte arbejde, går gennem
+samme adgangsmekanisme som baggrundsjob og feedprocesser. Detached mailjob
+har deres egen levetid, selv om HTTP-svaret er sendt. Et afledt job kan afslutte
+under dræningen, men en udløbet async-kontekst kan ikke omgå en senere pause.
+
+Der lukkes for nye opgaver og ventes højst 10 sekunder på igangværende arbejde.
+Ved timeout afbrydes backupforsøget, mens den igangværende ordre får lov at
+fortsætte. Nye HTTP-kald under pausen får 503 og Retry-After: 5; /health forbliver
+tilgængelig. Timere springer en kørsel over og prøver på næste normale interval.
+
+Når alle kendte operationer er afsluttet, tages og verificeres filkopien i en
+særskilt Node-proces. Ukendte aktive .lock-markører, SQLite, links, særlige filer,
+for stor kilde eller for mange filer afviser snapshot. Gamle backupmapper
+kopieres stadig; deres historiske låse er ikke aktive driftslåse.
+Kopiprocessen har maksimalt seks sekunder. Ved timeout dræbes den, og parenten
+venter på procesafslutning, før adgangsmekanismen åbnes igen.
+
+Denne lokale implementering bruger IKKE SIGSTOP på webprocessen. Den tidligere
+plan med en pause/watchdog er erstattet af kontrolleret dræning og en særskilt,
+tidsbegrænset kopiproces. Webprocessens event loop og health fortsætter. Der er
+ikke behov for at sende SIGCONT eller genstarte webprocessen efter snapshot.
+
+Arkiv og verificering
+Der oprettes kun nye, private arbejdsmapper uden for datalageret. Symbolske
+forældre kan ikke få backupværktøjet til at oprette mapper inde i datalageret.
+Maksimal kildestørrelse er 256 MiB, og der kræves reserveret ledig arbejdsplads.
+Kilde, kopier og restoremanifest sammenlignes med SHA-256 som i den tidligere
+backup-/gendannelsesprøve. Miljø og recovery-metadata lagres inde i arkivet.
+
+Efter genåbning af HTTP/jobadgang komprimeres arkivet med Python tarfile og
+krypteres med OpenSSL CMS/AES-256-CBC til det offentlige RSA-certifikat.
+Certifikatets SHA-256 skal matche den særskilt bekræftede værdi. Et forkert
+certifikat, en privat nøgle i certifikatfilen eller en RSA-nøgle under 2048 bit
+afvises. Den private produktionsdekrypteringsnøgle skal aldrig ligge på Render.
+
+B2-klienten streamer filer og downloads; den indlæser ikke hele store backups
+i hukommelsen. Den tillader kun Backblaze HTTPS-endpoints, ingen redirects,
+præcis konto/bucket/EU-region og præcis de forventede begrænsede rettigheder.
+Maksimal krypteret fil er 200 MiB og samlet versionsbudget under daily/ 8 GB.
+Der skrives ingen kundeoplysninger i objektnavne eller driftslogs.
+
+Uploadnavnet er en UTC-dato plus et tilfældigt UUID. Efter et tabt svar eller
+503 kontrolleres det samme navn før et nyt forsøg. Konflikter/dubletter kræver
+afstemning og overskrives ikke. Der forsøges højst tre gange i samme kørsel.
+En korrekt uploadkvittering er ikke nok: den konkrete filversion hentes igen,
+SHA-256 og størrelse skal stemme, og 30-dages Governance-lås skal være læsbar.
+Først derefter gemmes backup-status.json i datalageret og kørslen markeres OK.
+En fejl erstatter ikke den seneste succes. Midlertidig klartekst ryddes op ved
+både succes og normal fejlhåndtering. Ved hårdt proces-/maskinnedbrud kan en
+privat restmappe eller en lås kræve kontrolleret oprydning; den nulstilles ikke
+blindt ved næste start. Backendens proceslokale pause er væk ved procesophør.
+
+SHA-256 er ikke en digital signatur, og CBC-formatet giver ikke i sig selv
+autenticitetsbevis. TLS, certifikatfingerprint, kendte fil-ID'er/kvitteringer og
+bevarede låste versioner er derfor del af proceduren. Formatet bevares af hensyn
+til den allerede afprøvede gendannelse.
+
+Daglig plan og status
+Kun med eksplicit aktivering: UTC kl. 02 hver dag, dvs. kl. 03 dansk vintertid
+og kl. 04 dansk sommertid. Der kontrolleres hvert minut; en opstart efter dagens
+planlagte tidspunkt kan indhente dagens kørsel. Kun én kørsel ad gangen.
+Ved fejl højst tre kørsler på dagen, mindst 10 minutter mellem kørselsforsøg.
+En gyldig succes for samme bucket kan genindlæses fra kvitteringen efter restart.
+
+/api/admin/operations viser minimal backupstatus for en autentificeret admin.
+Der er ingen ny offentlig backup-trigger og ingen ny overførselsadgang i UI.
+Manuel frisk backup før det første deploy kræver fortsat den allerede beskrevne
+kontrollerede procedure og særskilt godkendelse. Den daglige plan erstatter ikke
+kravet om en frisk backup før en senere risikofyldt ændring.
+
+Ingen intern mail-/backupalarm er aktiveret. UptimeRobot overvåger webshop og
+health, men opdager ikke i sig selv en manglende backup. Indtil særskilt
+fejl-/friskhedsovervågning er godkendt, skal ejeren kontrollere seneste kvittering
+dagligt. Mål for datatab er 24 timer ved vellykket daglig drift; det er ikke en
+garanti under fejl. Fuld operationel gendannelsestid er endnu ikke fastlagt.
+
+Inaktiv opsætningsskabelon
+config/backup-env.example.json indlæses ikke automatisk. Aktiveringsflag står 0.
+Faktisk .env og render.yaml er ikke ændret. Fremtidig aktivering kræver gennemgang
+og ejerens udtrykkelige godkendelse af rigtige data, credentials og deploy.
+
+Fremtidig B2-nøgle efter særskilt godkendelse
+Kun bucket 1f97943366a09a82a8110910, præfiks daily/.
+Rettigheder præcis: listFiles, readFiles, writeFiles, readFileRetentions.
+Ingen deleteFiles, bypassGovernance, nøgleadministration eller bucketændringer.
+Den tidligere syntetiske B2-test havde ikke behov for listFiles i uploaderen;
+den nye klient bruger den til kontrolleret retry og det samlede størrelsesloft.
+Nøglen er ikke oprettet eller afprøvet live med denne Node-klient endnu.
+
+Privat credentialfilformat (kun skabelon, aldrig indsæt rigtige værdier her):
+{"keyId":"REPLACE_LOCALLY","applicationKey":"REPLACE_LOCALLY"}
+Filen skal være en almindelig fil, højst 4 KB, med rettigheder 0600 i en beskyttet
+mappe/secret-fil. Den læses kun ved faktisk backupkørsel efter aktivering.
+Planlæg udløb/rotation; brug ikke en master-nøgle. Runtime ændrer ikke andre nøgler.
+
+Før rigtige data
+1. Bekræft MFA og sikkert gemte kontogendannelseskoder hos Backblaze.
+2. Sikr en separat recovery-kopi af den eksisterende private backupnøgle.
+3. Bekræft det forventede offentlige certifikat via den tidligere restoreprøve.
+4. Godkend data og denne konkrete EU-destination samt en begrænset driftsnøgle.
+5. Gennemgå koden og de lokale tests. Godkend særskilt deploy og aktivering.
+6. Gennemfør første rigtige overførsel, ekstern download og isoleret restore.
+7. Godkend eventuel intern alarmrouting og afklar ansvar for daglig kontrol.
+
+Validering
+Tests bruger syntetiske ordre-/checkoutfiler, nye prøvenøgler/certifikater,
+en simuleret B2-udbyder og en isoleret rigtig HTTP-server på loopback.
+Ny Node-klient mod rigtig B2 og ny kode i Render er ikke afprøvet/aktiveret her.
+Den tidligere virkelige B2-cloudtest med kun syntetiske data er fortsat bevaret
+som særskilt dokumentation i output/b2-synthetic-validation-2026-11-01/.
+Samlet testresultat for denne kode findes i
+output/automatic-backup-local-2026-11-01/full-suite-final.log.
+
+OPDATERING — AFSLUTTENDE SYNTETISK CLOUDPRØVE BESTÅET
+Den nye createBackupRuntime/runNow og B2-klient er nu kørt mod den rigtige
+private EU-bucket med kun syntetiske data, midlertidigt certifikat og begrænset
+uploader: 1.647 bytes, verificeret version/hash/lås, ekstern download, dekryptering,
+manifestkontrol og isoleret restore. Ingen rigtige data eller produktionsnøgler.
+Det tidligere afsnit om manglende liveprøve af Node-klienten er dermed afsluttet.
+
+Den første opsætningsnøgles engangsvisning blev ikke fanget; den blev tilbagekaldt
+uden brug og erstattet inden for samme godkendte tidsvindue. Erstatningen havde
+kortere levetid, uploaderen 30 minutter. Master-nøglen blev ikke ændret.
+Alle prøvenøgler er tilbagekaldt, og efterfølgende Basic-login gav HTTP 401.
+Udstedt uploader-token blev også afvist. Et allerede udstedt opsætningstoken
+kunne fortsat læse b2_list_keys (HTTP 200) umiddelbart efter nøglens sletning.
+Det beviser ikke adgang til andre operationer; årsag og fuld varighed er ikke
+fastlagt. Alle lokale nøgler/tokens er slettet, og processerne er afsluttet.
+Der loves derfor ikke øjeblikkelig ugyldighed af enhver tidligere udstedt token.
+Backblazes dokumentation beskriver autorisationstokens med 24 timers udløb:
+https://www.backblaze.com/docs/cloud-storage-application-keys
+Fremtidig driftsnøgle skal derfor fortsat være strengt begrænset, og rotation/
+revokering skal tage højde for allerede udstedte tokens.
+
+Daglig produktionsbackup og intern alarmering er fortsat IKKE aktiveret.
