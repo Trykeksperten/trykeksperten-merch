@@ -21,6 +21,10 @@ Størrelse|Size
 Logostørrelse i procent|Logo size as a percentage
 Rotation af logo i grader|Logo rotation in degrees
 grader|degrees
+Logoet har cirka|The logo has approximately
+farver, men der er valgt|colours, but you selected
+Vælg mindst|Select at least
+eller ret originalfilens farver og upload den igen.|or change the colours in the original file and upload it again.
 Farvetjek: cirka|Colour check: approximately
 Du har valgt|You have selected
 til denne placering. Endelige farver kontrolleres før produktion.|for this position. Final colours are checked before production.

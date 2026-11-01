@@ -36,13 +36,13 @@ test('typing and removing customer text immediately refreshes the complete desig
  vm.runInContext(extract(' const renderColorWarning=','function renderColorChoices()'),f.context);
  f.$('colors').value='2';f.$('ink').value='#17201f';
  f.$('text').value='Privat ÆØÅ';f.$('text').oninput();
- assert.equal(f.$('color-warning').className,'pf-color-warning ok');
- assert.match(f.$('color-warning').innerHTML,/Farvetjek: cirka 2 farver/);
+ assert.equal(f.$('color-warning').hidden,true);
+ assert.equal(f.$('color-warning').innerHTML,'');
  f.$('text').value='';f.$('text').oninput();
- assert.equal(f.$('color-warning').className,'pf-color-warning');
+ assert.equal(f.$('color-warning').className,'pf-color-warning');assert.equal(f.$('color-warning').hidden,false);
  assert.match(f.$('color-warning').innerHTML,/cirka 1 farve/);
  f.$('text').value='Privat ÆØÅ';f.$('text').oninput();
- assert.match(f.$('color-warning').innerHTML,/Farvetjek: cirka 2 farver/);
+ assert.equal(f.$('color-warning').hidden,true);assert.equal(f.$('color-warning').innerHTML,'');
 });
 for(const name of ['QuotaExceededError','SecurityError'])test('autosave '+name+' keeps text/layers through placement navigation and shows live editor error',()=>{
  const f=fixture(),art={id:'art',logo:{id:'file',pixelWidth:300,pixelHeight:100},x:.4,y:.6,scale:.3,rotation:30};
@@ -95,4 +95,25 @@ test('cart attachment storage failure reports a warning after one successful car
  assert.equal(writes,1);assert.equal(f.$('cart-error').textContent,'');assert.equal(f.context.cartSnapshot,'submitted');assert.equal(f.context.cartSaving,false);
  assert.equal(f.cart[0].decorations[0].text,'Canonical cart design');assert.equal(f.store.saved().sku[0].text,'Canonical cart design');assert.match(f.$('editor-error').textContent,/Dit arbejde er bevaret/);
  f.fail(null);f.store.saveWorking(f.store.working());assert.equal(f.store.saved().sku[0].text,'Canonical cart design');f.store.assertCurrent();
+});
+
+
+test('colour mismatch explains the save block, preserves both files and text, and matching colours allow review',async()=>{
+ const f=fixture();
+ Object.assign(f.context,{designColorCount,colourChoices:()=>[{colors:1},{colors:3},{colors:4}],artworks:[{id:'front',logo:{id:'pdf1',detectedPalette:[{hex:'#ff0000'}]}},{id:'back',logo:{id:'pdf2',detectedPalette:[{hex:'#0000ff'}]}}]});
+ vm.runInContext(extract(' const renderColorWarning=','function renderColorChoices()'),f.context);
+ f.$('text').value='Privat ÆØÅ\niPhone 123';f.$('ink').value='#000000';f.$('text').oninput();
+ assert.match(f.$('color-warning').innerHTML,/cirka 3 farver, men der er valgt 1/);
+ assert.match(f.$('color-warning').innerHTML,/data-return-colour-choice/);
+ const reason='Logoet har cirka 3 farver, men der er valgt 1. Vælg mindst 3 trykfarver, eller ret originalfilens farver og upload den igen.';
+ f.context.renderPreflight=()=>({status:'rejected',label:'Farveantal passer ikke',checks:[reason]});
+ const writes=f.writes();await f.context.savePlacement();
+ assert.equal(f.writes(),writes);assert.equal(f.$('editor-error').textContent,reason);
+ assert.equal(f.context.artworks.length,2);assert.equal(f.$('text').value,'Privat ÆØÅ\niPhone 123');
+ assert.ok(!f.events.includes('closed'));
+ f.$('colors').value='4';f.$('text').oninput();assert.equal(f.$('color-warning').hidden,false);assert.match(f.$('color-warning').innerHTML,/cirka 3 farver/);assert.match(f.$('color-warning').innerHTML,/Du har valgt 4 farver/);assert.match(f.$('color-warning').innerHTML,/færre farver end valgt/);assert.doesNotMatch(f.$('color-warning').innerHTML,/Vælg flere trykfarver/);
+ f.$('colors').value='3';f.$('text').oninput();assert.equal(f.$('color-warning').hidden,true);assert.equal(f.$('color-warning').innerHTML,'');
+ f.context.renderPreflight=()=>({status:'review',label:'Kræver filkontrol'});await f.context.savePlacement();
+ assert.equal(f.$('editor-error').textContent,'');assert.equal(f.store.saved().sku[0].artworks.length,2);
+ assert.equal(f.store.saved().sku[0].text,'Privat ÆØÅ\niPhone 123');assert.ok(f.events.includes('closed'));
 });

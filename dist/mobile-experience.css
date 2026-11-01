@@ -223,7 +223,10 @@
  .pf-visual-designer .pf-layer-nudge button:active{background:#dce7da}
  .pf-visual-designer .pf-desktop-nudge{display:none}
  .pf-visual-designer .pf-mobile-nudge-icon{display:block}
- .pf-visual-designer .pf-upload-launch{border:0;border-radius:10px;background:#f1f4f0;box-shadow:none}
+ .pf-visual-designer .pf-upload-launch{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;row-gap:2px;border:0;border-radius:10px;background:#f1f4f0;box-shadow:none}
+ .pf-visual-designer .pf-upload-launch>strong,.pf-visual-designer .pf-upload-launch>small{grid-column:1;min-width:0;white-space:normal;overflow-wrap:anywhere}
+ .pf-visual-designer .pf-upload-launch>strong{grid-row:1}
+ .pf-visual-designer .pf-upload-launch>small{grid-row:2}
  .pf-visual-designer .pf-upload-launch>span{display:none}
  .pf-visual-designer .pf-designer-sidebar .pf-designer-panel{box-shadow:none;border-radius:0}
  .pf-visual-designer .pf-text-align button,.pf-visual-designer .pf-text-controls select{border-radius:8px}
@@ -295,4 +298,27 @@ body.storefront #main .pf-studio .pf-product-total span,.pf-product-total small{
 
 @media(max-width:1024px){
  .pf-studio[data-mobile-layout="stacked"] .pf-size-selection.has-single-quantity .pf-size-quantities label{justify-content:flex-start;gap:12px}
+}
+
+/* Leave the compact keyboard preview clear of the print-dimensions caption. */
+@media(max-width:1024px){
+ .pf-visual-designer.pf-keyboard-editing .pf-canvas-area>.pf-zone-size{display:none}
+}
+
+/* Product colours stay on one scrollable row, including in the editor. */
+.pf-studio .pf-mobile-product-colours,.pf-studio .pf-editor-product-colours{flex-wrap:nowrap;justify-content:flex-start;min-width:0;max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain}
+.pf-studio .pf-mobile-product-colours button,.pf-studio .pf-editor-product-colours button{flex:0 0 auto}
+.pf-studio .pf-editor-product-colours>span{flex:0 0 auto;max-width:45%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:1024px){
+ .pf-studio .pf-mobile-product-colours button,.pf-studio .pf-editor-product-colours button{width:32px;min-width:32px;height:32px;min-height:32px;padding:4px}
+ .pf-studio .pf-mobile-product-colours button span,.pf-studio .pf-editor-product-colours button i{width:20px;height:20px}
+ .pf-studio .pf-editor-product-colours{gap:4px;padding:4px 8px}
+}
+
+/* Let translated tool labels determine their width instead of overflowing a half-row. */
+@media(max-width:1024px){
+ body.storefront #main .pf-visual-designer .pf-mobile-tools>.pf-editor-tabs{flex-wrap:wrap;align-items:stretch;gap:6px}
+ body.storefront #main .pf-visual-designer .pf-mobile-tools .pf-content-tabs{flex:1 1 max-content;min-width:0;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+ body.storefront #main .pf-visual-designer .pf-mobile-tools #pf-placement-tabs{flex:1 1 max-content;min-width:0;max-width:100%}
+ body.storefront #main .pf-visual-designer .pf-mobile-tools .pf-content-tabs button[data-content-tab],body.storefront #main .pf-visual-designer .pf-mobile-tools #pf-placement-tabs button{flex:0 0 auto;min-height:44px}
 }

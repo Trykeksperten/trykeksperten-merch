@@ -162,3 +162,19 @@ test('postcommit preview persists the original placement and its renderer ignore
  assert.equal(f.context.option.id,'back');assert.equal(f.context.artworks.length,0);assert.equal(drafts.working()['p:sku-a:back'],undefined);
  assert.equal(f.$('designer-product').dataset.optionId,undefined);assert.equal(f.files.size,2);assert.equal(f.errors.length,0);
 });
+
+
+for(const targetCounts of [[1,3],[1]])test('open studio colour switch retains artwork and only supported colour confirmation: '+targetCounts,()=>{
+ const s=storageFixture(),f=harness(),drafts=s.store(null);s.bind(f,drafts,null);
+ Object.assign(f.context,{selectedColor:'a',groups:[{key:'a',variants:[f.context.p.variants[0]]},{key:'b',variants:[f.context.p.variants[1]]}],guidedIndex:0,sizeQuantities:{'sku-a':3},
+  orderVariants:()=>[f.context.v],selectionLines,transferColourQuantities,placementOptionAssets:()=>({ready:true}),validateDecoration:()=>'',renderSizes:noop,renderStock:noop,renderEditorColours:noop,productFlow:null,
+  colourChoices:()=>targetCounts.map(colors=>({colors})),hasChosenColours:o=>f.context.confirmedColourOptions.has(o.id)});
+ f.$('quantity').value='3';f.$('method').value='print';f.$('colors').value='3';f.context.confirmedColourOptions.add('front');
+ f.$('text').value='Privat ÆØÅ\niPhone 123';f.context.artworks=[{id:'one',logo:{id:'pdf1',name:'Forside.pdf'},x:.3,y:.4,scale:.2},{id:'two',logo:{id:'pdf2',name:'Bagside.pdf'},x:.7,y:.6,scale:.3}];
+ let reopened=0;f.context.openPlacement=()=>{reopened++;assert.equal(f.context.confirmedColourOptions.has('front'),targetCounts.includes(3));};
+ vm.runInContext(extract(' function changeProductColour(key){',' let productFlow;'),f.context);
+ f.context.changeProductColour('b');assert.equal(reopened,1);assert.equal(f.context.v.sku,'sku-b');
+ assert.equal(f.$('text').value,'Privat ÆØÅ\niPhone 123');assert.equal(f.context.artworks.length,2);
+ assert.deepEqual(f.context.artworks.map(a=>a.logo.id),['pdf1','pdf2']);assert.equal(f.$('colors').value,3);
+ assert.equal(drafts.working()['p:sku-b:front'].coloursConfirmed,true);
+});

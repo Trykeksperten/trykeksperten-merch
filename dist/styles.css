@@ -2657,3 +2657,15 @@ body.storefront #main .pf-visual-designer #pf-editor-subtitle.pf-selected-print-
 /* Keep persistence/validation failures visible while the mobile keyboard hides the footer. */
 .pf-visual-designer>.pf-studio-error{flex:0 0 auto;margin:0;padding:8px 16px;max-height:88px;overflow:auto;background:#fff4ef;color:#862e1d;font-size:13px;line-height:1.4}
 .pf-visual-designer>.pf-studio-error:empty{display:none}
+
+/* Print dimensions stay outside the interactive canvas at every zoom level. */
+.pf-visual-designer .pf-canvas-area>.pf-zone-size{position:static;inset:auto;transform:none;z-index:auto;align-self:center;flex:0 0 auto;max-width:100%;margin:0;padding:4px 10px;border-radius:0;background:transparent;color:#526657;font-size:12px;line-height:1.4;white-space:normal;box-shadow:none;pointer-events:none}
+
+/* Canvas layers use physical print proportions, not the 44px mobile button target. */
+.pf-visual-designer :is(.pf-design-layer,.pf-designer-text){min-width:0;min-height:0}
+
+/* Keep colour guidance beside the mockup, outside its interactive print area. */
+.pf-visual-designer .pf-canvas-area>.pf-color-warning{flex:0 0 auto;align-self:stretch;margin:6px 10px;padding:8px 10px;gap:6px;font-size:13px;line-height:1.35}
+.pf-visual-designer .pf-canvas-area>.pf-color-warning[hidden]{display:none}
+.pf-visual-designer .pf-canvas-area>.pf-color-warning.ok{padding:6px 10px}
+.pf-visual-designer .pf-canvas-area>.pf-color-warning.ok span{font-size:12px}
