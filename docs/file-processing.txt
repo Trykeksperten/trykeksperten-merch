@@ -18,6 +18,10 @@ Manglende Python eller afviste grænser giver fejl. Ingen ubegrænset Linux-fall
 På macOS kører samme separate proces og protokol, men Linux-RLIMIT-påstande
 gælder ikke. Native grænser skal bevises i Linux-CI, ikke via oversprungne tests.
 
+Kundekopien indlejrer de opaque, redigerede RGB-pixels direkte med tabsfri
+Flate-kompression. Ingen JPEG-konvertering og ingen genbrug af kilde-PDF-objekter.
+PNG-genafkodning undgås; pixelbuffere kan indsamles efter hver side.
+
 Node køres jitless, med 96 MiB V8-old-space og én V8-/libuv-puljetråd. Den
 arver kun PATH og faste runtimevalg. Ingen .env, HOME eller providercredentials.
 Node-filtilladelser tillader kun lib, node_modules og projektets package.json;

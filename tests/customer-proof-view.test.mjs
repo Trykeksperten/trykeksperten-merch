@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {PDFDocument,StandardFonts,PDFName,PDFString,degrees} from 'pdf-lib';
+import {PDFDocument,StandardFonts,PDFName,PDFString,degrees,rgb} from 'pdf-lib';
 import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
 import {customerProofView} from '../lib/customer-proof-view.mjs';
 import {createCanvas} from '@napi-rs/canvas';
@@ -10,6 +10,7 @@ async function fixture({split=false,rotate=0,pages=1,embedded=false,merged=false
  for(let i=0;i<pages;i++){
   const p=pdf.addPage([595,842]);if(rotate)p.setRotation(degrees(rotate));
   for(const [text,x,y] of [['Order Number',40,780],['7886901',200,780],...(companySplit?[['Trykeksperten',360,780],['ApS',418,780]]:[['Trykeksperten ApS',360,780]]),...(merged?[[`Customer Reference: ${reference}`,40,760]]:[['Customer Reference',40,760],...(split?[['SMERCH-',200,760],['demo',242,760]]:[[reference,200,760]])]),['Article',40,740],['Cap',200,740]])p.drawText(text,{x,y,font,size:9});
+  p.drawRectangle({x:300,y:690,width:60,height:30,color:rgb(1,.2,.4)});
   const a=pdf.context.register(pdf.context.obj({Type:'Annot',Subtype:'Link',Rect:[10,10,100,30],Contents:PDFString.of(reference),A:{S:'URI',URI:PDFString.of('https://example.test/'+reference)}}));p.node.addAnnot(a);
  }
  if(embedded)await pdf.attach(Buffer.from(reference),'internal.txt',{description:reference});
@@ -54,3 +55,10 @@ test('PDFs without reference labels are rebuilt; non-PDF artwork is preserved',a
  const image={mimeType:'image/png',data:Buffer.from('image')};assert.equal(await customerProofView(image,reference),image);
 });
 test('concurrent requests use the same sanitized customer copy',async()=>{const proof=await fixture({split:true,rotate:180});const results=await Promise.all(Array.from({length:3},()=>customerProofView(proof,reference)));assert.ok(results.every(r=>r.data.equals(results[0].data)));assert.notDeepEqual(results[0].data,proof.data);});
+
+test('bounded customer copy keeps exact flat RGB colour and page orientation without PNG re-decoding',async()=>{
+ const proof=await fixture(),result=await customerProofView(proof,reference),image=await render(result.data);
+ const pixel=[...image.context.getImageData(320,842-705,1,1).data];
+ for(const [index,expected] of [255,51,102,255].entries())assert.ok(Math.abs(pixel[index]-expected)<=1,JSON.stringify(pixel));
+ assert.equal(image.width,595);assert.equal(image.height,842);
+});
