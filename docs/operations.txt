@@ -1,0 +1,38 @@
+Local operations improvements after P1 audit (2026-10-31)
+
+CI preparation (OPS-01)
+.github/workflows/tests.yml runs the regression suite on pull requests/pushes
+using Node 24.14.0, a clean test environment and local-fetch-only preloader.
+The workflow has read-only repository permission and contains no deployment,
+provider credentials or messaging action. npm ci installs locked dependencies.
+
+Workflow source references:
+https://github.com/actions/checkout
+https://github.com/actions/setup-node
+Their official examples currently use v7. Runtime Node remains explicitly
+24.14.0 to match this repository's deployment baseline.
+
+Not yet enabled or verified remotely: publishing the workflow, requiring
+'Tests / Node 24 regression tests' in repository rules, and configuring Render
+to wait for checks. A workflow file alone does NOT block automatic deployment.
+These are deferred until deployment/account changes are authorized. Prove the
+gate in a disposable branch with an intentionally failing test before relying
+on it. No Render settings or render.yaml changes are included here.
+
+Background-worker visibility (part of OPS-02)
+The periodic seven worker invocations now record start/finish/success/failure
+and emit fixed-code JSON failures and recoveries. Exception bodies are omitted.
+A running invocation is not started again by the next timer. Other workers
+continue independently. An authenticated, read-only GET /api/admin/operations
+exposes the process-local invocation counters/timestamps.
+
+A successful invocation may mean a worker was disabled or internally handled a
+domain-level problem. It is NOT proof that a payment/email completed. Inspect
+the existing finance/mail reconciliation views for uncertain/blocked records.
+The in-memory monitor resets on restart. /health retains its existing semantics
+(process liveness; SQLite integrity when enabled). No new public diagnostics.
+
+Still required before launch: external alert routing and a real receipt test,
+readiness for disk/queue/feed freshness, backup cadence/retention/offsite copy,
+and a restore rehearsal with measured recovery point/time. No external alert,
+backup service, secrets or production state was configured by this patch.

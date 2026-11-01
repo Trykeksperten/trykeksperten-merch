@@ -1,0 +1,22 @@
+name: Tests
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  tests:
+    name: Node 24 regression tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.14.0'
+          package-manager-cache: false
+      - run: npm ci
+      - name: Isolated tests (no provider credentials)
+        run: env -i PATH="$PATH" PF_GATEWAY_MODE=test node --import ./scripts/test-local-fetch-only.mjs --test tests/*.test.mjs

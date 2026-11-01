@@ -10,6 +10,15 @@ function compile(){
 }
 compile();
 export const getLanguage=()=>language;
+// Translate the control's own label without translating the customer's artwork.
+export function translateTextLayerLabel(label,locale=language){
+ if(typeof label!=='string')return label;
+ return label.replace(/^(?:Placér tekst|Position text): /,locale==='en'?'Position text: ':'Placér tekst: ');
+}
+export function translateLogoLayerLabel(label,locale=language){
+ if(typeof label!=='string')return label;
+ return label.replace(/^(?:Placér |Position logo: )/,locale==='en'?'Position logo: ':'Placér ');
+}
 export function setLanguage(value){language=value==='en'?'en':'da';}
 export function installProductTranslations(entries){phrases=new Map([...Object.entries(entries),...Object.entries(englishUI)]);compile();}
 export function translate(text,locale=language){

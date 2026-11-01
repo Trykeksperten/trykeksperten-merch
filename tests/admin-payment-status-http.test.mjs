@@ -20,8 +20,10 @@ test('admin payment controls work on the API host with a separate storefront and
   await Promise.race([once(child.stdout,'data'),once(child,'exit').then(()=>{throw Error('Startup failed');}),new Promise((_,reject)=>setTimeout(()=>reject(Error('Timeout')),10000).unref())]);
   const path=base+'/api/admin/checkouts/'+id;
   assert.equal((await fetch(path+'/payment-status',{method:'POST'})).status,401);
+  assert.equal((await fetch(base+'/api/admin/operations')).status,401);
   const login=await fetch(base+'/api/admin/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:'test',password})});assert.equal(login.status,200);
   const headers={cookie:login.headers.get('set-cookie').split(';')[0],'content-type':'application/json','x-smerch-admin':'1',origin:base};
+  const operations=await fetch(base+'/api/admin/operations',{headers});assert.equal(operations.status,200);const monitored=await operations.json();assert.equal(monitored.scope,'process_invocations');assert.equal(monitored.workers.length,7);assert.ok(monitored.workers.every(row=>row.lastSucceededAt===null));
   const post=(suffix,body={},extra={})=>fetch(path+suffix,{method:'POST',headers:{...headers,...extra},body:JSON.stringify(body)});
   for(const origin of ['https://evil.test','https://shop.example.test']){
    assert.equal((await post('/payment-status',{}, {origin})).status,401);

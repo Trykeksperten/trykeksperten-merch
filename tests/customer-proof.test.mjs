@@ -55,14 +55,15 @@ test('production approval uses an unexpired reservation; capture waits for full 
  const {id,checkoutId}=await fixture(),token=await invite(id);
  await decideProof(id,{version:1,decision:'approve',customerToken:token});
  const path=join(directory,'checkouts',checkoutId+'.json'),checkout=JSON.parse(await readFile(path));
- checkout.authorizationExpiresAt=new Date(Date.now()+86400000).toISOString();checkout.pfOrderIds=[id];checkout.fulfillment={groups:[{}]};checkout.lines=[{decorations:[{method:'Broderi fixed'}]}];await writeFile(path,JSON.stringify(checkout));
+ checkout.authorizationExpiresAt=new Date(Date.now()+86400000).toISOString();checkout.pfOrderIds=[id];checkout.fulfillment={groups:[{lineIndexes:[0]}]};checkout.lines=[{sku:'fixture-sku',quantity:1,decorations:[{method:'Broderi fixed'}]}];await writeFile(path,JSON.stringify(checkout));
  assert.equal(await checkoutReadyForCapture(checkout),false);
  await recordApprovalDelivery(id,{channel:'E-mail',reference:'proof-approved'});
  await recordExternalApproval(id,{pfApprovalReference:'PF-accepted'});
  assert.equal(JSON.parse(await readFile(path)).status,'authorized');
  const pf=await readOrder(id);pf.pfOrderNumber='123';pf.status='partially_shipped';pf.shipment={shipDate:new Date().toISOString(),isOrderComplete:false};await writeFile(join(directory,'orders',id+'.json'),JSON.stringify(pf));
  assert.equal(await checkoutReadyForCapture(checkout),false);
- pf.status='shipped';pf.shipment.isOrderComplete=true;await writeFile(join(directory,'orders',id+'.json'),JSON.stringify(pf));assert.equal(await checkoutReadyForCapture(checkout),true);
+ pf.status='shipped';pf.shipment.isOrderComplete=true;await writeFile(join(directory,'orders',id+'.json'),JSON.stringify(pf));assert.equal(await checkoutReadyForCapture(checkout),false);
+ pf.checkoutGroupIndex=0;pf.lines=checkout.lines;pf.shipment.deliveries=[{key:'actual-shipment',shipDate:pf.shipment.shipDate,isOrderComplete:true,items:[{sku:'fixture-sku',quantity:1}]}];await writeFile(join(directory,'orders',id+'.json'),JSON.stringify(pf));assert.equal(await checkoutReadyForCapture(checkout),true);
 });
 test('expired reservation cannot release a proof to production',async()=>{
  const {id,checkoutId}=await fixture(),token=await invite(id);await decideProof(id,{version:1,decision:'approve',customerToken:token});

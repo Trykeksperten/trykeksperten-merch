@@ -25,7 +25,7 @@ export function renderPantonePanel(note,artworks,{hidden=false}={}){
  if(!panel){panel=document.createElement('section');panel.dataset.pantonePanel='';panel.className='pf-pantone-panel';panel.setAttribute('aria-label','Pantone-farver');note.after(panel);}
  panel.replaceChildren();panel.hidden=hidden||!artworks.length;if(panel.hidden)return;
  const title=document.createElement('strong');title.textContent='Pantone-farver';panel.append(title);
- for(const art of artworks){const rows=artworkPantoneRows(art),name=document.createElement('small');name.textContent=art.logo.name;panel.append(name);
+ for(const art of artworks){const rows=artworkPantoneRows(art),name=document.createElement('small');name.textContent=art.logo.name;name.setAttribute('translate','no');panel.append(name);
   for(const row of rows){const line=document.createElement('div'),swatch=document.createElement('span'),label=document.createElement('span');swatch.className='pf-pantone-swatch';if(row.hex)swatch.style.backgroundColor=row.hex;else swatch.hidden=true;label.textContent=`${row.code} · ${row.status==='verified'?'Aflæst fra filen':row.status==='candidate'?'Farvenavn i filen':'Nærmeste Pantone (forslag)'}`;line.append(swatch,label);panel.append(line);}
   if(!rows.length){const msg=document.createElement('span');msg.textContent='Farven kunne ikke aflæses. Vi afklarer den i korrekturen.';panel.append(msg);}
  }

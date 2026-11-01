@@ -9,6 +9,7 @@ import {applyPFNotification,readOrder} from '../lib/pf-orders.mjs';
 import {reconcileShipmentMail,shipmentMailStatus,sendShipmentMail} from '../lib/shipment-mail.mjs';
 import {reconcileSalesShipments,financeView,withLedger,updateFinance} from '../lib/sales-ledger.mjs';
 import {executeSalesPayment} from '../lib/sales-payments.mjs';
+import {captureApprovedCheckout} from '../lib/order-flow.mjs';
 import {queueAccountantBasis,sendFinanceMail} from '../lib/sales-mail.mjs';
 import {salesBasis} from '../lib/sales-basis.mjs';
 import {processSalesFinance} from '../lib/sales-worker.mjs';
@@ -45,6 +46,12 @@ test('missing tracking blocks only tracking mail and a later reference enriches 
 test('tracking alone, future shipment dates, contradictory quantities and incomplete shipments never capture',async()=>{
  for(const options of [{quantity:2},{complete:false},{shipDate:'2099-01-01'}]){const f=await fixture();await delivered(f,options);await assert.rejects(executeSalesPayment(f.order.id,{kind:'capture',amount:13750,key:'capture:blocked-demo'},{env,fetchImpl:f.fetchImpl}));assert.equal(f.posts(),0);}
  const f=await fixture(),message=notice(f.pf);delete message.ShipmentNotification.deliveries[0].deliveryLocation.item;await applyPFNotification('shipment',message);await reconcileSalesShipments(f.order.id);await assert.rejects(executeSalesPayment(f.order.id,{kind:'capture',amount:13750,key:'capture:tracking-only'},{env,fetchImpl:f.fetchImpl}));assert.equal(f.posts(),0);
+});
+for(const flow of ['legacy','finance'])test(`${flow} capture requires actual shipment quantities and accepts a corrected full ASN`,async()=>{
+ const f=await fixture(),missing=notice(f.pf);delete missing.ShipmentNotification.deliveries[0].deliveryLocation.item;await applyPFNotification('shipment',missing);
+ const capture=()=>flow==='legacy'?captureApprovedCheckout(f.order.id,{env,fetchImpl:f.fetchImpl}):executeSalesPayment(f.order.id,{kind:'capture',amount:f.order.totalIncVat,key:'capture:actual-quantities'},{env,fetchImpl:f.fetchImpl});
+ await assert.rejects(capture());assert.equal(f.posts(),0);assert.equal((await readCheckout(f.order.id)).status,'authorized');
+ await applyPFNotification('shipment',notice(f.pf));const result=await capture();assert.equal(result.status,flow==='legacy'?'paid':'confirmed');assert.equal(f.posts(),1);assert.equal((await readCheckout(f.order.id)).status,'paid');
 });
 test('changing billing after queued or sent basis retains previous PDF and requires review of a new version',async()=>{
  const f=await fixture();await delivered(f);let view=await financeView(f.order.id);const key=view.shipments[0].key,first=await queueAccountantBasis(f.order.id,key);

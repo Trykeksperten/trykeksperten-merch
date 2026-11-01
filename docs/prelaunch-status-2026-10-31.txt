@@ -1,0 +1,49 @@
+Status før lancering — 31. oktober 2026
+
+Denne revision samler dagens lokale P0/P1/P2-rettelser, håndtering af gentagne
+SKU'er, betalings-/dokumentforløb, designkladder, upload, oversættelser samt
+miljøbestemt administrationslink og den tidlige EPS-kontrol før checkout.
+
+Validering
+Den samlede suite består i en ren kopi af kandidatkoden: 928 tests, 0 fejl,
+0 oversprunget. Node 24.14.0, rent kørselsmiljø, PF_GATEWAY_MODE=test og
+scripts/test-local-fetch-only.mjs. Kopien havde ingen .env, produktionsnøgler
+eller eksisterende private data. git diff --check består.
+
+Der er udført lokale browserkontroller af design, kurv, sprog og EPS-beskeder.
+EPS uden brugbar forhåndsvisning har fortsat en mærket pladsholder i kundevisning,
+men blokeres før bestilling; PDF/PDF-kompatibel AI eller manuel filkontrol er
+vejen videre. Strikte ordre- og maileksporter accepterer ikke pladsholderen.
+
+En afgrænset Quickpay-test har verificeret testautorisation, signeret callback,
+sikre gentagelser og annullering uden hævning eller PF-afsendelse. Den midlertidige
+tunnel er efterfølgende lukket. Lokale mailtests har brugt en SMTP-fælde; det er
+ikke bevis for ekstern indbakkelevering. Tidligere bekræftet PF-forbindelse skal
+ikke behandles som en ny, generel tilslutningsopgave.
+
+Backupprøven gendannede en eksisterende krypteret kopi fra 22. oktober med
+28 verificerede filer og læste ordrer, korrekturer og originaler gennem den
+aktuelle kode. Den isolerede server startede med bestilling lukket. macOS
+blokerede udgående TCP/UDP og adgang til oprindelige private miljødata.
+Midlertidige dekrypterede kopier er fjernet. Den gamle eksterne kopi er ikke
+ajourført med aktuel drift; en frisk konsistent ekstern backup og en aftalt
+skrivepause er stadig et konkret punkt før lancering. Seneste Render-snapshot
+blev kun kontrolleret læsende, ikke gendannet over den aktive disk.
+
+Frigivelse afventer
+- Frisk ekstern backup med dokumenteret konsistens, opbevaring og nøglehåndtering.
+- Den resterende accepttest på fysisk mobil, herunder den rigtige OS-filvælger.
+- Afsluttende frigivelsesbeslutning, kontrolleret deploy og efterfølgende kontrol.
+- Remote CI, krav om beståede checks og deploy-gate er endnu ikke verificeret.
+  Workflowfilen i sig selv blokerer ikke et Render-deploy.
+
+Denne revision er tiltænkt en separat codex-gren. Før push er Render kontrolleret
+læsende: service og Blueprint følger main, service-auto-deploy er On Commit, og
+PR-previews er Off. Branch-push må ikke ledsages af merge, PR, manuel sync/deploy
+eller ændringer til main. GitHub-workflowet udfører kun tests og har contents:read;
+det indeholder ingen deployhandling eller produktionsnøgler.
+
+Produktion og PF Gateway skal fortsat forblive urørte. PF er TEST; bestilling er
+fortsat lukket i launchConfig. Denne revision ændrer ikke .env, render.yaml eller
+selve gatewaykonfigurationen. Private testmapper, udbydernøgler, sikkerhedskopier,
+originale kunde-/ordrerapporter og lokale skærmbilleder indgår ikke i kodepush.

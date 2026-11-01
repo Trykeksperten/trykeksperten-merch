@@ -7,4 +7,4 @@ export function productionPaymentActive(order,now=Date.now()){
  return order?.status==='paid'||(order?.status==='authorized'&&Number.isFinite(Date.parse(order.authorizationExpiresAt))&&Date.parse(order.authorizationExpiresAt)>now);
 }
 
-export function supplierPaymentReady(order){return order?.paymentProvider==='bank_transfer'?bankPaymentComplete(order):order?.status==='authorized';}
+export function supplierPaymentReady(order,now=Date.now()){return order?.paymentProvider==='bank_transfer'?bankPaymentComplete(order):order?.status==='authorized'&&productionPaymentActive(order,now);}

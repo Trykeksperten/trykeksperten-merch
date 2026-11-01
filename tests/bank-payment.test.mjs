@@ -62,7 +62,7 @@ test('registering full payment starts PF handoff automatically; partial payment 
  }finally{if(previous===undefined)delete process.env.SMERCH_DATA_DIR;else process.env.SMERCH_DATA_DIR=previous;await rm(root,{recursive:true,force:true});}
 });
 
-test('manual invoice sent is recorded once, permits verified bank receipts and never marks an order paid by itself',()=>{
+test('manual invoice sent is recorded once and requires its invoice number before bank receipts',()=>{
  const order=seed(),now=Date.now();
  assert.throws(()=>applyBankPayment(order,{action:'invoice_sent'},{actor}),/Bekræft/);
  assert.throws(()=>applyBankPayment({...order,paymentProvider:'quickpay'},{action:'invoice_sent',confirmed:true},{actor}),/bankbetaling/);
@@ -71,5 +71,6 @@ test('manual invoice sent is recorded once, permits verified bank receipts and n
  assert.equal(order.events.filter(e=>e.type==='bank_invoice_sent').length,1);
  assert.equal(order.bankPayment.invoicedAt,new Date(now).toISOString());
  assert.equal(order.status,'awaiting_bank_payment');assert.equal(supplierPaymentReady(order),false);
- receipt(order,order.totalIncVat);assert.equal(order.status,'paid');
+ assert.throws(()=>receipt(order,order.totalIncVat),/fakturanummer/);assert.equal(order.bankPayment.receipts.length,0);
+ invoice(order);receipt(order,order.totalIncVat);assert.equal(order.status,'paid');assert.equal(order.bankPayment.invoicedAt,new Date(now).toISOString());assert.equal(bankPaymentComplete(order),true);
 });

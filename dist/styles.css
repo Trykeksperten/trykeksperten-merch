@@ -2653,3 +2653,7 @@ body.storefront #main .pf-notebook-pages p{font-size:17px}
 body.storefront #main .pf-visual-designer #pf-editor-subtitle.pf-selected-print-method{display:inline-flex;align-items:center;width:fit-content;max-width:100%;box-sizing:border-box;margin-top:7px;padding:6px 11px;border:1px solid #8c9f90;border-radius:8px;background:#edf1ed;color:#253b2d;font-size:15px;font-weight:600;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
 @media(max-width:700px){body.storefront #main .pf-visual-designer #pf-editor-subtitle.pf-selected-print-method{margin-top:5px;padding:5px 8px;font-size:13px}}
 @media(max-width:1024px){body.storefront #main .pf-visual-designer>.pf-designer-heading{display:flex;flex-direction:row;align-items:center;flex-shrink:0}body.storefront #main .pf-visual-designer>.pf-designer-heading>div:first-child{flex:1;min-width:0;max-width:none}}
+
+/* Keep persistence/validation failures visible while the mobile keyboard hides the footer. */
+.pf-visual-designer>.pf-studio-error{flex:0 0 auto;margin:0;padding:8px 16px;max-height:88px;overflow:auto;background:#fff4ef;color:#862e1d;font-size:13px;line-height:1.4}
+.pf-visual-designer>.pf-studio-error:empty{display:none}

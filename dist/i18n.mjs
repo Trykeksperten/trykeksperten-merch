@@ -1,8 +1,8 @@
-import {getLanguage,setLanguage,installProductTranslations,translate} from './i18n-core.mjs';
+import {getLanguage,setLanguage,installProductTranslations,translate,translateTextLayerLabel,translateLogoLayerLabel} from './i18n-core.mjs';
 const originals=new WeakMap(),attributes=new WeakMap();
-const skip='script,style,noscript,textarea,[translate="no"],[data-no-translate],.pf-design-layer,.pf-designer-text,#pf-designer-text,#pf-art-text,.pf-cart-decorations span,.pf-cart-decorations button,#special-file-list';
+const skip='script,style,noscript,textarea,[translate="no"],[data-no-translate],.pf-designer-text,#pf-designer-text,#pf-art-text,.pf-cart-design-text,.pf-cart-decorations span,.pf-cart-decorations button,#special-file-list';
 let observer,productPromise,applying=false,scheduled=false,selectionVersion=0;
-const watches={subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['placeholder','title','aria-label','alt']};
+const watches={subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['placeholder','title','aria-label','aria-valuetext','alt']};
 function storedValue(store,key,current){
  const previous=store.get(key);
  const source=previous&&previous.rendered===current?previous.source:current;
@@ -10,10 +10,20 @@ function storedValue(store,key,current){
  store.set(key,{source,rendered});return rendered;
 }
 function translateElement(element){
+ if(element.matches('.pf-design-layer')){
+  const label=element.getAttribute('aria-label'),translated=translateLogoLayerLabel(label);
+  if(translated!==label)element.setAttribute('aria-label',translated);
+  return;
+ }
+ if(element.matches('#pf-designer-text')){
+  const label=element.getAttribute('aria-label'),translated=translateTextLayerLabel(label);
+  if(translated!==label)element.setAttribute('aria-label',translated);
+  return;
+ }
  if(element.closest(skip.replace('textarea,','')))return;
  if(element.tagName==='OPTION'&&!element.hasAttribute('value'))element.setAttribute('value',element.value);
  const state=attributes.get(element)||new Map();attributes.set(element,state);
- for(const key of ['placeholder','title','aria-label','alt',...(element.matches('input[readonly]:not([type=hidden])')?['value']:[])]){
+ for(const key of ['placeholder','title','aria-label','aria-valuetext','alt',...(element.matches('input[readonly]:not([type=hidden])')?['value']:[])]){
   if(!element.hasAttribute(key))continue;
   const value=element.getAttribute(key),translated=storedValue(state,key,value);
   if(translated!==value)element.setAttribute(key,translated);

@@ -1,3 +1,5 @@
+import {createCatalogResponse} from './lib/catalog-response.mjs';
+import {createWorkerMonitor} from './lib/worker-monitor.mjs';
 import {invoiceBasisFilename} from './dist/document-filenames.mjs';
 import {documentOrderNumber,withDocumentOrderNumbers} from './lib/document-order-number.mjs';
 import {queueRefundBasis} from './lib/refund-basis.mjs';
@@ -68,6 +70,7 @@ import {createAdminSession,adminSessionActor,adminSessionAuthorized,closeAdminSe
 import {gatewayRequirements} from './lib/pf-gateway.mjs';
 import {applyStripeEvent,cancelCheckout,checkoutConfiguration,checkoutFulfillmentAssessment,checkoutPublic,createStripeSession,listCheckouts,persistCheckout,persistCheckoutArtwork,prepareCheckout,validateDelivery,readCheckout,reauthorizeCheckout,refreshAuthorizationExpiry,updateCheckout,verifyStripeEvent} from './lib/checkout.mjs';
 import {readSignedArtwork} from './lib/pf-artwork.mjs';
+import {readCheckoutArtwork} from './lib/checkout-artwork.mjs';
 import {verifyPFRelaySignature} from './lib/webhook-signing.mjs';
 import {bankInvoiceBasis} from './lib/bank-invoice-basis.mjs';
 import {prepareBankPayment,registerBankPaymentAndHandoff,publicBankPayment} from './lib/bank-payment.mjs';
@@ -109,6 +112,8 @@ async function quoteOnlyProductIds(catalog,priceResult){
   return [...new Set(Array.isArray(config.productIds)?config.productIds:[])].filter(id=>known.has(id)&&!priceResult.products[id]);
  }catch{return [];}
 }
+const workerMonitor=createWorkerMonitor();
+const catalogResponse=createCatalogResponse({loadCatalog:loadCatalogIndex,readAssortment,publicAssortment});
 const handleRequest=async(req,res)=>{
  if(await backofficeHTTP(req,res,{readJSON,json}))return;
  if(blocksLaunchOrder(new URL(req.url,'http://localhost').pathname,req.method)){json(res,503,{error:launchMessage});return;}
@@ -117,6 +122,10 @@ const handleRequest=async(req,res)=>{
  if(/^\/(?:api|admin)(?:\/|$)/.test(new URL(req.url,'http://localhost').pathname))res.setHeader('X-Robots-Tag','noindex');
  if(req.url==='/health'&&databaseEnabled()&&['GET','HEAD'].includes(req.method)){try{const status=databaseHealth();json(res,status.integrity?200:503,{status:status.integrity?'ok':'unhealthy'});}catch{json(res,503,{status:'unhealthy'});}return;}
  if(req.url==='/health'&&['GET','HEAD'].includes(req.method)){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify({status:'ok'}));return;}
+ if(req.url==='/api/admin/operations'&&req.method==='GET'){
+  if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}
+  json(res,200,{scope:'process_invocations',workers:workerMonitor.snapshot(),notes:['Invocation success does not confirm delivery or domain queue completion.','State resets on process restart; external alerts and backup monitoring are not configured by this endpoint.']});return;
+ }
  const legalURL=new URL(req.url,'http://localhost');
  const customerPath=/^\/api\/customer-proofs\/(ord-[a-f0-9-]{36})(?:\/(file|decision))?$/.exec(legalURL.pathname);
  if(customerPath){
@@ -313,7 +322,7 @@ const handleRequest=async(req,res)=>{
  const checkoutAction=/^\/api\/admin\/checkouts\/(pay-[a-f0-9-]{36})\/(retry-handoff|capture|cancel)$/.exec(new URL(req.url,'http://localhost').pathname);
  if(checkoutAction&&req.method==='POST'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}try{const id=checkoutAction[1];if(checkoutAction[2]==='capture'){if(financeConfiguration().enabled){await reconcileSalesShipments(id);const v=await financeView(id);json(res,200,await executeSalesPayment(id,{kind:'capture',amount:v.summary.shipped-v.summary.captured,key:'shipment-capture:'+v.summary.shipped}));}else{const order=await captureApprovedCheckout(id);json(res,200,checkoutPublic(order));}}else if(checkoutAction[2]==='cancel'){const existing=await readCheckout(id),order=await (financeConfiguration().enabled?withLedger(()=> (existing.paymentProvider==='quickpay'?cancelQuickpay:cancelCheckout)(id)):(existing.paymentProvider==='quickpay'?cancelQuickpay:cancelCheckout)(id));json(res,200,checkoutPublic(order));}else{const order=await readCheckout(id),catalog=await loadProductCatalog(order.lines.map(line=>line.productId)),{prices,rules}=await loadPricing(),stock=await loadStock();const result=await handoffAuthorizedCheckout(id,{catalog,prices,rules,stock});json(res,200,{...checkoutPublic(result),pfHandoff:result.pfHandoff});}}catch(error){json(res,400,{error:error.message});}return;}
  const artworkPath=/^\/api\/admin\/checkouts\/(pay-[a-f0-9-]{36})\/artwork\/([a-f0-9-]{36})$/.exec(new URL(req.url,'http://localhost').pathname);
- if(artworkPath&&req.method==='GET'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}try{const order=await readCheckout(artworkPath[1]),asset=order.artworks?.find(item=>item.id===artworkPath[2]);if(!asset)throw Error();const data=await readFile(asset.path);res.writeHead(200,{'Content-Type':'application/octet-stream','Content-Disposition':`attachment; filename="${asset.name.replace(/[^a-zA-Z0-9._-]/g,'_')}"`,'X-Content-Type-Options':'nosniff'}).end(data);}catch{json(res,404,{error:'Logofilen blev ikke fundet.'});}return;}
+ if(artworkPath&&req.method==='GET'){if(!adminSessionAuthorized(req)){json(res,401,{error:'Administratoradgang kræves.'});return;}try{const order=await readCheckout(artworkPath[1]),asset=order.artworks?.find(item=>item.id===artworkPath[2]);if(!asset)throw Error();const data=await readCheckoutArtwork(order.id,asset);res.writeHead(200,{'Content-Type':'application/octet-stream','Content-Disposition':`attachment; filename="${asset.name.replace(/[^a-zA-Z0-9._-]/g,'_')}"`,'X-Content-Type-Options':'nosniff'}).end(data);}catch{json(res,404,{error:'Logofilen blev ikke fundet.'});}return;}
  if(req.url?.startsWith('/api/pf-artwork?')&&req.method==='GET'){try{const asset=await readSignedArtwork(new URL(req.url,'http://localhost').searchParams);res.writeHead(200,{'Content-Type':asset.mimeType,'Content-Disposition':`attachment; filename="${asset.name.replace(/[^a-zA-Z0-9._-]/g,'_')}"`,'X-Robots-Tag':'noindex, nofollow'}).end(asset.data);}catch{json(res,404,{error:'Trykfilen blev ikke fundet.'});}return;}
  const confirmationPath=/^\/api\/admin\/pf-confirmations\/(ord-[a-f0-9-]{36})$/.exec(legalURL.pathname);
  if(confirmationPath&&['GET','POST'].includes(req.method)){
@@ -505,7 +514,7 @@ const handleRequest=async(req,res)=>{
   res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8'}).end(req.method==='HEAD'?undefined:data);return;
  }
  if(path==='/pf-english.json'){const data=await readFile(resolve(root,'pf-english.json'));res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-cache'}).end(req.method==='HEAD'?undefined:data);return;}
- if(path==='/api/pf-catalog'){await sendPublicJSON(req,res,publicAssortment(await loadCatalogIndex(),await readAssortment()));return;}
+ if(path==='/api/pf-catalog'){await catalogResponse(req,res);return;}
  if(/^\/api\/pf-product\/pf-[a-z0-9]+$/i.test(path)){const product=await loadPFProduct(path.split('/').at(-1));if(!product||!isVisibleProduct(product,await readAssortment())){res.writeHead(404).end('Produktet findes ikke');return;}await sendPublicJSON(req,res,product);return;}
  if(path==='/api/catalog'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'}).end(req.method==='HEAD'?undefined:JSON.stringify(publicCatalog()));return;}
  if(path==='/robots.txt'){const data=Buffer.from(robotsTXT);res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'public, max-age=3600','Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);return;}
@@ -539,7 +548,7 @@ async function freightContext(input,req){
 }
 const server=createServer((req,res)=>handleRequest(req,res).catch(()=>{console.error(JSON.stringify({event:'request_failed',code:'unexpected_error'}));if(!res.headersSent)json(res,500,{error:'Der opstod en fejl. Prøv igen senere.'});else res.end();}));
 server.on('error',e=>{console.error(e.message);process.exit(1)});
-setInterval(()=>{processProofMailbox().catch(()=>{});processSalesFinance().catch(()=>{});retryWithdrawalReceipts().catch(()=>{});retryOrderConfirmations().catch(()=>{});retryProofMail().catch(()=>{});processShipmentMail().catch(()=>{});syncEconomicInvoices().catch(()=>{});},60000).unref();
+setInterval(()=>{for(const [name,task] of [['proof_mailbox',processProofMailbox],['sales_finance',processSalesFinance],['withdrawal_receipts',retryWithdrawalReceipts],['order_confirmations',retryOrderConfirmations],['proof_mail',retryProofMail],['shipment_mail',processShipmentMail],['economic_invoices',syncEconomicInvoices]])void workerMonitor.run(name,task);},60000).unref();
 server.listen(port,host,()=>console.log(`Smerch server listening on ${host}:${port}`));
 process.on('SIGTERM',()=>server.close(()=>process.exit(0)));
 const syncMinutes=Number(process.env.PF_PRICE_SYNC_INTERVAL_MINUTES||60);

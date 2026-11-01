@@ -9,7 +9,7 @@ export function createDesignOverview({root,getItems,renderMockup,onEdit,onContin
  let items=[],index=0,version=0,images=new Map();
  async function loadImage(item){
   if(!images.has(item)){
-   const pending=(async()=>{const canvas=await renderMockup(item);const image=document.createElement('img');image.src=canvas.toDataURL('image/png');image.alt=`Dit design · ${item.option.impLocation}`;await image.decode();return image;})();
+   const pending=(async()=>{const canvas=await renderMockup(item);const image=document.createElement('img'),warning=canvas.getAttribute?.('data-preview-warning');image.src=canvas.toDataURL('image/png');image.alt=`Dit design · ${item.option.impLocation}`+(warning?' · '+warning:'');if(warning)image.setAttribute('data-preview-warning',warning);await image.decode();return image;})();
    images.set(item,pending);pending.catch(()=>{if(images.get(item)===pending)images.delete(item);});
   }
   return images.get(item);
@@ -27,7 +27,7 @@ export function createDesignOverview({root,getItems,renderMockup,onEdit,onContin
   if(!item.ready){stage.textContent='Åbn placeringen for at færdiggøre og gemme dit design.';return;}
   status.textContent=`Indlæser ${item.option.impLocation}…`;
   if(!stage.querySelector('img'))stage.textContent='Indlæser mockup…';
-  try{const image=await loadImage(item);if(token!==version||!dialog.open)return;stage.replaceChildren(image);stage.setAttribute('aria-busy','false');status.textContent='Gemt design · forhåndsvisning';}
+  try{const image=await loadImage(item);if(token!==version||!dialog.open)return;stage.replaceChildren(image);stage.setAttribute('aria-busy','false');status.textContent=image.getAttribute('data-preview-warning')||'Gemt design · forhåndsvisning';}
   catch{if(token===version&&dialog.open){stage.setAttribute('aria-busy','false');status.textContent='Mockuppet kunne ikke indlæses.';stage.textContent='';const retry=document.createElement('button');retry.type='button';retry.className='button light';retry.textContent='Prøv igen';retry.onclick=()=>show(index);stage.append(retry);}}
  }
  find('[data-close]').onclick=close;

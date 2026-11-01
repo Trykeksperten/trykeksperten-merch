@@ -1,7 +1,9 @@
 import {loadArtworkPreview} from './artwork-preview.mjs';
+import {loadFile as loadOriginalArtwork} from './storage.mjs';
+import {translate} from './i18n-core.mjs';
 import {placementOptionAssets} from './pf-rules.mjs?v=2';
 import {artworkPrintSize,textPrintSize,optionPrintSize,printableBounds,containMappedBounds,proportionalPrintBounds} from './design-layers.mjs?v=8';
-import {fontFamily} from './pf-text.mjs?v=5';
+import {drawTextPreview} from './text-preview.mjs';
 import {decorationPreviewColor} from './decoration-preview.mjs';
 import {recolorArtworkPreview,tintArtworkPreview} from './vector-preview.mjs?v=2';
 
@@ -17,7 +19,7 @@ async function productDetail(id){
  if(!products.has(id))products.set(id,fetch('/api/pf-product/'+encodeURIComponent(id)).then(r=>{if(!r.ok)throw Error();return r.json();}).catch(error=>{products.delete(id);throw error;}));
  return products.get(id);
 }
-export async function renderCartMockup(product,option,design,{loadPreview=loadArtworkPreview,variant}={}){
+export async function renderCartMockup(product,option,design,{loadPreview=loadArtworkPreview,variant,allowEPSPlaceholder=false,loadOriginal}={}){
  const assets=placementOptionAssets(product,option);
  if(!assets.ready)throw Error('Der mangler et placeringsbillede.');
  const image=await loadImage(assets.svg?'/api/pf-placement-art?src='+encodeURIComponent(assets.svg):'/api/pf-imprint-image?src='+encodeURIComponent(assets.image));
@@ -40,9 +42,23 @@ export async function renderCartMockup(product,option,design,{loadPreview=loadAr
  };
  const previewColor=decorationPreviewColor(option,{foil:design.foilFinish,productHex:variant?.hex});
  const artworks=design.artworks?.length?design.artworks:design.logo?[{logo:design.logo,x:.5,y:.5,scale:.34}]:[];
+ let incomplete=false;
  for(const art of artworks){
   const file=await loadPreview(art.logo);
-  if(!file)throw Error('Logofilen kan ikke vises som skitse.');
+  if(!file){
+   // Only customer previews may substitute a clearly labelled EPS placeholder.
+   // Missing originals and failed PDF/AI previews must still fail closed.
+   if(!allowEPSPlaceholder||art.logo?.type!=='application/postscript'||!(/\.eps$/i.test(art.logo?.name||'')))throw Error('Logofilen kan ikke vises som skitse.');
+   const original=await (loadOriginal||loadOriginalArtwork)(art.logo.id);
+   if(!original||new TextDecoder().decode(await original.slice(0,4).arrayBuffer())!=='%!PS')throw Error('Logofilen mangler eller er ugyldig.');
+   const size=artworkPrintSize(art,option);
+   place(art,()=>{
+    ctx.fillStyle='rgba(255, 240, 205, 0.85)';ctx.fillRect(-size.widthMm/2,-size.heightMm/2,size.widthMm,size.heightMm);
+    ctx.strokeStyle='#8a4700';ctx.lineWidth=.5;ctx.setLineDash([2,1]);ctx.strokeRect(-size.widthMm/2,-size.heightMm/2,size.widthMm,size.heightMm);
+    ctx.fillStyle='#633300';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`bold ${Math.min(12,size.widthMm/4,size.heightMm/3)}px Arial`;ctx.fillText('EPS',0,0);
+   });
+   incomplete=true;continue;
+  }
   let url;
   try{
    url=previewColor?await tintArtworkPreview(file,previewColor):art.paletteColors?.length&&art.logo.recolorable?await recolorArtworkPreview(file,art.paletteColors):art.color&&art.logo.recolorable?await tintArtworkPreview(file,art.color):null;
@@ -53,17 +69,18 @@ export async function renderCartMockup(product,option,design,{loadPreview=loadAr
  }
  if(design.text?.trim()){
   await document.fonts.ready;
-  const placement={x:.5,y:.5,scale:.24,lineSpacing:1.25,align:'center',...design.textPlacement},size=textPrintSize(design.text,placement,option),lines=design.text.trim().split(/\r?\n/);
-  const fontStyle=(placement.italic?'italic ':'')+(placement.bold?'700 ':'400 ');ctx.font=fontStyle+'100px '+fontFamily(placement.font);
-  const measured=Math.max(1,...lines.map(line=>ctx.measureText(line||' ').width+Math.max(0,Array.from(line).length-1)*(placement.letterSpacing||0)*100)),spacing=placement.lineSpacing;
-  const fontSize=Math.min(size.widthMm*100/measured,size.heightMm/(.82*(1+(lines.length-1)*spacing)));
-  place(placement,()=>{
-   ctx.font=fontStyle+fontSize+'px '+fontFamily(placement.font);ctx.fillStyle=previewColor||design.ink||'#17201f';ctx.textAlign=placement.align;ctx.textBaseline='middle';
-   const x=placement.align==='left'?-size.widthMm/2:placement.align==='right'?size.widthMm/2:0;
-   lines.forEach((line,i)=>{const y=(i-(lines.length-1)/2)*fontSize*.82*spacing,gap=(placement.letterSpacing||0)*fontSize;if(placement.underline&&line){const width=ctx.measureText(line).width+Math.max(0,Array.from(line).length-1)*gap,left=x-(placement.align==='left'?0:placement.align==='right'?width:width/2);ctx.fillRect(left,y+fontSize*.43,width,Math.max(fontSize*.05,.1));}if(!gap){ctx.fillText(line,x,y);return;}const chars=Array.from(line),width=ctx.measureText(line).width+Math.max(0,chars.length-1)*gap;let cursor=x-(placement.align==='left'?0:placement.align==='right'?width:width/2);ctx.save();ctx.textAlign='left';for(const char of chars){ctx.fillText(char,cursor,y);cursor+=ctx.measureText(char).width+gap;}ctx.restore();});
-  });
+  const placement={x:.5,y:.5,scale:.24,...design.textPlacement},size=textPrintSize(design.text,placement,option);
+  place(placement,()=>drawTextPreview(ctx,design.text,placement,size,previewColor||design.ink||'#17201f'));
+ }
+ if(incomplete){
+  const warning='Ufuldstændig forhåndsvisning: EPS kræver manuel filkontrol.';
+  ctx.save();ctx.fillStyle='#fff0cd';ctx.fillRect(0,934,1024,90);ctx.fillStyle='#633300';ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.font='bold 26px Arial';ctx.fillText(translate('Ufuldstændig forhåndsvisning'),24,947);
+  ctx.font='22px Arial';ctx.fillText(translate('EPS vises som pladsholder og kræver manuel filkontrol.'),24,983);ctx.restore();
+  canvas.setAttribute('data-preview-warning',warning);
  }
  canvas.setAttribute('role','img');canvas.setAttribute('aria-label','Dit design · '+option.impLocation+' · '+option.impMethod);
+ if(incomplete)canvas.setAttribute('aria-label',canvas.getAttribute('aria-label')+' · '+canvas.getAttribute('data-preview-warning'));
  return canvas;
 }
 export function bindCartMockups(root,lines){
@@ -101,13 +118,17 @@ export function bindCartMockups(root,lines){
     try{
      const product=await productDetail(line.productId),variant=product.variants.find(v=>v.sku===line.sku),option=variant?.options.find(o=>o.id===design.optionId);
      if(!option)throw Error('Placeringen findes ikke længere.');
-     const canvas=await renderCartMockup(product,option,design,{variant});
+     const canvas=await renderCartMockup(product,option,design,{variant,allowEPSPlaceholder:true});
      if(!target.isConnected)return;
-     const image=document.createElement('img'),button=document.createElement('button'),captionText=option.impLocation+' · Dit design';
+     const warning=canvas.getAttribute('data-preview-warning');
+     const image=document.createElement('img'),button=document.createElement('button'),captionText=option.impLocation+' · Dit design'+(warning?' · '+warning:'');
      image.src=canvas.toDataURL('image/png');image.alt=`Mockup af ${product.name}, ${option.impLocation}`;
+     if(warning)image.alt+=' · '+warning;
+     if(warning)caption.setAttribute('data-preview-warning',warning);
      button.type='button';button.className='pf-mockup-expand';button.dataset.pfExpandMockup='';button.dataset.caption=captionText;button.setAttribute('aria-label',`Forstør mockup: ${captionText}`);
      button.append(image);button.insertAdjacentHTML('beforeend','<span class="pf-mockup-plus" aria-hidden="true">+</span>');
-     figure.prepend(button);caption.textContent=captionText;
+     figure.prepend(button);caption.textContent=warning?'EPS · Se advarsel':captionText;
+     if(warning)caption.title=warning;
     }catch(error){if(target.isConnected)caption.textContent=(design.position?design.position+': ':'')+(error.message||'Mockuppet kunne ikke vises.')+' Åbn designet for at se eller rette det.';}
    })();
   }
@@ -116,6 +137,7 @@ export function bindCartMockups(root,lines){
 
 // Mail previews are bounded independently of the full-size cart canvas.
 export function mailMockupBase64(canvas){
+ if(canvas.getAttribute?.('data-preview-warning'))throw Error('En ufuldstændig forhåndsvisning må ikke bruges som ordremockup.');
  const preview=document.createElement('canvas');
  const scale=Math.min(1,512/Math.max(canvas.width,canvas.height));
  preview.width=Math.max(1,Math.round(canvas.width*scale));

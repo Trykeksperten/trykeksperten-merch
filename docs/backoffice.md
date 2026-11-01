@@ -56,7 +56,7 @@ Importen er atomisk og markeret som udført i databasen. Senere starter importer
 - Betalingsordre: afventer reservation → bekræftet; betaling og produktion har hver sin status. En reservation er ikke en betaling.
 - Manuel produktion: afventer → klar → i produktion → afsluttet. Kundeaccept, actor, tidspunkt og korrekturversion lagres.
 - Manuel levering: ikke afsendt → delvist afsendt → afsendt, beregnet ud fra linjeantal.
-- PF-ordrer: eksisterende PF-/betalingsforløb er fortsat autoritativt. Det nye arbejdsområde viser status og link til originalordren. En komplet PF-underordre fordeles på de tilhørende ordrelinjer; en tvetydig delvis PF-meddelelse opfinder ikke antal. Afsendelsesdokument afventer afstemning, hvis linjeantal mangler.
+- PF-ordrer: eksisterende PF-/betalingsforløb er fortsat autoritativt. Det nye arbejdsområde viser status og link til originalordren. PF-forsendelser fordeles efter dokumenterede leveringslinjer og faktiske antal. Manglende eller modstridende antal, fremtidige datoer og annullerede PF-ordrer kræver afstemning. Delbetalinger og refunderinger vises særskilt med hævet, refunderet og nettobetalt beløb; en reservation vises ikke som en hævning.
 - De gamle administrationsendpoints kræver fortsat administrator. Nye roller arbejder i det nye arbejdsområde; de har ikke automatisk adgang til alle eksisterende PF-handlinger.
 - Nye manuelle tilbudsordrer sendes **ikke automatisk til PF** og får ikke automatisk betalingslink. Det er en bevidst integrationsgrænse, ikke en skjult ordreafsendelse.
 
@@ -68,7 +68,9 @@ SMTP kan have modtaget en mail, selv om forbindelsen bagefter fejler. Derfor bli
 
 Driftssiden viser kø, forsøg og fejlkoder. `/health` kontrollerer også SQLite, når databasefunktionen er aktiv. Der er endnu ikke en ekstern alarmtjeneste; en driftansvarlig skal overvåge sundhed og fejlede/ukendte jobs. Nye fejllogs bruger faste koder uden kundedata eller hemmeligheder.
 
-Den eksisterende PDF-knap på original PF-ordrevisning er bevaret. Når databasen er aktiv, bruger knappen også jobkøen og linker videre til dokumentstatus i arbejdsområdet. Dokumentet gemmes i den fælles databasehistorik. Uden databaseflag er den gamle synkrone funktion bevaret. Eksisterende PF- og ordremailkøer er bevaret; de er ikke omskrevet til den nye jobtabel i denne version.
+Den eksisterende PDF-knap på original PF-ordrevisning er bevaret. Når databasen er aktiv, bruger dokumenter med kundecheckout jobkøen og linker videre til dokumentstatus i arbejdsområdet. Selvstændige PF-ordrer uden kundecheckout får deres dokumenter i SQLite-tabellen `pf_documents`; generering er fortsat synkron, og samme aktive lager bruges til oprettelse, liste og download. De bliver ikke til kundeordrer. Migration006 bevarer eksisterende dokumenter og importerer tidligere oversprungne, selvstændige PF-PDF’er én gang ved en senere SQLite-opstart, også hvis den oprindelige JSON-import allerede er markeret udført. Originale JSON-filer, dokument-id’er, versioner og PDF-bytes bevares. Uden databaseflag er den gamle synkrone JSON-funktion bevaret. Eksisterende PF- og ordremailkøer er bevaret; de er ikke omskrevet til den nye jobtabel i denne version.
+
+Migration007 tilknytter dokumenter oprettet fra en PF-ordre til netop den oprindelige PF-delordre. Et fælles kundecheckout gør ikke et dokument tilgængeligt under andre PF-delordrer. Ved opgradering kan en bevaret JSON-dokumentpost etablere tilknytningen, når dens oprindelige PF-id, snapshot og PDF-bytes stemmer præcist med SQLite. Konflikter stopper denne migration uden at ændre dokumenterne; afstem originalmaterialet før nyt forsøg. Dokumenter uden dokumenteret PF-ejer bevares i kundeordrens arbejdsområde, men vises eller sendes ikke fra en tilfældigt valgt PF-delordre. Systemet gætter ikke ejer ud fra reference, SKU eller fælles checkout. PDF-bytes og snapshots omskrives ikke.
 
 ## Backup og gendannelse
 
@@ -100,3 +102,9 @@ Seneste samlede kørsel: **339 tests bestået, 0 fejl**.
 `npm test` omfatter adgang og CSRF, login efter genstart, kundeadskillelse, priser/moms/rabat, serverpris mod manipuleret input, tilbud→ordre, idempotens, stale writes, private filer, korrekturversion, produktion, overlevering, delleverancer/PDF-antal, dokumenteret betaling, SMTP-usikkerhed, PF-projektion samt backup/restore. Den eksisterende testpakke for PF, checkout og betalingsspærring er kørt med.
 
 Browserprøve: login, oprettelse af demokunde, tilbud med 10 kasketter + tryk + opstart + fragt = 1.246,13 kr., og statusskift. Kun syntetiske data i separat lokal database. Screenshot: `output/backoffice/tilbud-demo.png`.
+
+## Validering og udestående driftskontrol, 31. oktober 2026
+
+PDF-upload undersøger de parsede objekter, inklusive komprimerede objektstrømme, indlejrede ordbøger og afkodede PDF-navne. JavaScript, aktive handlinger og indlejrede filer afvises uden at udføre indholdet. Eksisterende downloadkontroller (adgangskontrol, attachment, CSP sandbox og nosniff) bevares. Dette er ikke en generel garanti mod alle PDF-fejl eller dekompressionsressourcer.
+
+SEC-RISK er fortsat åben for ekstern MFA/adgangsbeskyttelse, proxyens klient-IP- og headerhåndtering, en understøttet admin-credentialrotation samt samlede lagerkvoter og PDF-dekompressionsgrænser. Disse forhold er ikke verificeret eller konfigureret ved de lokale rettelser. De kræver særskilt driftsafklaring; der er ikke indført et bredt nyt login- eller adgangssystem.

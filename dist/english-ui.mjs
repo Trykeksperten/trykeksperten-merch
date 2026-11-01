@@ -1,6 +1,149 @@
 // Danish source copy and reviewed English interface copy. Product copy is
 // maintained separately from PF's public English feed.
 export const englishUI=Object.fromEntries(`
+Kontrollerer logofiler…|Checking artwork files…
+Onlinebestilling er sat på pause.|Online ordering is paused.
+Logofilerne kunne ikke kontrolleres. Prøv igen eller kontakt os.|The artwork files could not be checked. Try again or contact us.
+En EPS-fil mangler forhåndsvisning. Onlinebestilling er sat på pause. Åbn designet fra kurven og erstat filen med en PDF eller PDF-kompatibel AI-fil, eller kontakt os om manuel filkontrol. Din kurv og originalfil er bevaret.|An EPS file has no preview. Online ordering is paused. Open the design from your basket and replace the file with a PDF or PDF-compatible AI file, or contact us for manual artwork review. Your basket and original file have been kept.
+EPS · Se advarsel|EPS · See warning
+Luk stort mockup|Close enlarged preview
+Indlæser mockup…|Loading preview…
+Indlæser|Loading
+Upload et andet logo|Upload another logo
+AI, EPS eller PDF|AI, EPS or PDF
+Lag i designet|Design layers
+Logofiler|Logo files
+Tilpas logo til trykfeltet|Fit logo to print area
+Centrér logo i trykfeltet|Centre logo in print area
+Slet valgt logo|Remove selected logo
+Flyt valgt logo eller tekst|Move selected logo or text
+Størrelse|Size
+Logostørrelse i procent|Logo size as a percentage
+Rotation af logo i grader|Logo rotation in degrees
+grader|degrees
+Farvetjek: cirka|Colour check: approximately
+Du har valgt|You have selected
+til denne placering. Endelige farver kontrolleres før produktion.|for this position. Final colours are checked before production.
+Logoet ser ud til at have cirka|The logo appears to have approximately
+Logoet har flere farver end valgt. Designet kan ikke gemmes, før farveantallet passer.|The logo has more colours than selected. Match the colour count before saving the design.
+Logoet har færre farver end valgt. Kontrollér dit valg, så du ikke betaler for flere trykfarver end nødvendigt.|The logo has fewer colours than selected. Check your selection to avoid paying for unnecessary print colours.
+Vælg flere trykfarver, eller slet logoet og upload en fil med færre farver.|Select more print colours, or remove the logo and upload a file with fewer colours.
+Ret antal trykfarver|Change the number of print colours
+Farveantallet kunne ikke aflæses automatisk. Kontrollér originalfilen og vælg det korrekte antal trykfarver. Filen kræver manuel kontrol.|The colour count could not be detected automatically. Check the original file and select the correct number of print colours. The file requires manual review.
+logo tilføjet|logo added
+logoer tilføjet|logos added
+Pantone-farver|Pantone colours
+Aflæst fra filen|Read from the file
+Farvenavn i filen|Colour name in the file
+Nærmeste Pantone (forslag)|Nearest Pantone (suggestion)
+Farven kunne ikke aflæses. Vi afklarer den i korrekturen.|The colour could not be detected. We will confirm it in the proof.
+Farvematch er vejledende. Ved broderi matcher vi tråden; den endelige farve afklares i korrekturen.|Colour matching is approximate. For embroidery, we match the thread; the final colour is confirmed in the proof.
+Forhåndsvisning mangler · originalfilen kræver manuel kontrol.|Preview unavailable · the original file requires manual review.
+Foreløbig pris|Estimated price
+Forventet total|Estimated total
+Luk designoversigt|Close design overview
+Trykplaceringer|Print positions
+Forrige placering|Previous position
+Færdiggør placering|Finish position
+Placeringen mangler et gemt design.|This position needs a saved design.
+Åbn placeringen for at færdiggøre og gemme dit design.|Open this position to finish and save your design.
+Smerch designstudio|Smerch design studio
+Vælg en PDF-, AI- eller EPS-fil fra Filer på din telefon eller fra din computer. Maks. 5 MB.|Choose a PDF, AI or EPS file from Files on your phone or from your computer. Max. 5 MB.
+Vælg en fil fra din telefon eller computer|Choose a file from your phone or computer
+Ufuldstændig forhåndsvisning: EPS kræver manuel filkontrol.|Incomplete preview: EPS requires manual artwork review.
+Ufuldstændig forhåndsvisning|Incomplete preview
+EPS vises som pladsholder og kræver manuel filkontrol.|EPS is shown as a placeholder and requires manual artwork review.
+Privat|Individual
+Privat eller erhverv?|Individual or business?
+Prisvisning|Price display
+Inkl. moms|Including VAT
+Ekskl. moms|Excluding VAT
+Du kan ændre valget øverst på siden.|You can change your choice at the top of the page.
+Filtrer|Filter
+Vælg produktfarve|Choose product colour
+i farven|in
+vist variant|shown variant
+Produktsider|Product pages
+Priser ekskl. moms. Tryk beregnes i designprocessen.|Prices exclude VAT. Printing is calculated as you design.
+Priser inkl. moms.|Prices include VAT.
+Priser ekskl. moms.|Prices exclude VAT.
+Priser|Prices
+Rediger design|Edit design
+Slet|Remove
+Til betaling|Proceed to checkout
+Opdater kurv|Update cart
+Fortsæt til kurv|Continue to cart
+I alt|Total
+Om produktet|About the product
+Vælg farve og antal|Choose colour and quantity
+Farve og antal|Colour and quantity
+Produktfarve|Product colour
+Vælg antal|Choose quantity
+Intet tryk|No printing
+Kun produktet|Product only
+Uden dit eget logo eller tekst. Brandets originale mærkning bevares.|Without your own logo or text. The brand's original markings remain.
+Trykpriser|Printing prices
+Tilpas den valgte placering|Customise the selected position
+maksimal trykflade|maximum print area
+Trykfladen vises direkte på produktet nedenfor.|The print area is shown directly on the product below.
+Din seneste kladde er gendannet automatisk.|Your latest draft has been restored automatically.
+Vælg antal først.|Choose a quantity first.
+Vælg antal for at se prisen.|Choose a quantity to see the price.
+Vælg antal og trykmetode først.|Choose a quantity and print method first.
+Vælg trykmetode først.|Choose a print method first.
+Vælg en trykplacering.|Choose a print position.
+Vælg antal farver|Choose the number of colours
+Samme pris uanset antal farver.|The price is the same for any number of colours.
+Gem design i designstudiet|Save your design in the design studio
+Gem dit design for at fortsætte.|Save your design to continue.
+Ret placering|Edit position
+Gemt design · forhåndsvisning|Saved design · preview
+Mockuppet kunne ikke indlæses.|The preview could not be loaded.
+Design og placering|Design and position
+Trykområde|Print area
+Klar|Ready
+Ret farver|Change colours
+Luk designstudiet|Close design studio
+Forlad designstudiet|Leave design studio
+Tekst klar|Text ready
+Mangler design|Design needed
+Tekstformatering|Text formatting
+Fed|Bold
+Understregning|Underline
+Kursiv|Italic
+Venstrestil tekst|Align text left
+Centrér tekst|Centre text
+Højrestil tekst|Align text right
+Flyt tekst|Move text
+Flyt mod venstre|Move left
+Flyt mod højre|Move right
+Flyt op|Move up
+Flyt ned|Move down
+Tekstfarve|Text colour
+Tekststørrelse i procent|Text size as a percentage
+Bogstavafstand|Letter spacing
+Rotation i grader|Rotation in degrees
+Zoom ud|Zoom out
+Zoom ind|Zoom in
+Tilladt trykflade|Printable area
+Træk designet på plads. Brug justeringslinjen til størrelsen.|Drag the design into position. Use the adjustment bar to resize it.
+Oregon 140 g/m² bomulds rygsæk med snøre 5L|Oregon 140 g/m² cotton drawstring bag 5L
+Sådan bestiller du|How to order
+Vælg tryk|Choose printing
+Merchandise med logo til virksomheder|Branded merchandise for businesses
+Orange totebag med hvidt Smerch-logo og smerch.dk, båret over skulderen i byen|Orange tote bag with a white Smerch logo and smerch.dk, worn over the shoulder in the city
+To personer med orange og turkis Stanley Quencher|Two people with orange and turquoise Stanley Quencher tumblers
+To personer med farverige Stanley Quencher-krus|Two people with colourful Stanley Quencher tumblers
+Orange Karst Stone Paper Journal på orange baggrund|Orange Karst Stone Paper Journal on an orange background
+Mit navn er Joakim, og i 2023 var jeg med til at stifte Trykeksperten. Her hjælper vi både etablerede virksomheder og startups med grafisk design, tekstiltryk, folie, glasdekoration, print og merchandise.|My name is Joakim, and in 2023 I co-founded Trykeksperten. We help established businesses and startups with graphic design, textile printing, vinyl graphics, glass decoration, print and merchandise.
+Smerch er næste skridt i udviklingen af vores virksomhed. Med erfaringen fra Trykeksperten har vi skabt en online merchandisebutik for private og professionelle - med slutbrugeren i centrum.|Smerch is the next step in our business. Building on our experience at Trykeksperten, we have created an online merchandise shop for individuals and professionals, with the end user at its heart.
+Et produkt, du ikke kan finde, et særligt design eller en større produktion? Beskriv din idé, så vi kan afklare mulighederne.|Looking for a product you cannot find, a custom design or a larger production run? Describe your idea so we can explore the options.
+Fortæl om produktet, materialer, farver og dit ønskede tryk|Tell us about the product, materials, colours and printing you would like
+Link til inspiration (valgfrit)|Inspiration link (optional)
+Indlæser dit mockup…|Loading your preview…
+Varer, tryk og opstart|Products, printing and setup
+Beløbet reserveres ved bestilling og hæves efter din korrekturgodkendelse og Smerchs interne godkendelse, før godkendelsen sendes til produktionspartneren og produktionen starter.|Payment is authorised when ordering and captured after your proof approval and Smerch’s internal approval, before approval is sent to the production partner and production starts.
+Beløbet reserveres ved bestilling og hæves tidligst ved afsendelse.|Payment is authorised when ordering and captured no earlier than dispatch.
 Gravering udføres uden trykfarve. Udseendet afhænger af produktets materiale og overflade. Logoets farver i skitsen viser ikke den færdige gravering.|Engraving uses no ink colour. Its appearance depends on the product material and surface. The logo colours in the preview do not represent the finished engraving.
 Flere indstillinger|More options
 Fil og trykfarver|File and print colours
