@@ -13,6 +13,7 @@ startes sættes både bløde og hårde RLIMIT-grænser:
 - Virtuelt adresserum: 768 MiB (reservationsgrænse, ikke tildelt fysisk RAM).
 - Datasegment/allokeringer: 192 MiB; begrænser også native brk/mmap-allokeringer
   på den testede moderne Linux-kerne. Dette er ikke en separat cgroup-RSS-grænse.
+- Stakke: 2 MiB pr. tråds standardstack; V8s JS-stack højst 512 KiB.
 - CPU-tid: 30 sekunder; core dumps og almindelig filskrivning: 0 bytes.
 Manglende Python eller afviste grænser giver fejl. Ingen ubegrænset Linux-fallback.
 På macOS kører samme separate proces og protokol, men Linux-RLIMIT-påstande
@@ -23,7 +24,7 @@ Flate-kompression. Ingen JPEG-konvertering og ingen genbrug af kilde-PDF-objekte
 PNG-genafkodning undgås. Pixels læses i 64-rækkers striber for at undgå ekstra
 fuldsides native buffere; midlertidige buffere kan indsamles løbende.
 
-Node køres jitless, med 64 MiB V8-old-space og én V8-/libuv-puljetråd. Den
+Node køres jitless, med 64 MiB V8-old-space, 1 MiB semi-space og én V8-/libuv-puljetråd. Den
 arver kun PATH og faste runtimevalg. Ingen .env, HOME eller providercredentials.
 Native canvas indlæser heller ikke systemets eller brugerens fonte automatisk;
 kun PDF.js' kontrollerede, pakkede fontdata bruges til denne pipeline.
