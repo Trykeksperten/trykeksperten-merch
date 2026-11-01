@@ -21,14 +21,16 @@ gælder ikke. Native grænser skal bevises i Linux-CI, ikke via oversprungne tes
 
 Kundekopien indlejrer de opaque, redigerede RGB-pixels direkte med tabsfri
 Flate-kompression. Ingen JPEG-konvertering og ingen genbrug af kilde-PDF-objekter.
-PNG-genafkodning undgås. Pixels læses i 64-rækkers striber for at undgå ekstra
-fuldsides native buffere; midlertidige buffere kan indsamles løbende.
+PNG-genafkodning undgås. Pixels pakkes i 64-rækkers striber, så JS ikke beholder
+en fuldsides ImageData-kopi. Canvas-bibliotekets egen native aflæsningscache kan
+stadig rumme hele siden; striberne er ikke i sig selv en native hukommelsesgrænse.
 
 Node køres jitless, med 64 MiB V8-old-space, 1 MiB semi-space og én V8-/libuv-puljetråd. Den
 arver kun PATH og faste runtimevalg. Ingen .env, HOME eller providercredentials.
 Native canvas indlæser heller ikke systemets eller brugerens fonte automatisk;
 kun PDF.js' kontrollerede, pakkede fontdata bruges til denne pipeline.
-Node-filtilladelser tillader kun lib, node_modules og projektets package.json;
+Node-filtilladelser tillader lib, node_modules og projektets package.json samt
+på Linux egen /proc/self/status til numerisk fejldiagnostik;
 skrivning og start af underprocesser/worker threads gives ikke. PDF.js-eval,
 XFA og systemfonte er slået fra, og fetch afvises. Native canvas kræver addons.
 Det betyder, at Node-permission-modellen ikke påstås at være et komplet
@@ -54,8 +56,11 @@ side-/pixel-/redaktionsregler. Et mislykket redaktionsjob returnerer aldrig
 leverandøroriginalen. Fejl sender ingen mails og ændrer ingen afgørelser alene.
 
 FØR FRIGIVELSE
-Faktiske parserkald skal bestå den samlede Linux-CI, herunder native allokerings-
-fejl gennem den samme launcher og fortsat korrekt redaktion. Den konkrete
+Faktiske parserkald har bestået Linux-CI ved kodecommit 531f476365e58b301b2c24212d6a820c20d2f412:
+993 bestået, 0 fejl, 0 oversprungne. Det omfatter native allokeringsfejl gennem
+samme launcher, intakt parent og fortsat korrekt redaktion.
+https://github.com/Trykeksperten/trykeksperten-merch/actions/runs/41354076119
+ Den konkrete
 Render-plan har 512 MiB samlet RAM; parent, kø/cache, andre HTTP-kald og barnet
 deler hostingbudgettet. Et testet enkeltjobs peak-RSS er ikke et bevis for
 hele webshoppens maksimale samtidige RSS. En kontrolleret platform-/belastnings-
@@ -68,3 +73,7 @@ https://nodejs.org/download/release/v24.14.0/docs/api/cli.html
 Linux getrlimit/setrlimit: RLIMIT_AS, DATA, CPU, CORE og FSIZE; RLIMIT_RSS
 er ikke anvendt som en virkende moderne Linux-grænse.
 https://man7.org/linux/man-pages/man2/getrlimit.2.html
+
+Canvas-aflæsningens cacheadfærd er kontrolleret mod den installerede versions
+officielle kilde, src/page_recorder.rs (RecordingSurface/get_pixels):
+https://github.com/Brooooooklyn/canvas/blob/v1.0.9/src/page_recorder.rs
