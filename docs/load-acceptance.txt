@@ -51,3 +51,12 @@ https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html
 Den første Linux-forprøve med testdriver inden for 512 MiB og én CPU er bevaret
 som en fejlet, konservativ diagnose. Den ramte memory.max uden OOM og havde
 p95 2,7 sekunder. Den er ikke bevis for kapaciteten på den korrekte afgrænsning.
+
+KATALOGRETTELSE EFTER FØRMÅLING
+Den efterfølgende prøve med korrekt webafgrænsning og 0,5 CPU fejlede med fire
+produkt-timeouts, produkt-p95 3,72 sekunder og peak cirka 460 MiB; ingen OOM.
+Førmålingen er bevaret. Katalogets cache på seks hele shards blev suppleret med
+en LRU for højst 128 faktisk efterspurgte produkter og 8 MiB serialiseret indhold.
+Samtidige miss på samme shard deler én læsning; højst to shards dekomprimeres ad
+gangen. Katalogfiler, sortiment, priser og produktindhold ændres ikke. Den ekstra
+cache er ikke en bytepræcis heapgrænse; den samlede effekt afgøres af Linux-prøven.
