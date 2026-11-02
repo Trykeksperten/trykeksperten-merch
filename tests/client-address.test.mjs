@@ -22,3 +22,25 @@ test('admin diagnostics expose only normalized addresses of this request and no 
  const input=req('127.0.0.1',{'cf-connecting-ip':'203.0.113.7',authorization:'SECRET-CREDENTIAL',cookie:'SECRET-COOKIE','x-forwarded-for':'SECRET-RAW'});
  const status=clientAddressDiagnostics(input,{});assert.equal(status.forwardingConfigured,false);assert.equal(status.resolvedClientAddress,'127.0.0.1');assert.equal(status.edgeHeaderAddress,'203.0.113.7');assert.doesNotMatch(JSON.stringify(status),/SECRET|authorization|cookie/);
 });
+
+test('equivalent IPv6 and mapped IPv4 spellings cannot create different rate-limit identities',()=>{
+ const resolve=createClientAddressResolver({cidrs:'127.0.0.1/32'});
+ for(const address of ['2001:db8::a','2001:0DB8::A','2001:db8:0:0::a','2001:0db8:0000:0000:0000:0000:0000:000a'])assert.equal(resolve(req('127.0.0.1',{'cf-connecting-ip':address})),'2001:db8::a');
+ for(const address of ['192.0.2.1','::ffff:192.0.2.1','::FFFF:192.0.2.1','::ffff:c000:201','0:0:0:0:0:FFFF:C000:0201'])assert.equal(resolve(req('127.0.0.1',{'cf-connecting-ip':address})),'192.0.2.1');
+ assert.equal(createClientAddressResolver()(req('2001:0DB8:0:0::A')),'2001:db8::a');
+});
+test('mixed-family XFF chains stop at the nearest untrusted client and normalize equivalent addresses',()=>{
+ const resolve=createClientAddressResolver({cidrs:'10.2.0.0/16,2001:db8:1::/64',header:'x-forwarded-for'});
+ assert.equal(resolve(req('::FFFF:10.2.0.7',{'x-forwarded-for':'192.0.2.99, 2001:0DB8:2:0::A, 2001:db8:1::8'})),'2001:db8:2::a');
+ assert.equal(resolve(req('10.2.0.7',{'x-forwarded-for':'192.0.2.99, ::ffff:c000:0201, 10.2.0.8'})),'192.0.2.1');
+ assert.equal(resolve(req('2001:db8:2::7',{'x-forwarded-for':'198.51.100.5'})),'2001:db8:2::7');
+});
+test('missing, duplicated, oversized or malformed chosen headers never fall back to a different forwarding header',()=>{
+ const resolve=createClientAddressResolver({cidrs:'10.2.0.0/16'});
+ for(const value of [undefined,['203.0.113.1','203.0.113.2'],'203.0.113.1, 203.0.113.2','[2001:db8::a]','fe80::1%lo','x'.repeat(1025)])assert.equal(resolve(req('10.2.0.7',{'cf-connecting-ip':value,'x-forwarded-for':'198.51.100.77'})),'10.2.0.7');
+ assert.equal(createClientAddressResolver({cidrs:'10.2.0.0/16',header:'x-forwarded-for'})(req('10.2.0.7',{'x-forwarded-for':Array(21).fill('192.0.2.1').join(','),'cf-connecting-ip':'203.0.113.1'})),'10.2.0.7');
+});
+test('proxy configuration rejects excessive lists and whitespace-only settings do not claim trust is active',()=>{
+ for(const cidrs of [Array(33).fill('10.0.0.1/32').join(','),'x'.repeat(2049),'10.0.0.1/32,','10.0.0.1/-1','::/129'])assert.throws(()=>createClientAddressResolver({cidrs}),{code:'PROXY_CONFIG_INVALID'});
+ const status=clientAddressDiagnostics(req('127.0.0.1'),{SMERCH_TRUSTED_PROXY_CIDRS:'  '});assert.equal(status.forwardingConfigured,false);assert.equal(status.configuredHeader,null);
+});

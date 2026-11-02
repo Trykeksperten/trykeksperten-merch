@@ -1,5 +1,5 @@
 PROXY-IP OG RATE LIMITS — LOKALT RETTET, EDGE-ACCEPT AFVENTER
-1. november 2026
+2. november 2026
 
 Fælles klientadresse bruges nu til adminlogin, virksomhedskonti, kontaktformular,
 adressesøgning, Pantone-kontrol og statistik. Direkte/untrusted forbindelser bruger
@@ -47,3 +47,60 @@ https://render.com/articles/fastapi-production-best-practices
 Render beskriver XFF bag sine proxyer. PocketBase-guiden advarer specifikt mod
 venstre XFF-led og viser CF-Connecting-IP; FastAPI-guiden understreger begrænset
 proxytrust. Det er vejledning, ikke en udført edge-prøve af denne webshop.
+
+KONTROL 2. NOVEMBER 2026 — IP-NORMALISERING OG PLATFORMGRÆNSE
+Samme IPv6-adresse normaliseres nu med Node SocketAddress til én skrivemåde;
+IPv4-mapped IPv6 samles med den tilsvarende IPv4-adresse. Store/små bogstaver,
+leading zeros og komprimering må ikke give nye rate-limit-tællere. Det er dækket
+med både en fejlet førtest og faktiske lokale HTTP-kald efter rettelsen.
+Whitespace-only proxykonfiguration vises nu korrekt som ikke konfigureret.
+
+Den aktuelle kontrol omfatter alle seks klientadresseforbrugere: adminlogin,
+virksomhedslogin, kontakt/honeypot, tom adressesøgning, ugyldigt Pantone-input og
+ugyldigt statistikinput. De syntetiske HTTP-forløb udløser hverken mails,
+udbyderkald, ændringer af rigtige data eller betaling. Operations-endpointet
+kræver login og returnerer ingen credentials eller rå XFF-kæder.
+
+Render dokumenterer, at CF-Connecting-IP sættes/overskrives på offentlig trafik
+via deres edge. Det dokumenterer ikke i sig selv en liste af TCP-peer-CIDR'er for
+vores app. Render dokumenterer også en privat netværksvej til samme HTTP-server,
+som skal afgrænses ved valg af trust-model. At stole på alle afsendere eller hele
+private net må derfor ikke udledes af den offentlige CF-headeranbefaling.
+Render Outbound IP Addresses beskriver udgående forbindelser; disse ranges er
+ikke dokumentation for indgående proxy-peers. Cloudflares offentlige IP-ranges
+er heller ikke nødvendigvis TCP-peer'en efter en intern Render-loadbalancer.
+
+INGEN produktions-CIDR'er er valgt, indsat eller aktiveret i dette trin.
+LOKAL accept er særskilt fra den udestående Render-/edge-accept. Den valgte
+strenge trust-model bevares. En observation af én intern IP er ikke bevis for
+et stabilt, komplet eller eksklusivt proxy-subnet.
+
+Næste platformafklaring, klargjort uden at sende en supportbesked:
+- Hvilke dokumenterede CIDR'er kan den sidste HTTP-proxy til en offentlig
+  Frankfurt-webservice komme fra, og hvor stabil er denne kontrakt?
+- Er CF-Connecting-IP overskrevet på både eget domæne og onrender.com, og hvilke
+  alternative/private indgangsveje kan ramme samme app med selvvalgte headers?
+- Kan transport-/netværksafgrænsningen skelne betroet edge fra øvrige private
+  forbindelser uden trust-all eller et gættet RFC1918-net?
+Der er ikke sendt mails, supportbeskeder eller andre eksterne meddelelser.
+
+LÆSENDE ACCEPT EFTER SÆRSKILT GODKENDT DEPLOY
+Behold checkout lukket og PF på TEST. Brug kun administratorens egne forbindelser
+og få GET-kald til /api/admin/operations. Notér for eget domæne og backenddomæne:
+transportAddress, resolvedClientAddress, edgeHeaderAddress, forwardingConfigured
+og configuredHeader. A og B skal være to kendte egne netværk (fx Wi-Fi/mobildata).
+Krav: valgt IP svarer til den korrekte klient, A og B adskilles, og en selvvalgt
+XFF/CF-header ændrer ikke identiteten. Kontrollér både IPv4 og IPv6, hvis de er
+tilgængelige. Test den dokumenterede private indgang med syntetiske læsekald,
+hvis den findes; ubekræftet direkte adgang må ikke accepteres som trusted edge.
+Ingen loginforsøgs-/kontakt-/belastningsbølge i drift. Rå IP'er gemmes privat og
+ikke i offentlige rapporter. Kald ikke noget "bestået", hvis tillidsgrænsen kun
+kan udledes af et matchende headerfelt. Manglende/ugyldig trusted header kan samle
+brugere på socket-fallback og skal behandles som en fejl i frigivelsesaccepten.
+
+Primære kilder, læst 2. november 2026:
+https://render.com/articles/host-pocketbase-on-render
+https://render.com/docs/private-network
+https://render.com/docs/outbound-ip-addresses
+https://developers.cloudflare.com/fundamentals/reference/http-headers/
+https://nodejs.org/download/release/v24.14.0/docs/api/net.html#class-netsocketaddress
