@@ -1,0 +1,51 @@
+name: Synthetic 512 MiB load acceptance
+on:
+  push:
+    branches: [codex/prelaunch-audit-2026-10-31]
+    paths:
+      - '.github/workflows/load-acceptance.yml'
+      - 'scripts/load-test*.mjs'
+      - 'lib/**'
+      - 'server.mjs'
+permissions:
+  contents: read
+jobs:
+  load:
+    name: Private Linux load test (512 MiB, one CPU)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.14.0'
+          package-manager-cache: false
+      - run: npm ci
+      - name: Prepare clean copy and synthetic fixtures
+        shell: bash
+        run: |
+          env -i PATH="$PATH" node scripts/load-test-prepare.mjs "$RUNNER_TEMP/smerch-load-$GITHUB_RUN_ID"
+      - name: Test actual server and file children inside a shared hard memory limit
+        shell: bash
+        run: |
+          test_root="$RUNNER_TEMP/smerch-load-$GITHUB_RUN_ID"
+          node_bin="$(command -v node)"
+          sudo systemd-run --unit="smerch-load-$GITHUB_RUN_ID" --wait --pipe --collect \
+            --service-type=exec --uid="$(id -u)" --gid="$(id -g)" \
+            --working-directory="$test_root/app" \
+            --property=MemoryAccounting=yes --property=MemoryMax=512M \
+            --property=MemorySwapMax=0 --property=CPUQuota=100% \
+            --property=TasksMax=128 --property=RuntimeMaxSec=360 \
+            --property=PrivateNetwork=yes --property=NoNewPrivileges=yes \
+            --property=ProtectSystem=strict --property="ReadWritePaths=$test_root" \
+            /usr/bin/env -i "PATH=$PATH" "$node_bin" \
+            --import "$test_root/app/scripts/test-local-fetch-only.mjs" \
+            "$test_root/app/scripts/load-test.mjs" "$test_root"
+      - name: Report synthetic result even on failure
+        if: always()
+        shell: bash
+        run: |
+          result="$RUNNER_TEMP/smerch-load-$GITHUB_RUN_ID/result.json"
+          if test -f "$result"; then cat "$result"; fi

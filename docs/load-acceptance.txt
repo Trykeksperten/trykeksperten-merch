@@ -1,0 +1,46 @@
+SYNTETISK BELASTNINGSACCEPT — INGEN PRODUKTIONSKONTAKT
+2. november 2026
+
+scripts/load-test-prepare.mjs laver en ny privat kopi af de versionsstyrede
+runtimefiler og genererer PDF-prøver. Den læser ikke .env, .private, ordrer,
+backupnøgler eller kunde-/korrekturfiler. Kataloget er det medfølgende offentlige
+produktgrundlag; korrekturer og runtimehistorik er syntetiske.
+
+Lokal forprøve: node scripts/load-test-prepare.mjs NY_MAPPE
+node --import ./scripts/test-local-fetch-only.mjs scripts/load-test.mjs NY_MAPPE --local
+Mac-forprøven er ikke en Linux-/512 MiB-accept.
+
+Workflow load-acceptance.yml kører kun på den nævnte codex-gren. Det ændrer
+hverken Render, main, driftsmiljø, betalingsadgang eller PF Gateway. Der er ingen
+deploystep eller providercredentials. Dependencyinstallation sker før testen.
+Selve belastningstesten bruger en systemd-netværksnamespace med kun loopback,
+en fælles cgroup for testdriver, ægte webserver og alle parserbørn, MemoryMax
+512 MiB, MemorySwapMax 0 og en CPU. Testdriverens overhead tælles også med.
+Det ændrer ingen grænser i produktion. Ingen fald tilbage til ubegrænset Linux-test.
+
+Forløb: baseline, 15 samtidige browserklienter under PDF-behandling, otte
+forskellige støjholdige kundekopier til cachepres, 12 samtidige filopgaver,
+ugyldige/for store filer og efterfølgende genoptaget normal trafik.
+HTTP-klienterne henter forside, health, katalog, produktdetaljer, lagerstatus og
+checkoutstatus. De kontakter ikke betaling, mail, PF, eksterne billeder eller AI.
+Filbehandlingen udløses via testharnessets IPC i samme webproces og dispatcher;
+server.mjs har ingen nye testruter. Dette er en belastningsprøve af server/cache/
+parser, ikke en end-to-end test af kundegodkendelse eller leverandørkommunikation.
+
+Kriterier fastsat før Linux-kørsel: ingen uventede HTTP-fejl eller serverexit,
+health højst 2 sekunder, samlet p95 under 1,5 sekunder, højst én ventende fil,
+forventede køafvisninger ved burst, intakte originaler, efterfølgende raske jobs,
+ingen cgroup-OOM og peak under 448 MiB (64 MiB margin). Tunge filer må afvises
+sikkert; normal-, flersidet og billedholdig A4-korrektur skal lykkes.
+Resultat gemmes i prøvemappens result.json, summeres i CI-loggen og overføres
+lokalt til output/load-acceptance-2026-11-02 efter kontrol.
+
+Afgrænsning: Linux-runneren simulerer hukommelsesbudget og én CPU; Render-kernel,
+proxy, faktisk datamængde, trafikmiks, backup og andre arbejdsprocesser kan afvige.
+En bestået prøve er konkret kapacitetsbevis for disse syntetiske scenarier og
+ikke en garanti for vilkårlig belastning eller ubegrænsede datamængder.
+
+Primære referencer:
+https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html
+https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html
+https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html
