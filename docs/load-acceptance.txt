@@ -14,8 +14,11 @@ Workflow load-acceptance.yml kører kun på den nævnte codex-gren. Det ændrer
 hverken Render, main, driftsmiljø, betalingsadgang eller PF Gateway. Der er ingen
 deploystep eller providercredentials. Dependencyinstallation sker før testen.
 Selve belastningstesten bruger en systemd-netværksnamespace med kun loopback,
-en fælles cgroup for testdriver, ægte webserver og alle parserbørn, MemoryMax
-512 MiB, MemorySwapMax 0 og en CPU. Testdriverens overhead tælles også med.
+en dedikeret cgroup for ægte webserver og alle parserbørn, memory.max
+512 MiB, memory.swap.max 0 og cpu.max 0,5 CPU. Testdriveren kører i en separat
+søskendegruppe; dens trafikgenerering og dekomprimering tælles ikke som webshop.
+Systemd delegerer kun undergrupper til den midlertidige tjeneste. Webserveren
+flyttes til sin begrænsede gruppe FØR Node starter, og gruppen verificeres.
 Det ændrer ingen grænser i produktion. Ingen fald tilbage til ubegrænset Linux-test.
 
 Forløb: baseline, 15 samtidige browserklienter under PDF-behandling, otte
@@ -35,7 +38,7 @@ sikkert; normal-, flersidet og billedholdig A4-korrektur skal lykkes.
 Resultat gemmes i prøvemappens result.json, summeres i CI-loggen og overføres
 lokalt til output/load-acceptance-2026-11-02 efter kontrol.
 
-Afgrænsning: Linux-runneren simulerer hukommelsesbudget og én CPU; Render-kernel,
+Afgrænsning: Linux-runneren simulerer hukommelsesbudget og 0,5 CPU; Render-kernel,
 proxy, faktisk datamængde, trafikmiks, backup og andre arbejdsprocesser kan afvige.
 En bestået prøve er konkret kapacitetsbevis for disse syntetiske scenarier og
 ikke en garanti for vilkårlig belastning eller ubegrænsede datamængder.
@@ -44,3 +47,7 @@ Primære referencer:
 https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html
 https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html
 https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html
+
+Den første Linux-forprøve med testdriver inden for 512 MiB og én CPU er bevaret
+som en fejlet, konservativ diagnose. Den ramte memory.max uden OOM og havde
+p95 2,7 sekunder. Den er ikke bevis for kapaciteten på den korrekte afgrænsning.

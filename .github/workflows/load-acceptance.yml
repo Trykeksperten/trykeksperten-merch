@@ -4,14 +4,14 @@ on:
     branches: [codex/prelaunch-audit-2026-10-31]
     paths:
       - '.github/workflows/load-acceptance.yml'
-      - 'scripts/load-test*.mjs'
+      - 'scripts/load-test*'
       - 'lib/**'
       - 'server.mjs'
 permissions:
   contents: read
 jobs:
   load:
-    name: Private Linux load test (512 MiB, one CPU)
+    name: Private Linux load test (512 MiB, 0.5 CPU)
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -35,13 +35,13 @@ jobs:
           sudo systemd-run --unit="smerch-load-$GITHUB_RUN_ID" --wait --pipe --collect \
             --service-type=exec --uid="$(id -u)" --gid="$(id -g)" \
             --working-directory="$test_root/app" \
-            --property=MemoryAccounting=yes --property=MemoryMax=512M \
-            --property=MemorySwapMax=0 --property=CPUQuota=100% \
-            --property=TasksMax=128 --property=RuntimeMaxSec=360 \
+            --property=MemoryAccounting=yes --property=Delegate=yes \
+            --property=DelegateSubgroup=driver \
+            --property=TasksMax=256 --property=RuntimeMaxSec=360 \
             --property=PrivateNetwork=yes --property=NoNewPrivileges=yes \
             --property=ProtectSystem=strict --property="ReadWritePaths=$test_root" \
             /usr/bin/env -i "PATH=$PATH" "$node_bin" \
-            --import "$test_root/app/scripts/test-local-fetch-only.mjs" \
+            --max-old-space-size=64 --import "$test_root/app/scripts/test-local-fetch-only.mjs" \
             "$test_root/app/scripts/load-test.mjs" "$test_root"
       - name: Report synthetic result even on failure
         if: always()

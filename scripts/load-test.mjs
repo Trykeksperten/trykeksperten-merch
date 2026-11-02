@@ -1,7 +1,7 @@
 // Run against a private synthetic copy. Linux acceptance requires a real 512 MiB cgroup.
 import assert from 'node:assert/strict';
-import {readFile,writeFile} from 'node:fs/promises';
-import {join,resolve} from 'node:path';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {join,resolve,dirname,basename} from 'node:path';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
 import {createServer} from 'node:net';
@@ -10,12 +10,21 @@ import {setTimeout as delay} from 'node:timers/promises';
 const root=resolve(process.argv[2]||''),local=process.argv.includes('--local'),manifest=JSON.parse(await readFile(join(root,'synthetic-load.json'),'utf8'));
 assert.equal(manifest.syntheticOnly,true);assert.equal(await readFile(join(root,'app/.env')).then(()=>true,()=>false),false);
 let cg;
-if(!local){assert.equal(process.platform,'linux');const line=(await readFile('/proc/self/cgroup','utf8')).split('\n').find(s=>s.startsWith('0::'));assert.ok(line,'cgroup v2 required');cg='/sys/fs/cgroup'+line.slice(3);assert.equal(Number(await readFile(join(cg,'memory.max'),'utf8')),512*1024*1024);assert.equal(Number(await readFile(join(cg,'memory.swap.max'),'utf8')),0);const [quota,period]=(await readFile(join(cg,'cpu.max'),'utf8')).trim().split(' ').map(Number);assert.equal(quota/period,1);assert.ok(Object.values(networkInterfaces()).flat().every(a=>a.internal),'loopback-only network required');}
+if(!local){
+ assert.equal(process.platform,'linux');const line=(await readFile('/proc/self/cgroup','utf8')).split('\n').find(s=>s.startsWith('0::'));assert.ok(line,'cgroup v2 required');
+ const own='/sys/fs/cgroup'+line.slice(3);assert.equal(basename(own),'driver');const parent=dirname(own);assert.ok(basename(parent).startsWith('smerch-load-'));
+ cg=join(parent,'web');await mkdir(cg);await writeFile(join(parent,'cgroup.subtree_control'),'+cpu +memory +pids');
+ for(const [name,value] of Object.entries({'memory.max':String(512*1024*1024),'memory.swap.max':'0','memory.oom.group':'1','cpu.max':'50000 100000','pids.max':'128'}))await writeFile(join(cg,name),value);
+ assert.equal(Number(await readFile(join(cg,'memory.max'),'utf8')),512*1024*1024);assert.equal(Number(await readFile(join(cg,'memory.swap.max'),'utf8')),0);
+ const [quota,period]=(await readFile(join(cg,'cpu.max'),'utf8')).trim().split(' ').map(Number);assert.equal(quota/period,.5);
+ assert.ok(Object.values(networkInterfaces()).flat().every(a=>a.internal),'loopback-only network required');
+}
 const memory=async()=>cg?{current:Number(await readFile(join(cg,'memory.current'),'utf8')),peak:Number(await readFile(join(cg,'memory.peak'),'utf8')),events:Object.fromEntries((await readFile(join(cg,'memory.events'),'utf8')).trim().split('\n').map(s=>s.split(' ')).map(([k,v])=>[k,Number(v)]))}:null;
-const result={version:1,sourceCommit:manifest.sourceCommit,platform:process.platform,hard512MiBCgroup:!local,cpuQuota:'one CPU in Linux workflow',syntheticOnly:true,productionContacted:false,phases:[],startedAt:new Date().toISOString()};
+const result={version:1,sourceCommit:manifest.sourceCommit,platform:process.platform,hard512MiBCgroup:!local,cpuQuota:'0.5 CPU in Linux workflow',syntheticOnly:true,productionContacted:false,testDriverExcludedFromWebBudget:true,phases:[],startedAt:new Date().toISOString()};
 const probe=createServer();await new Promise(r=>probe.listen(0,'127.0.0.1',r));const port=probe.address().port;await new Promise(r=>probe.close(r));const base='http://127.0.0.1:'+port;
 const env={PATH:process.env.PATH,NODE_ENV:'production',HOST:'127.0.0.1',PORT:String(port),PF_GATEWAY_MODE:'test',SMERCH_DATABASE_ENABLED:'0',SMERCH_BACKUP_ENABLED:'0',SMERCH_DATA_DIR:join(root,'runtime'),SMERCH_LOAD_ROOT:root};
-const child=spawn(process.execPath,['--import',join(root,'app/scripts/test-local-fetch-only.mjs'),join(root,'app/scripts/load-test-server.mjs')],{cwd:join(root,'app'),env,stdio:['ignore','pipe','pipe','ipc']});
+const args=['--import',join(root,'app/scripts/test-local-fetch-only.mjs'),join(root,'app/scripts/load-test-server.mjs')];
+const child=spawn(local?process.execPath:'python3',local?args:['-I','-S',join(root,'app/scripts/load-test-enter.py'),cg,process.execPath,...args],{cwd:join(root,'app'),env,stdio:['ignore','pipe','pipe','ipc']});
 let stdout='',stderr='',serial=0,exited=false;child.stdout.on('data',d=>{stdout=(stdout+d).slice(-4000);});child.stderr.on('data',d=>{stderr=(stderr+d).slice(-4000);});const pending=new Map();
 child.on('exit',()=>{exited=true;for(const {reject,timer} of pending.values()){clearTimeout(timer);reject(Error('Synthetic web server exited.'));}pending.clear();});
 child.on('message',m=>{const row=pending.get(m.id);if(row){clearTimeout(row.timer);pending.delete(m.id);row.resolve(m);}});
@@ -23,11 +32,11 @@ const rpc=(kind,fixture='normal',reference='SMERCH-synthetic')=>new Promise((res
 let paths=['/health','/','/api/pf-catalog','/api/pf-stock','/api/checkout/status'];
 const percentile=(rows,p)=>rows.slice().sort((a,b)=>a-b)[Math.min(rows.length-1,Math.floor(rows.length*p))]||0;
 async function traffic(name,{clients=5,ms=12000,work=async()=>{}}={}){
- const start=performance.now(),until=start+ms,latency=[],health=[],statuses={},errors=[];let requests=0,working=true;
+ const start=performance.now(),until=start+ms,latency=[],health=[],statuses={},errors=[],byPath={};let requests=0,working=true;
  const background=work().finally(()=>{working=false;});
- const pump=async client=>{let n=client;while(performance.now()<until||working){const path=client===0?'/health':paths[n++%paths.length],at=performance.now();try{const response=await fetch(base+path,{signal:AbortSignal.timeout(5000),headers:{'Accept-Encoding':n%2?'gzip':'identity'}});await response.arrayBuffer();statuses[response.status]=(statuses[response.status]||0)+1;assert.equal(response.status,200);const elapsed=performance.now()-at;latency.push(elapsed);if(path==='/health')health.push(elapsed);requests++;}catch(error){errors.push(error.name);break;}await delay(75);}};
+ const pump=async client=>{let n=client;while(performance.now()<until||working){const path=client===0?'/health':paths[n++%paths.length],at=performance.now();try{const response=await fetch(base+path,{signal:AbortSignal.timeout(5000),headers:{'Accept-Encoding':n%2?'gzip':'identity'}});await response.arrayBuffer();statuses[response.status]=(statuses[response.status]||0)+1;assert.equal(response.status,200);const elapsed=performance.now()-at;latency.push(elapsed);const key=path.startsWith('/api/pf-product/')?'/api/pf-product/:id':path;(byPath[key]??=[]).push(elapsed);if(path==='/health')health.push(elapsed);requests++;}catch(error){errors.push(error.name);break;}await delay(75);}};
  await Promise.all([background,...Array.from({length:clients},(_,i)=>pump(i))]);
- const state=await rpc('state'),row={name,clients,seconds:(performance.now()-start)/1000,requests,statuses,errors,p95Ms:percentile(latency,.95),maxMs:Math.max(0,...latency),healthP95Ms:percentile(health,.95),healthMaxMs:Math.max(0,...health),state,memory:await memory()};result.phases.push(row);console.log('SMERCH_LOAD_PHASE '+JSON.stringify(row));
+ const state=await rpc('state');if(cg)assert.equal('/sys/fs/cgroup'+state.cgroupPath,cg);const row={name,clients,seconds:(performance.now()-start)/1000,requests,statuses,errors,byPath:Object.fromEntries(Object.entries(byPath).map(([key,rows])=>[key,{requests:rows.length,p95Ms:percentile(rows,.95),maxMs:Math.max(...rows)}])),p95Ms:percentile(latency,.95),maxMs:Math.max(0,...latency),healthP95Ms:percentile(health,.95),healthMaxMs:Math.max(0,...health),state,memory:await memory()};result.phases.push(row);console.log('SMERCH_LOAD_PHASE '+JSON.stringify(row));
  assert.equal(errors.length,0,name+' request failures');assert.ok(row.healthMaxMs<2000,name+' health exceeded 2 seconds');assert.ok(row.p95Ms<1500,name+' p95 exceeded 1.5 seconds');assert.equal(exited,false);assert.ok(state.maxQueued<=1);
 }
 let success=false;

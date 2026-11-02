@@ -11,7 +11,7 @@ await mkdir(root,{recursive:false,mode:0o700});
 const app=join(root,'app'),fixtures=join(root,'fixtures'),runtime=join(root,'runtime');
 await Promise.all([mkdir(app),mkdir(fixtures),mkdir(runtime)]);
 const selected=execFileSync('git',['ls-files','-z'],{cwd:source,encoding:'utf8'}).split('\0').filter(f=>/^(lib|dist|config|data|migrations|scripts)\//.test(f)||['server.mjs','package.json','package-lock.json'].includes(f));
-for(const f of new Set([...selected,'scripts/load-test-prepare.mjs','scripts/load-test.mjs','scripts/load-test-server.mjs'])){const out=join(app,f);await mkdir(dirname(out),{recursive:true});await copyFile(join(source,f),out);}
+for(const f of new Set([...selected,'scripts/load-test-prepare.mjs','scripts/load-test.mjs','scripts/load-test-server.mjs','scripts/load-test-enter.py'])){const out=join(app,f);await mkdir(dirname(out),{recursive:true});await copyFile(join(source,f),out);}
 await symlink(await realpath(join(source,'node_modules')),join(app,'node_modules'),'dir');
 async function fixture(name,{pages=1,dense=false,large=false}={}){
  const pdf=await PDFDocument.create(),font=await pdf.embedFont(StandardFonts.Helvetica);
