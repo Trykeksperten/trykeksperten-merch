@@ -37,3 +37,66 @@ test('downloads all pages and carries PF locale cookie without executing page sc
  };
  const result=await fetchPopularity(fetcher);assert.equal(result.modelCount,1000);assert.equal(calls,4);
 });
+
+const danishConfig={applicationId:'PUBLICAPP',apiKey:'public-search-key',sortingIndices:[{attribute:'popularity_values',sort:'desc',name:'prod_da_dk_products_popularity_values_desc'}]};
+const countrySelector={countries:[{iso_code:'dk',stores:[{store_code:'da_dk'}]}],preselect:{store_code:'en_nl'},switcher_submit_url:'https://www.pfconcept.com/en_nl/bestseller.html?___from_store=en_nl'};
+function localeFixture({selector=countrySelector,selection={status:1,store_url:'https://www.pfconcept.com/da_dk/bestseller.html'},selectionStatus=200,redirectAgain=false,wrongIndex=false,partial=false}={}){
+ const calls=[];let selected=false;
+ const fetcher=async(value,options={})=>{
+  const url=new URL(value);calls.push({url,options});
+  assert.ok(['www.pfconcept.com','publicapp-dsn.algolia.net'].includes(url.hostname),'no unexpected destination');
+  if(url.hostname==='publicapp-dsn.algolia.net'){
+   assert.ok(selected);assert.equal(options.headers.Cookie,undefined,'supplier cookies never reach search host');
+   assert.equal(JSON.parse(options.body).requests[0].indexName,'prod_da_dk_products_popularity_values_desc');
+   return Response.json({results:[{hits:partial?hits.slice(0,999):hits,nbHits:1000,nbPages:1}]});
+  }
+  assert.equal(options.redirect,'manual');
+  if(options.method==='POST'){
+   assert.equal(url.href,countrySelector.switcher_submit_url);
+   const form=new URLSearchParams(options.body);
+   assert.deepEqual(Object.fromEntries(form),{country_iso:'dk',store_code:'da_dk',current_url:'https://www.pfconcept.com/da_dk/bestseller.html',___from_store:'en_nl',action:'set_session'});
+   assert.match(options.headers.Cookie,/session=anonymous/);
+   selected=true;
+   return Response.json(selection,{status:selectionStatus,headers:{'set-cookie':'store=da_dk; Path=/'}});
+  }
+  if(url.pathname==='/da_dk/bestseller.html'){
+   if(!selected||redirectAgain)return new Response('',{status:302,headers:{location:'/en_nl/bestseller.html','set-cookie':'session=anonymous; Path=/'}});
+   assert.match(options.headers.Cookie,/store=da_dk/);
+   const config=wrongIndex?{...danishConfig,sortingIndices:[{attribute:'popularity_values',sort:'desc',name:'prod_en_nl_products_popularity_values_desc'}]}:danishConfig;
+   return new Response(`window.algoliaConfig = JSON.parse('${JSON.stringify(config)}')`);
+  }
+  return new Response(`<script>window.country_switcher_data = ${JSON.stringify(selector)}</script>`);
+ };
+ return {fetcher,calls};
+}
+test('country selector recovers a server-side Dutch redirect and downloads only Danish scores',async()=>{
+ const {fetcher,calls}=localeFixture();const result=await fetchPopularity(fetcher);
+ assert.equal(result.modelCount,1000);assert.equal(Object.keys(result.scores).length,1000);
+ assert.equal(calls.length,5);assert.equal(calls.filter(x=>x.options.method==='POST'&&x.url.hostname==='www.pfconcept.com').length,1);
+});
+for(const [name,options,error] of [
+ ['wrong selected country',{selection:{status:1,store_url:'https://www.pfconcept.com/en_nl/bestseller.html'}},/Danish locale/],
+ ['locale still redirects after selection',{redirectAgain:true},/Danish locale/],
+ ['wrong index on Danish URL',{wrongIndex:true},/popularity index missing/],
+ ['incomplete results',{partial:true},/Incomplete PF popularity/],
+ ['denied country selection',{selectionStatus:403},/country selection failed/],
+ ['unsuccessful country selection',{selection:{status:0}},/country selection failed/],
+ ['external selector destination',{selector:{...countrySelector,switcher_submit_url:'https://unapproved.example/select'}},/Unexpected PF redirect/],
+ ['external selected destination',{selection:{status:1,store_url:'https://unapproved.example/da_dk/bestseller.html'}},/Unexpected PF redirect/],
+ ['unexpected selector action',{selector:{...countrySelector,switcher_submit_url:'https://www.pfconcept.com/en_nl/customer/account/'}},/Unexpected PF country selector/],
+ ['missing Danish store',{selector:{...countrySelector,countries:[]}},/Danish store missing/],
+ ['invalid source locale',{selector:{...countrySelector,preselect:{store_code:'bad\r\nvalue'}}},/Invalid PF country selector/],
+])test(name+' rejects the download and preserves the previous snapshot',async()=>{
+ const {fetcher}=localeFixture(options),previous=normalizePopularity(hits,1000,now),before=JSON.stringify(previous);let writes=0;
+ await assert.rejects(refreshPopularity({load:async()=>previous,download:()=>fetchPopularity(fetcher),save:async()=>{writes++;},now:now+popularityInterval}),error);
+ assert.equal(writes,0);assert.equal(JSON.stringify(previous),before);
+});
+test('external initial redirects are refused before cookies can leave PF',async()=>{
+ let calls=0;await assert.rejects(fetchPopularity(async()=>{calls++;return new Response('',{status:302,headers:{location:'https://unapproved.example/','set-cookie':'session=anonymous'}});}),/Unexpected PF redirect/);assert.equal(calls,1);
+});
+test('redirect loops are bounded without attempting country selection',async()=>{
+ let calls=0;await assert.rejects(fetchPopularity(async()=>{calls++;return new Response('',{status:302,headers:{location:'/da_dk/bestseller.html'}});}),/redirect limit/);assert.equal(calls,8);
+});
+test('missing redirect location is refused',async()=>{
+ await assert.rejects(fetchPopularity(async()=>new Response('',{status:302})),/Unexpected PF redirect/);
+});
