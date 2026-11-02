@@ -12,6 +12,7 @@ const descriptions={
  proof_published:'Korrekturen blev gjort tilgængelig for kunden til gennemgang og godkendelse.',
  customer_approved:'Kunden godkendte korrekturversionen. Smerchs interne godkendelse og afsendelse af svaret til PF er separate trin.',
  smerch_approved:'En medarbejder registrerede godkendelse af korrekturen i Smerch. Denne hændelse bekræfter ikke, at svaret er sendt til PF.',
+ staff_proof_approved:'Smerch godkendte den aktuelle korrektur til produktion. Betalingen forbliver reserveret indtil fuld afsendelse.',
  staff_proof_payment_approved:'Smerch godkendte korrekturversionen og tillod hævning af betalingen. Selve hævningen skal bekræftes særskilt.',
  revision_requested:'Der blev registreret et ønske om ændringer til korrekturen. Ændringsønsket skal behandles og sendes til PF.',
  approval_sent_to_pf:'Afsendelse af godkendelsen til PF blev registreret. Produktionsstart er ikke bekræftet af denne hændelse.',

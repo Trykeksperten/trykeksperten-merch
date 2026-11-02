@@ -146,7 +146,7 @@ Fortæl om produktet, materialer, farver og dit ønskede tryk|Tell us about the 
 Link til inspiration (valgfrit)|Inspiration link (optional)
 Indlæser dit mockup…|Loading your preview…
 Varer, tryk og opstart|Products, printing and setup
-Beløbet reserveres ved bestilling og hæves efter din korrekturgodkendelse og Smerchs interne godkendelse, før godkendelsen sendes til produktionspartneren og produktionen starter.|Payment is authorised when ordering and captured after your proof approval and Smerch’s internal approval, before approval is sent to the production partner and production starts.
+Beløbet reserveres ved bestilling og hæves automatisk, når hele ordren er afsendt, også for varer med logo eller tryk.|Payment is authorised when ordering and captured automatically once the entire order has been dispatched, including goods with a logo or printing.
 Beløbet reserveres ved bestilling og hæves tidligst ved afsendelse.|Payment is authorised when ordering and captured no earlier than dispatch.
 Gravering udføres uden trykfarve. Udseendet afhænger af produktets materiale og overflade. Logoets farver i skitsen viser ikke den færdige gravering.|Engraving uses no ink colour. Its appearance depends on the product material and surface. The logo colours in the preview do not represent the finished engraving.
 Flere indstillinger|More options
@@ -213,7 +213,7 @@ Levering uden logo:|Delivery without a logo:
 Levering: 7–10 hverdage efter godkendt korrektur.|Delivery: 7–10 business days after proof approval.
 Levering: 2–4 hverdage uden logo.|Delivery: 2–4 business days without a logo.
 Leveringstider|Delivery times
-Beløbet reserveres først og hæves efter godkendt korrektur. Personaliserede produkter og produkter med logo leveres 7–10 hverdage efter godkendt korrektur. Tiden frem til godkendt korrektur kommer oveni. Produkter uden logo leveres på 2–4 hverdage.|Payment is authorised first and captured after proof approval. Personalised products and products with a logo are delivered within 7–10 business days after proof approval. Time spent awaiting proof approval is additional. Products without a logo are delivered within 2–4 business days.
+Beløbet reserveres ved bestilling og hæves automatisk, når hele ordren er afsendt. Personaliserede produkter og produkter med logo leveres 7–10 hverdage efter godkendt korrektur. Tiden frem til godkendt korrektur kommer oveni. Produkter uden logo leveres på 2–4 hverdage.|Payment is authorised when ordering and captured automatically once the entire order has been dispatched. Personalised products and products with a logo are delivered within 7–10 business days after proof approval. Time spent awaiting proof approval is additional. Products without a logo are delivered within 2–4 business days.
 Gå til indhold|Skip to content
 Design dit merch|Design your merch
 Korrektur før produktion|Proof approval before production
@@ -1162,4 +1162,8 @@ Har du et spørgsmål? Send os en besked. Vi svarer inden for 24 timer.|Have a q
 Tak — din besked er sendt. Vi svarer inden for 24 timer.|Thank you — your message has been sent. We reply within 24 hours.
 Vi svarer på din e-mail inden for 24 timer.|We reply to your email within 24 hours.
 
+Beløbet reserveres ved bestilling og hæves automatisk, når hele ordren er afsendt.|Payment is authorised when ordering and captured automatically once the entire order has been dispatched.
+Vi afventer den endelige korrektur og produktionsgodkendelse. Beløbet hæves automatisk, når hele ordren er afsendt.|We are awaiting the final proof and production approval. Payment is captured automatically once the entire order has been dispatched.
+Vi behandler din ordre. Beløbet hæves automatisk, når hele ordren er afsendt.|We are processing your order. Payment is captured automatically once the entire order has been dispatched.
+Hele ordren er afsendt. Se leveringsstatus nedenfor.|The entire order has been dispatched. See the delivery status below.
 `.trim().split('\n').map(line=>line.split('|')));
