@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {createClientAddressResolver,validateClientAddressConfiguration,clientAddressDiagnostics} from '../lib/client-address.mjs';
+import {createClientAddressResolver,validateClientAddressConfiguration,clientAddressDiagnostics,clientAddress} from '../lib/client-address.mjs';
 const req=(peer,headers={})=>({socket:{remoteAddress:peer},headers});
 test('default resolver ignores spoofed forwarding headers and normalizes socket IPv4 mapping',()=>{
  const resolve=createClientAddressResolver();assert.equal(resolve(req('::ffff:192.0.2.7',{'x-forwarded-for':'198.51.100.9','cf-connecting-ip':'203.0.113.5'})),'192.0.2.7');assert.equal(resolve(req('test-socket',{'cf-connecting-ip':'203.0.113.5'})),'test-socket');
@@ -43,4 +43,47 @@ test('missing, duplicated, oversized or malformed chosen headers never fall back
 test('proxy configuration rejects excessive lists and whitespace-only settings do not claim trust is active',()=>{
  for(const cidrs of [Array(33).fill('10.0.0.1/32').join(','),'x'.repeat(2049),'10.0.0.1/32,','10.0.0.1/-1','::/129'])assert.throws(()=>createClientAddressResolver({cidrs}),{code:'PROXY_CONFIG_INVALID'});
  const status=clientAddressDiagnostics(req('127.0.0.1'),{SMERCH_TRUSTED_PROXY_CIDRS:'  '});assert.equal(status.forwardingConfigured,false);assert.equal(status.configuredHeader,null);
+});
+
+const renderEnv={RENDER:'true',RENDER_SERVICE_TYPE:'web',SMERCH_PROXY_TRUST_MODE:'render-workspace'};
+test('being on Render alone never enables provider header trust',()=>{
+ const input=req('10.9.0.7',{'cf-connecting-ip':'203.0.113.5','x-forwarded-for':'198.51.100.9'});
+ assert.equal(clientAddress(input,{RENDER:'true',RENDER_SERVICE_TYPE:'web'}),'10.9.0.7');
+ assert.equal(clientAddressDiagnostics(input,{RENDER:'true',RENDER_SERVICE_TYPE:'web'}).trustMode,'socket');
+});
+test('explicit Render workspace mode requires the Render web runtime and rejects ambiguous or unknown configuration',()=>{
+ validateClientAddressConfiguration(renderEnv);
+ for(const env of [
+  {...renderEnv,RENDER:undefined},{...renderEnv,RENDER:'false'},
+  {...renderEnv,RENDER_SERVICE_TYPE:'pserv'}, {...renderEnv,RENDER_SERVICE_TYPE:undefined},
+  {...renderEnv,SMERCH_PROXY_TRUST_MODE:'render'}, {...renderEnv,SMERCH_PROXY_TRUST_MODE:'*'},
+  {...renderEnv,SMERCH_TRUSTED_PROXY_CIDRS:'10.0.0.0/8'},
+  {...renderEnv,SMERCH_CLIENT_IP_HEADER:'x-forwarded-for'}
+ ])assert.throws(()=>validateClientAddressConfiguration(env),{code:'PROXY_CONFIG_INVALID'});
+ assert.throws(()=>createClientAddressResolver({mode:'render-workspace'}),{code:'PROXY_CONFIG_INVALID'});
+});
+test('Render mode uses only a single normalized CF address and never falls back to XFF',()=>{
+ const input=headers=>req('10.9.0.7',{'x-forwarded-for':'198.51.100.9',...headers});
+ assert.equal(clientAddress(req('test-socket',{'cf-connecting-ip':'203.0.113.9'}),renderEnv),'test-socket');
+ assert.equal(clientAddress(input({'cf-connecting-ip':'2001:0DB8:0000:0000::A'}),renderEnv),'2001:db8::a');
+ assert.equal(clientAddress(input({'cf-connecting-ip':'::ffff:cb00:7109'}),renderEnv),'203.0.113.9');
+ for(const value of [undefined,'',[],['203.0.113.1','203.0.113.2'],'203.0.113.1, 203.0.113.2','[2001:db8::a]','fe80::1%lo','not-an-IP','x'.repeat(1025)]){
+  assert.equal(clientAddress(input({'cf-connecting-ip':value}),renderEnv),'10.9.0.7');
+ }
+});
+test('Render workspace trust explicitly also trusts a private sender with a forged valid header',()=>{
+ // This is the documented limitation, not proof of a separate public-edge boundary.
+ const privateSender=req('10.1.2.3',{'cf-connecting-ip':'203.0.113.77'});
+ assert.equal(clientAddress(privateSender,renderEnv),'203.0.113.77');
+ assert.equal(clientAddress(privateSender,{}),'10.1.2.3');
+ const diagnostic=clientAddressDiagnostics(privateSender,renderEnv);
+ assert.equal(diagnostic.trustMode,'render-workspace');assert.equal(diagnostic.privateNetworkTrusted,true);
+ assert.equal(diagnostic.configuredHeader,'cf-connecting-ip');assert.equal(diagnostic.forwardingConfigured,true);
+});
+test('changing provider opt-in or runtime flags cannot reuse a previously trusted resolver',()=>{
+ const input=req('10.1.2.3',{'cf-connecting-ip':'203.0.113.77'});
+ assert.equal(clientAddress(input,renderEnv),'203.0.113.77');
+ assert.equal(clientAddress(input,{...renderEnv,SMERCH_PROXY_TRUST_MODE:undefined}),'10.1.2.3');
+ assert.throws(()=>clientAddress(input,{...renderEnv,RENDER:'false'}),{code:'PROXY_CONFIG_INVALID'});
+ assert.equal(clientAddress(input,renderEnv),'203.0.113.77');
 });

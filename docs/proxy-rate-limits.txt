@@ -1,106 +1,95 @@
-PROXY-IP OG RATE LIMITS — LOKALT RETTET, EDGE-ACCEPT AFVENTER
-2. november 2026
+PROXY-IP OG RATE LIMITS — TO EKSPPLICITTE TILLIDSMODELLER
+2. november 2026. Lokalt implementeret/testet; ingen aktivering eller deploy.
 
-Fælles klientadresse bruges nu til adminlogin, virksomhedskonti, kontaktformular,
-adressesøgning, Pantone-kontrol og statistik. Direkte/untrusted forbindelser bruger
-transportens socketadresse. Indsendt X-Forwarded-For eller CF-Connecting-IP kan
-ikke i sig selv give klienten en ny rate-limit-identitet.
+STANDARD: SOCKET ELLER EKSPPLICITTE CIDR-RANGES
+Uden ny konfiguration er adfærden bevaret. SMERCH_PROXY_TRUST_MODE er cidr som
+standard. Uden SMERCH_TRUSTED_PROXY_CIDRS bruges socketadressen, og klientens
+forwarding-headere ignoreres. Med eksplicitte CIDR-ranges accepteres den valgte
+header kun fra en matchende TCP-peer. /0, ugyldige ranges og for lange lister
+afvises. IPv6 normaliseres, og IPv4-mapped IPv6 får samme identitet som IPv4.
+SMERCH_CLIENT_IP_HEADER kan her være cf-connecting-ip eller x-forwarded-for.
+XFF-kæder læses bagfra til første ikke-betroede hop; venstre led vælges ikke blindt.
 
-Betroede proxyer kræver eksplicit SMERCH_TRUSTED_PROXY_CIDRS (kommasepareret).
-Ingen Render-adresser antages eller er tilføjet i produktionen. /0-ranges, ugyldige
-CIDR'er, for lange lister og ukendte headernavne afvises. IPv4 og IPv6 understøttes.
-SMERCH_CLIENT_IP_HEADER kan være cf-connecting-ip (standard) eller x-forwarded-for.
-For XFF følges kæden bagfra til første ikke-betroede adresse; en spoofet venstre
-adresse vælges ikke blindt. Ugyldige/for lange headers giver socket-fallback.
-Kontaktformularens adressetællere er desuden begrænset og udløber.
+NYT VALG: RENDER-WORKSPACE SOM TILLIDSGRÆNSE
+Dette er vores applikationsvalg baseret på Renders dokumentation, ikke en særlig
+indstilling eller en personlig lanceringsgodkendelse fra Render.
+Render beskriver overskrivning af CF-Connecting-IP på offentlig webservice-trafik.
+Deres private net omfatter samme workspace og region. Privat port 10000 kan nå
+samme HTTP-server som den offentlige indgang, også hvis serveren lytter andetsteds.
 
-VIGTIGT FØR DEPLOY
-På en delt Render-proxy kan socket-fallback samle flere brugere i samme bucket.
-De konkrete betroede ingress-peer-ranges skal derfor dokumenteres og accepteres,
-før denne ændring bruges i produktion. Der må ikke gættes på ranges eller vælges
-trust-all. Ellers kan legitime brugere fejlagtigt dele en rate limit.
+Forslaget kræver et eksplicit valg:
+  SMERCH_PROXY_TRUST_MODE=render-workspace
+  SMERCH_CLIENT_IP_HEADER=cf-connecting-ip
+  SMERCH_TRUSTED_PROXY_CIDRS=
 
-Den eksisterende loginbeskyttede GET /api/admin/operations indeholder minimale
-network-felter for administratorens EGEN forespørgsel: transportadresse, valgt
-klientadresse, normaliseret CF-header og om forwarding er konfigureret. Ingen
-cookies, authorization-headere, rå headerkæder eller andre besøgendes oplysninger.
-Der logges ikke automatisk IP-adresser med denne ændring.
+Derudover skal Renders EGNE runtimevariable være RENDER=true og
+RENDER_SERVICE_TYPE=web. De må ikke sættes manuelt for at omgå kontrollen.
+Uden disse metadata, ved ukendt mode, ved en blandet CIDR-konfiguration eller
+ved valg af XFF i Render-mode fejler konfigurationsvalideringen/starten.
+RENDER=true alene slår IKKE den nye mode til. Ingen .env/render.yaml er ændret.
 
-Efter særskilt godkendt deploy, fortsat med checkout lukket og PF på TEST:
-1. Log ind som administrator og læs operations-status fra kendte forbindelser.
-2. Afstem socket-/edge-/valgt adresse med den dokumenterede Render-ingress.
-3. Kontrollér forsigtigt med få egne læsekald, at en selvvalgt XFF ikke ændrer
-   den valgte klient-IP. Ingen belastningstest eller bruteforce i produktion.
-4. Dokumentér afgrænsning til én instans og proceslokale tællere. Flere instanser
-   kræver et fælles lager og en separat gennemgang.
+Den nye mode bruger en enkelt gyldig CF-adresse og ignorerer XFF. Manglende,
+dobbelt, for lang eller ugyldig CF-header giver normaliseret socket-fallback,
+aldrig fallback til en anden forwarding-header. Manglende gyldig transport-IP
+kan heller ikke erstattes af en header. Socket-fallback kan samle flere kunder;
+i den efterfølgende edge-accept er dette en fejl, som skal undersøges.
 
-Lokalt er samme HTTP-server testet med syntetiske honeypotbeskeder, der aldrig
-sender mails: fem beskeder accepteres, sjette afvises trods skiftende falske
-headers. Med eksplicit lokal testproxy adskilles to klienter korrekt, og XFF
-kan ikke nulstille hverken kontakt- eller loginbegrænsningen. IPv6, ugyldige
-ranges, headergrænser og private admin-diagnosefelter er også dækket.
+VIGTIG BEGRÆNSNING — TESTET OG BEVIDST
+Den nye mode identificerer IKKE kryptografisk, om den enkelte forespørgsel kom
+via public edge eller direkte fra det private net. En privat afsender i samme
+workspace kan sende en gyldig falsk CF-header og få den accepteret i denne mode.
+En test demonstrerer netop dette. Runtimevariable er ikke request-attestation.
 
-Dokumentation fra Render, kontrolleret 1. november 2026:
-https://render.com/articles/how-render-handles-ddos-attacks
-https://render.com/articles/host-pocketbase-on-render
-https://render.com/articles/fastapi-production-best-practices
-Render beskriver XFF bag sine proxyer. PocketBase-guiden advarer specifikt mod
-venstre XFF-led og viser CF-Connecting-IP; FastAPI-guiden understreger begrænset
-proxytrust. Det er vejledning, ikke en udført edge-prøve af denne webshop.
+Modevalget betyder derfor: ALLE afsendere i det relevante Render-workspace er
+betroede. Det er et andet tillidsgrundlag end den bevarede CIDR-model. Brug det
+kun i et ejerstyret workspace uden ikke-betroede services, previews, operatører
+eller workloads. Ændringer af workspaceadgang/services/previews kræver en ny
+vurdering. Hvis intern trafik skal være ikke-betroet, er denne mode uegnet;
+brug dokumenteret peer-afgrænsning eller en anden særskilt sikret arkitektur.
+En serviceoversigt med kun én app er et øjebliksbillede, ikke en garanti for fremtiden.
 
-KONTROL 2. NOVEMBER 2026 — IP-NORMALISERING OG PLATFORMGRÆNSE
-Samme IPv6-adresse normaliseres nu med Node SocketAddress til én skrivemåde;
-IPv4-mapped IPv6 samles med den tilsvarende IPv4-adresse. Store/små bogstaver,
-leading zeros og komprimering må ikke give nye rate-limit-tællere. Det er dækket
-med både en fejlet førtest og faktiske lokale HTTP-kald efter rettelsen.
-Whitespace-only proxykonfiguration vises nu korrekt som ikke konfigureret.
+DIAGNOSTIK
+Den eksisterende loginbeskyttede GET /api/admin/operations viser kun egen
+forespørgsels normaliserede adresser, forwardingConfigured og configuredHeader.
+Ny trustMode er socket, cidr eller render-workspace. privateNetworkTrusted er
+true i Render-mode og gør tillidsantagelsen synlig. Felterne beviser ikke, at
+netop denne request passerede public edge. Ingen cookies, credentials, rå XFF
+eller andre besøgendes adresser vises. Der tilføjes ingen automatisk IP-logning.
 
-Den aktuelle kontrol omfatter alle seks klientadresseforbrugere: adminlogin,
-virksomhedslogin, kontakt/honeypot, tom adressesøgning, ugyldigt Pantone-input og
-ugyldigt statistikinput. De syntetiske HTTP-forløb udløser hverken mails,
-udbyderkald, ændringer af rigtige data eller betaling. Operations-endpointet
-kræver login og returnerer ingen credentials eller rå XFF-kæder.
+LOKALE TESTS
+24 målrettede proxytests er bestået. En faktisk loopback-HTTP-proxy simulerer
+Renders dokumenterede headeroverskrivning foran den faktiske app. To klienter
+adskilles; skiftende falske CF-/XFF-headere nulstiller ikke kontakt-/adminbegrænsning.
+Alle seks forbrugere er dækket: admin, virksomhed, kontakt, adresser, Pantone,
+statistik. Malformed input, normalisering, konfigurationsvagter, cacheændring og
+privat-workspace-begrænsningen er dækket. Honeypot/syntetiske input sender ingen mails.
+Samlet lokal regression: 1.011 bestået, 0 fejl, 3 Linux-tests oversprunget på Mac.
+Ingen ny Linux-CI eller belastningsprøve er udført på disse endnu ikke committede
+ændringer. Tidligere Linux-resultater hører til det tidligere commit.
 
-Render dokumenterer, at CF-Connecting-IP sættes/overskrives på offentlig trafik
-via deres edge. Det dokumenterer ikke i sig selv en liste af TCP-peer-CIDR'er for
-vores app. Render dokumenterer også en privat netværksvej til samme HTTP-server,
-som skal afgrænses ved valg af trust-model. At stole på alle afsendere eller hele
-private net må derfor ikke udledes af den offentlige CF-headeranbefaling.
-Render Outbound IP Addresses beskriver udgående forbindelser; disse ranges er
-ikke dokumentation for indgående proxy-peers. Cloudflares offentlige IP-ranges
-er heller ikke nødvendigvis TCP-peer'en efter en intern Render-loadbalancer.
+FØR EVENTUEL AKTIVERING
+1. Vælg og dokumentér tillidsmodellen. Render-mode forudsætter et fuldt betroet
+   workspace; det skal accepteres som en konkret driftsbeslutning. Det kan ikke
+   erstattes af at gætte et privat subnet. Supportsvaret kan supplere, men er
+   ikke en formel tilladelse, som Render skal give før en webshop kan lanceres.
+2. Gennemfør sædvanlig release-/CI-kontrol og frisk backup. Deploy og ændring af
+   driftsvariable kræver fortsat særskilt godkendelse. Behold checkout lukket,
+   PF TEST og ingen kundemails/PF-afsendelse under den begrænsede efterkontrol.
+3. Kontrollér med få egne GET-kald til operations-endpointet på både eget domæne
+   og serviceens faktiske onrender.com-hostname. Brug to kendte egne netværk,
+   eksempelvis Wi-Fi og mobildata. Valgt IP skal matche den rigtige klient,
+   netværkene skal adskilles, og falske CF/XFF-headere må ikke ændre identiteten.
+   Kontrollér IPv4/IPv6 hvis tilgængeligt. Ingen brute-force eller load i drift.
+4. Afvis frigivelsesaccepten ved forkert klient-IP, manglende CF-header eller en
+   workspaceafgrænsning, som ikke kan opretholdes. Et lokalt proxy-simulat er
+   ikke en udført Render-edge-prøve. Rå egne IP'er gemmes privat, ikke i rapporter.
 
-INGEN produktions-CIDR'er er valgt, indsat eller aktiveret i dette trin.
-LOKAL accept er særskilt fra den udestående Render-/edge-accept. Den valgte
-strenge trust-model bevares. En observation af én intern IP er ikke bevis for
-et stabilt, komplet eller eksklusivt proxy-subnet.
+Der er ikke valgt/aktiveret produktions-CIDR'er, ændret server-/PF-konfiguration,
+åbnet nogen Cloudflare Quick Tunnel eller udført deploy i denne opgave.
+Renders brug af Cloudflare i deres egen platform åbner ikke vores lokale testtunnel.
 
-Næste platformafklaring, klargjort uden at sende en supportbesked:
-- Hvilke dokumenterede CIDR'er kan den sidste HTTP-proxy til en offentlig
-  Frankfurt-webservice komme fra, og hvor stabil er denne kontrakt?
-- Er CF-Connecting-IP overskrevet på både eget domæne og onrender.com, og hvilke
-  alternative/private indgangsveje kan ramme samme app med selvvalgte headers?
-- Kan transport-/netværksafgrænsningen skelne betroet edge fra øvrige private
-  forbindelser uden trust-all eller et gættet RFC1918-net?
-Der er ikke sendt mails, supportbeskeder eller andre eksterne meddelelser.
-
-LÆSENDE ACCEPT EFTER SÆRSKILT GODKENDT DEPLOY
-Behold checkout lukket og PF på TEST. Brug kun administratorens egne forbindelser
-og få GET-kald til /api/admin/operations. Notér for eget domæne og backenddomæne:
-transportAddress, resolvedClientAddress, edgeHeaderAddress, forwardingConfigured
-og configuredHeader. A og B skal være to kendte egne netværk (fx Wi-Fi/mobildata).
-Krav: valgt IP svarer til den korrekte klient, A og B adskilles, og en selvvalgt
-XFF/CF-header ændrer ikke identiteten. Kontrollér både IPv4 og IPv6, hvis de er
-tilgængelige. Test den dokumenterede private indgang med syntetiske læsekald,
-hvis den findes; ubekræftet direkte adgang må ikke accepteres som trusted edge.
-Ingen loginforsøgs-/kontakt-/belastningsbølge i drift. Rå IP'er gemmes privat og
-ikke i offentlige rapporter. Kald ikke noget "bestået", hvis tillidsgrænsen kun
-kan udledes af et matchende headerfelt. Manglende/ugyldig trusted header kan samle
-brugere på socket-fallback og skal behandles som en fejl i frigivelsesaccepten.
-
-Primære kilder, læst 2. november 2026:
-https://render.com/articles/host-pocketbase-on-render
+PRIMÆRE KILDER KONTROLLERET 2. NOVEMBER 2026
+https://render.com/articles/host-pocketbase-on-render (afsnit om real client IP)
 https://render.com/docs/private-network
-https://render.com/docs/outbound-ip-addresses
-https://developers.cloudflare.com/fundamentals/reference/http-headers/
-https://nodejs.org/download/release/v24.14.0/docs/api/net.html#class-netsocketaddress
+https://render.com/docs/environment-variables
+https://render.com/docs/tls
