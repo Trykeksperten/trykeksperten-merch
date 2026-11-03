@@ -112,5 +112,6 @@ body.storefront #main .pf-cart-page .pf-cart-actions :is(.pf-cart-edit,[data-pf-
 .pf-cart-page .cart-purchase-info summary{min-height:44px;align-content:center;font-size:13px;cursor:pointer}
 .pf-cart-page .cart-purchase-info .purchase-assurances{margin-top:4px}
 
-.pf-cart-page #pf-cart-checkout-link:not([aria-disabled="true"]){background:var(--purchase-green);color:#fff}
-.pf-cart-page #pf-cart-checkout-link:not([aria-disabled="true"]):hover{background:var(--purchase-green-hover)}
+.pf-cart-page #pf-cart-checkout-link{background:var(--blue);color:#fff}
+.pf-cart-page #pf-cart-checkout-link[aria-disabled="true"]{opacity:.65;cursor:wait}
+.pf-cart-page #pf-cart-checkout-link:not([aria-disabled="true"]):hover{background:#a83a14}

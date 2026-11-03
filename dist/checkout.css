@@ -87,7 +87,7 @@ body.storefront #main .pf-checkout .pf-price-total dd{font-size:16px}
  .pf-checkout:has(#pf-checkout-form){--checkout-control-height:44px;--checkout-button-height:44px}
  .pf-checkout .cart-layout{grid-template-columns:1fr;gap:14px}
  .pf-checkout .cart-summary{position:static;padding:12px}
- .pf-checkout #pf-checkout-form[data-checkout-step="details"] .checkout-sidebar{grid-row:1}
+ .pf-checkout #pf-checkout-form[data-checkout-step="details"] .checkout-sidebar{grid-row:2}
  .pf-checkout .checkout-heading{margin-top:6px}
  .pf-checkout #pf-checkout-form input:not([type=checkbox],[type=radio]),.pf-checkout #pf-checkout-form select{font-size:16px}
 }
@@ -101,7 +101,7 @@ body.storefront #main .pf-checkout .pf-price-total dd{font-size:16px}
 .pf-checkout #checkout-business label[hidden]{display:none}
 
 .pf-checkout :is([data-checkout-details],[data-checkout-payment],[data-checkout-method-step],[data-checkout-review-step],[data-checkout-method-next],[data-checkout-next],.checkout-confirmation,.checkout-freight)[hidden]{display:none}
-.pf-checkout #pf-checkout-form .checkout-back-details{grid-column:1/-1;justify-self:start;display:inline-flex;align-items:center;gap:6px;min-height:var(--checkout-control-height);margin:0;padding:5px 12px;border:1px solid #d9dfda;border-radius:7px;background:#fff;color:#43574a;cursor:pointer}
+.pf-checkout #pf-checkout-form .checkout-back-details{grid-column:1/-1;justify-self:start;display:inline-flex;align-items:center;gap:6px;min-height:var(--checkout-control-height);margin:0;padding:5px 12px;border:1px solid #d9dfda;border-radius:7px;background:#fff;color:#43574a;text-decoration:none;cursor:pointer}
 .pf-checkout #pf-checkout-form .checkout-back-details::before{content:'←'}
 .pf-checkout #pf-checkout-form .checkout-back-details:hover:not(:disabled){background:#edf1ed}
 .pf-checkout #pf-checkout-form .checkout-back-details[hidden]{display:none}
@@ -138,5 +138,5 @@ body.storefront #main .pf-checkout .pf-price-total dd{font-size:16px}
 
 
 
-.pf-checkout #pf-checkout-form[data-admin-test="false"] :is([data-checkout-next],[data-checkout-method-next],button[type="submit"]):not(:disabled){background:var(--purchase-green);color:#fff}
-.pf-checkout #pf-checkout-form[data-admin-test="false"] :is([data-checkout-next],[data-checkout-method-next],button[type="submit"]):not(:disabled):hover{background:var(--purchase-green-hover)}
+.pf-checkout #pf-checkout-form[data-admin-test="false"] :is([data-checkout-next],[data-checkout-method-next],button[type="submit"]):not(:disabled){background:var(--blue);color:#fff}
+.pf-checkout #pf-checkout-form[data-admin-test="false"] :is([data-checkout-next],[data-checkout-method-next],button[type="submit"]):not(:disabled):hover{background:#a83a14}

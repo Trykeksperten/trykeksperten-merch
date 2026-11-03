@@ -48,7 +48,7 @@ export function bindCart(data,nav,notify){if(!document.querySelector('.pf-cart-p
  async function refresh(){
   const current=++version,lines=readCart(),checkoutLink=document.querySelector('#pf-cart-checkout-link'),notice=document.querySelector('#pf-cart-checkout-notice');
   if(checkoutLink&&notice){
-   checkoutLink.href='/kurv';checkoutLink.setAttribute('aria-disabled','true');checkoutLink.textContent='Kontrollerer logofiler…';notice.textContent='';
+   checkoutLink.href='/kurv';checkoutLink.setAttribute('aria-disabled','true');checkoutLink.textContent='Til oplysninger og levering';notice.textContent='';
    checkoutLink.onclick=event=>{if(checkoutLink.getAttribute('aria-disabled')==='true')event.preventDefault();};
   }
   const [priceResult,shippingResult,artworkResult]=await Promise.allSettled([
