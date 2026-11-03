@@ -1,3 +1,4 @@
+import {colorFamily} from './pf-filters.mjs?v=10';
 import {notebookPaperBadge} from './notebook-pages.mjs?v=2';
 import {productDisplayVariant} from './product-display-variant.mjs?v=2';
 import {fromInc,vatLabel} from './customer-pricing.mjs';
@@ -41,13 +42,14 @@ export function cardPriceHTML(price){
  return `<strong>${price.varies?'Fra ':''}${new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK'}).format(fromInc(price.fromIncVat,price.fromExVat)/100)} / stk.</strong><small>Ved ${price.fromQuantity} stk. · ${vatLabel()} · uden tryk${price.varies?' · afhænger af størrelse':''}</small>`;
 }
 export function bindProductColorSwatches(root,products=[],prices={}){
+ const colorFilter=new URLSearchParams(location.search).get('farve');
  for(const card of root.querySelectorAll('.product-card')){
   const image=card.querySelector('.product-image img');
   const swatches=card.querySelector('.editorial-swatches');
   const product=products.find(p=>p.id===card.dataset.cardProduct);
   const updatePrice=source=>{const node=card.querySelector('.editorial-price, .pf-card-price');if(product&&prices.products?.[product.id]&&node)node.innerHTML=cardPriceHTML(cardPrice(product,prices,source));};
-  const updateLinks=source=>{
-   const variant=product&&pricedVariants(product,prices).find(v=>v.images?.includes(source));
+  const updateLinks=(source,preferred)=>{
+   const variant=preferred||(product&&pricedVariants(product,prices).find(v=>v.images?.includes(source)));
    if(!variant)return;
    for(const link of card.querySelectorAll('a.product-image,a.product-title')){
     const url=new URL(link.getAttribute('href'),'https://smerch.dk');
@@ -55,7 +57,7 @@ export function bindProductColorSwatches(root,products=[],prices={}){
     url.searchParams.set('sku',variant.sku);link.setAttribute('href',url.pathname+url.search);
    }
   };
-  let updateStock=()=>{};
+  let updateStock=()=>{}, manuallySelected=false;
   const title=card.querySelector('.product-title');
   if(product&&title&&image){
    const variants=pricedVariants(product,prices);
@@ -68,25 +70,41 @@ export function bindProductColorSwatches(root,products=[],prices={}){
      const sizes=variants.filter(variant=>variantColorKey(variant).toLowerCase()===colorKey);
      showStock(productStockStatus(sizes,stock));
     };
-    loadProductStock().then(result=>{if(card.isConnected){stock=result;updateStock(colorKey);}});
+    loadProductStock().then(result=>{
+     if(!card.isConnected)return;
+     stock=result;
+     const currentSizes=variants.filter(variant=>variantColorKey(variant).toLowerCase()===colorKey);
+     if(!manuallySelected&&swatches&&productStockStatus(currentSizes,stock)){
+      const alternative=variants.find(variant=>variant.images?.[0]&&
+       (!colorFilter||colorFamily(variant)===colorFilter)&&stock.items?.[variant.sku]?.available>0);
+      const button=alternative&&[...swatches.querySelectorAll('[data-card-image]')].find(
+       swatch=>swatch.dataset.cardColorKey===variantColorKey(alternative).toLowerCase());
+      if(button){selectSwatch(button,alternative);return;}
+     }
+     updateStock(colorKey);
+    });
    }
   }
   if(image){updatePrice(image.getAttribute('src'));updateLinks(image.getAttribute('src'));}
 
   if(!image||!swatches)continue;
-  swatches.addEventListener('click',event=>{
-   const button=event.target.closest('[data-card-image]');
-   if(!button||!swatches.contains(button))return;
+  function selectSwatch(button,preferred){
    const source=button.dataset.cardImage;
    if(!source)return;
    image.src=source;
    updatePrice(source);
-   updateLinks(source);
+   updateLinks(source,preferred);
    updateStock(button.dataset.cardColorKey);
    image.alt=`${card.querySelector('.product-title')?.textContent?.trim()||'Produkt'} – ${button.dataset.cardColor}`;
    image.dataset.colorPrimary=source;
    for(const swatch of swatches.querySelectorAll('[data-card-image]'))swatch.setAttribute('aria-pressed',String(swatch===button));
    image.dispatchEvent(new Event('product-card-color-change'));
+  }
+  swatches.addEventListener('click',event=>{
+   const button=event.target.closest('[data-card-image]');
+   if(!button||!swatches.contains(button))return;
+   manuallySelected=true;
+   selectSwatch(button);
   });
  }
 }
