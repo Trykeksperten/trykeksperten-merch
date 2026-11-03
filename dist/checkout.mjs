@@ -37,7 +37,6 @@ function checkoutPaymentChoices(){
     <span>Acceptér vilkårene. Næste åbner kortfelterne.</span>
     <span>Beløbet hæves først, når hele ordren er sendt.</span>
    </p>
-   <button class="button checkout-method-next" type="button" data-checkout-method-next disabled>Næste</button>
   </div>
   <div data-checkout-review-step hidden>
    <h2 data-checkout-selected-method></h2>
@@ -67,7 +66,7 @@ export function checkoutPage(adminTest=false,ordersEnabled=launchConfig.ordersEn
   <h2 id="checkout-card-title" tabindex="-1">Indtast kortoplysninger</h2>
   <p class="small"><a data-checkout-card-link>Åbn kortbetalingen i hele vinduet</a></p>
  </section>`}
- <p class="error" id="pf-checkout-error" role="alert"></p>${adminTest?'':'<button class="button wide" type="button" data-checkout-next disabled>Til betalingsmetode →</button>'}${adminTest?submit:''}</div><aside class="checkout-sidebar"><div class="cart-summary"><h2>Ordreoverblik</h2>${checkoutOrderItems(lines,catalog)}<div id="pf-checkout-summary" aria-live="polite">Beregner pris…</div><a class="checkout-back-cart" href="/kurv">Ret din kurv</a>${adminTest?paymentMethodsHTML:''}</div>${adminTest?'':`<div class="checkout-confirmation" data-checkout-review-step hidden>${approval}${submit}</div>`}</aside></form></section>`;}
+ <p class="error" id="pf-checkout-error" role="alert"></p>${adminTest?'':'<button class="button wide" type="button" data-checkout-next disabled>Til betalingsmetode →</button>'}${adminTest?submit:''}</div><aside class="checkout-sidebar"><div class="cart-summary"><h2>Ordreoverblik</h2>${checkoutOrderItems(lines,catalog)}<div id="pf-checkout-summary" aria-live="polite">Beregner pris…</div><a class="checkout-back-cart" href="/kurv">Ret din kurv</a>${adminTest?paymentMethodsHTML:''}</div>${adminTest?'':`<div class="checkout-confirmation" hidden>${approval}<button class="button checkout-method-next" type="button" data-checkout-method-next disabled>Næste</button>${submit}</div>`}</aside></form></section>`;}
 export function orderPage(){const id=new URLSearchParams(location.search).get('checkout')||'';return `<section class="wrap section pf-checkout"><nav class="purchase-path" aria-label="Købsforløb"><span class="complete"><i>1</i><b>Produkt</b></span><span class="complete"><i>2</i><b>Design</b></span><span class="complete"><i>3</i><b>Kurv</b></span><span class="complete"><i>4</i><b>Betaling</b></span><span class="active" aria-current="step"><i>5</i><b>Status</b></span></nav><p class="eyebrow">DIN ORDRE</p><h1>Ordrestatus</h1><div class="review-complete"><p id="pf-order-status" aria-live="polite">Kontrollerer betalingen…</p><div id="pf-order-tracking"></div><button type="button" id="pf-reauthorize" class="button" style="display:none" hidden>Godkend betalingen igen</button>${id?`<p class="small muted">Ordreference: ${escape(id)}</p>`:''}<a class="text-link" href="/produkter">Tilbage til produkterne</a></div></section>`;}
 function showCardWindow(form,{id,url}){
  const panel=form.querySelector('[data-checkout-card-window]'),frame=document.createElement('iframe');
@@ -140,12 +139,13 @@ export async function bindCheckout(notify,catalog){
    if(paymentMethod)paymentMethod.inert=submitting;
    if(cardInstructions)cardInstructions.hidden=!acceptBeforeCard;
    if(confirmation){
-    confirmation.hidden=checkoutStep!=='review'&&!acceptBeforeCard;
+    confirmation.hidden=checkoutStep==='details';
+    button.hidden=checkoutStep!=='review'&&!acceptBeforeCard;
     confirmation.inert=submitting;
    }
    if(next)next.disabled=!checkoutReady;
    if(methodNext){
-    methodNext.hidden=cardSelected();
+    methodNext.hidden=checkoutStep!=='payment'||cardSelected();
     methodNext.disabled=!checkoutReady;
    }
    if(back)back.disabled=submitting;
@@ -175,7 +175,7 @@ export async function bindCheckout(notify,catalog){
    heading.focus();
   };
   const continueToPayment=()=>{if(checkoutReady&&detailsValid()){error.textContent='';showStep('payment');}};
-  const continueToReview=()=>{if(checkoutReady&&paymentMethod.reportValidity()){error.textContent='';showStep('review');}};
+  const continueToReview=()=>{if(checkoutReady&&form.reportValidity()){error.textContent='';showStep('review');}};
   if(next){
    form.noValidate=true;
    next.onclick=continueToPayment;

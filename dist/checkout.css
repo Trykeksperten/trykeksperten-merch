@@ -97,7 +97,7 @@ body.storefront #main .pf-checkout .pf-price-total dd{font-size:16px}
 
 .pf-checkout #checkout-business label[hidden]{display:none}
 
-.pf-checkout :is([data-checkout-details],[data-checkout-payment],[data-checkout-method-step],[data-checkout-review-step],[data-checkout-method-next],[data-checkout-next],.checkout-freight)[hidden]{display:none}
+.pf-checkout :is([data-checkout-details],[data-checkout-payment],[data-checkout-method-step],[data-checkout-review-step],[data-checkout-method-next],[data-checkout-next],.checkout-confirmation,.checkout-freight)[hidden]{display:none}
 .pf-checkout #pf-checkout-form .checkout-back-details{grid-column:1/-1;justify-self:start;display:inline-flex;align-items:center;gap:6px;min-height:var(--checkout-control-height);margin:0;padding:5px 12px;border:1px solid #d9dfda;border-radius:7px;background:#fff;color:#43574a;cursor:pointer}
 .pf-checkout #pf-checkout-form .checkout-back-details::before{content:'←'}
 .pf-checkout #pf-checkout-form .checkout-back-details:hover:not(:disabled){background:#edf1ed}
