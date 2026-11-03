@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {persistCheckout,readCheckout,updateCheckout} from '../lib/checkout.mjs';
-import {cancelQuickpay} from '../lib/quickpay.mjs';
+import {abandonQuickpayCard,cancelQuickpay} from '../lib/quickpay.mjs';
 const prior=process.env.SMERCH_DATA_DIR;process.env.SMERCH_DATA_DIR=await mkdtemp(join(tmpdir(),'smerch-cancel-'));
 after(async()=>{await rm(process.env.SMERCH_DATA_DIR,{recursive:true,force:true});if(prior===undefined)delete process.env.SMERCH_DATA_DIR;else process.env.SMERCH_DATA_DIR=prior;});
 const env={QUICKPAY_MODE:'live',QUICKPAY_API_KEY:'fixture'};
@@ -17,3 +17,34 @@ test('failed link closure keeps the checkout open; retry safely recovers a link 
 test('authorization racing with link deletion is cancelled, never captured',async()=>{const {order,payment}=await fixture(),calls=[];await cancelQuickpay(order.id,{env,fetchImpl:async(url,options)=>{calls.push([options.method,url]);if(options.method==='DELETE'){payment.link=null;authorize(payment);return {ok:true,status:204};}if(options.method==='POST'){assert.match(url,/\/cancel\?synchronized$/);payment.operations.push({id:2,type:'cancel',qp_status_code:'20000',pending:false});}return response(payment);}});assert.equal((await readCheckout(order.id)).status,'cancelled');assert.equal(calls.filter(c=>c[0]==='POST').length,1);assert.ok(!calls.some(c=>/capture/.test(c[1])));});
 test('pending authorization and successful partial capture block link deletion and cancellation',async()=>{for(const operations of [[{type:'authorize',pending:true}],[{type:'capture',amount:100,qp_status_code:'20000',pending:false}]]){const {order,payment}=await fixture();payment.operations=operations;await assert.rejects(cancelQuickpay(order.id,{env,fetchImpl:async(url,options)=>{assert.equal(options.method,'GET');return response(payment);}}),/behandler|hævet/);assert.equal((await readCheckout(order.id)).status,'awaiting_payment');}});
 test('wrong payment or mode cannot close a link; local capture racing with final verification cannot be overwritten',async()=>{const {order,payment}=await fixture();await assert.rejects(cancelQuickpay(order.id,{env,fetchImpl:async()=>response({...payment,order_id:'wrong'})}),/matcher/);await assert.rejects(cancelQuickpay(order.id,{env,fetchImpl:async()=>response({...payment,test_mode:true})}),/test\/live/);let reads=0;await assert.rejects(cancelQuickpay(order.id,{env,fetchImpl:async(url,options)=>{if(options.method==='DELETE'){payment.link=null;return {ok:true,status:204};}if(++reads===2)await updateCheckout(order.id,o=>{o.status='capture_reconciliation';return o;});return response(payment);}}),/ændret/);assert.equal((await readCheckout(order.id)).status,'capture_reconciliation');});
+
+test('changing payment method closes only the matching unused card link and can safely retry',async()=>{
+ const {order,payment}=await fixture();
+ await updateCheckout(order.id,current=>({...current,quickpayFramed:true,quickpayMethod:'creditcard'}));
+ const calls=[];
+ const fetchImpl=async(url,{method})=>{
+  calls.push(method);
+  if(method==='DELETE'){payment.link=null;return {ok:true,status:204};}
+  return response(payment);
+ };
+ const options={env,fetchImpl};
+ await assert.rejects(abandonQuickpayCard(order.id,order.quickpayLinkUrl+'-other',options),/kan ikke lukkes/);
+ assert.deepEqual(calls,[]);
+ await abandonQuickpayCard(order.id,order.quickpayLinkUrl,options);
+ await abandonQuickpayCard(order.id,order.quickpayLinkUrl,options);
+ assert.deepEqual(calls,['GET','DELETE','GET']);
+ assert.equal((await readCheckout(order.id)).status,'cancelled');
+});
+test('changing payment method refuses an authorization observed while closing the link',async()=>{
+ const {order,payment}=await fixture();
+ await updateCheckout(order.id,current=>({...current,quickpayFramed:true,quickpayMethod:'creditcard'}));
+ const calls=[];
+ const fetchImpl=async(url,{method})=>{
+  calls.push(method);
+  if(method==='DELETE'){payment.link=null;authorize(payment);return {ok:true,status:204};}
+  return response(payment);
+ };
+ await assert.rejects(abandonQuickpayCard(order.id,order.quickpayLinkUrl,{env,fetchImpl}),/allerede godkendt/);
+ assert.deepEqual(calls,['GET','DELETE','GET']);
+ assert.equal((await readCheckout(order.id)).status,'awaiting_payment');
+});

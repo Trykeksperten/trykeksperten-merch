@@ -32,11 +32,10 @@ function checkoutPaymentChoices(){
  return `<div class="checkout-payment-choice" data-checkout-payment hidden>
   <div data-checkout-method-step hidden>
    <label for="checkout-payment-method">Vælg betalingsmetode</label>
-   <select id="checkout-payment-method" name="paymentMethod" required>${paymentOptions()}</select>
-   <p class="small checkout-payment-help" data-checkout-card-instructions hidden>
-    <span>Acceptér vilkårene. Næste åbner kortfelterne.</span>
-    <span>Beløbet hæves først, når hele ordren er sendt.</span>
-   </p>
+   <div class="checkout-method-controls">
+    <select id="checkout-payment-method" name="paymentMethod" required>${paymentOptions()}</select>
+    <button class="button wide" type="button" data-checkout-method-next disabled>Næste</button>
+   </div>
   </div>
   <div data-checkout-review-step hidden>
    <h2 data-checkout-selected-method></h2>
@@ -61,14 +60,14 @@ function checkoutOrderItems(lines,catalog){
 }
 export function checkoutPage(adminTest=false,ordersEnabled=launchConfig.ordersEnabled,catalog){if(!adminTest&&['1','live','pilot'].includes(new URLSearchParams(location.search).get('test')))return '<section class="wrap section" id="admin-checkout-test"><h1>Betalingstest</h1><p>Kontrollerer administratoradgang og testtilstand…</p></section>';const lines=readCart(),personalised=hasPersonalisation(lines);if(ordersEnabled!==true&&!adminTest)return `<section class="wrap section pf-checkout" id="checkout-launch-closed"><p class="eyebrow">VI ÅBNER SNART</p><h1>Dit design kan godt være klar før os.</h1><p class="intro">${launchMessage}</p><p>Din kurv er gemt i denne browser, så du kan arbejde videre med dit design.</p><a class="button" href="/kurv">Tilbage til kurven →</a></section>`;const approval=`<fieldset class="checkout-legal checkout-final" data-checkout-payment ${adminTest?'':'hidden aria-label="Betaling og godkendelse"'}>${adminTest?'<legend>3. Godkend og betal</legend>':''}<div class="checkout-terms">${adminTest?'':'<h2 class="checkout-approval">Godkend din ordre</h2>'}<p class="small checkout-business-terms" hidden>Ved erhvervskøb gælder korte reklamationsfrister, produktionstolerancer og begrænset ansvar som beskrevet i afsnit 13.</p><label class="legal-check"><input type="checkbox" name="termsAccepted" required><span>Jeg accepterer <a href="/handelsbetingelser" target="_blank" rel="noopener">handelsbetingelserne</a>.</span></label><label class="legal-check" ${!personalised?'hidden':''}><input type="checkbox" name="personalised" ${personalised?'required':'disabled'}><span>Jeg er informeret om, at varer med mit eget logo, navn, tekst eller individuelle design ikke har lovbestemt fortrydelsesret. Reklamationsretten berøres ikke.</span></label>${personalised&&!adminTest?'<p class="small checkout-cancellation">Du kan bede om annullering, indtil vi har sendt den godkendte korrektur til produktion. <a href="mailto:hello@smerch.dk">Send os en e-mail</a>.</p>':''}<p class="small">Se <a href="/privatlivspolitik" target="_blank" rel="noopener">privatlivspolitikken</a>.</p></div>${adminTest?'':checkoutMarketingHTML(getLanguage())}</fieldset>`;
  const submit=`<button class="button wide" type="submit" disabled data-checkout-payment ${adminTest?'':'hidden'}>${adminTest?(pilotRequested()?'Bestil rigtig testordre med betalingspligt':liveTestRequested()?'Reservér 5 kr. med MobilePay →':'Åbn testbetaling →'):'Betal'}</button><p class="small muted" data-checkout-payment ${adminTest?'':'hidden'}>${adminTest&&!pilotRequested()?'Testen sender ingen ordremail.':'Du modtager status på e-mail.'}</p>`;
- return `<section class="wrap section pf-checkout"> ${adminTest?`<nav class="purchase-path" aria-label="Købsforløb"><span class="complete"><i>1</i><b>Produkt</b></span><span class="complete"><i>2</i><b>Design</b></span><span class="complete"><i>3</i><b>Kurv</b></span><span class="active" aria-current="step"><i>4</i><b data-checkout-path>Betaling</b></span><span><i>5</i><b>${personalised?'Korrektur':'Levering'}</b></span></nav>`:`<nav class="purchase-path purchase-path--checkout" aria-label="Købsforløb"><span data-checkout-progress="details" aria-current="step"><i>1</i><b>Oplysninger og levering</b></span><span data-checkout-progress="payment"><i>2</i><b>Betalingsmetode</b></span><span data-checkout-progress="review"><i>3</i><b>Betaling</b></span></nav>`}<div class="checkout-heading">${adminTest?'<p class="eyebrow">INTERN TESTORDRE</p>':''}<h1 tabindex="-1">${adminTest?'Levering og betaling':'Oplysninger og levering'}</h1></div>${adminTest&&pilotRequested()?'<p class="checkout-test-notice" role="status"><strong>Rigtig ordre · kun for administrator.</strong> Kostprisen inklusive fragt og moms reserveres på dit kort. Ordren sendes til PF med logo, og kundemail sendes. Korrektur skal godkendes før produktion.</p>':adminTest&&liveTestRequested()?'<p class="checkout-test-notice" role="status">Live-test: Kun 5,00 kr. reserveres via MobilePay. Ingen varer bestilles. PF-afsendelse, hævning, fakturering og ordremail er blokeret. Kurvens normale priser bevares.</p>':adminTest?'<p class="checkout-test-notice" role="status"><strong>Kun testkort.</strong> Kortnummer: 1000 0000 0000 0008 · Udløb: 12/30 · Kontrolcifre: 208. Ingen PF-afsendelse eller ordremail. Din kurv beholdes efter testen.</p>':''}<div id="pf-checkout-artwork-notice" hidden><p class="error" role="alert"></p><a class="text-link" href="/kurv">Tilbage til kurven →</a></div><div class="checkout-intro" data-checkout-payment ${adminTest?'':'hidden'}><details><summary>Sådan fungerer betalingen</summary><p>Du handler som gæst uden at oprette en konto. ${paymentDescription(readCart())} Hvis reservationen udløber inden da, beder vi dig godkende betalingen igen.</p></details></div><form class="cart-layout" id="pf-checkout-form" data-admin-test="${adminTest}" data-checkout-step="${adminTest?'payment':'details'}">${adminTest?'':'<button type="button" class="checkout-back-details" data-checkout-back data-checkout-payment aria-label="Tilbage til oplysninger og levering" hidden>Tilbage</button>'}<div class="checkout-main"><div class="checkout-details-panel" data-checkout-details><fieldset class="checkout-legal checkout-customer-type"><legend>Kundeoplysninger</legend><label>Køber som<select name="customerType" required><option value="">Vælg kundetype</option><option value="consumer">Privatperson</option><option value="business">Erhverv</option></select></label><div id="checkout-business" hidden><div class="form-grid"><label>Firmanavn *<input name="billingCompany" autocomplete="organization" maxlength="200" disabled></label><label>CVR-nummer *<input name="billingCvr" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" disabled></label><label>Faktura-e-mail *<input name="billingEmail" type="email" maxlength="254" disabled></label><label>Reference (valgfrit)<input name="billingReference" maxlength="200" disabled></label><label class="legal-check" style="grid-column:1/-1"><input type="checkbox" name="differentBillingAddress" disabled><span>Anden fakturaadresse end leveringsadressen</span></label><p class="small" style="grid-column:1/-1">Fakturaadressen følger leveringsadressen, medmindre du vælger en anden adresse.</p><label>Fakturaadresse *<input name="billingStreet" maxlength="200" disabled></label><label>Postnummer *<input name="billingPostalCode" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" disabled></label><label>By *<input name="billingCity" maxlength="200" disabled></label><label>Fakturaland<select name="billingCountry" disabled><option value="DK">Danmark</option></select></label><label>EAN (valgfrit)<input name="billingEan" inputmode="numeric" pattern="[0-9]{13}" maxlength="13" disabled></label></div></div></fieldset><fieldset class="checkout-delivery"><legend>Leveringsadresse</legend><div class="form-grid"><label>Navn *<input name="name" autocomplete="name" required maxlength="200"></label><label>E-mail *<input name="email" type="email" autocomplete="email" required maxlength="254"></label><label>Telefon *<input name="phone" type="tel" autocomplete="tel" required maxlength="40"></label><label>Virksomhed<input name="company" autocomplete="organization" maxlength="200"></label>${addressPickerHTML()}<details class="checkout-delivery-extra"><summary>Tilføj leveringskommentar (valgfrit)</summary><label>Kommentar til levering<input name="deliveryComment" maxlength="100" placeholder="Fx port 2 eller indgang fra gården"><span class="small muted">Maks. 100 tegn. Sendes med leveringsadressen til leverandøren. Særlige leveringsønsker kan ikke garanteres.</span></label></details></div></fieldset></div>${adminTest?approval:checkoutPaymentChoices()}
+ return `<section class="wrap section pf-checkout"> ${adminTest?`<nav class="purchase-path" aria-label="Købsforløb"><span class="complete"><i>1</i><b>Produkt</b></span><span class="complete"><i>2</i><b>Design</b></span><span class="complete"><i>3</i><b>Kurv</b></span><span class="active" aria-current="step"><i>4</i><b data-checkout-path>Betaling</b></span><span><i>5</i><b>${personalised?'Korrektur':'Levering'}</b></span></nav>`:`<nav class="purchase-path purchase-path--checkout" aria-label="Købsforløb"><span data-checkout-progress="details" aria-current="step"><i>1</i><b>Oplysninger og levering</b></span><span data-checkout-progress="payment"><i>2</i><b>Betalingsmetode</b></span><span data-checkout-progress="review"><i>3</i><b>Betaling</b></span></nav>`}<div class="checkout-heading">${adminTest?'<p class="eyebrow">INTERN TESTORDRE</p>':''}<h1 tabindex="-1">${adminTest?'Levering og betaling':'Oplysninger og levering'}</h1></div>${adminTest&&pilotRequested()?'<p class="checkout-test-notice" role="status"><strong>Rigtig ordre · kun for administrator.</strong> Kostprisen inklusive fragt og moms reserveres på dit kort. Ordren sendes til PF med logo, og kundemail sendes. Korrektur skal godkendes før produktion.</p>':adminTest&&liveTestRequested()?'<p class="checkout-test-notice" role="status">Live-test: Kun 5,00 kr. reserveres. Ingen varer bestilles. PF-afsendelse, hævning, fakturering og ordremail er blokeret. Kurvens normale priser bevares.</p>':adminTest?'<p class="checkout-test-notice" role="status"><strong>Kun testkort.</strong> Kortnummer: 1000 0000 0000 0008 · Udløb: 12/30 · Kontrolcifre: 208. Ingen PF-afsendelse eller ordremail. Din kurv beholdes efter testen.</p>':''}<div id="pf-checkout-artwork-notice" hidden><p class="error" role="alert"></p><a class="text-link" href="/kurv">Tilbage til kurven →</a></div><div class="checkout-intro" data-checkout-payment ${adminTest?'':'hidden'}><details><summary>Sådan fungerer betalingen</summary><p>Du handler som gæst uden at oprette en konto. ${paymentDescription(readCart())} Hvis reservationen udløber inden da, beder vi dig godkende betalingen igen.</p></details></div><form class="cart-layout" id="pf-checkout-form" data-admin-test="${adminTest}" data-checkout-step="${adminTest?'payment':'details'}">${adminTest?'':'<button type="button" class="checkout-back-details" data-checkout-back data-checkout-payment aria-label="Tilbage til oplysninger og levering" hidden>Tilbage</button>'}<div class="checkout-main"><div class="checkout-details-panel" data-checkout-details><fieldset class="checkout-legal checkout-customer-type"><legend>Kundeoplysninger</legend><label>Køber som<select name="customerType" required><option value="">Vælg kundetype</option><option value="consumer">Privatperson</option><option value="business">Erhverv</option></select></label><div id="checkout-business" hidden><div class="form-grid"><label>Firmanavn *<input name="billingCompany" autocomplete="organization" maxlength="200" disabled></label><label>CVR-nummer *<input name="billingCvr" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" disabled></label><label>Faktura-e-mail *<input name="billingEmail" type="email" maxlength="254" disabled></label><label>Reference (valgfrit)<input name="billingReference" maxlength="200" disabled></label><label class="legal-check" style="grid-column:1/-1"><input type="checkbox" name="differentBillingAddress" disabled><span>Anden fakturaadresse end leveringsadressen</span></label><p class="small" style="grid-column:1/-1">Fakturaadressen følger leveringsadressen, medmindre du vælger en anden adresse.</p><label>Fakturaadresse *<input name="billingStreet" maxlength="200" disabled></label><label>Postnummer *<input name="billingPostalCode" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" disabled></label><label>By *<input name="billingCity" maxlength="200" disabled></label><label>Fakturaland<select name="billingCountry" disabled><option value="DK">Danmark</option></select></label><label>EAN (valgfrit)<input name="billingEan" inputmode="numeric" pattern="[0-9]{13}" maxlength="13" disabled></label></div></div></fieldset><fieldset class="checkout-delivery"><legend>Leveringsadresse</legend><div class="form-grid"><label>Navn *<input name="name" autocomplete="name" required maxlength="200"></label><label>E-mail *<input name="email" type="email" autocomplete="email" required maxlength="254"></label><label>Telefon *<input name="phone" type="tel" autocomplete="tel" required maxlength="40"></label><label>Virksomhed<input name="company" autocomplete="organization" maxlength="200"></label>${addressPickerHTML()}<details class="checkout-delivery-extra"><summary>Tilføj leveringskommentar (valgfrit)</summary><label>Kommentar til levering<input name="deliveryComment" maxlength="100" placeholder="Fx port 2 eller indgang fra gården"><span class="small muted">Maks. 100 tegn. Sendes med leveringsadressen til leverandøren. Særlige leveringsønsker kan ikke garanteres.</span></label></details></div></fieldset></div>${adminTest?approval:checkoutPaymentChoices()}
  ${adminTest?'':`<section class="checkout-card-window" data-checkout-card-window hidden aria-labelledby="checkout-card-title">
   <h2 id="checkout-card-title" tabindex="-1">Indtast kortoplysninger</h2>
   <p class="small"><a data-checkout-card-link>Åbn kortbetalingen i hele vinduet</a></p>
  </section>`}
- <p class="error" id="pf-checkout-error" role="alert"></p>${adminTest?'':'<button class="button wide" type="button" data-checkout-next disabled>Til betalingsmetode →</button>'}${adminTest?submit:''}</div><aside class="checkout-sidebar"><div class="cart-summary"><h2>Ordreoverblik</h2>${checkoutOrderItems(lines,catalog)}<div id="pf-checkout-summary" aria-live="polite">Beregner pris…</div><a class="checkout-back-cart" href="/kurv">Ret din kurv</a>${adminTest?paymentMethodsHTML:''}</div>${adminTest?'':`<div class="checkout-confirmation" hidden>${approval}<button class="button checkout-method-next" type="button" data-checkout-method-next disabled>Næste</button>${submit}</div>`}</aside></form></section>`;}
+ <p class="error" id="pf-checkout-error" role="alert"></p>${adminTest?'':'<button class="button wide" type="button" data-checkout-next disabled>Til betalingsmetode →</button>'}${adminTest?submit:''}</div><aside class="checkout-sidebar"><div class="cart-summary"><h2>Ordreoverblik</h2>${checkoutOrderItems(lines,catalog)}<div id="pf-checkout-summary" aria-live="polite">Beregner pris…</div><a class="checkout-back-cart" href="/kurv">Ret din kurv</a>${adminTest?paymentMethodsHTML:''}</div>${adminTest?'':`<div class="checkout-confirmation" hidden>${approval}${submit}</div>`}</aside></form></section>`;}
 export function orderPage(){const id=new URLSearchParams(location.search).get('checkout')||'';return `<section class="wrap section pf-checkout"><nav class="purchase-path" aria-label="Købsforløb"><span class="complete"><i>1</i><b>Produkt</b></span><span class="complete"><i>2</i><b>Design</b></span><span class="complete"><i>3</i><b>Kurv</b></span><span class="complete"><i>4</i><b>Betaling</b></span><span class="active" aria-current="step"><i>5</i><b>Status</b></span></nav><p class="eyebrow">DIN ORDRE</p><h1>Ordrestatus</h1><div class="review-complete"><p id="pf-order-status" aria-live="polite">Kontrollerer betalingen…</p><div id="pf-order-tracking"></div><button type="button" id="pf-reauthorize" class="button" style="display:none" hidden>Godkend betalingen igen</button>${id?`<p class="small muted">Ordreference: ${escape(id)}</p>`:''}<a class="text-link" href="/produkter">Tilbage til produkterne</a></div></section>`;}
-function showCardWindow(form,{id,url}){
+function showCardWindow(form,{id,url},onCancel){
  const panel=form.querySelector('[data-checkout-card-window]'),frame=document.createElement('iframe');
  const fallback=panel.querySelector('[data-checkout-card-link]');
  fallback.href=url;
@@ -80,6 +79,7 @@ function showCardWindow(form,{id,url}){
   if(returned.origin!==location.origin)return;
   if(returned.pathname==='/ordre'&&returned.searchParams.get('checkout')===id){location.assign(returned.href);return;}
   if(returned.pathname==='/betaling'&&returned.searchParams.get('annulleret')==='1'){
+   if(onCancel){void onCancel();return;}
    frame.remove();
    panel.querySelector('h2').textContent='Kortbetalingen er afbrudt';
    fallback.focus();
@@ -88,9 +88,10 @@ function showCardWindow(form,{id,url}){
  frame.src=url;
  panel.append(frame);
  panel.hidden=false;
- form.elements.paymentMethod.disabled=true;
- form.querySelector('.checkout-confirmation').inert=true;
- form.querySelector('.checkout-confirmation').hidden=true;
+ if(form.elements.paymentMethod)form.elements.paymentMethod.disabled=true;
+ const confirmation=form.querySelector('.checkout-confirmation');
+ if(confirmation){confirmation.inert=true;confirmation.hidden=true;}
+ else form.querySelector('button[type=submit]').hidden=true;
  form.querySelector('#checkout-payment-help').hidden=true;
  panel.querySelector('h2').focus();
 }
@@ -107,11 +108,10 @@ export async function bindCheckout(notify,catalog){
  const form=document.querySelector('#pf-checkout-form');if(form){const adminTest=form.dataset.adminTest==='true';const button=form.querySelector('button[type=submit]'),summary=document.querySelector('#pf-checkout-summary'),error=document.querySelector('#pf-checkout-error'),lines=readCart();
   form.onsubmit=event=>event.preventDefault();
   bindAddressPicker(form);
-  let submitting=false;
+  let submitting=false,cardWindow=null,closingCardWindow=false;
   const paymentMethod=form.elements.paymentMethod;
   const cardSelected=()=>paymentMethod?.value==='creditcard';
   const confirmation=form.querySelector('.checkout-confirmation');
-  const cardInstructions=form.querySelector('[data-checkout-card-instructions]');
   const syncPayment=()=>{
    const method=paymentMethod.value,bank=method==='bank_transfer';
    const helpByMethod={bank_transfer:invoiceHelp,creditcard:cardHelp,mobilepay:mobilePayHelp};
@@ -134,21 +134,17 @@ export async function bindCheckout(notify,catalog){
   const detailsFields=[...form.querySelectorAll('[data-checkout-details] :is(input,select,textarea)')];
   const detailsValid=()=>detailsFields.every(control=>control.reportValidity());
   const updateButtons=()=>{
-   const acceptBeforeCard=checkoutStep==='payment'&&cardSelected();
-   button.disabled=!checkoutReady||submitting||!(checkoutStep==='review'||acceptBeforeCard);
+   button.disabled=!checkoutReady||submitting||checkoutStep!=='review';
    if(paymentMethod)paymentMethod.inert=submitting;
-   if(cardInstructions)cardInstructions.hidden=!acceptBeforeCard;
    if(confirmation){
-    confirmation.hidden=checkoutStep==='details';
-    button.hidden=checkoutStep!=='review'&&!acceptBeforeCard;
+    confirmation.hidden=checkoutStep!=='review'||Boolean(cardWindow);
     confirmation.inert=submitting;
    }
    if(next)next.disabled=!checkoutReady;
    if(methodNext){
-    methodNext.hidden=checkoutStep!=='payment'||cardSelected();
     methodNext.disabled=!checkoutReady;
    }
-   if(back)back.disabled=submitting;
+   if(back)back.disabled=closingCardWindow||(submitting&&!cardWindow);
   };
   const steps={
    details:'Oplysninger og levering',
@@ -175,13 +171,41 @@ export async function bindCheckout(notify,catalog){
    heading.focus();
   };
   const continueToPayment=()=>{if(checkoutReady&&detailsValid()){error.textContent='';showStep('payment');}};
-  const continueToReview=()=>{if(checkoutReady&&paymentMethod.reportValidity()&&form.reportValidity()){error.textContent='';showStep('review');}};
+  const continueToReview=()=>{if(checkoutReady&&paymentMethod.reportValidity()){error.textContent='';showStep('review');}};
   if(next){
    form.noValidate=true;
    next.onclick=continueToPayment;
    methodNext.onclick=continueToReview;
-   back.onclick=()=>{error.textContent='';showStep(checkoutStep==='review'?'payment':'details');};
+   back.onclick=()=>{if(cardWindow){void closeCardWindow();return;}error.textContent='';showStep(checkoutStep==='review'?'payment':'details');};
   }
+  const closeCardWindow=async()=>{
+   if(!cardWindow||closingCardWindow)return;
+   const {id,url}=cardWindow;
+   closingCardWindow=true;
+   updateButtons();
+   error.textContent='';
+   try{
+    const response=await fetch(`/api/checkout/${encodeURIComponent(id)}/abandon-card`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({link:url})});
+    const result=await response.json();
+    if(!response.ok||result.closed!==true)throw Error(result.error||'Kortbetalingen kunne ikke lukkes.');
+   }catch(e){error.textContent=e.message;closingCardWindow=false;updateButtons();return;}
+   const panel=form.querySelector('[data-checkout-card-window]');
+   panel.querySelector('iframe')?.remove();
+   panel.querySelector('[data-checkout-card-link]').removeAttribute('href');
+   panel.hidden=true;
+   form.querySelector('#checkout-payment-help').hidden=false;
+   if(sessionStorage.getItem('pf-checkout-id')===id){
+    sessionStorage.removeItem('pf-checkout-id');
+    sessionStorage.removeItem('pf-checkout-cart');
+   }
+   cardWindow=null;
+   closingCardWindow=false;
+   submitting=false;
+   paymentMethod.disabled=false;
+   showStep('payment');
+   syncPayment();
+   paymentMethod.focus();
+  };
   if(paymentMethod){
    paymentMethod.addEventListener('change',syncPayment);
    syncPayment();
@@ -220,7 +244,7 @@ export async function bindCheckout(notify,catalog){
   form.onsubmit=async event=>{event.preventDefault();
    if(!checkoutReady||submitting)return;
    if(checkoutStep==='details'){continueToPayment();return;}
-   if(checkoutStep==='payment'&&!cardSelected()){continueToReview();return;}
+   if(checkoutStep==='payment'){continueToReview();return;}
    if(!adminTest&&detailsFields.some(control=>!control.checkValidity())){
     showStep('details');detailsValid();return;
    }
@@ -247,8 +271,9 @@ export async function bindCheckout(notify,catalog){
     }
     const shipping=Object.fromEntries(new FormData(form)),response=await fetch(adminTest?adminTestEndpoint()+'/session':'/api/checkout/session',{method:'POST',headers:{'Content-Type':'application/json',...(adminTest?{'X-Smerch-Admin':'1'}:{})},body:JSON.stringify({lines,paymentMethod:method==='bank_transfer'?'bank_transfer':'card',...(Object.hasOwn(onlineOptions,method)?{quickpayMethod:method}:{}),...(method==='creditcard'?{inlineCardPayment:true}:{}),bankPrepaymentAccepted:form.elements.bankPrepaymentAccepted?.checked===true,shipping,artworks,mockups,marketing:checkoutMarketingInput(form.elements.marketingEmail?.checked,getLanguage()),deliveryMethod:'STD',freightQuote:freightController?.acceptedQuote()||null,billing:{useDeliveryAddress:!form.elements.differentBillingAddress.checked,company:form.elements.billingCompany.value,cvr:form.elements.billingCvr.value,email:form.elements.billingEmail.value,reference:form.elements.billingReference.value,street:form.elements.billingStreet.value,postalCode:form.elements.billingPostalCode.value,city:form.elements.billingCity.value,country:form.elements.billingCountry.value,ean:form.elements.billingEan.value},legal:{version:LEGAL_VERSION,locale:getLanguage(),customerType:form.elements.customerType.value,accepted:form.elements.termsAccepted.checked,personalised:form.elements.personalised.checked}})}),result=await response.json();if(!response.ok)throw Error(result.error||'Betalingen kunne ikke startes.');sessionStorage.setItem('pf-checkout-id',result.id);sessionStorage.setItem('pf-checkout-cart',JSON.stringify(lines));
     if(method==='creditcard'&&result.framed===true&&/^https:\/\/payment\.quickpay\.net\/payments\/[A-Za-z0-9_-]+$/.test(result.url)){
-     showStep('review');
-     showCardWindow(form,result);
+     if(!adminTest)cardWindow=result;
+     showCardWindow(form,result,adminTest?undefined:closeCardWindow);
+     updateButtons();
     }else location.assign(result.url);
    }catch(e){error.textContent=e.message;submitting=false;if(freightController&&!freightController.acceptedQuote()){checkoutReady=false;showStep('details');}updateButtons();button.textContent=adminTest?(pilotRequested()?'Bestil rigtig testordre med betalingspligt':liveTestRequested()?'Reservér 5 kr. med MobilePay →':'Åbn testbetaling →'):'Betal';if(paymentMethod)syncPayment();notify?.(e.message);}
   };

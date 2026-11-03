@@ -37,7 +37,10 @@ body.storefront #main .pf-checkout :is(.checkout-heading h1,.cart-summary h2,.pf
 .pf-checkout .address-country{font-size:12px}
 .pf-checkout .checkout-payment-choice{min-width:0;margin:0 0 7px}
 .pf-checkout #pf-checkout-form .checkout-payment-choice label[for]{display:block;margin:0 0 6px;font-size:15px;font-weight:500}
-.pf-checkout .checkout-payment-choice select,.pf-checkout [data-checkout-card-instructions]{max-width:21rem}
+.pf-checkout .checkout-method-controls{display:flex;align-items:center;gap:10px}
+.pf-checkout .checkout-method-controls select{min-width:0;max-width:21rem}
+.pf-checkout .checkout-method-controls .button{flex:1;min-height:var(--checkout-button-height);border-radius:999px;font-size:14px;font-weight:400;padding:7px 16px}
+@media(max-width:480px){.pf-checkout .checkout-method-controls{flex-direction:column;align-items:stretch}.pf-checkout .checkout-method-controls select{max-width:none}}
 .pf-checkout .checkout-payment-choice select{cursor:pointer}
 body.storefront #main .pf-checkout [data-checkout-card-instructions] span{display:block;font:inherit}
 body.storefront #main .pf-checkout .checkout-payment-help{margin:4px 0 0;font-size:12px;line-height:1.4;color:#59675e}
@@ -56,7 +59,7 @@ body.storefront #main .pf-checkout :is(.checkout-terms,.checkout-marketing) :is(
 .pf-checkout .checkout-marketing p:last-child{margin:4px 0 0 26px}
 .pf-checkout .checkout-marketing a{white-space:nowrap;text-underline-offset:2px}
 .pf-checkout .checkout-business-terms[hidden]{display:none}
-.pf-checkout #pf-checkout-form :is(.checkout-main,.checkout-confirmation)>.button,.pf-checkout #pf-checkout-form .checkout-method-next{min-height:var(--checkout-button-height);border-radius:999px;font-size:14px;font-weight:400;padding:7px 16px}
+.pf-checkout #pf-checkout-form :is(.checkout-main,.checkout-confirmation)>.button{min-height:var(--checkout-button-height);border-radius:999px;font-size:14px;font-weight:400;padding:7px 16px}
 .pf-checkout #pf-checkout-form :is(.checkout-main,.checkout-confirmation)>.small{margin:6px 0 0}
 .pf-checkout .checkout-sidebar{min-width:0}
 .pf-checkout :is(.cart-summary,.checkout-payment-choice,.checkout-details-panel){padding:12px;background:var(--purchase-surface);border:1px solid var(--purchase-border);border-radius:16px;box-shadow:none}
@@ -124,7 +127,6 @@ body.storefront #main .pf-checkout .pf-price-total dd{font-size:16px}
 @media(max-width:800px){.pf-checkout .checkout-card-window iframe{min-height:620px}}
 @media(min-width:801px){.pf-checkout #pf-checkout-form:is([data-checkout-step="payment"],[data-checkout-step="review"]){grid-template-columns:minmax(0,1fr) minmax(280px,360px)}}
 
-.pf-checkout .checkout-method-next{display:flex;width:fit-content;margin:8px 0 0}
 
 .pf-checkout .checkout-details-panel{margin-bottom:10px}
 .pf-checkout #pf-checkout-form .checkout-details-panel>fieldset:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
