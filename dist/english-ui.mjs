@@ -1171,9 +1171,6 @@ Vælg betalingsmetode|Choose payment method
 Vælg en betalingsmetode|Select a payment method
 Acceptér vilkårene. Næste åbner kortfelterne.|Accept the terms. Next opens the card form.
 Beløbet hæves først, når hele ordren er sendt.|Payment is captured when the entire order ships.
-Trin 1 af 3|Step 1 of 3
-Trin 2 af 3|Step 2 of 3
-Trin 3 af 3|Step 3 of 3
 Godkend og betal|Confirm and pay
 Tilbage til betalingsvalg|Back to payment methods
 Betal|Pay

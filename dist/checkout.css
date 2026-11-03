@@ -106,7 +106,6 @@ body.storefront #main .pf-checkout .pf-price-total dd{font-size:16px}
 
 .pf-checkout #pf-checkout-error:empty{display:none}
 
-.pf-checkout .checkout-step-count{margin:2px 0 5px;color:#64706a;font-size:12px}
 .pf-checkout .checkout-order-items{border-block:1px solid #d4dcd4;margin:0 0 8px}
 .pf-checkout .checkout-order-items summary{display:flex;align-items:center;gap:5px;min-height:var(--checkout-control-height);font-size:13px;cursor:pointer}
 .pf-checkout .checkout-order-items summary::-webkit-details-marker{display:none}
