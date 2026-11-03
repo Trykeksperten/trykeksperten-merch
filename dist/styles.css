@@ -2654,6 +2654,11 @@ body.storefront #main .pf-notebook-pages p{font-size:17px}
 .product-image{position:relative}
 .product-image>.pf-paper-badge{position:absolute;z-index:2;top:14px;left:14px;padding:5px;border-radius:5px;background:rgba(255,255,255,.8);pointer-events:none}
 .pf-notebook-pages>.pf-paper-badge{float:right;margin-left:12px}
+.pf-product-gallery .pf-photo{position:relative}
+.product-stock-badge{position:absolute;z-index:3;top:12px;right:0;max-width:calc(100% - 48px);padding:5px 10px;background:#35513d;color:#fff;border-radius:4px 0 0 4px;font-size:.75rem;font-weight:600;line-height:1.25;pointer-events:none}
+.product-stock-badge::after{content:"";position:absolute;right:0;top:100%;width:7px;height:7px;background:#26392c;clip-path:polygon(0 0,100% 0,0 100%)}
+.product-stock-notice{margin:4px 0 0;color:#526657;font-size:.875rem;line-height:1.35}
+
 @media(max-width:600px){body.storefront #main .pf-notebook-pages,body.storefront #main .pf-notebook-pages p{font-size:16px}.product-image>.pf-paper-badge{top:9px;left:9px}.product-image>.pf-paper-badge svg{width:19px;height:26px}}
 
 /* Keep the current print method prominent while editing on every screen size. */

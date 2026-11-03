@@ -2,6 +2,8 @@ import {notebookPaperBadge} from './notebook-pages.mjs?v=2';
 import {productDisplayVariant} from './product-display-variant.mjs?v=2';
 import {fromInc,vatLabel} from './customer-pricing.mjs';
 import {pricedVariants} from './pf-visibility.mjs';
+import {variantColorKey} from './product-selection.mjs?v=2';
+import {createStockIndicator,loadProductStock,productStockStatus} from './product-stock.mjs';
 const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 // Lifestyle photographs for the featured product stories.
 const stories={
@@ -24,7 +26,7 @@ export function productColorSwatches(variants=[],selectedImage=''){
   if(key&&image&&(!colors.has(key)||variant.images.includes(selectedImage)))colors.set(key,{name:name||'Farve',hex,image});
  }
  if(colors.size<2)return '';
- return `<span class="editorial-swatches" role="group" aria-label="Vælg produktfarve">${[...colors.values()].map(({name,hex,image})=>`<button type="button" class="editorial-swatch${hex?'':' swatch-unknown'}" aria-label="Vis ${escape(name)}" aria-pressed="${image===selectedImage}" title="${escape(name)}" data-card-image="${escape(image)}" data-card-color="${escape(name)}"${hex?` style="--swatch:${hex}"`:''}></button>`).join('')}</span>`;
+ return `<span class="editorial-swatches" role="group" aria-label="Vælg produktfarve">${[...colors.entries()].map(([key,{name,hex,image}])=>`<button type="button" class="editorial-swatch${hex?'':' swatch-unknown'}" aria-label="Vis ${escape(name)}" aria-pressed="${image===selectedImage}" title="${escape(name)}" data-card-image="${escape(image)}" data-card-color="${escape(name)}" data-card-color-key="${escape(key)}"${hex?` style="--swatch:${hex}"`:''}></button>`).join('')}</span>`;
 }
 // A card shows the cheapest size of the pictured colour, never another colour's price.
 export function cardPrice(product,prices,image){
@@ -53,6 +55,22 @@ export function bindProductColorSwatches(root,products=[],prices={}){
     url.searchParams.set('sku',variant.sku);link.setAttribute('href',url.pathname+url.search);
    }
   };
+  let updateStock=()=>{};
+  const title=card.querySelector('.product-title');
+  if(product&&title&&image){
+   const variants=pricedVariants(product,prices);
+   if(variants.length){
+    const showStock=createStockIndicator(image.parentElement,title);
+    const shown=variants.find(variant=>variant.images?.includes(image.getAttribute('src')));
+    let colorKey=shown?variantColorKey(shown).toLowerCase():null,stock;
+    updateStock=key=>{
+     colorKey=key;
+     const sizes=variants.filter(variant=>variantColorKey(variant).toLowerCase()===colorKey);
+     showStock(productStockStatus(sizes,stock));
+    };
+    loadProductStock().then(result=>{if(card.isConnected){stock=result;updateStock(colorKey);}});
+   }
+  }
   if(image){updatePrice(image.getAttribute('src'));updateLinks(image.getAttribute('src'));}
 
   if(!image||!swatches)continue;
@@ -64,6 +82,7 @@ export function bindProductColorSwatches(root,products=[],prices={}){
    image.src=source;
    updatePrice(source);
    updateLinks(source);
+   updateStock(button.dataset.cardColorKey);
    image.alt=`${card.querySelector('.product-title')?.textContent?.trim()||'Produkt'} – ${button.dataset.cardColor}`;
    image.dataset.colorPrimary=source;
    for(const swatch of swatches.querySelectorAll('[data-card-image]'))swatch.setAttribute('aria-pressed',String(swatch===button));

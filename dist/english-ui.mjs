@@ -1,6 +1,9 @@
 // Danish source copy and reviewed English interface copy. Product copy is
 // maintained separately from PF's public English feed.
 export const englishUI=Object.fromEntries(`
+Ikke på lager|Out of stock
+Forventes på lager fra|Expected back in stock from
+Ny lagerdato er ikke oplyst|Restock date unavailable
 Kontrollerer logofiler…|Checking artwork files…
 Onlinebestilling er sat på pause.|Online ordering is paused.
 Logofilerne kunne ikke kontrolleres. Prøv igen eller kontakt os.|The artwork files could not be checked. Try again or contact us.

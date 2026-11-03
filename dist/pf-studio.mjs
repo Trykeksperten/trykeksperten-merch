@@ -30,7 +30,8 @@ import {productPriceIntro,printExampleQuantity} from './product-price-intro.mjs?
 import {readJSONResponse} from './api-response.mjs';
 import {foilFinishes,foilFinish,isFoilOption,validateFoilFinish} from './foil-options.mjs';
 import {designColorCount} from './design-colors.mjs';
-import {editorialStory,productColorSwatches,cardPrice,cardPriceHTML} from './product-editorial.mjs?v=10';
+import {editorialStory,productColorSwatches,cardPrice,cardPriceHTML} from './product-editorial.mjs?v=11';
+import {createStockIndicator,loadProductStock,productStockStatus} from './product-stock.mjs';
 import {brandEditorialBlocks,showBrandEditorial} from './brand-editorial.mjs';
 import {readCart,putCartLines,fetchQuote,priceHTML,updateCartHeader} from './pf-cart.mjs?v=29';
 import {saveFile,loadFile,deleteFile} from './storage.mjs?v=22';
@@ -244,8 +245,9 @@ export function bindPF(data,nav,notify,priceData){
  const redo=async()=>{if(!future.length)return;history.push(snapshot());await restoreSnapshot(future.pop());updateHistoryButtons();};updateHistoryButtons();
  const stockStatus=document.createElement('p');stockStatus.className='small muted';stockStatus.setAttribute('aria-live','polite');stockStatus.textContent='Lagerstatus indlæses…';$('quantity').closest('label').after(stockStatus);let stockData=null;
  const quantityNote=stockStatus.nextElementSibling;if(quantityNote?.matches('p'))quantityNote.textContent='Prisen opdateres efter antal og trykvalg.';
- const renderStock=()=>{if(orderVariants().length>1){stockStatus.textContent='';return;}const row=stockData?.items?.[v?.sku];stockStatus.textContent=!stockData?.available?stockData?.message||'Lagerstatus afventer.':!row?'Lagerstatus er ikke oplyst for denne variant.':row.available>0?`${row.available.toLocaleString('da-DK')} stk. på lager${row.incoming?` · ${row.incoming.toLocaleString('da-DK')} på vej`:''}`:row.incoming?`Ikke på lager · ${row.incoming.toLocaleString('da-DK')} på vej${row.incomingDate?' omkring '+row.incomingDate:''}`:'Ikke på lager';};
- fetch('/api/pf-stock').then(r=>r.json()).then(result=>{stockData=result;renderStock();}).catch(()=>{stockData={available:false,message:'Lagerstatus kunne ikke indlæses.'};renderStock();});$('variant').addEventListener('change',()=>queueMicrotask(renderStock));
+ const showStock=createStockIndicator($('photo').parentElement,root.querySelector('.pf-design-heading h1'));
+ const renderStock=()=>{showStock(productStockStatus(selectedVariants(),stockData));if(orderVariants().length>1){stockStatus.textContent='';return;}const row=stockData?.items?.[v?.sku];stockStatus.textContent=!stockData?.available?stockData?.message||'Lagerstatus afventer.':!row?'Lagerstatus er ikke oplyst for denne variant.':row.available>0?`${row.available.toLocaleString('da-DK')} stk. på lager${row.incoming?` · ${row.incoming.toLocaleString('da-DK')} på vej`:''}`:row.incoming?`Ikke på lager · ${row.incoming.toLocaleString('da-DK')} på vej`:'Ikke på lager';};
+ loadProductStock().then(result=>{if(root.isConnected){stockData=result;renderStock();}});$('variant').addEventListener('change',()=>queueMicrotask(renderStock));
  const allDrafts=()=>draftStore.saved();
  const allWorkingDrafts=()=>draftStore.working();
  let persistenceError='';
