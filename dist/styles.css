@@ -2619,6 +2619,7 @@ body.storefront #main .pf-visual-designer .pf-layer-list button.active{backgroun
 body.storefront #main .pf-visual-designer :is(.pf-text-align button[aria-pressed=true],.pf-colour-count-buttons button[aria-pressed=true],.pf-text-rotation-presets button[aria-pressed=true]){background:var(--studio-selected);border-color:var(--studio-border);color:#17201f;box-shadow:inset 0 0 0 1px var(--studio-border)}
 body.storefront #main .pf-visual-designer :is(.pf-upload-launch,.pf-editor-leave,.pf-editor-close,.pf-designer-actions .button){background:#f1f4f0;border:1px solid #d4dbd5;border-radius:999px;color:var(--studio-ink);box-shadow:none;font-weight:500}
 body.storefront #main .pf-visual-designer .pf-editor-close{padding:7px 12px;min-height:36px}
+body.storefront #main .pf-visual-designer .pf-editor-leave{padding:10px 16px;text-decoration:none}
 body.storefront #main .pf-visual-designer .pf-upload-launch{padding:12px 16px}
 body.storefront #main .pf-visual-designer :is(.pf-upload-launch,.pf-editor-leave,.pf-editor-close,.pf-designer-actions .button):hover{background:#e4ebe5;border-color:#aebeb1;color:#284532}
 body.storefront #main .pf-visual-designer :is(.pf-upload-launch,.pf-editor-leave,.pf-editor-close,.pf-designer-actions .button):focus-visible{outline:2px solid #64796a;outline-offset:3px}
