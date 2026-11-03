@@ -48,7 +48,7 @@
  .pf-cart-page .pf-cart-controls a,.pf-cart-page .pf-cart-controls button,.pf-cart-page .pf-line-price-details>summary{min-height:44px}
 }
 
-.pf-cart-page .cart-summary{padding:20px}
+.pf-cart-page .cart-summary{padding:20px;background:var(--purchase-surface);border:1px solid var(--purchase-border)}
 .pf-cart-page .cart-summary h2{margin-bottom:12px}
 .pf-cart-page .pf-overview-note{margin:0 0 10px}
 .pf-cart-page .cart-summary .pf-price-breakdown{margin:0}
@@ -95,8 +95,8 @@ body.storefront #main .pf-cart-page :is(.pf-cart-controls,.pf-cart-controls labe
 
 /* Quiet actions beside the design, with quantity and price on the right. */
 .pf-cart-page .pf-cart-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:10px}
-body.storefront #main .pf-cart-page .pf-cart-actions :is(.pf-cart-edit,[data-pf-remove]){display:inline-flex;justify-content:center;align-items:center;min-height:36px;min-width:100px;padding:7px 16px;border:0;border-radius:999px;background:#f0ebea;color:#000;font-family:inherit;font-size:var(--type-body);font-weight:var(--type-weight);line-height:1.4;text-decoration:none;margin:0}
-body.storefront #main .pf-cart-page .pf-cart-actions :is(.pf-cart-edit,[data-pf-remove]):hover{background:#e6dfdc}
+body.storefront #main .pf-cart-page .pf-cart-actions :is(.pf-cart-edit,[data-pf-remove]){display:inline-flex;justify-content:center;align-items:center;min-height:36px;min-width:100px;padding:7px 16px;border:0;border-radius:999px;background:var(--purchase-surface);color:var(--purchase-green);font-family:inherit;font-size:var(--type-body);font-weight:var(--type-weight);line-height:1.4;text-decoration:none;margin:0}
+body.storefront #main .pf-cart-page .pf-cart-actions :is(.pf-cart-edit,[data-pf-remove]):hover{background:#e4ebe5}
 .pf-cart-page .pf-cart-actions .pf-cart-delete-action{justify-self:auto}
 @container(min-width:620px){
  .pf-cart-page .pf-cart-controls{display:flex;justify-content:flex-end;align-items:center}
@@ -111,3 +111,6 @@ body.storefront #main .pf-cart-page .pf-cart-actions :is(.pf-cart-edit,[data-pf-
 .pf-cart-page .cart-purchase-info{border-top:1px solid var(--line);margin-top:10px}
 .pf-cart-page .cart-purchase-info summary{min-height:44px;align-content:center;font-size:13px;cursor:pointer}
 .pf-cart-page .cart-purchase-info .purchase-assurances{margin-top:4px}
+
+.pf-cart-page #pf-cart-checkout-link:not([aria-disabled="true"]){background:var(--purchase-green);color:#fff}
+.pf-cart-page #pf-cart-checkout-link:not([aria-disabled="true"]):hover{background:var(--purchase-green-hover)}

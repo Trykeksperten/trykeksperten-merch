@@ -3,7 +3,7 @@
 .pf-checkout:has(#pf-checkout-form[data-admin-test="false"]){max-width:820px}
 .pf-checkout:has(#pf-checkout-form){--type-body:13px;--type-meta:12px;--type-weight:400;--type-h1:clamp(24px,2.3vw,30px);--type-h2:16px;--checkout-control-height:36px;--checkout-button-height:40px;padding-block:14px 24px}
 .pf-checkout.section{padding-top:20px}
-.pf-checkout:has(#pf-checkout-form) .purchase-path{margin-bottom:8px;padding-block:4px}
+
 .pf-checkout .checkout-heading{margin:6px 0 4px}
 .pf-checkout .checkout-heading .eyebrow{font-size:11px;letter-spacing:.1em;color:#69726d;margin:0 0 10px}
 .pf-checkout .checkout-heading h1{margin:0}
@@ -59,7 +59,7 @@ body.storefront #main .pf-checkout :is(.checkout-terms,.checkout-marketing) :is(
 .pf-checkout #pf-checkout-form :is(.checkout-main,.checkout-confirmation)>.button,.pf-checkout #pf-checkout-form .checkout-method-next{min-height:var(--checkout-button-height);border-radius:999px;font-size:14px;font-weight:400;padding:7px 16px}
 .pf-checkout #pf-checkout-form :is(.checkout-main,.checkout-confirmation)>.small{margin:6px 0 0}
 .pf-checkout .checkout-sidebar{min-width:0}
-.pf-checkout :is(.cart-summary,.checkout-payment-choice,.checkout-details-panel){padding:12px;background:#edf1ed;border:1px solid #dce3dc;border-radius:16px;box-shadow:none}
+.pf-checkout :is(.cart-summary,.checkout-payment-choice,.checkout-details-panel){padding:12px;background:var(--purchase-surface);border:1px solid var(--purchase-border);border-radius:16px;box-shadow:none}
 .pf-checkout .cart-summary{position:static}
 .pf-checkout .cart-summary h2{margin:0 0 6px}
 .pf-checkout .pf-price-breakdown{margin:0;font-size:13px;line-height:1.5}
@@ -129,10 +129,13 @@ body.storefront #main .pf-checkout .pf-price-total dd{font-size:16px}
 
 .pf-checkout .checkout-details-panel{margin-bottom:10px}
 .pf-checkout #pf-checkout-form .checkout-details-panel>fieldset:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
-.pf-checkout .checkout-progress ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;list-style:none;margin:0 0 10px;padding:0}
-.pf-checkout .checkout-progress li{display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid #dce3dc;border-radius:8px;color:#526158;font-size:12px;line-height:1.3;overflow-wrap:anywhere}
-.pf-checkout .checkout-progress li>span{flex:none;display:grid;place-items:center;width:21px;height:21px;border-radius:50%;background:#edf1ed}
-.pf-checkout .checkout-progress li.complete>span{background:#dce8df;color:#234f35}
-.pf-checkout .checkout-progress li[aria-current="step"]{border-color:#c44922;color:#17201b;font-weight:500}
-.pf-checkout .checkout-progress li[aria-current="step"]>span{background:#bd421c;color:#fff}
-@media(max-width:420px){.pf-checkout .checkout-progress li{flex-direction:column;text-align:center;padding-inline:4px}}
+
+
+
+
+
+
+
+
+.pf-checkout #pf-checkout-form[data-admin-test="false"] :is([data-checkout-next],[data-checkout-method-next],button[type="submit"]):not(:disabled){background:var(--purchase-green);color:#fff}
+.pf-checkout #pf-checkout-form[data-admin-test="false"] :is([data-checkout-next],[data-checkout-method-next],button[type="submit"]):not(:disabled):hover{background:var(--purchase-green-hover)}
