@@ -10,6 +10,7 @@ import {brands} from '../lib/brands.mjs';
 import {curatedProducts} from '../lib/curated-products.mjs';
 import {pfCatalogShard} from '../lib/pf-catalog-store.mjs';
 import {insulationStatus} from '../dist/pf-filters.mjs';
+import {notebookPageInfo} from '../dist/notebook-pages.mjs';
 const zip=promisify(gzip);
 const clean=s=>String(s||'').toLowerCase().replace(/[®™]/g,'').trim();
 const wanted=new Map(brands.map(b=>[clean(b.name),b]));
@@ -64,7 +65,10 @@ for(const source of sources){
 if(!products.length||new Set(products.map(p=>p.id)).size!==products.length)throw Error('Empty or duplicate catalog');
 const counts=Object.fromEntries([...new Set(products.map(product=>product.brandId))].map(id=>[id,products.filter(product=>product.brandId===id).length])),availableBrands=[...knownBrands.values()].filter(brand=>counts[brand.id]).sort((a,b)=>(wanted.has(clean(b.name))-wanted.has(clean(a.name)))||a.name.localeCompare(b.name,'da'));
 const result={source:'product-data',importedAt:new Date().toISOString(),feeds:timestamps,brands:availableBrands,products,counts};
-const summary={...result,products:products.map(product=>({...product,insulation:insulationStatus(product),material:undefined,description:undefined,variants:product.variants.map(variant=>({...variant,images:variant.images.slice(0,1),options:undefined,methods:[...new Set(variant.options.map(option=>option.impMethod).filter(Boolean))],optionCount:variant.options.length})),detail:false}))},temporary='data/pf-products.tmp';
+const summary={...result,products:products.map(product=>{
+ const paperLayouts=notebookPageInfo(product)?.layouts;
+ return {...product,insulation:insulationStatus(product),material:undefined,description:undefined,variants:product.variants.map(variant=>({...variant,images:variant.images.slice(0,1),options:undefined,methods:[...new Set(variant.options.map(option=>option.impMethod).filter(Boolean))],optionCount:variant.options.length})),detail:false,paperLayouts:paperLayouts?.length?paperLayouts:undefined};
+})},temporary='data/pf-products.tmp';
 await rm(temporary,{recursive:true,force:true});await mkdir(temporary,{recursive:true});
 const shards=new Map();for(const product of products){const key=pfCatalogShard(product.id);shards.set(key,[...(shards.get(key)||[]),product]);}
 for(let number=0;number<64;number++){const key=String(number).padStart(2,'0');await writeFile(`${temporary}/${key}.json.gz`,await zip(JSON.stringify(shards.get(key)||[]),{level:9}));}

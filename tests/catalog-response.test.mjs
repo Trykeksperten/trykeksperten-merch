@@ -2,7 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {gunzipSync} from 'node:zlib';
 import {createCatalogResponse} from '../lib/catalog-response.mjs';
-import {loadCatalogIndex} from '../lib/pf-catalog-store.mjs';
+import {loadCatalogIndex,loadPFProduct} from '../lib/pf-catalog-store.mjs';
+import {notebookPageInfo,notebookPaperBadge} from '../dist/notebook-pages.mjs';
+import {editorialProductCard} from '../dist/product-editorial.mjs';
+
+test('Executive A4 catalogue card shows the same lined paper icon as its detail page',async()=>{
+ const id='pf-106263';
+ const [catalog,detail]=await Promise.all([loadCatalogIndex(),loadPFProduct(id)]);
+ const product=catalog.products.find(product=>product.id===id);
+ assert.equal(product.description,undefined);
+ assert.deepEqual(notebookPageInfo(product).layouts,['lined']);
+ assert.equal(notebookPaperBadge(product),notebookPaperBadge(detail));
+ const prices={available:true,skus:{[product.variants[0].sku]:true}};
+ assert.ok(editorialProductCard(product,prices).includes(notebookPaperBadge(detail)));
+});
 test('real catalogue loader reuses the snapshot consumed by the response cache',async()=>{
  const cold=await Promise.all(Array.from({length:16},()=>loadCatalogIndex()));
  assert.equal(new Set(cold).size,1);

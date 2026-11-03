@@ -1,24 +1,38 @@
 // Page information comes from the supplier copy, never from a product image.
-const notebook = /notesb[oø]g|notesbøger|notebook|journal|notepad|notesblok/i;
+const notebook = /notesb[oø]g|notesbøger|notatbog|notebook|journal|notepad|notesblok/i;
+const notebookCategory = /^Notesbøger med (?:hard|soft) cover$/i;
 const layouts = [
   ['Prikkede sider', /prikke[dt]|dotted/i],
   ['Ternede sider', /kvadrere[dt]|terne[dt]|squared|grid paper/i],
-  ['Linjerede sider', /linjeret|linjerede|forede|foret|\blined\b|\bruled\b/i],
+  ['Linjerede sider', /\blin[ij]ere(?:t|de)\b|(?:papir|sider?) med linjer\b|forede|foret|\blined\b|\bruled\b/i],
   ['Blanke sider', /blank[et]?\b|blanke|plain paper|unlined/i],
 ];
 export function notebookPageInfo(product) {
-  if (!notebook.test(product?.name || '')) return null;
-  const name = product.name;
+  if (!product?.description && Array.isArray(product?.paperLayouts)) {
+    const knownLayouts = product.paperLayouts
+      .map(key => paperLayouts.find(([value]) => value === key))
+      .filter(Boolean);
+    return {
+      type: knownLayouts.map(([, label]) => label).join(' · '),
+      layouts: knownLayouts.map(([key]) => key),
+      details: '',
+      custom: false,
+    };
+  }
+  const name = product?.name || '';
+  const namedNotebook = notebook.test(name);
+  if (!namedNotebook && !notebookCategory.test(product?.category || '')) return null;
   const sentences = String(product.description || '').match(/[^.!?]+(?:[.!?]+|$)/g)?.map(s => s.trim()) || [];
   // Alternative models and bespoke printing are not selectable SKU variants.
-  const alternative = /også|tilpas|dit eget|dit valg|du vælger|ethvert design|also|custom/i;
-  const pageSentences = sentences.filter(s => /sider|ark|papir|pages|sheets|paper/i.test(s));
+  const alternative = /(?:findes|fås|leveres|tilbydes) også|genopfyldning.*separat|tilpas|dit eget|dit valg|du vælger|ethvert design|also|custom/i;
+  const pageSentences = sentences.filter(s => /sider|ark|papir|pages|sheets|paper|notesbøger\s*[-–:]|hæfter\s*[-–:]/i.test(s));
   const standard = pageSentences.filter(s => !alternative.test(s));
   const namedLayout = name.split(/\s[-–]\s/).at(-1);
   const matches = layouts.filter(([, pattern]) => pattern.test(namedLayout) && (namedLayout !== name || /sider|pages/i.test(namedLayout)));
   const inferred = layouts.filter(([, pattern]) => standard.some(sentence => pattern.test(sentence)));
   const selected = matches.length === 1 ? matches : inferred;
   const type = selected.map(([label]) => label).join(' · ');
+  if (!namedNotebook && !type) return null;
   const custom = pageSentences.some(s => /tilpas|dit eget|dit valg|du vælger|ethvert design|custom/i.test(s));
   const customDetails = pageSentences.filter(s => /som standard/i.test(s));
   return {
