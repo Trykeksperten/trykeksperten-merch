@@ -20,7 +20,7 @@ body.storefront #main .pf-checkout :is(.checkout-heading h1,.cart-summary h2,.pf
 .pf-checkout #pf-checkout-form :is(.checkout-main,.checkout-details-panel)>fieldset>legend+*{clear:both}
 .pf-checkout .form-grid{gap:6px 10px}
 .pf-checkout #pf-checkout-form label:not(.legal-check){font-size:13px;line-height:1.35;font-weight:400;gap:3px;margin:0;color:#303a34}
-.pf-checkout #pf-checkout-form input:not([type=checkbox],[type=radio]),.pf-checkout #pf-checkout-form select{width:100%;min-width:0;box-sizing:border-box;min-height:var(--checkout-control-height);padding:5px 9px;border:1px solid #d9dfda;border-radius:7px;background:#f6f7f5;color:#17201b;font:400 14px/1.35 var(--font-sans);box-shadow:none}
+.pf-checkout #pf-checkout-form input:not([type=checkbox],[type=radio]),.pf-checkout #pf-checkout-form select{width:100%;min-width:0;box-sizing:border-box;min-height:var(--checkout-control-height);padding:5px 9px;border:1px solid #d9dfda;border-radius:7px;background:#fff;color:#17201b;font:400 14px/1.35 var(--font-sans);box-shadow:none}
 .pf-checkout #pf-checkout-form input::placeholder{color:#828a84;font-weight:400}
 .pf-checkout #pf-checkout-form input:focus,.pf-checkout #pf-checkout-form select:focus{outline:2px solid #8e9e92;outline-offset:2px;background:#fff}
 .pf-checkout #pf-checkout-form input[readonly]{background:#edf1ed;color:#64706a}
