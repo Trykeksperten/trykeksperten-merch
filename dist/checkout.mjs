@@ -175,7 +175,7 @@ export async function bindCheckout(notify,catalog){
    heading.focus();
   };
   const continueToPayment=()=>{if(checkoutReady&&detailsValid()){error.textContent='';showStep('payment');}};
-  const continueToReview=()=>{if(checkoutReady&&form.reportValidity()){error.textContent='';showStep('review');}};
+  const continueToReview=()=>{if(checkoutReady&&paymentMethod.reportValidity()&&form.reportValidity()){error.textContent='';showStep('review');}};
   if(next){
    form.noValidate=true;
    next.onclick=continueToPayment;
