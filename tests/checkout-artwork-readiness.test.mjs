@@ -41,9 +41,10 @@ const noop=()=>{};
 const deferred=()=>{let resolve;const promise=new Promise(done=>resolve=done);return {promise,resolve};};
 function checkoutFixture(initial,{loadPreview=async()=>null}={}){
  let lines=initial;const requests=[],button={disabled:true},summary={append:noop},error={},notice={hidden:true,querySelector:()=>notice.message},field=()=>({addEventListener:noop});notice.message={};
- const next={disabled:true},methodNext={disabled:true},back={},heading={focus:noop},path={},payment={hidden:true},review={hidden:true},details={hidden:false};
+ const next={disabled:true},methodNext={disabled:true},back={},heading={focus:noop},payment={hidden:true},review={hidden:true},details={hidden:false};
  const paymentMethod={...field(),value:'',selectedOptions:[{textContent:'Betal online'}],reportValidity(){return !!this.value;},checkValidity(){return !!this.value;}};
- const section={querySelector:selector=>selector==='[data-checkout-path]'?path:heading,querySelectorAll:()=>[payment]};
+ const progress=['details','payment','review'].map(checkoutProgress=>({dataset:{checkoutProgress},setAttribute:noop,removeAttribute:noop,classList:{toggle:noop}}));
+ const section={querySelector:()=>heading,querySelectorAll:selector=>selector==='[data-checkout-progress]'?progress:[payment]};
  const controls={'button[type=submit]':button,'[data-checkout-next]':next,'[data-checkout-method-next]':methodNext,'[data-checkout-back]':back,'.checkout-business-terms':{},'#checkout-payment-help':{},'[data-checkout-selected-method]':{},'#bank-prepayment-consent':{}};
  const form={dataset:{adminTest:'false'},isConnected:true,elements:{customerType:field(),differentBillingAddress:field(),paymentMethod,bankPrepaymentAccepted:{}},querySelector:selector=>controls[selector],closest:()=>section,querySelectorAll:selector=>selector.includes(':is(')?[]:selector==='[data-checkout-review-step]'?[review]:selector.includes('[data-checkout-details]')?[details]:[],reportValidity:()=>true};
  const nodes={'#pf-checkout-form':form,'#pf-checkout-summary':summary,'#pf-checkout-error':error,'#pf-checkout-artwork-notice':notice,'#checkout-business':{}};
