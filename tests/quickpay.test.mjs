@@ -110,3 +110,49 @@ test('historical test status lookup stays in test mode after the shop switches t
   assert.equal(result.paymentMode,'test');assert.equal(result.status,'authorized');
  }finally{await rm(new URL(`../.private/checkouts/${order.id}.json`,import.meta.url),{force:true});}
 });
+
+test('checkout payment rows reflect Quickpay configuration and preserve custom hosted filters',async()=>{
+ const {checkoutConfiguration}=await import('../lib/checkout.mjs');
+ assert.deepEqual(checkoutConfiguration(env).onlineMethods,['creditcard','mobilepay','apple-pay','google-pay']);
+ assert.deepEqual(checkoutConfiguration({...env,QUICKPAY_PAYMENT_METHODS:'mobilepay, creditcard'}).onlineMethods,['creditcard','mobilepay']);
+ assert.deepEqual(checkoutConfiguration({...env,QUICKPAY_PAYMENT_METHODS:'creditcard,!visa-us'}).onlineMethods,[]);
+});
+
+test('Quickpay sends only the selected method and makes no provider call if that method is disabled',async()=>{
+ const order={id:`pay-${randomUUID()}`,createdAt:new Date().toISOString(),paymentProvider:'quickpay',quickpayMethod:'mobilepay',quickpayFramed:true,status:'prepared',totalIncVat:10000,shipping:{email:'test@example.invalid'},events:[]};
+ await persistCheckout(order);
+ const calls=[];
+ const fetchImpl=async(url,options)=>{
+  const body=JSON.parse(options.body);calls.push(body);
+  return options.method==='POST'?response({id:12345,order_id:body.order_id}):response({url:'https://payment.quickpay.net/payments/test-option'});
+ };
+ try{
+  await assert.rejects(createQuickpayLink(order.id,{env:{...env,QUICKPAY_PAYMENT_METHODS:'creditcard'},fetchImpl}),/ikke tilgængelig/);
+  assert.equal(calls.length,0);
+  assert.equal((await readCheckout(order.id)).status,'prepared');
+  await createQuickpayLink(order.id,{env,fetchImpl});
+  assert.equal(calls.length,2);
+  assert.equal(calls[1].payment_methods,'mobilepay');
+  assert.equal(calls[1].framed,undefined);
+  assert.equal(calls[1].auto_capture,false);
+ }finally{await rm(new URL(`../.private/checkouts/${order.id}.json`,import.meta.url),{force:true});}
+});
+
+test('an inline card checkout requests a framed link once and reuses it on retry',async()=>{
+ const order={id:`pay-${randomUUID()}`,paymentProvider:'quickpay',quickpayMethod:'creditcard',quickpayFramed:true,status:'prepared',totalIncVat:10000,shipping:{email:'test@example.invalid'},events:[]};
+ await persistCheckout(order);
+ const calls=[];
+ const fetchImpl=async(url,options)=>{
+  const body=JSON.parse(options.body);calls.push(body);
+  return options.method==='POST'?response({id:12345,order_id:body.order_id}):response({url:'https://payment.quickpay.net/payments/test-framed'});
+ };
+ try{
+  const first=await createQuickpayLink(order.id,{env,fetchImpl});
+  assert.equal(first.framed,true);
+  assert.equal(calls[1].framed,true);
+  assert.equal(calls[1].payment_methods,'creditcard');
+  assert.equal(calls[1].auto_capture,false);
+  assert.deepEqual(await createQuickpayLink(order.id,{env,fetchImpl}),first);
+  assert.equal(calls.length,2);
+ }finally{await rm(new URL(`../.private/checkouts/${order.id}.json`,import.meta.url),{force:true});}
+});

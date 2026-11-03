@@ -107,3 +107,7 @@ body.storefront #main .pf-cart-page .pf-cart-actions :is(.pf-cart-edit,[data-pf-
  body.storefront #main .pf-cart-page .pf-cart-actions :is(.pf-cart-edit,[data-pf-remove]){min-height:44px;min-width:80px;padding-inline:12px}
  .pf-cart-page .pf-cart-actions .cart-remove-confirmation{right:auto;left:0;white-space:normal;min-width:180px;max-width:calc(100vw - 48px)}
 }
+
+.pf-cart-page .cart-purchase-info{border-top:1px solid var(--line);margin-top:10px}
+.pf-cart-page .cart-purchase-info summary{min-height:44px;align-content:center;font-size:13px;cursor:pointer}
+.pf-cart-page .cart-purchase-info .purchase-assurances{margin-top:4px}

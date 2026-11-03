@@ -3,7 +3,7 @@ const fields=['name','company','email','phone','street','postalCode','city','cou
 export function bindFreightQuote(form,{readCart,goodsTotalIncVat,onChange}){
  const box=el('fieldset'),legend=el('legend','3. Fragt'),note=el('p','Fragten afhænger af varerne og leveringsadressen. Bed om en pris, før du godkender ordren.'),request=el('button','Bed om fragtpris'),status=el('p'),label=el('label'),accept=el('input');
  box.className='checkout-freight';request.type='button';status.setAttribute('role','status');accept.type='checkbox';accept.disabled=true;label.className='legal-check';label.append(accept,el('span','Jeg godkender fragtprisen og den samlede pris vist her.'));box.append(legend,note,request,status,label);
- const legal=form.querySelector('fieldset:last-of-type');form.insertBefore(box,legal);if(legal?.querySelector('legend'))legal.querySelector('legend').textContent='4. Godkend og betal';
+ const delivery=form.querySelector('.checkout-delivery');delivery.after(box);
  let quote=null,reference=null,context='',sequence=0,timer;const initialCart=JSON.stringify(readCart());
  const shipping=()=>Object.fromEntries(new FormData(form)),key=()=>JSON.stringify([readCart(),...fields.map(field=>form.elements[field]?.value||'')]);
  const valid=()=>fields.filter(f=>['name','email','phone','street','postalCode','city','country'].includes(f)).every(field=>form.elements[field]?.value&&form.elements[field].checkValidity());

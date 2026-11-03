@@ -95,7 +95,7 @@ test('historically accepted proof-prepayment is not migrated or automatically ca
 test('new confirmation snapshots dispatch terms and both language policies remove proof prepayment',async()=>{
  for(const locale of ['da','en']){
   const f=await fixture();f.checkout.legal={...legal(true,locale),documents:{terms:'Accepted '+locale+' dispatch terms',privacy:'Privacy'}};await queueOrderConfirmation(f.checkout);const mail=JSON.parse(await readFile(join(root,'order-mail',f.checkout.id+'.json')));assert.equal(mail.paymentTerms,dispatchPaymentText[locale]);assert.ok(mail.text.includes(dispatchPaymentText[locale]));assert.equal(mail.documents.terms,'Accepted '+locale+' dispatch terms');
-  const terms=await readFile(new URL('../dist/legal/terms-'+locale+'.html',import.meta.url),'utf8');assert.match(terms,/2026-11-02/);assert.doesNotMatch(terms,/Beløbet hæves, når du har godkendt|Payment is captured after you approve/);
+  const terms=await readFile(new URL('../dist/legal/terms-'+locale+'.html',import.meta.url),'utf8');assert.ok(terms.includes(LEGAL_VERSION));assert.doesNotMatch(terms,/Beløbet hæves, når du har godkendt|Payment is captured after you approve/);
   for(const printed of [true,false])assert.match(paymentDescription([{decorations:printed?[{}]:[]}],locale),locale==='da'?/hæves automatisk, når hele ordren er afsendt/:/captured automatically once the entire order has been dispatched/);
  }
  assert.equal(englishUI[paymentDescription([])],dispatchPaymentText.en);

@@ -41,11 +41,15 @@ const noop=()=>{};
 const deferred=()=>{let resolve;const promise=new Promise(done=>resolve=done);return {promise,resolve};};
 function checkoutFixture(initial,{loadPreview=async()=>null}={}){
  let lines=initial;const requests=[],button={disabled:true},summary={append:noop},error={},notice={hidden:true,querySelector:()=>notice.message},field=()=>({addEventListener:noop});notice.message={};
- const form={dataset:{adminTest:'false'},isConnected:true,elements:{customerType:field(),differentBillingAddress:field()},querySelector:()=>button,reportValidity:()=>true};
+ const next={disabled:true},methodNext={disabled:true},back={},heading={focus:noop},path={},payment={hidden:true},review={hidden:true},details={hidden:false};
+ const paymentMethod={...field(),value:'',selectedOptions:[{textContent:'Betal online'}],reportValidity(){return !!this.value;},checkValidity(){return !!this.value;}};
+ const section={querySelector:selector=>selector==='[data-checkout-path]'?path:heading,querySelectorAll:()=>[payment]};
+ const controls={'button[type=submit]':button,'[data-checkout-next]':next,'[data-checkout-method-next]':methodNext,'[data-checkout-back]':back,'.checkout-business-terms':{},'#checkout-payment-help':{},'[data-checkout-selected-method]':{},'#bank-prepayment-consent':{}};
+ const form={dataset:{adminTest:'false'},isConnected:true,elements:{customerType:field(),differentBillingAddress:field(),paymentMethod,bankPrepaymentAccepted:{}},querySelector:selector=>controls[selector],closest:()=>section,querySelectorAll:selector=>selector.includes(':is(')?[]:selector==='[data-checkout-review-step]'?[review]:selector.includes('[data-checkout-details]')?[details]:[],reportValidity:()=>true};
  const nodes={'#pf-checkout-form':form,'#pf-checkout-summary':summary,'#pf-checkout-error':error,'#pf-checkout-artwork-notice':notice,'#checkout-business':{}};
  const context=vm.createContext({URLSearchParams,location:{search:''},document:{querySelector:selector=>nodes[selector],contains:()=>true,createElement:()=>({append:noop})},window:{addEventListener:noop},readCart:()=>lines,checkoutArtworkIssue:lines=>checkoutArtworkIssue(lines,{loadPreview}),bindAddressPicker:noop,syncBillingFields:noop,customerType:()=> 'business',setCustomerType:noop,fetchQuote:async()=>({net:100,vat:25,totalIncVat:125}),get:async url=>{requests.push(url);return {ready:true,deliveryTerms:{da:'LOCAL'}};},fetch:async url=>{requests.push(url);return {ok:true,json:async()=>({ready:true,deliveryTerms:{da:'LOCAL'}})};},freightEstimate:()=>({exVat:100,incVat:125}),getLanguage:()=> 'da',vatLabel:()=> 'ekskl. moms',kroner:String,quoteAmount:q=>q.net,fromInc:(inc,ex)=>ex});
  vm.runInContext(checkoutSource+';globalThis.bind=bindCheckout;',context);
- return {form,button,summary,error,notice,requests,start:()=>context.bind(),setLines:value=>{lines=value;}};
+ return {form,button,next,methodNext,back,payment,review,details,summary,error,notice,requests,start:()=>context.bind(),setLines:value=>{lines=value;}};
 }
 test('direct checkout blocks EPS before any quote/payment requests and prevents native form submission during checks',async()=>{
  const gate=deferred(),fixture=checkoutFixture([line([eps])],{loadPreview:async()=>{await gate.promise;return null;}}),binding=fixture.start();
@@ -53,8 +57,18 @@ test('direct checkout blocks EPS before any quote/payment requests and prevents 
  gate.resolve();await binding;assert.equal(fixture.notice.hidden,false);assert.equal(fixture.notice.message.textContent,epsCheckoutMessage);assert.equal(fixture.requests.length,0);assert.equal(fixture.button.disabled,true);assert.equal(fixture.summary.textContent,'Onlinebestilling er sat på pause.');
 });
 test('checkout rechecks a changed cart at submit and sends no payment session for new EPS without preview',async()=>{
- const fixture=checkoutFixture([line([pdf])]);await fixture.start();assert.equal(fixture.button.disabled,false,fixture.error.textContent);
- const before=fixture.requests.length;fixture.setLines([line([eps])]);await fixture.form.onsubmit({preventDefault:noop});
+ const fixture=checkoutFixture([line([pdf])]);await fixture.start();assert.equal(fixture.next.disabled,false,fixture.error.textContent);
+ assert.equal(fixture.button.disabled,true);
+ const before=fixture.requests.length;
+ fixture.next.onclick();assert.equal(fixture.requests.length,before);assert.equal(fixture.button.disabled,true);
+ assert.equal(fixture.payment.hidden,false);assert.equal(fixture.details.hidden,true);
+ fixture.methodNext.onclick();assert.equal(fixture.review.hidden,true);
+ fixture.form.elements.paymentMethod.value='card';
+ fixture.methodNext.onclick();assert.equal(fixture.review.hidden,false);assert.equal(fixture.button.disabled,false);
+ assert.equal(fixture.requests.length,before);
+ fixture.back.onclick();assert.equal(fixture.payment.hidden,false);assert.equal(fixture.review.hidden,true);
+ fixture.back.onclick();assert.equal(fixture.payment.hidden,true);assert.equal(fixture.details.hidden,false);
+ fixture.next.onclick();fixture.methodNext.onclick();fixture.setLines([line([eps])]);await fixture.form.onsubmit({preventDefault:noop});
  assert.equal(fixture.error.textContent,epsCheckoutMessage);assert.equal(fixture.requests.length,before);assert.ok(!fixture.requests.some(url=>url.includes('/session')));
 });
 

@@ -74,7 +74,13 @@ Priser ekskl. moms.|Prices exclude VAT.
 Priser|Prices
 Rediger design|Edit design
 Slet|Remove
-Til betaling|Proceed to checkout
+Til oplysninger og levering|Continue to details and delivery
+Til betaling|Continue to payment
+Til betaling →|Continue to payment →
+Oplysninger og levering|Details and delivery
+Tilbage til oplysninger og levering|Back to details and delivery
+Godkend din ordre|Confirm your order
+Vi kontrollerer broderiets trådfarver, før vi sender ordren til leverandøren.|We check the embroidery thread colours before sending your order to the supplier.
 Opdater kurv|Update cart
 Fortsæt til kurv|Continue to cart
 I alt|Total
@@ -1140,10 +1146,49 @@ Ved erhvervskøb gælder korte reklamationsfrister, produktionstolerancer og beg
 Jeg accepterer|I accept
 handelsbetingelserne|the terms and conditions
 privatlivspolitikken|the privacy policy
-Jeg er informeret om, at varer med mit eget logo, navn, tekst eller individuelle design ikke har fortrydelsesret. Reklamationsretten berøres ikke.|I have been informed that goods bearing my own logo, name, text or individual design are exempt from withdrawal. Rights concerning defects remain unaffected.
+Jeg er informeret om, at varer med mit eget logo, navn, tekst eller individuelle design ikke har lovbestemt fortrydelsesret. Reklamationsretten berøres ikke.|I have been informed that goods bearing my own logo, name, text or individual design are exempt from withdrawal. Rights concerning defects remain unaffected.
 Jeg accepterer, at betalingen for mine personligt tilpassede varer hæves efter min godkendelse af produktionskorrekturen og før produktion, fordi varerne fremstilles særligt til mig.|I agree that payment for my personalised goods will be captured after I approve the production proof and before production, because the goods are made specifically for me.
 Oplysninger til ordren bruges ikke automatisk til marketing.|Order information is not automatically used for marketing.
 Modtag tilbud (valgfrit)|Receive offers (optional)
+Tilføj leveringskommentar (valgfrit)|Add delivery note (optional)
+Kommentar til levering|Delivery note
+Fx port 2 eller indgang fra gården|E.g. gate 2 or entrance from the courtyard
+Afmeld|Unsubscribe
+Valgfrit. Du kan købe uden tilmelding og afmelde dig gratis når som helst.|Optional. You can buy without subscribing and unsubscribe for free at any time.
+Trin 1 af 2|Step 1 of 2
+Trin 2 af 2|Step 2 of 2
+Kundeoplysninger|Customer details
+Ordreoverblik|Order overview
+Varer i ordren|Items in your order
+Kortbetaling|Card payment
+Du kan bede om annullering, indtil vi har sendt den godkendte korrektur til produktion.|You can request cancellation until we have sent the approved proof to production.
+Send os en e-mail|Email us
+Beløbet reserveres ved bestilling og hæves, når hele ordren er afsendt. Du godkender betalingen hos Quickpay.|The amount is authorised when you order and captured when the entire order has been dispatched. Confirm your payment with Quickpay.
+Du modtager en faktura. Vi bestiller først varerne, når hele betalingen er modtaget.|You will receive an invoice. We order the goods once we have received full payment.
+Vælg betalingsmetode|Choose payment method
+Vælg en betalingsmetode|Select a payment method
+Acceptér vilkårene. Næste åbner kortfelterne.|Accept the terms. Next opens the card form.
+Beløbet hæves først, når hele ordren er sendt.|Payment is captured when the entire order ships.
+Trin 1 af 3|Step 1 of 3
+Trin 2 af 3|Step 2 of 3
+Trin 3 af 3|Step 3 of 3
+Godkend og betal|Confirm and pay
+Tilbage til betalingsvalg|Back to payment methods
+Betal|Pay
+Kortfelterne åbner her på siden, når du har accepteret handelsbetingelserne og trykker Næste. Beløbet reserveres, når du betaler, og hæves først, når hele ordren er afsendt.|The card form opens on this page after you accept the terms and select Next. The amount is authorised when you pay and captured once the entire order has been dispatched.
+Fortsæt til MobilePay for at indtaste dit nummer, hvis du bliver bedt om det, og godkend i appen. Beløbet hæves først ved afsendelse.|Continue to MobilePay, enter your number if prompted and approve in the app. The amount is captured when the order is dispatched.
+Indtast kortoplysninger|Enter card details
+Åbn kortbetalingen i hele vinduet|Open card payment in the full window
+Kortbetalingen er afbrudt|Card payment was cancelled
+Betaling og godkendelse|Payment and confirmation
+Betal online med Quickpay|Pay online with Quickpay
+Visa, Mastercard, MobilePay, Apple Pay og Google Pay|Visa, Mastercard, MobilePay, Apple Pay and Google Pay
+Du vælger betalingsmetoden på Quickpays betalingsside. Beløbet reserveres ved bestilling og hæves først, når hele ordren er afsendt.|Choose your payment method on the Quickpay page. The amount is reserved when you order and captured only once the entire order has been dispatched.
+Faktura med bankoverførsel|Invoice with bank transfer
+Forudbetaling for private og virksomheder|Prepayment for consumers and businesses
+Du modtager en faktura med betalingsoplysninger. Vi bestiller først varerne, når hele betalingen er modtaget.|You will receive an invoice with payment details. We order the goods once we have received full payment.
+Jeg vælger bankoverførsel og accepterer, at hele betalingen skal være modtaget før bestilling og produktion, både med og uden tryk.|I choose bank transfer and accept that full payment must be received before the goods are ordered and produced, with or without printing.
+Du modtager status på e-mail.|You will receive updates by email.
 Bestil med betalingspligt →|Place order with obligation to pay →
 Vi bruger oplysningerne til at behandle din henvendelse.|We use your information to handle your enquiry.
 Læs privatlivspolitikken|Read the privacy policy
