@@ -77,6 +77,8 @@ Slet|Remove
 Til oplysninger og levering|Continue to details and delivery
 Til betaling|Continue to payment
 Til betaling →|Continue to payment →
+Til betalingsmetode →|Continue to payment method →
+Betalingsmetode|Payment method
 Oplysninger og levering|Details and delivery
 Tilbage til oplysninger og levering|Back to details and delivery
 Godkend din ordre|Confirm your order
