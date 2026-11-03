@@ -61,7 +61,7 @@ export function bindCart(data,nav,notify){if(!document.querySelector('.pf-cart-p
   if(checkoutLink&&notice){
    const issue=artworkResult.status==='fulfilled'?artworkResult.value:'Logofilerne kunne ikke kontrolleres. Prøv igen eller kontakt os.',unavailable=!!issue||(shipping&&!shipping[1].ready);
    checkoutLink.removeAttribute('aria-disabled');checkoutLink.href=unavailable?'/kontakt':'/betaling';checkoutLink.textContent=unavailable?'Kontakt os om bestillingen →':'Til oplysninger og levering';
-   notice.textContent=issue||(unavailable?shipping[1].message:shipping&&!shipping[0].ready?(shipping[0].launch?.ordersEnabled===false?'Webshoppen er endnu ikke åben for bestillinger.':'Bestilling afventer afklaring. Kontakt os, hvis du vil bestille nu.'):'Fragt lægges til subtotalen før betaling.');
+   notice.textContent=issue||(unavailable?shipping[1].message:shipping&&!shipping[0].ready?(shipping[0].launch?.ordersEnabled===false?'Webshoppen er endnu ikke åben for bestillinger.':'Bestilling afventer afklaring. Kontakt os, hvis du vil bestille nu.'):'');
    notice.className=issue?'small error':'small muted';
   }
   if(priceResult.status==='rejected'){

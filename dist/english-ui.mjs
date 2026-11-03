@@ -190,7 +190,6 @@ Vi behandler din ordre. Betalingen hæves tidligst ved afsendelse.|We are proces
 Dine varer er afsendt. Se leveringsstatus nedenfor.|Your products have been dispatched. See the delivery status below.
 
 Fragt beregnes før betaling.|Delivery is calculated before payment.
-Fragt lægges til subtotalen før betaling.|Delivery is added to the subtotal before payment.
 Kontakt os om bestillingen →|Contact us about your order →
 Se bestillingsstatus →|View ordering status →
 Webshoppen er endnu ikke åben for bestillinger.|The webshop is not yet open for orders.
