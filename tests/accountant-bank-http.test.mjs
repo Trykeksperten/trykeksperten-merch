@@ -1,0 +1,21 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';import {mkdtemp,mkdir,writeFile,readFile,readdir,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';import {join} from 'node:path';import {fileURLToPath} from 'node:url';import {randomUUID,scryptSync} from 'node:crypto';import {once} from 'node:events';import {createServer} from 'node:net';
+test('external-invoice acknowledgement requires staff and same origin; records once without money, mail or PF handoff',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'smerch-invoice-http-')),id='pay-'+randomUUID(),cardId='pay-'+randomUUID();await mkdir(join(root,'checkouts'));
+ const order={id,accountingWorkflow:'payment-method-v1',paymentProvider:'bank_transfer',status:'awaiting_bank_payment',createdAt:new Date().toISOString(),totalIncVat:12500,bankPayment:{invoiceNumber:null,receipts:[]},lines:[],pfOrderIds:[],events:[]},card={...order,id:cardId,paymentProvider:'quickpay'};
+ for(const o of [order,card])await writeFile(join(root,'checkouts',o.id+'.json'),JSON.stringify(o));
+ const probe=createServer();await new Promise(r=>probe.listen(0,'127.0.0.1',r));const port=probe.address().port;await new Promise(r=>probe.close(r));const base='http://127.0.0.1:'+port,salt='33'.repeat(16),password='synthetic-test-password',hash=scryptSync(password,Buffer.from(salt,'hex'),64).toString('hex');
+ const child=spawn(process.execPath,['--import',fileURLToPath(new URL('../scripts/test-local-fetch-only.mjs',import.meta.url)),fileURLToPath(new URL('../server.mjs',import.meta.url))],{cwd:root,env:{PATH:process.env.PATH,NODE_ENV:'production',HOST:'127.0.0.1',PORT:String(port),SMERCH_DATA_DIR:root,SMERCH_PUBLIC_BASE_URL:base,SMERCH_ADMIN_USERNAME:'test',SMERCH_ADMIN_PASSWORD_HASH:salt+':'+hash,PF_GATEWAY_MODE:'test',PF_AUTO_SUBMIT_ENABLED:'0',SMERCH_ORDERS_ENABLED:'0',SMERCH_FINANCE_ENABLED:'0'},stdio:['ignore','pipe','pipe']});
+ try{
+  await Promise.race([once(child.stdout,'data'),once(child,'exit').then(()=>{throw Error('Fixture startup failed');}),new Promise((_,reject)=>setTimeout(()=>reject(Error('Startup timeout')),10000).unref())]);
+  const url=base+'/api/admin/checkouts/'+id+'/bank-payment',body=JSON.stringify({action:'invoice_sent',confirmed:true});assert.equal((await fetch(url,{method:'POST',body})).status,403);
+  const login=await fetch(base+'/api/admin/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:'test',password})});assert.equal(login.status,200);const headers={cookie:login.headers.get('set-cookie').split(';')[0],'content-type':'application/json','x-smerch-admin':'1',origin:base};
+  assert.equal((await fetch(url,{method:'POST',headers:{...headers,origin:'https://foreign.example.invalid'},body})).status,403);assert.equal((await fetch(url,{method:'POST',headers,body:JSON.stringify({action:'invoice_sent',confirmed:false})})).status,400);
+  for(let i=0;i<2;i++){const res=await fetch(url,{method:'POST',headers,body});assert.equal(res.status,200);const data=await res.json();assert.equal(data.status,'awaiting_bank_payment');assert.equal(data.bankPayment.received,0);assert.equal(data.bankPayment.invoiceSender,'Financial Outsourcing');}
+  const saved=JSON.parse(await readFile(join(root,'checkouts',id+'.json')));assert.equal(saved.events.filter(e=>e.type==='bank_invoice_sent').length,1);assert.equal(saved.events[0].performedBy.type,'staff');assert.equal(saved.paidAt,undefined);assert.deepEqual(saved.bankPayment.receipts,[]);assert.deepEqual(saved.pfOrderIds,[]);
+  const cardBefore=await readFile(join(root,'checkouts',cardId+'.json'),'utf8');assert.equal((await fetch(base+'/api/admin/checkouts/'+cardId+'/bank-payment',{method:'POST',headers,body})).status,400);assert.equal(await readFile(join(root,'checkouts',cardId+'.json'),'utf8'),cardBefore);
+  for(const name of ['order-mail','proof-mail','shipment-mail'])assert.equal((await readdir(join(root,name)).catch(e=>{if(e.code==='ENOENT')return [];throw e;})).length,0);
+  assert.equal((await(await fetch(base+'/api/checkout/status')).json()).launch.ordersEnabled,false);
+ }finally{if(child.exitCode===null&&child.signalCode===null){const done=once(child,'exit');child.kill('SIGTERM');await done;}await rm(root,{recursive:true,force:true});}
+});

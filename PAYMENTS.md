@@ -30,3 +30,13 @@ Ingen rigtig PF-ordre eller Quickpay-/Stripe-hævning er udført her.
 ## Lokal ændring 2. november 2026 — endnu ikke deployet
 
 Frigivelsesspærren kræver eksplicit automatisk forsendelseshævning (`SMERCH_AUTOMATIC_SHIPMENT_CAPTURE=1`), aktiveret økonomiflow, bekræftet betalingsaftale og en gyldig startdato, der er nået. Nye offentlige ordrer skal bruge Quickpay, som håndteres af økonomijobbet. De separate mailvalg forbliver `review`. Åbningsflag, livekrav, pauset postkasse og øvrige spærringer gælder stadig; denne kodeændring åbner intet. Ingen driftsvariabler, eksisterende ordredata eller PF-miljø ændres af ændringen.
+
+## Bogholderforløb pr. betalingsform — lokal kandidat 2. november 2026
+
+Nye serveroprettede ordrer får `accountingWorkflow=payment-method-v1`. Historiske ordrer og køposter får ikke mærket efterfølgende. Den nye automatik kræver eksplicit `SMERCH_ACCOUNTANT_MAIL=automatic` samt aktivt økonomiflow og en nået finansstartdato. Kundens betalingskvittering er et selvstændigt mailvalg; den omdirigeres ikke.
+
+For Quickpay dannes én særskilt bogholderkvittering pr. verificeret live-hævning med beløb, ordrenummer, Quickpay order_id/Clearhaus Reference, betalings-ID, operations-ID og tidspunkt. Den instruerer udelukkende i afstemning og siger udtrykkeligt, at der ikke skal oprettes eller sendes faktura. Nye Quickpay-ordrer kan ikke bruge fakturagrundlag, den gamle e-conomic-kladdeintegration eller fakturagenudsendelse.
+
+Ved valgt fakturabetaling dannes fakturaanmodning og HTML-fakturagrundlag ud fra ordren før betaling/afsendelse. Financial Outsourcing udarbejder og sender faktura til kunden med kopi til Smerch. Smerch sender ikke selv fakturaen. Operatøren kan bekræfte i backenden, at bogholderen har sendt den; dette ændrer ikke betalingsstatus og sender ingen mail. Et fakturanummer alene er en separat registrering på nye ordrer. Eksisterende bankforudbetaling og krav om fuld betaling før PF/produktion bevares.
+
+Mailintent gemmes før SMTP. Genkørsel genbruger samme køpost/message-id; usikre udfald og ændrede modtagere/betalingsdata/fakturagrundlag stopper til manuel afklaring. Allerede registreret/sendt faktura udløser ikke en ny fakturaanmodning. Ingen historik masseaktiveres eller genafsendes. Denne kandidat er kun testet lokalt; den er ikke aktiveret, committet, pushet eller deployet.

@@ -75,3 +75,7 @@ test('invoice orders record manual sending and show green status after reopening
  assert.ok(!all(entry.state).some(n=>/mailserver|markér den som sendt/.test(n.textContent)));
  }finally{globalThis.document=previous;globalThis.confirm=previousConfirm;}
 });
+test('external accountant invoice acknowledgement displays actual sender and does not add an invoice task to Quickpay',()=>{
+ const previous=globalThis.document;globalThis.document={createElement:tag=>new Element(tag)};
+ try{const rows=createDocumentRows({}, {paymentProvider:'bank_transfer',shipping:{email:'customer@example.test'},bankPayment:{invoicedAt:'2026-11-02T20:00:00Z',invoiceSender:'Financial Outsourcing'}});assert.ok(all(rows.ensure('invoice').state).some(n=>n.textContent==='Faktura sendt af bogholderen · bekræftet i Smerch'));const card=createDocumentRows({}, {paymentProvider:'quickpay',shipping:{email:'customer@example.test'}});assert.equal(card.entries.has('invoice'),false);}finally{globalThis.document=previous;}
+});
