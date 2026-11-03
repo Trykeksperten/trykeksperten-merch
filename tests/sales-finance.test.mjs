@@ -8,7 +8,8 @@ import {randomUUID,createHash} from 'node:crypto';
 import {allocateShipment,invoicePolicy,quickpayTotals,financeSummary,validateSettlement} from '../lib/sales-finance.mjs';
 import {financeConfiguration,withLedger,ledgerOrder,saveVerifiedPayment,financeView,updateFinance} from '../lib/sales-ledger.mjs';
 import {executeSalesPayment,reconcileSalesPayment} from '../lib/sales-payments.mjs';
-import {sendFinanceMail} from '../lib/sales-mail.mjs';
+import {orderTasks} from '../dist/admin-order-attention.mjs';
+import {dismissAccountantBasis,sendFinanceMail} from '../lib/sales-mail.mjs';
 import {persistCheckout,readCheckout,updateCheckout} from '../lib/checkout.mjs';
 const prior=process.env.SMERCH_DATA_DIR;process.env.SMERCH_DATA_DIR=await mkdtemp(join(tmpdir(),'smerch-sales-'));
 after(async()=>{await rm(process.env.SMERCH_DATA_DIR,{recursive:true,force:true});if(prior===undefined)delete process.env.SMERCH_DATA_DIR;else process.env.SMERCH_DATA_DIR=prior;delete process.env.SMERCH_INVOICE_NUMBERING_AUTHORITY;delete process.env.SMERCH_INVOICE_SERIES;});
@@ -64,4 +65,33 @@ test('agreed proof prepayment is not an outstanding finance task before shipment
  for(const legal of [{...order.legal,prepayment:false},{...order.legal,prepaymentText:''},{...order.legal,acceptedAt:null}]){
   assert.ok(financeSummary({...order,legal},finance).problems.includes('Forudbetaling: afklar fakturering og moms særskilt.'));
  }
+});
+
+test('closing a legacy accountant draft preserves history and clears its finance and shipment tasks',async()=>{
+ const {order,payment}=await fixture();
+ await shipment(order,3);
+ payment.operations.push(op(2,'capture',order.totalIncVat));
+ await saveVerifiedPayment(order,payment);
+ const shipmentKey=(await financeView(order.id)).shipments[0].key;
+ await withLedger(data=>{
+  const mail=ledgerOrder(data,order.id).mail;
+  mail.find(row=>row.kind==='payment_receipt').status='sent';
+  mail.push(
+   {kind:'accountant_basis',key:'old',shipmentKey,status:'sent'},
+   {kind:'accountant_basis',key:'draft',shipmentKey,status:'review',requiresReview:true,pdf:'draft-pdf'}
+  );
+ });
+ const tasks=finance=>orderTasks({id:'pf',status:'confirmed'},null,{finance,documents:{documents:[{id:'basis',type:'basis'}]}});
+ assert.deepEqual(tasks(await financeView(order.id)).map(task=>task.id),['mail-draft','finance']);
+ await assert.rejects(dismissAccountantBasis(order.id,'old'),/usendt kladde/);
+ await dismissAccountantBasis(order.id,'draft',{actor:'staff'});
+ await dismissAccountantBasis(order.id,'draft',{actor:'another staff member'});
+ const transport={sendMail:()=>assert.fail('A dismissed draft must never send')};
+ const closed=await sendFinanceMail(order.id,'draft',{env,transport});
+ assert.equal(closed.status,'obsolete');
+ assert.equal(closed.dismissedBy,'staff');
+ assert.equal(closed.pdf,'draft-pdf');
+ const finance=await financeView(order.id);
+ assert.equal(finance.summary.captured,order.totalIncVat);
+ assert.deepEqual(tasks(finance),[]);
 });

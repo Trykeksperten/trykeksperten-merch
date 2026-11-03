@@ -19,12 +19,13 @@ test('live test requires authenticated administrator, test isolation and HTTPS',
  for(const key of ['QUICKPAY_CAPTURE_ENABLED','PF_AUTO_SUBMIT_ENABLED','QUICKPAY_LIVE_ENABLED'])assert.throws(()=>assertAdminLiveTest(true,{...env,[key]:'1'}));
  assert.throws(()=>assertAdminLiveTest(true,{...env,SMERCH_CUSTOMER_BASE_URL:'http://shop.example'}));
 });
-test('5 kr live reservation verifies callbacks, blocks all commerce, cancels after environment changes',async()=>{
+for(const framed of [false,true])test(`5 kr ${framed?'framed card':'MobilePay'} reservation verifies callbacks, blocks commerce and cancels`,async()=>{
  const quote={totalIncVat:10000,net:8000};const order=prepareAdminLiveTest({id:'pay-'+randomUUID(),status:'prepared',paymentProvider:'quickpay',totalIncVat:28750,quote,lines:[],pfOrderIds:[],createdAt:new Date().toISOString(),shipping:{email:'fixture@example.invalid'},events:[]});
+ if(framed){order.quickpayMethod='creditcard';order.quickpayFramed=true;}
  assert.equal(order.totalIncVat,500);assert.equal(order.testOriginalTotalIncVat,28750);assert.deepEqual(order.quote,quote);
  await persistCheckout(order);let link;
- await createQuickpayLink(order.id,{env,fetchImpl:async(url,options)=>{const body=JSON.parse(options.body);if(options.method==='POST')return {ok:true,json:async()=>({id:987654,order_id:body.order_id})};link=body;return {ok:true,json:async()=>({url:'https://payment.quickpay.net/payments/fixture'})};}});
- assert.equal(link.amount,500);assert.equal(link.auto_capture,false);assert.equal(link.payment_methods,'mobilepay');assert.equal(link.callback_url,'https://api.example/api/quickpay/callback');assert.match(link.continue_url,/https:\/\/shop.example\/ordre\?checkout=/);
+ const session=await createQuickpayLink(order.id,{env,fetchImpl:async(url,options)=>{const body=JSON.parse(options.body);if(options.method==='POST')return {ok:true,json:async()=>({id:987654,order_id:body.order_id})};link=body;return {ok:true,json:async()=>({url:'https://payment.quickpay.net/payments/fixture'})};}});
+ assert.equal(link.amount,500);assert.equal(link.auto_capture,false);assert.equal(link.payment_methods,framed?'creditcard':'mobilepay');assert.equal(link.framed,framed?true:undefined);assert.equal(session.framed,link.framed);assert.equal(link.callback_url,'https://api.example/api/quickpay/callback');assert.match(link.continue_url,/https:\/\/shop.example\/ordre\?checkout=/);
  const saved=await readCheckout(order.id),payment={id:saved.quickpayPaymentId,order_id:saved.quickpayOrderId,type:'Payment',currency:'DKK',test_mode:false,accepted:true,link:{amount:500},operations:[{id:1,type:'authorize',amount:500,pending:false,qp_status_code:'20000'}]};
  await assert.rejects(applyQuickpayCallback({...payment,test_mode:true},{env}),/test\/live/);
  await assert.rejects(applyQuickpayCallback({...payment,link:{amount:100}},{env}),/beløb/);
