@@ -2368,8 +2368,9 @@ body.storefront #main .pf-visual-designer .pf-text-controls input[type=range]{he
 .pf-visual-designer .pf-text-controls>.pf-text-rotation.pf-rotation-slider{display:flex;grid-column:1/-1;gap:3px;margin:0}
 .pf-visual-designer .pf-rotation-slider>label{font-size:13px;line-height:1.35}
 .pf-rotation-ticks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0 7px;margin-top:-5px;color:#69756c;font-size:10px;line-height:1.4}
-.pf-rotation-ticks span{position:relative;padding-top:6px}
-.pf-rotation-ticks span:before{content:"";position:absolute;top:0;left:0;width:1px;height:4px;background:#9aa69d}
+.pf-rotation-ticks button{position:relative;min-height:26px;padding:6px 4px 0 0;background:transparent;color:inherit;text-align:left}
+.pf-rotation-ticks button::before{content:"";position:absolute;top:0;left:0;width:1px;height:4px;background:#9aa69d}
+.pf-rotation-ticks button:is(:hover,:focus-visible,[aria-pressed="true"]){color:#36543d;text-decoration:underline;text-underline-offset:3px}
 .pf-visual-designer .pf-layer-controls[data-layer-kind="text"] .pf-mobile-rotate{display:none}
 
 /* Keep text alignment and print-area centering in one compact row. */
