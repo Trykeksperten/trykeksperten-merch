@@ -96,6 +96,7 @@ import { publicCatalog } from './lib/catalog.mjs';
 import {sanitizeDesignLine} from './lib/design-validation.mjs';
 import {loadCatalogIndex,loadPFProduct,loadProductCatalog} from './lib/pf-catalog-store.mjs';
 import {seoPage,seoHead,seoMain,sitemapXML,robotsTXT} from './dist/seo-pages.mjs';
+import {homeHeroImage} from './dist/home-hero.mjs';
 import {parsePFPlacementSVG,stripPFPlacementGuide,highlightPFPlacementGuide} from './lib/pf-placement.mjs';
 const root=resolve(fileURLToPath(new URL('./dist/',import.meta.url)));
 const pdfRoot=resolve(fileURLToPath(new URL('./node_modules/pdfjs-dist/build/',import.meta.url)));
@@ -556,7 +557,7 @@ const handleRequest=async(req,res)=>{
   const commerce=(await publicLaunchConfiguration()).ordersEnabled&&visible&&checkout.ready&&checkout.mode==='live'?await (async()=>{const {prices,rules}=await loadPricing();return {prices:listPFProductPrices(catalog,prices,rules),stock:listPFStock(catalog,await loadStock()),checkout};})():null;
   const page=seoPage(path,legalURL.search,catalog,detail,commerce);
   const template=await readFile(file,'utf8');
-  const html=template.replace('<title>Smerch</title>',`<title>${page.title.replaceAll('&','&amp;').replaceAll('<','&lt;')}</title>${seoHead(page)}${path==='/'?'<link rel="preload" as="image" href="/assets/smerch-orange-tote-lifestyle-960.jpg" imagesrcset="/assets/smerch-orange-tote-lifestyle-640.jpg 640w, /assets/smerch-orange-tote-lifestyle-960.jpg 960w, /assets/smerch-orange-tote-lifestyle-1280.jpg 1280w, /assets/smerch-orange-tote-lifestyle.jpg 1536w" imagesizes="100vw" fetchpriority="high">':''}`).replace('<main id="main" tabindex="-1" data-loading><div class="wrap loading">Indlæser produkter…</div></main>',`<main id="main" tabindex="-1" data-loading>${seoMain(page,catalog)}</main>`);
+  const html=template.replace('<title>Smerch</title>',`<title>${page.title.replaceAll('&','&amp;').replaceAll('<','&lt;')}</title>${seoHead(page)}${path==='/'?`<link rel="preload" as="image" href="${homeHeroImage}" fetchpriority="high">`:''}`).replace('<main id="main" tabindex="-1" data-loading><div class="wrap loading">Indlæser produkter…</div></main>',`<main id="main" tabindex="-1" data-loading>${seoMain(page,catalog)}</main>`);
   const data=Buffer.from(html);res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache','Content-Length':data.length}).end(req.method==='HEAD'?undefined:data);return;
  }
  const data=await readFile(file),extension=extname(file),cacheControl=['.html','.css','.mjs','.js'].includes(extension)?'no-cache':'public, max-age=604800, stale-while-revalidate=86400';
