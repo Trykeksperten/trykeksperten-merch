@@ -1,7 +1,7 @@
 import {brandLogoURL} from './brand-logos.mjs';
 import {productLoading} from './product-loading.mjs';
 import {shopProducts} from './pf-visibility.mjs';
-import {homeHero,homeHeroImage} from './home-hero.mjs';
+import {homeHero} from './home-hero.mjs';
 // Shared by the HTTP response and client-side navigation. Keep metadata tied to the visible page.
 import {categoryEditorial,productEditorial} from './seo-copy.mjs';
 import {canonicalSubcategory} from './product-groups.mjs?v=23';
@@ -24,7 +24,7 @@ export function verifiedProductOffer(product,priceData,stockData,checkout){
 }
 export function seoPage(path,search='',catalog={products:[],brands:[]},detail=null,commerce=null){
  const params=new URLSearchParams(search),products=catalog?.products||[],brands=catalog?.brands||[];
- let title='Premium merchandise med logo | Smerch',description='Find merchandise til virksomheder: drikkeflasker, tasker, tekstil og mere. Vælg produkt, tilføj logo og godkend korrektur før produktion.',canonical=origin+'/',heading='Merchandise med logo',image=origin+homeHeroImage,robots='index,follow,max-image-preview:large',kind='website',product=null;
+ let title='Premium merchandise med logo | Smerch',description='Find merchandise til virksomheder: drikkeflasker, tasker, tekstil og mere. Vælg produkt, tilføj logo og godkend korrektur før produktion.',canonical=origin+'/',heading='Merchandise med logo',image=origin+'/assets/smerch-forside3.jpg',robots='index,follow,max-image-preview:large',kind='website',product=null;
  if(path==='/produkter'){
   const group=params.get('kategori'),subcategory=canonicalSubcategory(params.get('underkategori')),brandId=params.get('brand'),brand=brands.find(item=>item.id===brandId);
   const validGroup=groups[group],validSubcategory=validGroup&&products.some(item=>item.shopCategory===group&&item.category===subcategory),validBrand=brand&&products.some(item=>item.brandId===brandId);
