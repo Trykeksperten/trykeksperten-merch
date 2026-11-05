@@ -1,9 +1,19 @@
-import {orderTasks,hasUnread} from './admin-order-attention.mjs';
+import {orderTasks,hasUnread,loadOrderAttention} from './admin-order-attention.mjs';
 import {captureWarning,appendCaptureWarning} from './admin-capture-warning.mjs';
 import {matchesOrder} from './order-search.mjs';
 import {appendOrderSummaryInfo,appendOrderSummaryState,assembleOrderSummaryCard} from './admin-order-summary.mjs?v=capture-warning-1';
 import {mockupsForPfOrder,appendMockupOverview} from './admin-mockups.mjs?v=4';
 import {nextStep,isTestOrder,dateTime,paymentLabel} from './admin-order-state.mjs';
+export async function loadAdminOrderQueue(api) {
+ const [orders,checkouts,automation]=await Promise.all([
+  api('/api/pf-orders').then(response=>response.json()),
+  api('/api/admin/checkouts').then(response=>response.json()),
+  api('/api/pf-orders/automation-settings').then(response=>response.json())
+ ]);
+ await loadOrderAttention(orders,api);
+ return {orders,checkouts,shipmentMails:automation.shipments||[]};
+}
+
 export function workQueue(orders,checkouts,mailRows=[]){return orders.filter(o=>!isTestOrder(o,checkouts.find(c=>c.id===o.checkoutId))).map(order=>{const checkout=checkouts.find(c=>c.id===order.checkoutId),[owner,next]=nextStep(order,checkout,mailRows),blockers=[...(order.attention?.finance?.summary?.problems||checkout?.finance?.problems||[]),...(order.proofIntakeProblems||[])];
  const paymentWarning=captureWarning(checkout);if(paymentWarning)blockers.push(paymentWarning.title);
  if(['needs_attention','needs_reconciliation'].includes(order.status))blockers.push(order.pfStatusInformation||'Afklar PF-status og hændelseslog.');

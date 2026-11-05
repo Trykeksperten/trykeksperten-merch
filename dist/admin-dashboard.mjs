@@ -1,8 +1,7 @@
-import {loadOrderAttention} from './admin-order-attention.mjs';
 import {renderFreight} from './admin-freight.mjs';
 import {mountAdminNavigation,bindAdminMenu} from './admin-navigation.mjs?v=attention-1';
 import {automationPanel} from './admin-automation.mjs';
-import {renderWorkQueue,queueCounts} from './admin-work-queue.mjs?v=attention-1';
+import {loadAdminOrderQueue,renderWorkQueue,queueCounts} from './admin-work-queue.mjs?v=shared-queue-1';
 import {orderList} from './admin-order-list.mjs?v=attention-1';
 import {mockupsForPfOrder,mockupsForCheckout,appendMockupOverview,appendMockup} from './admin-mockups.mjs?v=4';
 import {renderCompanies} from './admin-companies.mjs';
@@ -29,7 +28,11 @@ function render(){const title={freight:'Fragt og tilbud',actions:'Kræver handli
  if(view==='orders'){content.append(orderList(orders,checkouts,shipmentMails));return;}
  const box=panel('Status på PF-forbindelsen');box.append(el('p','PF’s ordre-Gateway, statusbeskeder og korrekturindbakke er adskilte trin. Automatisk korrekturgodkendelse kræver, at PF oplyser og aktiverer den konkrete kanal.'));api('/api/pf-orders/status').then(response=>response.json()).then(result=>{const state=el('p',result.ready?`Gateway: klar (${result.mode})`:`Gateway: ikke klar (${result.mode||'off'})`,'status '+(result.ready?'ready':'pending'));box.append(state);if(result.missing?.length){const list=el('ul');for(const name of result.missing)list.append(el('li',name));box.append(el('p','Mangler fra PF eller serveropsætning:'),list);}if(result.nextStep)box.append(el('p',result.nextStep,'muted'));if(result.ready&&result.mode==='test')box.append(link('Opret Gateway-testordre →','/admin/pf-orders'));}).catch(()=>box.append(el('p','Gateway-status kunne ikke hentes.','status pending')));box.append(el('p','Interne godkendelser frigiver ikke produktionen, før PF faktisk har kvitteret.','muted'));content.append(box);
 }
-async function load(){try{const session=await(await api('/api/admin/session')).json();if(session.role&&session.role!=='administrator'){location.href='/backoffice.html';return;}[orders,checkouts,marketing,withdrawals]=await Promise.all([api('/api/pf-orders').then(r=>r.json()),api('/api/admin/checkouts').then(r=>r.json()),api('/api/admin/marketing').then(r=>r.json()),api('/api/admin/withdrawals').then(r=>r.json())]);const automation=await(await api('/api/pf-orders/automation-settings')).json();shipmentMails=automation.shipments||[];await loadOrderAttention(orders,api);showApp();render();$('feedback').textContent='';}catch(error){$('feedback').textContent=error.message;if(error.message.includes('Administratoradgang'))showLogin();}}
+async function load(){try{const session=await(await api('/api/admin/session')).json();if(session.role&&session.role!=='administrator'){location.href='/backoffice.html';return;}const [queue,marketingRows,withdrawalRows]=await Promise.all([
+ loadAdminOrderQueue(api),
+ api('/api/admin/marketing').then(response=>response.json()),
+ api('/api/admin/withdrawals').then(response=>response.json())
+]);({orders,checkouts,shipmentMails}=queue);marketing=marketingRows;withdrawals=withdrawalRows;showApp();render();$('feedback').textContent='';}catch(error){$('feedback').textContent=error.message;if(error.message.includes('Administratoradgang'))showLogin();}}
 const menu=bindAdminMenu({shell:$('admin-app'),button:$('menu-toggle'),sidebar:$('admin-nav')}),navigation=mountAdminNavigation($('admin-nav'),{navigate:key=>{view=key;history.pushState(null,'',key==='overview'?'/admin':'/admin#'+key);menu.close();render();$('page-title').focus();},onLogout:async()=>{try{await api('/api/admin/logout','POST');}finally{location.assign('/');}}});$('page-title').tabIndex=-1;
 document.getElementById('admin-login').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,data=new FormData(form);try{await api('/api/admin/login','POST',{username:String(data.get('username')||'').trim(),password:String(data.get('password')||'')});form.elements.password.value='';await load();}catch(error){form.elements.password.value='';$('login-error').textContent=error.message;}});
 $('refresh').onclick=()=>load();
