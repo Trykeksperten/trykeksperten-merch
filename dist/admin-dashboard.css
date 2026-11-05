@@ -23,3 +23,74 @@
 .sidebar nav details summary{color:#34473e}.sidebar nav details a{color:#34473e}.sidebar nav details{margin-top:18px;border-top:1px solid #dce1d9;padding-top:12px}.sidebar nav details[open]{background:#f6f7f3;border-radius:12px}#content form button{justify-self:start;padding:12px 22px;border-radius:24px;border:0;background:#c85120;color:#fff}#content form label:has(input[type=checkbox]){display:flex;align-items:center}
 
 .bank-payment{margin-top:16px;border:1px solid #d5ded7;border-radius:12px;padding:14px;background:#f6f8f5}.bank-payment summary{font-weight:600;cursor:pointer}.bank-payment form{display:grid;gap:12px;margin:16px 0}.bank-payment label{display:grid;gap:6px}.bank-payment input:not([type=checkbox]){width:100%;min-width:0;padding:10px;border:1px solid #cbd4cd;border-radius:8px}.bank-payment label:has(input[type=checkbox]){display:flex;align-items:center;gap:8px}.bank-payment button{padding:10px 14px;border:1px solid #a1b2a3;border-radius:8px;background:#385740;color:#fff;cursor:pointer}.bank-payment a{display:inline-block;margin:8px 0}.bank-payment p{overflow-wrap:anywhere}
+
+.accounting-view {
+ display:grid;
+ grid-template-columns:minmax(0,1fr);
+ gap:.625rem;
+ container-type:inline-size;
+}
+#content .accounting-view form {
+ padding:.625rem .75rem;
+ gap:.5rem;
+ border-radius:10px;
+}
+#content .accounting-period {
+ display:flex;
+ flex-wrap:wrap;
+ align-items:end;
+ max-width:none;
+}
+#content .accounting-view form label {
+ gap:.25rem;
+ font-size:.8125rem;
+}
+#content .accounting-period label[hidden] { display:none; }
+#content .accounting-view form :is(select,input:not([type="checkbox"])) {
+ min-height:36px;
+ padding:.375rem .625rem;
+ border-radius:8px;
+}
+#content .accounting-period input { width:9.75rem; }
+#content .accounting-view form button {
+ min-height:36px;
+ padding:.375rem .75rem;
+ font-size:.8125rem;
+}
+.accounting-status { margin:0; }
+.accounting-status:empty { display:none; }
+#content .accounting-view .panel {
+ margin:0 0 .625rem;
+ padding:.625rem .75rem;
+ border-radius:10px;
+}
+.accounting-view .panel h2 { margin:0 0 .25rem; }
+.accounting-view .panel h3 { margin:.625rem 0 .25rem; font-size:.875rem; }
+.accounting-view .panel p { margin:.25rem 0; }
+.accounting-view .panel > form { margin-top:.5rem; }
+.accounting-view .panel form [role="status"]:empty { display:none; }
+.accounting-metrics {
+ display:grid;
+ grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:.375rem;
+ margin:.5rem 0;
+}
+.accounting-metrics div {
+ display:grid;
+ grid-template-rows:1fr auto;
+ padding:.375rem .5rem;
+ border:1px solid #dce2dd;
+ border-radius:.5rem;
+}
+.accounting-metrics dt { font-size:.75rem; line-height:1.3; overflow-wrap:anywhere; }
+.accounting-metrics dd { margin:.125rem 0 0; font-size:1rem; font-weight:600; }
+.accounting-table { overflow:auto; }
+.accounting-table table { width:100%; border-collapse:collapse; font-size:.8125rem; }
+.accounting-table :is(th,td) { padding:.375rem .5rem; border-bottom:1px solid #dce2dd; text-align:left; }
+.accounting-table :is(th,td):first-child { white-space:nowrap; }
+@container (max-width:40rem) {
+ .accounting-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (pointer:coarse) {
+ #content .accounting-view form :is(button,select,input:not([type="checkbox"])) { min-height:44px; }
+}

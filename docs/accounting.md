@@ -1,0 +1,28 @@
+# Smerch Regnskab
+
+Åbn **Regnskab** i administrationen. Administratoren ser også **Integrationer** og kan oprette en separat bogholder via **Brugere** i medarbejderportalen. Bogholderen kan læse rapporter og bilag og gemme en månedsafstemning i Smerchs validerede SQLite-arbejdsområde. API'erne kontrollerer rolle og virksomhed; bogholderen kan ikke administrere brugere eller integrationer. På en installation med den ældre JSON-lagring er rapport og eksport tilgængelig for administratoren. Lagring af månedsafstemninger og særskilte logins kræver, at den eksisterende SQLite-migrering er afprøvet og taget i brug. Aktivér ikke lagringsskiftet blot for at prøve siden.
+
+## Brug og eksport
+
+Vælg **Måned** for en kalendermåned eller **Periode** for et valgfrit datointerval. Begge datoer er med i perioden, og JSON-eksporten følger det valgte udsnit. En periode kan bruges til rapportering på tværs af måneder; gemte afstemninger hører til en enkelt kalendermåned.
+
+1. Vælg en afsluttet måned. Sammenhold registrerede afsendelser og korrektioner med fakturaer og øvrige bilag, og kontrollér Quickpay-hævninger og refunderinger særskilt.
+2. Sammenhold **Samlet pr. udbetaling** med Clearhaus-afregninger og bankkontoudtog. Registrér kun den enkelte ordres andel under ordredetaljer. Brug samme afregningsreference, bankreference og bankens udbetalingsdato for alle andele af samme udbetaling. En historisk andel uden dato vises særskilt og er udeladt af månedens udbetalinger.
+3. Angiv afstemningsreferencen og gem perioden. Systemet gemmer den viste rapport med versionsnummer, hash, dato og ansvarlig bruger i revisionssporet. Ændrer kildedata sig, står perioden som ændret, indtil den gennemgås igen. Den tidligere version kan stadig hentes. Afstemning er ikke godkendelse til bogføring.
+
+JSON-eksporten `smerch.accounting.v1` bruger heltal i øre og dansk lokal dato. Den har stabile kilde-id'er, ordrenumre, fakturareferencer, afsendelses-, transaktions-, betalings- og udbetalingsdatoer efter kildens oplysninger, Quickpay-betalings-id, Quickpay-operation og ordre-reference, bank- og Clearhaus-referencer, moms og beløb samt registrerede afregningsgebyrer, tilbageholdelser, reguleringer og refunderinger. Bilag er særskilte downloads med SHA-256 af originalen; eksporten medtager referencer og hash. Gem de relevante bilag sammen med et arkiveret grundlag, hvis kildesystemet kan ændre eller fjerne en mail. PDF-bilag i salgsregistret ændres ikke af denne funktion.
+
+Omsætning er her afsendt salg og registrerede omsætningskorrektioner i webshoppens salgsregister. Quickpay-hævninger, refunderinger og bankudbetalinger er selvstændige pengestrømme, ikke yderligere omsætning. Perioderne kan være forskellige. Rapporten er ikke en kontoplan, en komplet hovedbog eller en erstatning for underliggende bilag. Clearhaus vises ud fra registrerede andele; der hentes ingen bank- eller Clearhaus-kontoudtog. Rapporten omfatter ikke f.eks. manuelle tilbud, omkostninger og bogførte poster uden for webshoppens kilder. Gebyrer og andre beløb uden struktureret data skal afstemmes særskilt.
+
+## Senere adapter til e-conomic
+
+Regnskabssektionen viser **e-conomic – Ikke tilsluttet**. Den kalder ingen eksterne regnskabs-API'er. En eventuel særskilt, ældre fakturaudsteder har sin egen opsætning; regnskabssektionen bruger eller aktiverer den ikke.
+
+Den kommende adapter skal arbejde fra en version af et afstemt grundlag. Den skal omsætte grundlaget til balancerede kladdeposteringer efter en godkendt, versionsstyret kontotilknytning for omsætning, moms, Quickpay/Clearhaus-mellemregning, gebyrer, refunderinger og bank. Konfigurér aftale, regnskabsår, kladde og momskoder; hent og kontrollér gyldige konti/koder. Fastlæg sammen med bogholderen hvilke poster der overføres pr. transaktion, og hvilke der eventuelt samles pr. måned. Bevar bilag og kildekobling i begge tilfælde, og afgræns ordrer og fakturaer, der allerede er bogført uden for adapteren.
+
+- Brug e-conomics officielle [Accounts API](https://apis.e-conomic.com/accountsapi/redoc.html) til kontoplan, [Journals API](https://apis.e-conomic.com/journalsapi/redoc.html) til kladder og separat bogføring, og [Documents API](https://apis.e-conomic.com/documentsapi/redoc.html) til relevante dokumenter. Verificér adgange, momskoder, kobling til bilagsnummer/regnskabsår og idempotens mod den konkrete e-conomic-aftale før ibrugtagning. Opbevar App Secret Token og Agreement Grant Token i hemmelighedslager på serveren.
+- Opret særskilte rettigheder til opsætning, godkendelse og overførsel. En fremtidig godkendelse skal binde den konkrete version, kontotilknytning, bogføringsmetode og hash af det gennemgåede bogføringsforslag. Afstemning eller en ny periodeversion giver ikke i sig selv ret til at sende.
+- Databasen har tabeller til godkendelser, overførselsstatus, eksterne referencer og unikke krav på kilde-id pr. aftale. Reservér id'er atomisk før afsendelse: en samlet post skal også reservere alle underliggende id'er, så samme salg ikke kan sendes via begge metoder. Knyt efterfølgende refunderinger og korrektioner til egne kilde-id'er og originalreference. Skeln mellem informationsbilag og posteringer.
+- Gem status, fejl og ekstern reference for hvert forsøg; brug det samme idempotens-id ved en sikker gentagelse. API’ernes dokumenterede idempotenscache er én time, så Smerch skal bevare sin egen beskyttelse derefter. Ved timeout med ukendt resultat skal adapteren først afstemme mod e-conomic. Den må ikke blindt gentage kaldet eller frigive de reserverede kilde-id'er. Vis status og reelle fejl for relevante roller uden at vise tokens eller følsomme rå API-svar.
+
+Der er ingen aktiv adapter, opsætningsformular, afsendelsesrettighed eller automatisk bogføring i denne version.

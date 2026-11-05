@@ -1,5 +1,6 @@
+import {renderAccounting} from './admin-accounting.mjs?v=2';
 import {renderFreight} from './admin-freight.mjs';
-import {mountAdminNavigation,bindAdminMenu} from './admin-navigation.mjs?v=attention-1';
+import {mountAdminNavigation,bindAdminMenu} from './admin-navigation.mjs?v=accounting-1';
 import {automationPanel} from './admin-automation.mjs';
 import {loadAdminOrderQueue,renderWorkQueue,queueCounts} from './admin-work-queue.mjs?v=shared-queue-1';
 import {orderList} from './admin-order-list.mjs?v=attention-1';
@@ -8,7 +9,7 @@ import {renderCompanies} from './admin-companies.mjs';
 import {proofQueueLabel} from './proof-status.mjs';
 import {renderStatistics} from './admin-statistics.mjs';
 import {renderProducts} from './admin-products.mjs?v=4';
-const $=id=>document.getElementById(id),content=$('content');let orders=[],checkouts=[],marketing=[],withdrawals=[],shipmentMails=[],view='overview';
+const $=id=>document.getElementById(id),content=$('content');let orders=[],checkouts=[],marketing=[],withdrawals=[],shipmentMails=[],view='overview',role=null,operationsLoaded=false;
 const statusText={prepared:'Klar til PF',confirmed:'PF har bekræftet ordren',gateway_accepted:'PF har modtaget',awaiting_proof:'Afventer korrektur',proof_received:'Til gennemgang',approval_pending_pf:'Afventer PF-kvittering',revision_requested:'Ændring ønsket',approval_recorded:'PF-godkendelse registreret',processing:'Under behandling',shipped:'Afsendt',needs_attention:'Kræver opmærksomhed',needs_reconciliation:'Kræver afstemning',cancelled:'Annulleret'};
 function el(tag,text,className){const node=document.createElement(tag);if(text!==undefined)node.textContent=String(text);if(className)node.className=className;return node;}
 function link(text,href,light=false){const a=el('a',text,'action'+(light?' light':''));a.href=href;return a;}
@@ -16,7 +17,8 @@ function panel(title){const item=el('section',undefined,'panel');item.append(el(
 async function api(path,method='GET',body){const response=await fetch(path,{method,credentials:'same-origin',headers:{...(method==='POST'?{'X-Smerch-Admin':'1'}:{}),...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,cache:'no-store'});if(!response.ok){let data;try{data=await response.json();}catch{}throw Error(data?.error||`HTTP ${response.status}`);}return response;}
 function showLogin(){document.getElementById('login-view').hidden=false;document.getElementById('admin-app').hidden=true;}
 function showApp(){document.getElementById('login-view').hidden=true;document.getElementById('admin-app').hidden=false;}
-function render(){const title={freight:'Fragt og tilbud',actions:'Kræver handling',production:'Produktion',deliveries:'Leveringer',blocked:'Fejl og mangler',automation:'Automatik og beskeder',companies:'Virksomheder',statistics:'Statistik',products:'Produkter',overview:'I dag',proofs:'Korrekturer',orders:'Alle ordrer',integration:'PF-integration',marketing:'Kundekartotek',withdrawals:'Anmodninger om fortrydelse'}[view];$('page-title').textContent=title;navigation.update(view,queueCounts(orders,checkouts,shipmentMails));document.title=title+' · Smerch';content.replaceChildren();
+function render(){if(role==='accountant')view='accounting';const title={accounting:'Regnskab',freight:'Fragt og tilbud',actions:'Kræver handling',production:'Produktion',deliveries:'Leveringer',blocked:'Fejl og mangler',automation:'Automatik og beskeder',companies:'Virksomheder',statistics:'Statistik',products:'Produkter',overview:'I dag',proofs:'Korrekturer',orders:'Alle ordrer',integration:'PF-integration',marketing:'Kundekartotek',withdrawals:'Anmodninger om fortrydelse'}[view];$('page-title').textContent=title;navigation.update(view,queueCounts(orders,checkouts,shipmentMails));document.title=title+' · Smerch';content.replaceChildren();
+ if(view==='accounting'){renderAccounting(content,api);return;}
  if(view==='freight'){renderFreight(content,api);return;}
  if(view==='automation'){automationPanel(content,api);return;}
  if(['overview','actions','production','deliveries','blocked','proofs'].includes(view)){renderWorkQueue(content,orders,checkouts,view,shipmentMails);return;}
@@ -28,14 +30,16 @@ function render(){const title={freight:'Fragt og tilbud',actions:'Kræver handli
  if(view==='orders'){content.append(orderList(orders,checkouts,shipmentMails));return;}
  const box=panel('Status på PF-forbindelsen');box.append(el('p','PF’s ordre-Gateway, statusbeskeder og korrekturindbakke er adskilte trin. Automatisk korrekturgodkendelse kræver, at PF oplyser og aktiverer den konkrete kanal.'));api('/api/pf-orders/status').then(response=>response.json()).then(result=>{const state=el('p',result.ready?`Gateway: klar (${result.mode})`:`Gateway: ikke klar (${result.mode||'off'})`,'status '+(result.ready?'ready':'pending'));box.append(state);if(result.missing?.length){const list=el('ul');for(const name of result.missing)list.append(el('li',name));box.append(el('p','Mangler fra PF eller serveropsætning:'),list);}if(result.nextStep)box.append(el('p',result.nextStep,'muted'));if(result.ready&&result.mode==='test')box.append(link('Opret Gateway-testordre →','/admin/pf-orders'));}).catch(()=>box.append(el('p','Gateway-status kunne ikke hentes.','status pending')));box.append(el('p','Interne godkendelser frigiver ikke produktionen, før PF faktisk har kvitteret.','muted'));content.append(box);
 }
-async function load(){try{const session=await(await api('/api/admin/session')).json();if(session.role&&session.role!=='administrator'){location.href='/backoffice.html';return;}const [queue,marketingRows,withdrawalRows]=await Promise.all([
+async function load(){try{const session=await(await api('/api/admin/session')).json();role=session.role;if(role==='accountant'){view='accounting';history.replaceState(null,'','/admin#accounting');mountNavigation(['accounting']);showApp();render();$('feedback').textContent='';return;}if(role&&role!=='administrator'){location.href='/backoffice.html';return;}if(view==='accounting'){showApp();render();$('feedback').textContent='';return;}const [queue,marketingRows,withdrawalRows]=await Promise.all([
  loadAdminOrderQueue(api),
  api('/api/admin/marketing').then(response=>response.json()),
  api('/api/admin/withdrawals').then(response=>response.json())
-]);({orders,checkouts,shipmentMails}=queue);marketing=marketingRows;withdrawals=withdrawalRows;showApp();render();$('feedback').textContent='';}catch(error){$('feedback').textContent=error.message;if(error.message.includes('Administratoradgang'))showLogin();}}
-const menu=bindAdminMenu({shell:$('admin-app'),button:$('menu-toggle'),sidebar:$('admin-nav')}),navigation=mountAdminNavigation($('admin-nav'),{navigate:key=>{view=key;history.pushState(null,'',key==='overview'?'/admin':'/admin#'+key);menu.close();render();$('page-title').focus();},onLogout:async()=>{try{await api('/api/admin/logout','POST');}finally{location.assign('/');}}});$('page-title').tabIndex=-1;
+]);({orders,checkouts,shipmentMails}=queue);marketing=marketingRows;withdrawals=withdrawalRows;operationsLoaded=true;showApp();render();$('feedback').textContent='';}catch(error){$('feedback').textContent=error.message;if(error.message.includes('Administratoradgang'))showLogin();}}
+const menu=bindAdminMenu({shell:$('admin-app'),button:$('menu-toggle'),sidebar:$('admin-nav')});
+function renderCurrentView(){if(view==='accounting'||operationsLoaded||role==='accountant')render();else void load();}
+let navigation;function mountNavigation(onlyViews){navigation=mountAdminNavigation($('admin-nav'),{onlyViews,navigate:key=>{view=key;history.pushState(null,'',key==='overview'?'/admin':'/admin#'+key);menu.close();renderCurrentView();$('page-title').focus();},onLogout:async()=>{try{await api('/api/admin/logout','POST');}finally{location.assign('/');}}});}mountNavigation();$('page-title').tabIndex=-1;
 document.getElementById('admin-login').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,data=new FormData(form);try{await api('/api/admin/login','POST',{username:String(data.get('username')||'').trim(),password:String(data.get('password')||'')});form.elements.password.value='';await load();}catch(error){form.elements.password.value='';$('login-error').textContent=error.message;}});
 $('refresh').onclick=()=>load();
-view=['freight','actions','production','deliveries','blocked','automation','companies','statistics','products','proofs','orders','integration','marketing','withdrawals'].includes(location.hash.slice(1))?location.hash.slice(1):'overview';api('/api/admin/session').then(response=>response.json()).then(state=>state.authenticated?load():showLogin()).catch(showLogin);
+view=['freight','actions','production','deliveries','blocked','automation','companies','statistics','products','proofs','orders','integration','marketing','withdrawals','accounting'].includes(location.hash.slice(1))?location.hash.slice(1):'overview';api('/api/admin/session').then(response=>response.json()).then(state=>state.authenticated?load():showLogin()).catch(showLogin);
 
-window.addEventListener('hashchange',()=>{const requested=location.hash.slice(1)||'overview';if(['freight','overview','actions','production','deliveries','blocked','automation','orders','proofs','companies','statistics','products','integration','marketing','withdrawals'].includes(requested)){view=requested;render();}});
+window.addEventListener('hashchange',()=>{const requested=location.hash.slice(1)||'overview';if(['freight','overview','actions','production','deliveries','blocked','automation','orders','proofs','companies','statistics','products','integration','marketing','withdrawals','accounting'].includes(requested)){view=requested;renderCurrentView();}});

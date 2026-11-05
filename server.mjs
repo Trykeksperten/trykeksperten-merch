@@ -25,6 +25,7 @@ import {retryProofMailRecord} from './lib/proof-mail.mjs';
 import {automationSettings,saveAutomationSettings} from './lib/automation-settings.mjs';
 import {shipmentMailStatus,sendShipmentMail,reconcileShipmentMail,processShipmentMail} from './lib/shipment-mail.mjs';
 import {sendOrderDocument} from './lib/order-document-send.mjs';
+import {accountingHTTP} from './lib/accounting/http.mjs';
 import {backofficeHTTP} from './lib/backoffice/http.mjs';
 import {databaseEnabled,databaseHealth,assertStorageMode} from './lib/backoffice/database.mjs';
 import {importLegacy} from './lib/backoffice/migration.mjs';
@@ -145,6 +146,7 @@ const handleRequest=async(req,res)=>{
   json(res,200,{scope:'process_invocations',workers:workerMonitor.snapshot(),backup:backupRuntime.status(),network:clientAddressDiagnostics(req),notes:['Invocation success does not confirm delivery or domain queue completion.','State resets on process restart; external alerts and backup monitoring are not configured by this endpoint.']});return;
  }
  const legalURL=new URL(req.url,'http://localhost');
+ if(await accountingHTTP(req,res,legalURL,{readJSON,json}))return;
  const customerPath=/^\/api\/customer-proofs\/(ord-[a-f0-9-]{36})(?:\/(file|decision))?$/.exec(legalURL.pathname);
  if(customerPath){
   res.setHeader('Referrer-Policy','no-referrer');
@@ -367,7 +369,7 @@ const handleRequest=async(req,res)=>{
     else if(input.action==='accountant'){const row=await queueAccountantBasis(id,input.shipmentKey);json(res,200,await sendFinanceMail(id,row.key));}
     else if(input.action==='dismiss_accountant_basis')json(res,200,await dismissAccountantBasis(id,input.key,{actor:adminSessionActor(req)}));
     else if(input.action==='receipt')json(res,200,await sendFinanceMail(id,input.key,{confirmedNotSent:input.confirmedNotSent===true}));
-    else json(res,200,await updateFinance(id,input));return;
+    else json(res,200,await updateFinance(id,input,{actor:adminSessionActor(req)}));return;
    }json(res,405,{error:'Handlingen er ikke tilladt.'});
   }catch(e){json(res,400,{error:e.message});}return;
  }
