@@ -8,6 +8,7 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {randomUUID} from 'node:crypto';
 import {createServer} from 'node:net';
+import {PDFDocument} from 'pdf-lib';
 import {bootstrapAdmin,passwordHash,saveUser} from '../lib/backoffice/security.mjs';
 import {closeDatabases,db} from '../lib/backoffice/database.mjs';
 import {saveRecord} from '../lib/backoffice/records.mjs';
@@ -73,6 +74,10 @@ test('accounting HTTP enforces roles and original documents; reconciliation is v
  assert.equal((await get()).status,401);
  const staff=await login('test-admin'),books=await login('test-accountant'),sales=await login('test-sales');
  assert.equal((await get('/export',sales)).status,403);
+ assert.equal((await get('/sales-export')).status,401);
+ assert.equal((await get('/sales-export',sales)).status,403);
+ assert.equal((await get('/sales-export.pdf')).status,401);
+ assert.equal((await get('/sales-export.pdf',sales)).status,403);
  assert.equal((await fetch(base+'/api/backoffice/users',{headers:{cookie:books}})).status,403);
  const overview=async cookie=>{const r=await get('',cookie);assert.equal(r.status,200);assert.equal(r.headers.get('cache-control'),'private, no-store');return r.json();};
  const start=await overview(books);
@@ -146,4 +151,61 @@ test('accounting HTTP enforces roles and original documents; reconciliation is v
  assert.equal(exportedRange.to,dates.to);
  assert.equal((await fetch(base+path+'/reconcile?'+new URLSearchParams(dates),{method:'POST',
   headers:{cookie:books,origin:base,'content-type':'application/json','x-smerch-admin':'1'},body:JSON.stringify(confirmation)})).status,400);
+
+ await withLedger(data=>{
+  const f=ledgerOrder(data,orderId);
+  f.documents.push({id:'credit-1',kind:'credit',original:'invoice-1',date:'2025-12-01',total:50,vat:10});
+  f.shipments.push({key:'shipment-2',shipDate:'2025-12-02',net:400,vat:100,total:500});
+ });
+ const monthCSV=await get('/sales-export',books);
+ assert.equal(monthCSV.status,200);
+ assert.equal(monthCSV.headers.get('content-type'),'text/csv; charset=utf-8');
+ assert.equal(monthCSV.headers.get('cache-control'),'private, no-store');
+ assert.equal(monthCSV.headers.get('content-disposition'),'attachment; filename="smerch-omsaetning-2025-11.csv"');
+ const csvHeader='\uFEFFDato;Ordrenummer;Type;Ekskl. moms (DKK);Moms (DKK);Inkl. moms (DKK)';
+ const sale='2025-11-02;"7911001";Afsendt salg;100,00;25,00;125,00';
+ const csvLines=async response=>Buffer.from(await response.arrayBuffer()).toString('utf8').split('\r\n');
+ assert.deepEqual(await csvLines(monthCSV),[csvHeader,sale,';;I alt;100,00;25,00;125,00','']);
+ const rangeCSV=await get('/sales-export',staff,dates);
+ assert.equal(rangeCSV.status,200);
+ assert.equal(rangeCSV.headers.get('content-disposition'),'attachment; filename="smerch-omsaetning-2025-11-02_til_2025-12-01.csv"');
+ assert.deepEqual(await csvLines(rangeCSV),[csvHeader,sale,'2025-12-01;"7911001";Kreditnota;-0,40;-0,10;-0,50',';;I alt;99,60;24,90;124,50','']);
+ assert.equal((await get('/sales-export',books,{...dates,period})).status,400);
+ const emptyCSV=await get('/sales-export',books,{period:'2025-10'});
+ assert.equal(emptyCSV.status,200);
+ assert.deepEqual(await csvLines(emptyCSV),[csvHeader,';;I alt;0,00;0,00;0,00','']);
+ for(const [selection,name,title] of [
+  [{period},'2025-11','november 2025'],
+  [dates,'2025-11-02_til_2025-12-01','02.11.2025 - 01.12.2025'],
+  [{period:'2025-10'},'2025-10','oktober 2025']
+ ]){
+  const response=await get('/sales-export.pdf',books,selection);
+  assert.equal(response.status,200);
+  assert.equal(response.headers.get('content-type'),'application/pdf');
+  assert.equal(response.headers.get('cache-control'),'private, no-store');
+  assert.equal(response.headers.get('content-disposition'),`attachment; filename="smerch-omsaetning-${name}.pdf"`);
+  const pdf=await PDFDocument.load(await response.arrayBuffer());
+  assert.equal(pdf.getPageCount(),1);
+  assert.equal(pdf.getTitle(),'Omsætningsrapport · '+title);
+ }
+
+ const userAction=(action,cookie,body,origin=base)=>fetch(base+'/api/backoffice/users/'+accountant.id+'/'+action,{
+  method:'POST',headers:{cookie,origin,'content-type':'application/json','x-smerch-admin':'1','idempotency-key':randomUUID()},body:JSON.stringify(body)
+ });
+ const newPassword='synthetic-accountant-password';
+ assert.equal((await userAction('password',books,{password:newPassword})).status,403);
+ assert.equal((await userAction('password',staff,{password:newPassword},'https://wrong.example.test')).status,401);
+ assert.equal((await userAction('password',staff,{password:'too-short'})).status,400);
+ assert.equal((await userAction('password',staff,{password:newPassword})).status,200);
+ assert.equal((await get('',books)).status,401);
+ const accountantLogin=password=>fetch(base+'/api/admin/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:'test-accountant',password})});
+ assert.equal((await accountantLogin(password)).status,401);
+ const relogin=await accountantLogin(newPassword);
+ assert.equal(relogin.status,200);
+ const newCookie=relogin.headers.get('set-cookie').split(';')[0];
+ assert.equal((await get('',newCookie)).status,200);
+ assert.equal((await userAction('disable',staff,{})).status,200);
+ assert.equal((await get('',newCookie)).status,401);
+ assert.equal((await accountantLogin(newPassword)).status,401);
+ assert.deepEqual(db().prepare("SELECT action FROM audit WHERE entity_type='user' AND entity_id=? ORDER BY rowid").all(accountant.id).map(r=>r.action),['created','password_changed','disabled']);
 });

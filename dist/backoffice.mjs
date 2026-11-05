@@ -11,7 +11,7 @@ function input(parent,label,value='',type='text'){const wrap=el('label',label),f
 function select(parent,label,choices,value){const wrap=el('label',label),field=el('select');for(const [v,t] of choices){const o=el('option',t);o.value=v;field.append(o);}field.value=value||choices[0]?.[0];wrap.append(field);parent.append(wrap);return field;}
 function form(parent,title,submit){const f=el('form');f.append(el('h3',title));const b=el('button','Gem');b.type='submit';let key=crypto.randomUUID();f.onsubmit=async e=>{e.preventDefault();b.disabled=true;say('');try{await submit();key=crypto.randomUUID();}catch(err){say(err.message);}finally{b.disabled=false;}};parent.append(f);return {f,done:()=>f.append(b),key:()=>key};}
 function table(parent,head,rows){if(!rows.length){parent.append(el('p','Ingen poster endnu.'));return;}const t=el('table'),h=el('tr');head.forEach(x=>h.append(el('th',x)));t.append(h);for(const values of rows){const row=el('tr');for(const value of values){const td=el('td');if(value instanceof Node)td.append(value);else td.textContent=value??'—';row.append(td);}t.append(row);}parent.append(t);}
-async function start(){try{actor=await api('/session');$('login').hidden=true;$('tabs').hidden=false;$('logout').hidden=false;$('identity').textContent=actor.username+' · '+name(actor.role);$('tabs').replaceChildren();for(const [title,fn,allowed] of [['Ordrer',orders,true],['Kunder',customerList,can('sales')],['Tilbud',quoteList,can('sales','customer')],['Produkter og priser',productList,can('sales')],['Brugere',userList,can()],['Drift',health,can()]])if(allowed)button($('tabs'),title,fn);if(can('accountant'))link($('tabs'),'Regnskab','/admin#accounting');if(location.hash.startsWith('#order='))await detail(decodeURIComponent(location.hash.slice(7)));else await orders();}catch(e){say(e.message);$('login').hidden=false;}}
+async function start(){try{actor=await api('/session');$('login').hidden=true;$('tabs').hidden=false;$('logout').hidden=false;$('identity').textContent=actor.username+' · '+name(actor.role);$('tabs').replaceChildren();for(const [title,fn,allowed] of [['Ordrer',orders,true],['Kunder',customerList,can('sales')],['Tilbud',quoteList,can('sales','customer')],['Produkter og priser',productList,can('sales')],['Brugere',userList,can()],['Drift',health,can()]])if(allowed)button($('tabs'),title,fn);if(can('accountant'))link($('tabs'),'Regnskab','/admin#accounting');if(location.hash==='#users'&&can())await userList();else if(location.hash.startsWith('#order='))await detail(decodeURIComponent(location.hash.slice(7)));else await orders();}catch(e){say(e.message);$('login').hidden=false;}}
 $('login').onsubmit=async e=>{e.preventDefault();const data=new FormData(e.target),r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(data))});if(r.ok)await start();else say('Login mislykkedes. Kontrollér oplysningerne.');};$('logout').onclick=async()=>{await fetch('/api/admin/logout',{method:'POST',headers:{'X-Smerch-Admin':'1'}});location.reload();};
 function page(title){const c=$('content');c.replaceChildren(el('h2',title));say('');return c;}
 async function customerList(){const c=page('Kunder');customers=await api('/customers');table(c,['Kunde','E-mail',''],customers.map(row=>{const tools=el('div');button(tools,'Redigér',()=>customerForm(c,row));return [row.name,row.email,tools];}));button(c,'Opret kunde',()=>customerForm(c,{}));}
@@ -35,6 +35,50 @@ async function detail(id){const o=await api('/orders/'+encodeURIComponent(id)),c
 }
 function messageForm(c,o){let audience,recipient,subject,text,attachment;const f=form(c,'Besked / intern note',async()=>{await api('/orders/'+o.id+'/messages',{audience:audience.value,recipient:recipient.value,subject:subject.value,text:text.value,documentId:attachment.value||undefined},f.key());await detail(o.id);});audience=select(f.f,'Modtagergruppe',[['internal','Intern note (ingen mail)'],['customer','Kunde'],['accountant','Bogholder'],['production','Produktion']]);recipient=input(f.f,'Modtagerens e-mail (ved afsendelse)');subject=input(f.f,'Emne','Smerch-ordre '+o.id);text=input(f.f,'Besked','','textarea');attachment=select(f.f,'Vedhæft dokument',[['','Intet bilag'],...o.documents.filter(d=>d.ready).map(d=>[d.id,(d.type==='basis'?'Fakturagrundlag':d.type==='receipt'?'Kvittering':'Forsendelsesbekræftelse')+' · v'+d.version])]);f.f.append(el('p','Kontrollér modtager og indhold. Kundemails kræver kundens registrerede adresse.'));f.done();for(const m of o.messages)c.append(el('p',`${date(m.created_at)} · ${m.audience} · ${name(m.status)} · ${m.subject}`));}
 async function documentForm(id,type,parent){const d=await api('/orders/'+id+'/document-draft?type='+type),fields=[];const f=form(parent,'Gennemse dokumentoplysninger',async()=>{for(const [obj,key,field,money] of fields)obj[key]=money?(field.value===''?null:Math.round(Number(field.value.replace(',','.'))*100)):key==='quantity'?Number(field.value):field.value;await api('/orders/'+id+'/documents',d,f.key());await detail(id);say('PDF’en er sat i kø. Opdatér dokumentstatus om et øjeblik.');});function add(obj,key,label,money=false){const value=money?(obj[key]===null?'':(obj[key]/100).toFixed(2)):obj[key];const field=input(f.f,label,value,['address','notes','paymentTerms'].includes(key)?'textarea':'text');if((type==='receipt'&&(money||key==='quantity'))||(type==='shipment'&&key==='quantity'))field.readOnly=true;fields.push([obj,key,field,money]);}f.f.append(el('p','Reference: '+d.reference+' · '+d.paymentStatus));for(const k of ['legalName','address','cvr','email','phone'])add(d.company,k,'Afsender · '+k);for(const k of ['name','contact','address','cvr','ean','email','reference'])add(d.customer,k,'Kunde · '+k);if(type==='shipment'){for(const k of ['deliveryAddress','shipDate','carrier','tracking'])add(d,k,k);}for(const [i,l]of d.lines.entries()){f.f.append(el('h4','Vare '+(i+1)));for(const k of ['description','variant','quantity','discount'])add(l,k,k);if(type!=='shipment')add(l,'net','Linjetotal ekskl. moms',true);}if(type!=='shipment'){add(d,'freight','Fragt ekskl. moms',true);add(d,'vat','Moms',true);add(d,'paymentTerms','Betalingsbetingelser');}add(d,'notes',type==='basis'?'Bemærkninger til bogholderen':'Bemærkninger til kunden');f.done();}
-async function userList(){const c=page('Brugere og roller'),rows=await api('/users');table(c,['Brugernavn','Rolle','Status',''],rows.map(u=>{const tools=el('div');if(u.id!==actor.id&&u.id!=='bootstrap-admin'&&u.enabled)button(tools,'Deaktivér',async()=>{await api('/users/'+u.id+'/disable',{});await userList();});return [u.username,name(u.role),u.enabled?'Aktiv':'Deaktiveret',tools];}));customers=await api('/customers');let username,password,role,customer;const f=form(c,'Opret bruger',async()=>{await api('/users',{username:username.value,password:password.value,role:role.value,customerId:customer.value},f.key());await userList();});username=input(f.f,'Brugernavn');password=input(f.f,'Adgangskode (mindst 12 tegn)','','password');password.autocomplete='new-password';role=select(f.f,'Rolle',Object.entries(labels).filter(([k])=>['administrator','sales','production','accountant','customer'].includes(k)));customer=select(f.f,'Kunde (kun ved kunderolle)',[['','Vælg kunde'],...customers.map(c=>[c.id,c.name])]);f.done();}
+async function userList(){
+ const c=page('Brugere og roller'),rows=await api('/users');
+ const passwordEditor=el('div');
+ table(c,['Brugernavn','Rolle','Status',''],rows.map(user=>{
+  const tools=el('div');
+  if(user.enabled&&user.id!==actor.id&&user.id!=='bootstrap-admin'){
+   if(user.role==='accountant')button(tools,'Skift adgangskode',()=>{
+    passwordEditor.replaceChildren();
+    const editor=form(passwordEditor,'Skift adgangskode for '+user.username,async()=>{
+     await api('/users/'+user.id+'/password',{password:nextPassword.value});
+     await userList();
+     say('Adgangskoden er ændret, og bogholderen skal logge ind igen.');
+    });
+    const nextPassword=input(editor.f,'Ny adgangskode (mindst 12 tegn)','','password');
+    nextPassword.autocomplete='new-password';
+    nextPassword.required=true;
+    nextPassword.minLength=12;
+    nextPassword.maxLength=200;
+    editor.done();
+    button(editor.f,'Annullér',()=>passwordEditor.replaceChildren());
+    nextPassword.focus();
+   });
+   button(tools,'Deaktivér',async()=>{
+    if(!window.confirm('Fjern loginadgangen for '+user.username+'?'))return;
+    await api('/users/'+user.id+'/disable',{});
+    await userList();
+    say('Loginadgangen er fjernet.');
+   });
+  }
+  return [user.username,name(user.role),user.enabled?'Aktiv':'Deaktiveret',tools];
+ }));
+ c.append(passwordEditor);
+ customers=await api('/customers');
+ const creator=form(c,'Opret bruger',async()=>{
+  await api('/users',{username:username.value,password:password.value,role:role.value,customerId:customer.value},creator.key());
+  await userList();
+ });
+ const username=input(creator.f,'Brugernavn');
+ const password=input(creator.f,'Adgangskode (mindst 12 tegn)','','password');
+ password.autocomplete='new-password';
+ const roles=Object.entries(labels).filter(([key])=>['administrator','sales','production','accountant','customer'].includes(key));
+ const role=select(creator.f,'Rolle',roles,location.hash==='#users'?'accountant':undefined);
+ const customer=select(creator.f,'Kunde (kun ved kunderolle)',[['','Vælg kunde'],...customers.map(c=>[c.id,c.name])]);
+ creator.done();
+}
 async function health(){const c=page('Drift'),[h,jobs]=await Promise.all([api('/health'),api('/jobs')]);c.append(el('p',`Database: ${h.integrity?'OK':'FEJL'} · Opgaver i kø: ${h.pendingJobs} · Kræver opmærksomhed: ${h.failedJobs}`));table(c,['Type','Status','Forsøg','Fejlkode','Tid'],jobs.map(j=>[j.kind,name(j.status),j.attempts,j.error_code,date(j.created_at)]));c.append(el('p','Mail med ukendt afsendelsesstatus genforsøges ikke automatisk. Afstem mailkontoen før ny afsendelse.'));}
 start();
