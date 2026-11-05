@@ -33,7 +33,6 @@ test('accounting HTTP enforces roles and original documents; reconciliation is v
  const credentials={SMERCH_ADMIN_USERNAME:'test-admin',SMERCH_ADMIN_PASSWORD_HASH:passwordHash(password)};
  bootstrapAdmin(credentials);
  const admin={id:'bootstrap-admin',companyId:'smerch',role:'administrator'};
- const accountant=saveUser(admin,{username:'test-accountant',role:'accountant',password});
  saveUser(admin,{username:'test-sales',role:'sales',password});
  const orderId='pay-'+randomUUID(),original='Synthetic payment receipt';
  const supplierId='ord-'+randomUUID();
@@ -72,7 +71,20 @@ test('accounting HTTP enforces roles and original documents; reconciliation is v
   return r.headers.get('set-cookie').split(';')[0];
  };
  assert.equal((await get()).status,401);
- const staff=await login('test-admin'),books=await login('test-accountant'),sales=await login('test-sales');
+ const staff=await login('test-admin'),sales=await login('test-sales');
+ const createAccountant=async cookie=>fetch(base+'/api/backoffice/users',{
+  method:'POST',headers:{cookie,origin:base,'content-type':'application/json','x-smerch-admin':'1','idempotency-key':randomUUID()},
+  body:JSON.stringify({username:'test-accountant',role:'accountant',password})
+ });
+ assert.notEqual((await createAccountant(sales)).status,200);
+ const created=await createAccountant(staff);
+ assert.equal(created.status,200);
+ const accountant=await created.json(),books=await login('test-accountant');
+ assert.equal(accountant.role,'accountant');
+ for(const path of ['/api/admin/products','/api/admin/invoices/status','/api/admin/marketing']){
+  const response=await fetch(base+path,{headers:{cookie:books}});
+  assert.ok([401,403].includes(response.status),path);
+ }
  assert.equal((await get('/export',sales)).status,403);
  assert.equal((await get('/sales-export')).status,401);
  assert.equal((await get('/sales-export',sales)).status,403);
@@ -82,6 +94,15 @@ test('accounting HTTP enforces roles and original documents; reconciliation is v
  const overview=async cookie=>{const r=await get('',cookie);assert.equal(r.status,200);assert.equal(r.headers.get('cache-control'),'private, no-store');return r.json();};
  const start=await overview(books);
  assert.equal(start.integration,undefined);
+ assert.equal(start.canReconcile,false);
+ assert.equal(start.reconciliationAvailable,false);
+ for(const resource of ['orders','customers','products','quotes','jobs','files/example','documents/example']){
+  assert.equal((await fetch(base+'/api/backoffice/'+resource,{headers:{cookie:books}})).status,403,resource);
+ }
+ for(const resource of ['orders/example/state','orders/example/payment','orders/example/invoice','orders/example/messages','orders/example/documents','products','customers','users']){
+  const response=await fetch(base+'/api/backoffice/'+resource,{method:'POST',headers:{cookie:books,origin:base,'content-type':'application/json','x-smerch-admin':'1','idempotency-key':randomUUID()},body:'{}'});
+  assert.equal(response.status,403,resource);
+ }
  assert.equal((await overview(staff)).integration.status,'not_connected');
  assert.equal(start.report.totals.payouts,12300);
  assert.equal(start.report.rows.find(row=>row.kind==='capture').orderNumber,'7911001');
@@ -97,11 +118,13 @@ test('accounting HTTP enforces roles and original documents; reconciliation is v
  assert.equal(await download.text(),original);
  assert.equal((await get('/document',books,{...params,digest:'0'.repeat(64)})).status,404);
  assert.equal((await get('/document',sales,params)).status,403);
- const post=(body,origin=base,selected=period)=>fetch(base+path+'/reconcile?period='+selected,{method:'POST',
-  headers:{cookie:books,origin,'content-type':'application/json','x-smerch-admin':'1'},body:JSON.stringify(body)});
+ const post=(body,origin=base,selected=period,cookie=staff)=>fetch(base+path+'/reconcile?period='+selected,{method:'POST',
+  headers:{cookie,origin,'content-type':'application/json','x-smerch-admin':'1'},body:JSON.stringify(body)});
  const confirmation={statementReference:'SYN-BANK-11',fingerprint:start.report.fingerprint,basisVersion:0,confirmed:true};
  assert.ok([401,403].includes((await post(confirmation,'https://wrong.example.test')).status));
  assert.equal((await post(confirmation,base,'2099-01')).status,409);
+ assert.equal((await post(confirmation,base,period,books)).status,403);
+ assert.equal(db().prepare('SELECT count(*) n FROM accounting_bases').get().n,0);
  const first=await post(confirmation);
  assert.equal(first.status,200);
  assert.equal((await first.json()).version,1);
@@ -121,7 +144,7 @@ test('accounting HTTP enforces roles and original documents; reconciliation is v
  assert.equal(old.totals.refunded,0);
  assert.equal((await overview(books)).versions[0].version,2);
  const audited=db().prepare("SELECT actor_id FROM audit WHERE entity_type='accounting_period' ORDER BY rowid").all();
- assert.deepEqual(audited.map(r=>r.actor_id),[accountant.id,accountant.id]);
+ assert.deepEqual(audited.map(r=>r.actor_id),[admin.id,admin.id]);
  assert.equal(db().prepare('SELECT count(*) n FROM accounting_transfers').get().n,0);
 
  await withLedger(data=>{

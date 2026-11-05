@@ -1,6 +1,6 @@
 # Smerch Regnskab
 
-Åbn **Regnskab** i administrationen. Administratoren ser også **Integrationer** og kan oprette en separat bogholder via **Brugere** i medarbejderportalen. Bogholderen kan læse rapporter og bilag og gemme en månedsafstemning i Smerchs validerede SQLite-arbejdsområde. API'erne kontrollerer rolle og virksomhed; bogholderen kan ikke administrere brugere eller integrationer. På en installation med den ældre JSON-lagring er rapport og eksport tilgængelig for administratoren. Lagring af månedsafstemninger og særskilte logins kræver, at den eksisterende SQLite-migrering er afprøvet og taget i brug. Aktivér ikke lagringsskiftet blot for at prøve siden.
+Åbn **Regnskab** i administrationen. Administratoren ser også **Integrationer** og kan oprette en separat bogholder via **Brugere** i medarbejderportalen. Bogholderen kan se omsætning for en dag, måned, et år eller en valgt periode, eksportere rapporten og slå ordrer op efter nummer eller reference. Øvrige rapporter og bilag ligger under Flere rapporter og afstemning. Bogholderen har læseadgang. Kun administratoren kan gemme en månedsafstemning i Smerchs validerede SQLite-arbejdsområde. API'erne kontrollerer rolle og virksomhed; bogholderen kan ikke administrere brugere eller integrationer. På en installation med den ældre JSON-lagring er rapport og eksport tilgængelig for administratoren. Lagring af månedsafstemninger og særskilte logins kræver, at den eksisterende SQLite-migrering er afprøvet og taget i brug. Aktivér ikke lagringsskiftet blot for at prøve siden.
 
 ## Brug og eksport
 

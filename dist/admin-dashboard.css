@@ -131,3 +131,18 @@
 @media (pointer:coarse) {
  #content a.accounting-download { min-height:44px; }
 }
+
+.accounting-sales-metrics { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.accounting-sales-metrics dd { font-size:clamp(1.05rem,2vw,1.4rem); }
+.accounting-search { display:grid; gap:.25rem; max-width:25rem; margin:.625rem 0; }
+.accounting-search input { width:100%; }
+.accounting-order-list details { border-bottom:1px solid #dce2dd; }
+.accounting-order-list summary,
+.accounting-more > summary { cursor:pointer; padding:.625rem .25rem; }
+.accounting-order-list summary span { margin-left:.75rem; font-size:.8125rem; }
+.accounting-pagination { display:flex; align-items:center; flex-wrap:wrap; gap:.5rem; margin-top:.625rem; font-size:.8125rem; }
+.accounting-pagination button { padding:.3rem .65rem; }
+.accounting-more > summary { margin-bottom:.375rem; font-weight:600; }
+@container (max-width:26rem) {
+ .accounting-sales-metrics { grid-template-columns:1fr; }
+}
