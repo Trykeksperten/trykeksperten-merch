@@ -97,3 +97,49 @@ test('a changed accountant recipient blocks automatic delivery and keeps the pro
  assert.equal(row.status,'blocked');
  assert.match(row.error,/Bogholdermodtageren er ændret/);
 });
+
+for(const failingRecipient of [null,'customer@example.invalid','bookkeeper@example.invalid']){
+ test(`automatic receipt copies share payment details and track failures separately: ${failingRecipient||'both succeed'}`,async()=>{
+  const order=await fixture(),attempts=[];
+  const options={
+   env:{...env,SMERCH_PAYMENT_RECEIPT_MAIL:'automatic'},fetchImpl:forbidden,
+   transport:{sendMail:async mail=>{
+    attempts.push(mail);
+    if(mail.to===failingRecipient)throw Error('Synthetic timeout');
+    return {accepted:[mail.to]};
+   }}
+  };
+  await capture(order,{pending:true});
+  await processSalesFinance(options);
+  assert.equal(attempts.length,0);
+  const payment=await capture(order);
+  await saveVerifiedPayment(await readCheckout(order.id),payment);
+  await processSalesFinance(options);
+  await processSalesFinance(options);
+  const customer=attempts.find(mail=>mail.to===order.shipping.email);
+  const accountant=attempts.find(mail=>mail.to===env.SMERCH_ACCOUNTANT_EMAIL);
+  assert.equal(attempts.length,2);
+  assert.notEqual(customer.messageId,accountant.messageId);
+  const details=mail=>mail.text.split('\n').slice(1,7);
+  assert.deepEqual(details(customer),details(accountant));
+  assert.match(customer.text,/Ordre nr:/);
+  assert.match(customer.text,/125,00 DKK/);
+  assert.match(customer.text,/Betalingsdato:/);
+  assert.ok(customer.text.includes(order.quickpayOrderId));
+  const ledgerRows=await rows(order.id);
+  assert.equal(ledgerRows.length,2);
+  for(const row of ledgerRows)assert.equal(row.status,row.to===failingRecipient?'uncertain':'sent');
+ });
+}
+
+test('an invalid accountant address is visible without blocking the customer receipt',async()=>{
+ const order=await fixture(),sent=[];
+ await capture(order);
+ const options={env:{...env,SMERCH_PAYMENT_RECEIPT_MAIL:'automatic',SMERCH_ACCOUNTANT_EMAIL:'invalid'},fetchImpl:forbidden,transport:mailer(sent)};
+ await processSalesFinance(options);
+ await processSalesFinance(options);
+ assert.deepEqual(sent.map(mail=>mail.to),[order.shipping.email]);
+ const blocked=(await rows(order.id)).find(row=>row.kind==='accountant_payment_receipt');
+ assert.equal(blocked.status,'blocked');
+ assert.match(blocked.error,/modtageradresse er ugyldig/);
+});
