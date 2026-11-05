@@ -94,3 +94,40 @@
 @media (pointer:coarse) {
  #content .accounting-view form :is(button,select,input:not([type="checkbox"])) { min-height:44px; }
 }
+
+.accounting-report-heading {
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ flex-wrap:wrap;
+ gap:.5rem 1rem;
+}
+.accounting-view .accounting-report-heading :is(h2,h3) { margin:0; }
+.accounting-table + .accounting-report-heading,
+.accounting-view .panel > p + .accounting-report-heading { margin-top:.75rem; }
+.accounting-downloads { display:flex; flex-wrap:wrap; gap:.375rem; }
+#content a.accounting-download {
+ display:inline-flex;
+ align-items:center;
+ gap:.35rem;
+ min-height:32px;
+ box-sizing:border-box;
+ padding:.25rem .625rem;
+ border:1px solid #9eb1a3;
+ border-radius:.5rem;
+ background:#edf4ee;
+ color:#20432d;
+ font-size:.8125rem;
+ font-weight:600;
+ text-decoration:none;
+ white-space:nowrap;
+}
+#content a.accounting-download:hover { background:#dcebe0; }
+#content a.accounting-download:focus-visible { outline:2px solid #20432d; outline-offset:2px; }
+.accounting-document-files details { margin-top:.375rem; }
+.accounting-document-files summary { cursor:pointer; }
+.accounting-document-files ul { padding-left:1.125rem; }
+.accounting-document-files li + li { margin-top:.375rem; }
+@media (pointer:coarse) {
+ #content a.accounting-download { min-height:44px; }
+}

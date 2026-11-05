@@ -189,6 +189,48 @@ test('accounting HTTP enforces roles and original documents; reconciliation is v
   assert.equal(pdf.getTitle(),'Omsætningsrapport · '+title);
  }
 
+ await persistCheckout({id:'pay-'+randomUUID(),paymentProvider:'bank_transfer',paymentMode:'live',
+  bankPayment:{invoiceNumber:'F-1',receipts:[{at:'2025-11-20',amount:2500,reference:'=TEST()'}]}});
+ const reportFile=(report,format,cookie=books,selection={period})=>get('/report-export',cookie,{...selection,report,format});
+ assert.equal((await reportFile('quickpay','csv','')).status,401);
+ assert.equal((await reportFile('quickpay','pdf',sales)).status,403);
+ assert.equal((await reportFile('constructor','csv')).status,400);
+ assert.equal((await reportFile('quickpay','html')).status,400);
+ assert.equal((await reportFile('quickpay','csv',books,{...dates,period})).status,400);
+ for(const [section,expected] of [
+  ['overblik',/"Omsætning inkl\. moms";124,50/],
+  ['quickpay',/"Refundering";"202";"103";"qp-9";-2,50/],
+  ['bankbetalinger',/"F-1";"'=TEST\(\)";25,00/],
+  ['clearhaus',/"clear-1";"bank-1";125,00;0,00;2,00;0,00;0,00;123,00/],
+  ['udbetalinger',/"clear-1";"bank-1";1;2,00;123,00/],
+  ['afregninger-uden-dato',/Ordrenummer;Afregningsreference/],
+  ['bilagsoversigt',/"Betalingskvittering";"receipt:202:101";"TXT"/],
+  ['datakontrol',/Fejlkode;Blokerer afstemning/]
+ ]){
+  const response=await reportFile(section,'csv',books,dates);
+  assert.equal(response.status,200);
+  assert.equal(response.headers.get('cache-control'),'private, no-store');
+  assert.equal(response.headers.get('content-disposition'),`attachment; filename="smerch-${section}-2025-11-02_til_2025-12-01.csv"`);
+  const lines=await csvLines(response);
+  assert.match(lines.join('\n'),expected);
+  assert.ok(!lines.some(line=>line.includes(original)));
+ }
+ const monthPayments=(await csvLines(await reportFile('quickpay','csv'))).join('\n');
+ assert.match(monthPayments,/"Hævning";"202";"101";"qp-9";125,00/);
+ assert.doesNotMatch(monthPayments,/"103"/);
+ for(const [section,selection,title] of [
+  ['clearhaus',{period},'Clearhaus-afstemning pr. ordre · november 2025'],
+  ['quickpay',dates,'Quickpay-betalinger · 2025-11-02 til 2025-12-01'],
+  ['bankbetalinger',{period},'Registrerede bankbetalinger · november 2025']
+ ]){
+  const response=await reportFile(section,'pdf',staff,selection);
+  assert.equal(response.status,200);
+  assert.equal(response.headers.get('content-type'),'application/pdf');
+  const pdf=await PDFDocument.load(await response.arrayBuffer());
+  assert.equal(pdf.getTitle(),title);
+  assert.equal(pdf.getPageCount(),1);
+ }
+
  const userAction=(action,cookie,body,origin=base)=>fetch(base+'/api/backoffice/users/'+accountant.id+'/'+action,{
   method:'POST',headers:{cookie,origin,'content-type':'application/json','x-smerch-admin':'1','idempotency-key':randomUUID()},body:JSON.stringify(body)
  });

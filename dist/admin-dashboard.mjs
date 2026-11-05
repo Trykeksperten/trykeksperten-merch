@@ -1,4 +1,4 @@
-import {renderAccounting} from './admin-accounting.mjs?v=3';
+import {renderAccounting} from './admin-accounting.mjs?v=4';
 import {renderFreight} from './admin-freight.mjs';
 import {mountAdminNavigation,bindAdminMenu} from './admin-navigation.mjs?v=accounting-1';
 import {automationPanel} from './admin-automation.mjs';
