@@ -13,12 +13,11 @@ export function financePanel(order,api,{onChanged=async()=>{}}={}){
  function button(label,fn){const b=el('button',label);b.type='button';b.onclick=fn;return b;}
  function field(form,label,name,value='',type='text'){const l=el('label',label),i=el('input');i.name=name;i.type=type;i.value=value;i.required=true;l.append(i);form.append(l);return i;}
  async function load(){try{const data=await(await api(url)).json();body.replaceChildren();const s=data.summary;
-  const reconciliation=data.accountingPurpose==='reconciliation';heading.textContent=reconciliation?'Betaling og bogholderkvittering':'Betaling og fakturagrundlag';
-  const accountantReceipt=data.mail.find(m=>m.kind==='accountant_payment_receipt');
+  const reconciliation=data.accountingPurpose==='reconciliation';heading.textContent=reconciliation?'Betaling og afstemning':'Betaling og fakturagrundlag';
   const overview=el('section');overview.className='finance-overview';
   const paid=s.captured>=s.ordered&&s.ordered>0,sent=basisDelivery(order.attention)?.status==='sent'||data.mail.find(m=>m.kind==='accountant_basis'&&m.status==='sent');
   overview.append(el('h3',paid?'Betalt – beløbet er hævet':s.captured>0?'Delvist hævet':'Betaling ikke registreret som hævet'),el('p','Hævet '+money(s.captured)+' af '+money(s.ordered)+(s.refunded?' · Refunderet '+money(s.refunded):'')));
-  overview.append(el('p',reconciliation?(accountantReceipt?.status==='sent'?'Betalingskvittering sendt til bogholderens Quickpay-afstemning. Ingen faktura skal udarbejdes.':'Betalingskvittering til bogholder afventer verificeret hævning eller afsendelse. Ingen faktura skal udarbejdes.'):sent?'Fakturagrundlag sendt til Financial Outsourcing.':data.shipments.some(m=>m.invoiceStatus==='issued')?'Faktura registreret fra Financial Outsourcing.':'Fakturagrundlag: afventer gennemgang og afsendelse.'));
+  overview.append(el('p',reconciliation?'Kortbetalinger afstemmes via månedsrapporterne i Regnskab.':sent?'Fakturagrundlag sendt til Financial Outsourcing.':data.shipments.some(m=>m.invoiceStatus==='issued')?'Faktura registreret fra Financial Outsourcing.':'Fakturagrundlag: afventer gennemgang og afsendelse.'));
   overview.append(el('p',!verified?'Kontrollér betalingsstatus før en hævning.':paid?'Betalingen er bekræftet. Financial Outsourcing håndterer bogføring og bankafstemning.':s.shipped===s.ordered&&s.ordered>0?'Ordren er afsendt. Hævning afventer behandling; se automatikstatus nedenfor.':'Betaling følger ordrens aftalte vilkår. Ved forudbetaling håndteres godkendelse og hævning under Korrektur.'));
   body.append(overview);
   body.append(el('p',data.configuration.enabled&&data.configuration.automaticCapture&&data.configuration.agreementConfirmed&&Number.isFinite(Date.parse(data.configuration.startAt))?'Automatisk hævning ved fuld afsendelse er aktiveret for omfattede ordrer. Forudbetaling følger korrekturflowet.':'Automatisk hævning kræver aktivering af økonomiflow, betalingsaftale og startdato i serveropsætningen.'));
@@ -26,14 +25,14 @@ export function financePanel(order,api,{onChanged=async()=>{}}={}){
 
   accounting.append(el('p',`${data.policy.type==='simplified'?'Forenklet faktura':'Fuld faktura'} · Nummerering: ${data.configuration.numberingAuthority||'håndteres i e-conomic'}`));
   if(data.captureDeadline?.policy==='clearhaus-179-days'){body.append(el('p','Hævningsfrist hos Clearhaus: '+new Date(data.captureDeadline.at).toLocaleString('da-DK')+'. Bankens reservation kan udløbe tidligere.'));if(data.captureDeadline.lateCapture)body.append(el('p','Hævning efter syv dage: late capture-gebyr og øget risiko for indsigelser.'));}
-  if(!data.configuration.enabled||data.configuration.accountantMail!=='automatic')accounting.append(el('p','Automatisk afsendelse af bogholderbilag er slået fra. Betalingsstatus kontrolleres, når denne sektion åbnes.'));
+  if(!reconciliation&&(!data.configuration.enabled||!data.accountantMailAutomatic))accounting.append(el('p','Automatisk afsendelse af bogholderbilag er slået fra. Betalingsstatus kontrolleres, når denne sektion åbnes.'));
   const stats=el('dl');stats.className='finance-totals';for(const [key,label] of [['ordered','Bestilt'],['shipped','Afsendt'],['remaining','Restordre'],['invoiced','Faktureret'],['credited','Krediteret'],['captured','Hævet'],['refunded','Refunderet'],['unsettled','Ikke afregnet før gebyrer'],['held','Tilbageholdt']])stats.append(el('dt',label),el('dd',money(s[key])));accounting.append(stats);
   for(const problem of s.problems)body.append(el('p',problem));
   body.append(button('Opdatér betalingsstatus',refreshPayment));
   if(verified&&s.ordered>0&&s.shipped===s.ordered&&s.captured===0&&!data.operations.some(o=>['requested','sending','uncertain'].includes(o.status)))body.append(button('Bekræft hævning · '+money(s.ordered),()=>{if(confirm('Hæv hele ordrebeløbet på '+money(s.ordered)+' efter bekræftet fuld afsendelse?'))action({action:'payment',kind:'capture',amount:s.ordered,key:'shipment-capture:'+s.ordered});}));
-  const table=el('table');table.className='finance-table';const header=el('tr');for(const title of ['Leverance','Beløb',reconciliation?'Bogholderkvittering':'Fakturagrundlag','Handling'])header.append(el('th',title));table.append(header);
+  const table=el('table');table.className='finance-table';const header=el('tr');for(const title of ['Leverance','Beløb',reconciliation?'Betalingskvittering':'Fakturagrundlag','Handling'])header.append(el('th',title));table.append(header);
   for(const shipment of data.shipments){
-   if(reconciliation){const row=el('tr');row.append(el('td',shipment.shipDate.slice(0,10)),el('td',money(shipment.total)),el('td',accountantReceipt?.status==='sent'?'Sendt til bogholder':accountantReceipt?'Kræver kontrol af afsendelse':'Afventer verificeret hævning'),el('td','Quickpay-afstemning · ingen faktura'));table.append(row);continue;}
+   if(reconciliation){const row=el('tr');row.append(el('td',shipment.shipDate.slice(0,10)),el('td',money(shipment.total)),el('td',data.mail.some(m=>m.kind==='payment_receipt'&&m.status==='sent')?'Sendt til kunden':'Se betalingsstatus nedenfor'),el('td','Quickpay-afstemning · ingen faktura'));table.append(row);continue;}
    const delivery=basisDelivery(order.attention)||data.mail.find(m=>m.kind==='accountant_basis'&&m.shipmentKey===shipment.key&&['sent','sending','uncertain','review'].includes(m.status));
    const sent=delivery?.status==='sent',row=el('tr');
    if(sent)row.className='is-completed';

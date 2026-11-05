@@ -67,7 +67,7 @@ test('agreed proof prepayment is not an outstanding finance task before shipment
  }
 });
 
-test('closing a legacy accountant draft preserves history and clears its finance and shipment tasks',async()=>{
+test('a legacy Quickpay accountant draft stays in history without creating finance or shipment tasks',async()=>{
  const {order,payment}=await fixture();
  await shipment(order,3);
  payment.operations.push(op(2,'capture',order.totalIncVat));
@@ -82,7 +82,7 @@ test('closing a legacy accountant draft preserves history and clears its finance
   );
  });
  const tasks=finance=>orderTasks({id:'pf',status:'confirmed'},null,{finance,documents:{documents:[{id:'basis',type:'basis'}]}});
- assert.deepEqual(tasks(await financeView(order.id)).map(task=>task.id),['mail-draft','finance']);
+ assert.deepEqual(tasks(await financeView(order.id)),[]);
  await assert.rejects(dismissAccountantBasis(order.id,'old'),/usendt kladde/);
  await dismissAccountantBasis(order.id,'draft',{actor:'staff'});
  await dismissAccountantBasis(order.id,'draft',{actor:'another staff member'});

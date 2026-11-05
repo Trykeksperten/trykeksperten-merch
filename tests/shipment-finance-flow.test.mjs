@@ -31,16 +31,14 @@ async function fixture(){
 function notice(pf,{quantity=4,complete=true,tracking=true,reference=true,shipDate=new Date(Date.now()-600000).toISOString(),messageId=randomUUID()}={}){return {ShipmentNotification:{messageId,deliveries:[{deliveryLocation:{customerPONumber:pf.purchaseOrderNumber,carrier:'UPS',shipDate,isOrderComplete:complete,trackAndTrace:tracking?[{trackingId:'DEMO123',trackingURL:'https://tracking.example.test/DEMO123'}]:[],item:[{SKU:'DEMO-CAP',quantity}],...(reference?{reference:{shipmentID:'DEMO-SHIPMENT'}}:{})}}]}};}
 async function delivered(f,options={}){const message=notice(f.pf,options);const pf=await applyPFNotification('shipment',message);await reconcileShipmentMail(pf);await reconcileSalesShipments(f.order.id);return {pf,message};}
 const accepted={sendMail:async mail=>({accepted:[mail.to]})};
-test('PF shipment to one full capture, tracking mail, receipt and paid accountant PDF is idempotent end to end',async()=>{
+test('PF shipment to one full capture, tracking mail and customer receipt is idempotent end to end',async()=>{
  const f=await fixture();const {message}=await delivered(f);await applyPFNotification('shipment',message);await applyPFNotification('shipment',{ShipmentNotification:{...message.ShipmentNotification,messageId:randomUUID()}});await reconcileSalesShipments(f.order.id);await reconcileShipmentMail(await readOrder(f.pf.id));
  let view=await financeView(f.order.id);assert.equal(view.shipments.length,1);assert.equal(view.mail.length,0);assert.equal(view.summary.captured,0);assert.equal((await shipmentMailStatus(f.pf.id)).length,1);
  const input={kind:'capture',amount:13750,key:'capture:full-order-demo'};assert.equal((await executeSalesPayment(f.order.id,input,{env,fetchImpl:f.fetchImpl})).status,'confirmed');await executeSalesPayment(f.order.id,input,{env,fetchImpl:f.fetchImpl});assert.equal(f.posts(),1);
  view=await financeView(f.order.id);assert.equal(view.summary.netPaid,13750);assert.equal((await readCheckout(f.order.id)).status,'paid');const receipt=view.mail.find(m=>m.kind==='payment_receipt');const mails=[];const transport={sendMail:async m=>{mails.push(m);return {accepted:[m.to]};}};
  await sendFinanceMail(f.order.id,receipt.key,{transport});await sendFinanceMail(f.order.id,receipt.key,{transport});const shipping=(await shipmentMailStatus(f.pf.id))[0];await sendShipmentMail(f.pf.id,shipping.id,{transport});await sendShipmentMail(f.pf.id,shipping.id,{transport});
- const basis=await queueAccountantBasis(f.order.id,view.shipments[0].key);assert.match(basis.text,/Hele ordrebeløbet er betalt/);assert.match(basis.text,/afstemning af udbetalingen fra Clearhaus/);assert.match(basis.text,/skal ikke returneres til Smerch/);assert.doesNotMatch(basis.text,/registrér PDF og nummer på ordren/);assert.match(basis.text,/137,50/);await sendFinanceMail(f.order.id,basis.key,{transport});await sendFinanceMail(f.order.id,basis.key,{transport});
- assert.equal(mails.length,3);assert.equal(mails.find(m=>m.attachments?.length).to,'trykeksperten@financialoutsourcing.dk');assert.match(mails.find(m=>m.subject==='Smerch – betalingskvittering').text,/137,50/);assert.match(mails.find(m=>m.subject.includes('afsendt')).text,/https:\/\/tracking.example.test\/DEMO123/);
- await withLedger(data=>{data.orders[f.order.id].shipments[0].invoiceStatus='issued';});assert.equal((await queueAccountantBasis(f.order.id,view.shipments[0].key)).key,basis.key);assert.equal((await financeView(f.order.id)).mail.filter(m=>m.kind==='accountant_basis').length,1);
- if(process.env.SMERCH_PIPELINE_PREVIEW_DIR){const out=process.env.SMERCH_PIPELINE_PREVIEW_DIR;await mkdir(out,{recursive:true});await writeFile(join(out,'fakturagrundlag-betalt-demo.pdf'),Buffer.from(basis.pdf,'base64'));await writeFile(join(out,'betalingskvittering-demo.txt'),mails.find(m=>m.subject==='Smerch – betalingskvittering').text);await writeFile(join(out,'forsendelsesmail-demo.txt'),mails.find(m=>m.subject.includes('afsendt')).text);}
+ assert.equal(mails.length,2);assert.ok(mails.every(m=>m.to===f.order.shipping.email));assert.match(mails.find(m=>m.subject==='Smerch – betalingskvittering').text,/137,50/);assert.match(mails.find(m=>m.subject.includes('afsendt')).text,/https:\/\/tracking.example.test\/DEMO123/);
+ if(process.env.SMERCH_PIPELINE_PREVIEW_DIR){const out=process.env.SMERCH_PIPELINE_PREVIEW_DIR;await mkdir(out,{recursive:true});await writeFile(join(out,'betalingskvittering-demo.txt'),mails.find(m=>m.subject==='Smerch – betalingskvittering').text);await writeFile(join(out,'forsendelsesmail-demo.txt'),mails.find(m=>m.subject.includes('afsendt')).text);}
 });
 test('missing tracking blocks only tracking mail and a later reference enriches the same delivery without duplicate quantities',async()=>{
  const f=await fixture(),date=new Date(Date.now()-600000).toISOString();await delivered(f,{tracking:false,reference:false,shipDate:date});assert.equal((await shipmentMailStatus(f.pf.id))[0].status,'blocked');
@@ -57,7 +55,7 @@ for(const flow of ['legacy','finance'])test(`${flow} capture requires actual shi
  await applyPFNotification('shipment',notice(f.pf));const result=await capture();assert.equal(result.status,flow==='legacy'?'paid':'confirmed');assert.equal(f.posts(),1);assert.equal((await readCheckout(f.order.id)).status,'paid');
 });
 test('changing billing after queued or sent basis retains previous PDF and requires review of a new version',async()=>{
- const f=await fixture();await delivered(f);let view=await financeView(f.order.id);const key=view.shipments[0].key,first=await queueAccountantBasis(f.order.id,key);
+ const f=await fixture();await updateCheckout(f.order.id,order=>({...order,paymentProvider:'bank_transfer'}));await delivered(f);let view=await financeView(f.order.id);const key=view.shipments[0].key,first=await queueAccountantBasis(f.order.id,key);
  await updateFinance(f.order.id,{action:'billing',billing:{...f.order.billing,company:'Rettet Demokunde ApS'}});await assert.rejects(sendFinanceMail(f.order.id,first.key,{transport:accepted}),/ændret/);
  const second=await queueAccountantBasis(f.order.id,key);assert.notEqual(second.key,first.key);await sendFinanceMail(f.order.id,second.key,{transport:accepted});
  await updateFinance(f.order.id,{action:'billing',billing:{...f.order.billing,company:'Ny fakturamodtager ApS'}});const third=await queueAccountantBasis(f.order.id,key);assert.equal(third.requiresReview,true);assert.notEqual(third.pdf,second.pdf);const data=JSON.parse(await readFile(join(root,'sales-ledger.json'),'utf8'));assert.equal(data.orders[f.order.id].mail.find(m=>m.key===second.key).pdf,second.pdf);assert.ok((await financeView(f.order.id)).summary.problems.some(p=>p.includes('manuel gennemgang')));
@@ -77,13 +75,13 @@ test('shipment mail uses checkout product names even when PF line only has SKU',
  await delivered(f);const row=(await shipmentMailStatus(f.pf.id))[0];assert.match(row.text,/4 × Grafton kasket/);
 });
 
-test('worker captures a completed shipment and automatically sends one receipt and one accountant basis',async()=>{
+test('worker captures a completed shipment and automatically sends one customer receipt',async()=>{
  const f=await fixture(),start=new Date().toISOString();await updateCheckout(f.order.id,o=>({...o,createdAt:start}));
  const mails=[];const options={env:{...env,SMERCH_FINANCE_START_AT:start},fetchImpl:f.fetchImpl,transport:{sendMail:async mail=>{mails.push(mail);return {accepted:[mail.to]};}}};
  await processSalesFinance(options);assert.equal(f.posts(),0);assert.equal(mails.length,0);
  await delivered(f);await processSalesFinance(options);await processSalesFinance(options);
  assert.equal(f.posts(),1);assert.equal((await readCheckout(f.order.id)).status,'paid');
- assert.equal((await financeView(f.order.id)).mail.find(m=>m.kind==='payment_receipt').status,'sent');assert.equal(mails.length,2);assert.equal(mails.filter(m=>m.subject==='Smerch – betalingskvittering').length,1);assert.equal(mails.filter(m=>m.to==='trykeksperten@financialoutsourcing.dk').length,1);assert.equal((await financeView(f.order.id)).mail.find(m=>m.kind==='accountant_basis').status,'sent');
+ assert.equal((await financeView(f.order.id)).mail.find(m=>m.kind==='payment_receipt').status,'sent');assert.deepEqual(mails.map(m=>m.to),[f.order.shipping.email]);assert.equal((await financeView(f.order.id)).mail.some(m=>m.kind==='accountant_basis'),false);
 });
 
 test('receipt worker sends an existing captured payment with capture disabled and never retries uncertain mail',async()=>{
@@ -95,7 +93,7 @@ test('receipt worker sends an existing captured payment with capture disabled an
  assert.equal(calls,1);assert.equal(f.posts(),1);assert.equal((await financeView(f.order.id)).mail.find(m=>m.kind==='payment_receipt').status,'uncertain');
 });
 
-test('automatic tracking and both receipts survive replay and a delayed capture confirmation',async()=>{
+test('automatic tracking and the customer receipt survive replay and a delayed capture confirmation',async()=>{
  const f=await fixture(),start=new Date().toISOString();
  await updateCheckout(f.order.id,order=>{
   order.createdAt=start;
@@ -143,7 +141,7 @@ test('automatic tracking and both receipts survive replay and a delayed capture 
  assert.equal(finance.operations[0].status,'confirmed');
  assert.deepEqual(finance.summary.problems,[]);
  assert.equal(f.posts(),1);
- assert.deepEqual(mails.map(mail=>mail.to).sort(),['accountant@example.test','kunde@example.test']);
+ assert.deepEqual(mails.map(mail=>mail.to).sort(),['kunde@example.test']);
  assert.deepEqual(finance.mail.map(({kind,status})=>[kind,status]).sort(),
-  [['accountant_payment_receipt','sent'],['payment_receipt','sent']]);
+  [['payment_receipt','sent']]);
 });

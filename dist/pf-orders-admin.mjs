@@ -6,7 +6,7 @@ import {matchedPaymentAttempts} from './payment-attempt-matching.mjs?v=2';
 import {paymentAttemptHistory} from './admin-payment-attempt-history.mjs';
 import {createDocumentRows} from './admin-document-rows.mjs';
 import {actorLabel} from './admin-activity.mjs';
-import {financePanel} from './admin-finance.mjs?v=accounting-1';
+import {financePanel} from './admin-finance.mjs?v=accounting-2';
 import {mountAdminNavigation,bindAdminMenu} from './admin-navigation.mjs?v=accounting-1';
 import {loadAdminOrderQueue,queueCounts} from './admin-work-queue.mjs?v=shared-queue-1';
 import {compactOrderWorkspace} from './admin-order-tabs.mjs?v=attention-1';

@@ -31,7 +31,7 @@ function reportHeading(title,downloads,level='h2'){
 const types={
  settlement:'Clearhaus-afregning',sale:'Afsendt salg',credit:'Kreditnota',replacement:'Erstatningsfaktura',capture:'Hævning',
  refund:'Refundering',bank_payment:'Bankbetaling',invoice:'Faktura',accountant_invoice_request:'Fakturaanmodning',
- payment_receipt:'Betalingskvittering',accountant_payment_receipt:'Bogholderkvittering',
+ payment_receipt:'Betalingskvittering',
  accountant_basis:'Fakturagrundlag',refund_basis:'Refunderingsgrundlag'
 };
 const issues={
@@ -108,7 +108,7 @@ function table(headers,rows,paginate=true){
 
 function documentRows(rows){
  const basesByOrder=new Map();
- const documents=rows.filter(row=>row.kind==='document');
+ const documents=rows.filter(row=>row.kind==='document'&&row.type!=='accountant_payment_receipt');
  for(const row of documents){
   if(!['accountant_basis','accountant_invoice_request'].includes(row.type))continue;
   const versions=basesByOrder.get(row.orderId)??[];
@@ -158,7 +158,7 @@ function orderLookup(rows){
      amount(row.kind==='settlement'?row.amounts?.bank:row.amounts?.gross)
     ])));
     const documents=documentRows(order.entries.slice().reverse());
-    if(documents.length)details.append(el('h3','Bilag og kvitteringer'),table(['Dato','Ordrenummer','Type','Reference','Bilag'],documents));
+    if(documents.length)details.append(el('h3','Dokumenter for ordren'),table(['Dato','Ordrenummer','Type','Reference','Bilag'],documents));
    });
    list.append(details);
   }
@@ -265,13 +265,11 @@ export function renderAccounting(container,api){
    clearing.append(reportHeading('Samlet pr. udbetaling',downloads('Clearhaus-udbetalinger','udbetalinger'),'h3'),table(['Dato','Afregningsreference','Bankreference','Ordreandele','Gebyr','Udbetalt'],report.payouts.map(p=>[p.payoutDate,p.settlementReference,p.bankReference,p.allocationIds.length,amount(p.amounts.fees),amount(p.amounts.bank)])));
    if(report.unassignedSettlements.length)clearing.append(reportHeading('Historiske afregninger uden dato',downloads('historiske afregninger uden dato','afregninger-uden-dato'),'h3'),table(['Ordrenummer','Afregningsreference','Bankreference','Udbetalt'],report.unassignedSettlements.map(r=>[r.orderNumber,r.settlementReference,r.bankReference,amount(r.amounts.bank)])));
    payments.append(reportHeading('Registrerede bankbetalinger',downloads('registrerede bankbetalinger','bankbetalinger'),'h3'),table(['Betalingsdato','Ordrenummer','Fakturanummer','Bankreference','Beløb'],rows.filter(r=>r.kind==='bank_payment').map(r=>[r.date,r.orderNumber,r.invoiceReference,r.bankReference,amount(r.amounts.gross)])));
-   const documents=panel('Bilag og kvitteringer','Hent registrerede originalbilag og de kvitteringer, der er gemt på ordren. Eksporten viser en oversigt over alle gemte versioner.',downloads('bilagsoversigt','bilagsoversigt'));
-   documents.append(table(['Dato','Ordrenummer','Type','Reference','Bilag'],documentRows(rows)));
    function addIssues(section){
     if(!report.issues.length)return;
     const list=el('ul');for(const issue of report.issues)list.append(el('li',(issues[issue.code]||issue.code)+' · '+issue.orderId));section.append(list);
    }
-   reports.append(financialOverview,sales,payments,clearing,documents);
+   reports.append(financialOverview,sales,payments,clearing);
    if(key){
     const close=panel('Månedsafstemning');
     const states={open:'Afventer afstemning',reconciled:'Afstemt',changed:'Grundlaget er ændret siden sidste afstemning'};
