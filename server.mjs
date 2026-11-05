@@ -388,7 +388,9 @@ const handleRequest=async(req,res)=>{
    }
    const automation=pathname.match(/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})\/automation$/);
    if(automation){if(!adminSessionAuthorized(req))throw Error('Medarbejderlogin kræves.');const order=await readOrder(automation[1]);await reconcileShipmentMail(order);
-    if(req.method==='GET'){json(res,200,{shipments:await shipmentMailStatus(order.id),proofs:await proofMailStatus(order.id),intake:[...await proofIntakeStatus(order.id),...await proofMailboxItems(order.id)],confirmation:order.checkoutId?await orderConfirmationStatus(order.checkoutId):null});return;}
+    if(req.method==='GET'){const settings=await automationSettings();json(res,200,{shipmentMailAutomatic:settings.shipmentMail==='automatic'&&
+     settings.supplierCustomerMail==='disabled',
+     shipments:await shipmentMailStatus(order.id),proofs:await proofMailStatus(order.id),intake:[...await proofIntakeStatus(order.id),...await proofMailboxItems(order.id)],confirmation:order.checkoutId?await orderConfirmationStatus(order.checkoutId):null});return;}
     if(req.method==='POST'){if(!adminRequestOriginAllowed(req))throw Error('Ugyldig oprindelse.');const input=await readJSON(req,4096);if(input.kind==='confirmation'){if(!order.checkoutId)throw Error('Ordren mangler checkout.');await releaseOrderConfirmation(order.checkoutId,{confirmedNotSent:input.confirmUncertain===true,initiatedBy:adminSessionActor(req)});backupRuntime.runOperation(()=>retryOrderConfirmations()).catch(()=>{});json(res,200,{queued:true});return;}if(input.kind==='proof'){await retryProofMailRecord(order.id,input.key,{confirmedNotSent:input.confirmUncertain===true,initiatedBy:adminSessionActor(req)});backupRuntime.runOperation(()=>retryProofMail()).catch(()=>{});json(res,200,{queued:true});return;}json(res,200,await sendShipmentMail(order.id,input.id,{confirmUncertain:input.confirmUncertain===true,initiatedBy:adminSessionActor(req)}));return;}
    }
    const documents=pathname.match(/^\/api\/pf-orders\/(ord-[a-f0-9-]{36})\/documents(?:\/([a-f0-9-]{36}))?$/);

@@ -13,10 +13,10 @@ for(const [name,patch] of [['test payments',{payment:{ready:true,mode:'test'}}],
  const c=checkoutLaunchConfiguration({...ready(),...patch});assert.equal(c.ordersEnabled,false);assert.equal(blocksLaunchOrder('/api/checkout/pay-example/reauthorize','POST',c),true);
 });
 
-for(const [key,value] of [['SMERCH_FINANCE_ENABLED','0'],['SMERCH_PAYMENT_AGREEMENT_CONFIRMED','0'],['SMERCH_AUTOMATIC_SHIPMENT_CAPTURE','0'],['SMERCH_AUTOMATIC_SHIPMENT_CAPTURE',undefined],['SMERCH_PAYMENT_RECEIPT_MAIL','automatic'],['SMERCH_PAYMENT_RECEIPT_MAIL',undefined],['SMERCH_ACCOUNTANT_MAIL','review'],['SMERCH_ACCOUNTANT_MAIL',undefined]])test('dispatch startup refuses '+key+'='+value,()=>{
+for(const [key,value] of [['SMERCH_FINANCE_ENABLED','0'],['SMERCH_PAYMENT_AGREEMENT_CONFIRMED','0'],['SMERCH_AUTOMATIC_SHIPMENT_CAPTURE','0'],['SMERCH_AUTOMATIC_SHIPMENT_CAPTURE',undefined],['SMERCH_PAYMENT_RECEIPT_MAIL','invalid'],['SMERCH_PAYMENT_RECEIPT_MAIL',undefined],['SMERCH_ACCOUNTANT_MAIL','review'],['SMERCH_ACCOUNTANT_MAIL',undefined]])test('dispatch startup refuses '+key+'='+value,()=>{
  const input=ready();input.env[key]=value;assert.equal(checkoutLaunchConfiguration(input).ordersEnabled,false);
 });
-for(const [key,value] of [['proofMailboxEnabled',false],['supplierCustomerMail','enabled'],['supplierCustomerMail','unknown'],['proofPublication','automatic'],['shipmentMail','automatic'],['confirmationMail','review'],['decisionReceipt','review']])test('reviewed startup refuses '+key+'='+value,()=>{
+for(const [key,value] of [['proofMailboxEnabled',false],['supplierCustomerMail','enabled'],['supplierCustomerMail','unknown'],['proofPublication','automatic'],['shipmentMail','disabled'],['shipmentMail',undefined],['confirmationMail','review'],['decisionReceipt','review']])test('reviewed startup refuses '+key+'='+value,()=>{
  const input=ready();input.automation[key]=value;assert.equal(checkoutLaunchConfiguration(input).ordersEnabled,false);
 });
 for(const state of [true,undefined])test('paused or unknown mailbox prevents public opening: '+state,()=>{
@@ -25,3 +25,12 @@ for(const state of [true,undefined])test('paused or unknown mailbox prevents pub
 
 for(const value of [undefined,'','invalid','2099-01-01T00:00:00Z'])test('dispatch capture release requires an effective finance start: '+value,()=>{const input=ready();input.env.SMERCH_FINANCE_START_AT=value;assert.equal(checkoutLaunchConfiguration(input).ordersEnabled,false);});
 for(const provider of [undefined,'stripe'])test('automatic dispatch release requires the supported new-order provider: '+provider,()=>{const input=ready();input.payment.provider=provider;assert.equal(checkoutLaunchConfiguration(input).ordersEnabled,false);});
+
+test('automatic shipment mail and receipts preserve the public checkout release',()=>{
+ const input=ready();
+ input.env.SMERCH_PAYMENT_RECEIPT_MAIL='automatic';
+ input.automation.shipmentMail='automatic';
+ assert.equal(checkoutLaunchConfiguration(input).ordersEnabled,true);
+ input.automation.supplierCustomerMail='enabled';
+ assert.equal(checkoutLaunchConfiguration(input).ordersEnabled,false);
+});

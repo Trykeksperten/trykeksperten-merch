@@ -6,13 +6,16 @@ import {tmpdir} from 'node:os';
 import {randomUUID} from 'node:crypto';
 import {persistCheckout,readCheckout,updateCheckout} from '../lib/checkout.mjs';
 import {applyPFNotification,readOrder} from '../lib/pf-orders.mjs';
-import {reconcileShipmentMail,shipmentMailStatus,sendShipmentMail} from '../lib/shipment-mail.mjs';
-import {reconcileSalesShipments,financeView,withLedger,updateFinance} from '../lib/sales-ledger.mjs';
+import {reconcileShipmentMail,shipmentMailStatus,sendShipmentMail,processShipmentMail} from '../lib/shipment-mail.mjs';
+import {reconcileSalesShipments,financeView,saveVerifiedPayment,withLedger,updateFinance} from '../lib/sales-ledger.mjs';
 import {executeSalesPayment} from '../lib/sales-payments.mjs';
 import {captureApprovedCheckout} from '../lib/order-flow.mjs';
 import {queueAccountantBasis,sendFinanceMail} from '../lib/sales-mail.mjs';
 import {salesBasis} from '../lib/sales-basis.mjs';
 import {processSalesFinance} from '../lib/sales-worker.mjs';
+import {saveAutomationSettings} from '../lib/automation-settings.mjs';
+import {initializeMethodAccounting} from '../lib/method-accounting.mjs';
+import {applyQuickpayPayment} from '../lib/quickpay.mjs';
 const prior=process.env.SMERCH_DATA_DIR,root=await mkdtemp(join(tmpdir(),'smerch-pipeline-'));process.env.SMERCH_DATA_DIR=root;
 after(async()=>{if(prior===undefined)delete process.env.SMERCH_DATA_DIR;else process.env.SMERCH_DATA_DIR=prior;await rm(root,{recursive:true,force:true});});
 const env={SMERCH_FINANCE_ENABLED:'1',SMERCH_PAYMENT_AGREEMENT_CONFIRMED:'1',QUICKPAY_MODE:'live',QUICKPAY_API_KEY:'mock-only',QUICKPAY_CAPTURE_ENABLED:'1'};
@@ -90,4 +93,57 @@ test('receipt worker sends an existing captured payment with capture disabled an
  await processSalesFinance({...options,env:{...options.env,SMERCH_PAYMENT_RECEIPT_MAIL:'review'}});assert.equal(calls,0);
  await processSalesFinance(options);await processSalesFinance(options);
  assert.equal(calls,1);assert.equal(f.posts(),1);assert.equal((await financeView(f.order.id)).mail.find(m=>m.kind==='payment_receipt').status,'uncertain');
+});
+
+test('automatic tracking and both receipts survive replay and a delayed capture confirmation',async()=>{
+ const f=await fixture(),start=new Date().toISOString();
+ await updateCheckout(f.order.id,order=>{
+  order.createdAt=start;
+  order.paymentMode='live';
+  initializeMethodAccounting(order);
+  return order;
+ });
+ await saveAutomationSettings({shipmentMail:'automatic',supplierCustomerMail:'disabled'});
+ const mails=[];
+ const options={
+  env:{...env,SMERCH_FINANCE_START_AT:start,SMERCH_ACCOUNTANT_MAIL:'automatic',SMERCH_ACCOUNTANT_EMAIL:'accountant@example.test'},
+  fetchImpl:async(url,options)=>{
+   const response=await f.fetchImpl(url,options);
+   if(options.method==='POST')f.payment.operations.at(-1).pending=true;
+   return response;
+  },
+  transport:{sendMail:async mail=>{mails.push(mail);return {accepted:[mail.to]};}}
+ };
+ const {message}=await delivered(f);
+ const waiting=await financeView(f.order.id,options);
+ assert.equal(waiting.summary.captureWaiting,true);
+ assert.deepEqual(waiting.summary.problems,[]);
+ assert.equal((await financeView(f.order.id,{env:{...options.env,QUICKPAY_CAPTURE_ENABLED:'0'}})).summary.captureWaiting,false);
+ // Limit assertions to this shipment; the shared fixture also contains older shipment drafts.
+ await processShipmentMail(options);
+ const shipping=(await shipmentMailStatus(f.pf.id))[0];
+ assert.equal(shipping.status,'sent');
+ const tracking=mails.find(mail=>mail.messageId==='<shipment-'+shipping.id+'@smerch.dk>');
+ assert.match(tracking.text,/DEMO123\nhttps:\/\/tracking.example.test\/DEMO123/);
+ mails.length=0;
+ await processSalesFinance(options);
+ await processSalesFinance(options);
+ assert.equal(f.posts(),1);
+ assert.equal(mails.length,0);
+ assert.equal((await financeView(f.order.id)).operations[0].status,'uncertain');
+ f.payment.operations.at(-1).pending=false;
+ for(let replay=0;replay<2;replay++){
+  const order=await applyQuickpayPayment(f.order.id,f.payment,options);
+  await saveVerifiedPayment(order,f.payment);
+  await applyPFNotification('shipment',message);
+  await processSalesFinance(options);
+  await processShipmentMail(options);
+ }
+ const finance=await financeView(f.order.id);
+ assert.equal(finance.operations[0].status,'confirmed');
+ assert.deepEqual(finance.summary.problems,[]);
+ assert.equal(f.posts(),1);
+ assert.deepEqual(mails.map(mail=>mail.to).sort(),['accountant@example.test','kunde@example.test']);
+ assert.deepEqual(finance.mail.map(({kind,status})=>[kind,status]).sort(),
+  [['accountant_payment_receipt','sent'],['payment_receipt','sent']]);
 });

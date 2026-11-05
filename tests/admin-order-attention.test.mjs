@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {orderTasks,proofStages,newsFingerprint,hasUnread,markRead} from '../dist/admin-order-attention.mjs';
+import {queueCounts} from '../dist/admin-work-queue.mjs';
 const order=()=>({id:'a',status:'approval_pending_pf',proof:{version:2,hash:'abc',customer:{}},decision:{version:2,actor:'customer',decision:'approve'}});
 test('customer approval requires staff work until delivery and does not imply PF confirmation',()=>{const o=order();assert.equal(orderTasks(o)[0].tab,'proof');assert.equal(proofStages(o)[1][1],'Afventer gennemgang');o.decision.delivery={reference:'ack'};assert.equal(orderTasks(o).length,0);assert.equal(proofStages(o)[3][1],'Afventer bekræftelse');o.proof.approvalReference='PF';assert.equal(proofStages(o)[3][1],'Godkendelse bekræftet');});
 test('mail review and failures route to documents, successful and automatic pending messages do not',()=>{const o=order();o.decision.delivery={reference:'ack'};o.attention={proofs:[{version:1,status:'failed'},{version:2,status:'sent'},{version:2,status:'pending'}],finance:{mail:[{key:'basis',kind:'accountant_basis',status:'review'},{key:'other',status:'uncertain'}]}};const tasks=orderTasks(o);assert.equal(tasks.length,2);assert.ok(tasks.every(t=>t.tab==='documents'));assert.ok(tasks[1].error);});
@@ -39,4 +40,31 @@ test('duplicate queue records produce one action and fresh finance summary wins 
 test('HTTP errors are visible as incomplete task status',async()=>{
  const {loadAttention}=await import('../dist/admin-order-attention.mjs');
  const context=await loadAttention({id:'x'},async()=>({ok:false,json:async()=>({error:'Login'})}));assert.equal(context.error,true);assert.ok(orderTasks({status:'processing'},null,context).some(t=>t.id==='load'));
+});
+
+test('pending automatic shipment and receipt mails do not count as staff tasks',()=>{
+ const checkout={id:'pay-1',status:'paid'};
+ const o={id:'order-1',checkoutId:checkout.id,status:'shipped',shipment:{
+  trackingDetails:[{trackingId:'DEMO',trackingURL:'https://example.test/DEMO'}],
+  deliveries:[{key:'parcel-1',trackingDetails:[{trackingId:'DEMO',trackingURL:'https://example.test/DEMO'}]}]
+ }};
+ const shipment={id:'ship-mail',orderId:o.id,deliveryKey:'parcel-1',status:'review'};
+ const receipt={key:'receipt',kind:'payment_receipt',status:'review'};
+ const accountant={key:'accountant',kind:'accountant_payment_receipt',status:'review'};
+ o.attention={shipmentMailAutomatic:true,shipments:[shipment],finance:{
+  automationEligible:true,configuration:{receiptMail:'automatic'},accountantMailAutomatic:true,
+  accountingPurpose:'reconciliation',shipments:[{key:'parcel-1',invoiceStatus:'awaiting_accountant'}],mail:[receipt,accountant]
+ }};
+ assert.deepEqual(orderTasks(o,checkout),[]);
+ assert.equal(queueCounts([o],[checkout]).overview,0);
+ receipt.requiresReview=true;
+ assert.deepEqual(orderTasks(o,checkout).map(task=>task.id),['mail-receipt']);
+ receipt.requiresReview=false;
+ o.attention.finance.automationEligible=false;
+ assert.deepEqual(orderTasks(o,checkout).map(task=>task.id),['mail-receipt','mail-accountant']);
+ o.attention.finance.automationEligible=true;
+ shipment.status='uncertain';
+ assert.equal(queueCounts([o],[checkout]).overview,1);
+ assert.equal(queueCounts([o],[checkout]).blocked,1);
+ assert.ok(orderTasks(o,checkout)[0].error);
 });

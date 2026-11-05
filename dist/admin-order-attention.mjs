@@ -1,5 +1,5 @@
 import {completedSteps} from './admin-completed-steps.mjs';
-import {isTestOrder,nextStep} from './admin-order-state.mjs';
+import {isTestOrder,nextStep,shipmentMailPending} from './admin-order-state.mjs';
 // A saved document is not a send. Match the exact latest basis and accountant audience.
 export function basisDelivery(context={}){
  const latest=(context.documents?.documents||[]).filter(d=>d.type==='basis').sort((a,b)=>(b.version||0)-(a.version||0))[0];
@@ -7,6 +7,16 @@ export function basisDelivery(context={}){
  return (context.correspondence||[]).filter(m=>m.documentId===latest.id&&m.audience==='accountant'&&['sent','sending','uncertain'].includes(m.status)).sort((a,b)=>String(b.sentAt||b.createdAt||'').localeCompare(String(a.sentAt||a.createdAt||'')))[0]||null;
 }
 const actionable=new Set(['review','blocked','failed','uncertain']);
+function financeMailPending(row, finance) {
+ if (!finance?.automationEligible || row.requiresReview || row.status !== 'review') return false;
+ switch (row.kind) {
+  case 'payment_receipt': return finance.configuration?.receiptMail === 'automatic';
+  case 'accountant_basis': return finance.configuration?.accountantMail === 'automatic';
+  case 'accountant_payment_receipt':
+  case 'accountant_invoice_request': return finance.accountantMailAutomatic === true;
+  default: return false;
+ }
+}
 export function orderTasks(order,checkout,context=order.attention||{}){
  if(order.status==='cancelled')return [];
  const tasks=[],add=(id,tab,title,detail='',error=false)=>tasks.push({id,tab,title,detail,error});
@@ -17,15 +27,16 @@ export function orderTasks(order,checkout,context=order.attention||{}){
   if(decision.apiDispatch?.state==='uncertain')add('pf-uncertain','proof','Afstem korrektursvaret med PF','Udfaldet er ukendt. Kontrollér hos PF før et nyt forsøg.',true);
   else if(!sent)add('decision','proof',decision.decision==='approve'?'Kunden har godkendt – afventer Smerch':'Kunden ønsker ændringer',isTestOrder(order,checkout)?'Testordre: gennemgå svaret. Ingen betaling eller produktionsfrigivelse.':decision.decision==='approve'?'Gennemgå korrekturen og betalingen, før svaret sendes til PF.':'Gennemgå kommentaren og send ændringsønsket til PF.');
  }
- const rows=[...(context.proofs||[]).filter(m=>Number(m.version)===Number(proof?.version)),...(context.shipments||[]),...(context.confirmation?[{...context.confirmation,kind:'confirmation'}]:[]),...(context.finance?.mail||[]),...(context.correspondence||[]).filter(m=>m.kind==='email')];
+ const rows=[...(context.proofs||[]).filter(m=>Number(m.version)===Number(proof?.version)),...(context.shipments||[]).filter(m=>!shipmentMailPending(m,context.shipmentMailAutomatic)),...(context.confirmation?[{...context.confirmation,kind:'confirmation'}]:[]),...(context.finance?.mail||[]).filter(m=>!financeMailPending(m,context.finance)),...(context.correspondence||[]).filter(m=>m.kind==='email')];
  for(const [i,m] of rows.entries())if(actionable.has(m.status))add('mail-'+(m.key||m.id||i),'documents',m.status==='review'?'Gennemse og send mail':'Mail kræver opfølgning',[(m.kind==='invitation'?'Korrekturmail':m.kind==='confirmation'?'Ordrebekræftelse':m.kind==='accountant_basis'?'Fakturagrundlag til bogholder':'Besked'),m.to,m.error].filter(Boolean).join(' · '),m.status!=='review');
  const financeProblems=[...new Set(context.finance?.summary?.problems||checkout?.finance?.problems||[])];
  if(financeProblems.length)add('finance','documents','Afklar fakturering og betaling',financeProblems.join(' '),true);
- for(const shipment of context.finance?.shipments||[])if(shipment.invoiceStatus!=='issued'&&!basisDelivery(context)&&!context.finance?.mail?.some(m=>m.shipmentKey===shipment.key&&['sent','confirmed','pending','sending','review','uncertain','failed','blocked','obsolete'].includes(m.status)))add('basis-'+shipment.key,'documents','Send fakturagrundlag til bogholder','Gennemgå grundlaget og afsendelsen.');
+ const legacyBasis=context.finance?.accountingPurpose!=='reconciliation'&&context.finance?.accountingPurpose!=='invoice';
+ for(const shipment of (legacyBasis?context.finance?.shipments||[]:[]))if(shipment.invoiceStatus!=='issued'&&!basisDelivery(context)&&!context.finance?.mail?.some(m=>m.shipmentKey===shipment.key&&['sent','confirmed','pending','sending','review','uncertain','failed','blocked','obsolete'].includes(m.status)))add('basis-'+shipment.key,'documents','Send fakturagrundlag til bogholder','Gennemgå grundlaget og afsendelsen.');
  const latestBasis=(context.documents?.documents||[]).filter(d=>d.type==='basis').sort((a,b)=>(b.version||0)-(a.version||0))[0];
- if(latestBasis&&!isTestOrder(order,checkout)&&!tasks.some(t=>t.id.startsWith('basis-')||t.detail.includes('Fakturagrundlag'))&&!basisDelivery(context)&&!context.finance?.mail?.some(m=>m.kind==='accountant_basis'&&['sent','sending','review','uncertain','obsolete'].includes(m.status)))add('document-'+latestBasis.id,'documents','Gennemse og send fakturagrundlag','Den seneste PDF-version er ikke registreret som sendt til bogholder.');
+ if(legacyBasis&&latestBasis&&!isTestOrder(order,checkout)&&!tasks.some(t=>t.id.startsWith('basis-')||t.detail.includes('Fakturagrundlag'))&&!basisDelivery(context)&&!context.finance?.mail?.some(m=>m.kind==='accountant_basis'&&['sent','sending','review','uncertain','obsolete'].includes(m.status)))add('document-'+latestBasis.id,'documents','Gennemse og send fakturagrundlag','Den seneste PDF-version er ikke registreret som sendt til bogholder.');
  if(context.error)add('load','history','Opgavestatus kunne ikke indlæses','Opdatér siden. Der kan være flere opgaver.',true);
- if(!tasks.length&&!isTestOrder(order,checkout)){const effectiveCheckout=context.finance?.summary?{...checkout,finance:context.finance.summary}:checkout;const [owner,detail]=nextStep(order,effectiveCheckout,context.shipments||[]);if(owner==='Smerch')add('next','summary','Ordren kræver handling',detail);}
+ if(!tasks.length&&!isTestOrder(order,checkout)){const effectiveCheckout=context.finance?.summary?{...checkout,finance:context.finance.summary}:checkout;const [owner,detail]=nextStep({...order,attention:context},effectiveCheckout,context.shipments||[]);if(owner==='Smerch')add('next','summary','Ordren kræver handling',detail);}
  return tasks.filter((task,index)=>tasks.findIndex(other=>other.id===task.id)===index);
 }
 export function proofStages(order){const p=order.proof,d=order.decision,current=d&&Number(d.version)===Number(p?.version);return [

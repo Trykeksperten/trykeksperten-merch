@@ -84,3 +84,16 @@ test('new invoice and Quickpay workflows preserve their separate messages and co
  const {closeDatabases}=await import('../lib/backoffice/database.mjs');process.env.SMERCH_DATABASE_ENABLED='1';
  try{const bank=await fixture('bank_transfer'),card=await fixture();await capture(card);const sent=[];await processSalesFinance({env,fetchImpl:forbidden,transport:mailer(sent)});await processSalesFinance({env,fetchImpl:forbidden,transport:mailer(sent)});assert.equal(sent.length,2);assert.equal(sent.filter(m=>m.attachments.length).length,1);assert.equal((await rows(bank.id))[0].kind,'accountant_invoice_request');assert.equal((await rows(card.id)).filter(m=>m.kind==='accountant_payment_receipt').length,1);await updateCheckout(bank.id,v=>applyBankPayment(v,{action:'invoice_sent',confirmed:true},{actor}));const b=await readCheckout(bank.id);assert.equal(b.bankPayment.invoiceSender,'Financial Outsourcing');assert.equal(b.status,'awaiting_bank_payment');assert.deepEqual(b.bankPayment.receipts,[]);}finally{closeDatabases();delete process.env.SMERCH_DATABASE_ENABLED;}
 });
+
+test('a changed accountant recipient blocks automatic delivery and keeps the problem visible',async()=>{
+ const order=await fixture('bank_transfer');
+ const [draft]=await queueMethodAccountantMail(order.id,{finance:financeConfiguration(env)});
+ const sent=[];
+ const options={env:{...env,SMERCH_ACCOUNTANT_EMAIL:'changed@example.invalid'},fetchImpl:forbidden,transport:mailer(sent)};
+ await processSalesFinance(options);
+ await processSalesFinance(options);
+ assert.deepEqual(sent,[]);
+ const row=(await rows(order.id)).find(mail=>mail.key===draft.key);
+ assert.equal(row.status,'blocked');
+ assert.match(row.error,/Bogholdermodtageren er ændret/);
+});
